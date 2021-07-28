@@ -104,7 +104,7 @@ in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center =
 
 list()
 {
-[[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0}
+[[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file >= nfiles ? nfiles - 1 : file))
 ((nfiles)) && { parse_path ; fsstate ; echo -en '\e[?25l\e[H' ; wcpreview ; } || { header "\e[33m<Empty>" && tcpreview && return ; }
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center))
 
