@@ -183,7 +183,7 @@ move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles - 1 ? nfiles - 1 :
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
 my_pane()   { while read -s pi pp ; do _my_pane $pp && my_pane=$pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 _my_pane()  { [[ $$ == $1 ]] || [[ $(ps -o pid --no-headers --ppid $1 | rg $$) ]] ; }
-old_dir()   { { read od ; read op ; od="$(dirname $od)" ; } < /tmp/ftl/ftl ; marks[F]="$od" ; marks[$'\'']="$od" ; dir_file[$od]=$op ; }
+old_dir()   { [[ -e /tmp/ftl/ftl ]] && { read od ; read op ; od="$(dirname "${od:- }")" ; } < /tmp/ftl/ftl ; marks[f]="$od" ; dir_file[${od:- }]=$op ; }
 parse_path(){ n="${files[file]}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 prompt()    { stty echo ; echo -ne '\e[999B\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
 quit()      { kepanes ; wcpreview ; tcpreview ; fsstate "/tmp/ftl" ; rm -rf $fs ; quit2 ; ((exit_mplayer)) && kmplayer ; exit 0 ; }
