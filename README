@@ -66,7 +66,9 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	\>|\<  ) extra pane
 	\|     ) close extra panes
 	[1-4]  ) switch to given tab
-	v|V    ) v: switch preview on/off for all files, V:preview current file 
+	+|v    ) +: switch preview on/off for all files, v:preview current file 
+	\\     ) show only directory preview
+	_      ) open shell pane
 	-      ) change preview size
 	' '|y|Y) tag/untag current file, tgs are shared among the tabs
 	T      ) fzf tag
@@ -107,8 +109,6 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	x|X    ) chmod a+x, a-x
 	d      ) delete
 	\!     ) run shell command
-
-	\_  kept for user commands
 #TODO
 
 - Handle SIGWINCH
@@ -119,11 +119,11 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
  
 #PATCHING ftl (with gratitude to Larry wall, and not just for patch)
 
-There's no documentation, the code is *dense* but the call stack is seldom
-more than 2 deep. I Kept the code short, albeit with longer lines.
+There's no documentation, the code is *dense* with long lines but there's hope as
+the call stack is seldom more than 2 deep.
 
-The description of the main variables and functions should get you going otherwise
-send me a mail.
+The description of the main variables and functions should get you going, watch the
+videos and if you need help send me a mail.
 
 ##Variables
 
