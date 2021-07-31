@@ -3,15 +3,15 @@ cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && { d=
 
 ftl() # fd_directory, parent fs. © Nadim Khemir 2021, Artistic licence 2.0
 {
-mkapipe 4 5 6 ; declare -A dir_file filters tfilter pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
-my_pane ; preview_all=${preview_all:-1} ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml get_mime pperl pshell ptext ptype) 
-pw3start ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; imode=0 ; zoom=0 ; zooms=(80 50 35) 
+my_pane ; mkapipe 4 5 6 ; declare -A dir_file filters tfilter pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
+preview_all=${preview_all:-1} ; pdir_only=0 ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml get_mime pperl pshell ptext ptype) 
+pw3start ; find_auto=README ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; imode=0 ; zoom=0 ; zooms=(80 50 35) 
 tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
 sort_type=0 ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡦 ≣ )
 
-[[ $1 ]] && { dir=$1 && [[ -d $dir ]] || { echo ftl: \'$1\', no such directory ; exit 1 ; } ; }
+[[ "$1" ]] && { dir="$1" ; [[ -d "$dir" ]] || { echo ftl: \'$1\', no such directory ; exit 1 ; } ; }
 echo -en '\e[?1049h' ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null ; stty -echo ; prev_dir
-[[ $2 ]] && { fs="$2/$$" ; mkdir -p $fs ; parent_fs="$2" ; ftl_pmode "$parent_fs" ; } || { fs=/tmp/ftl/$$ ; mkdir -p $fs ; cdir ; }
+[[ "$2" ]] && { fs="$2/$$" ; mkdir -p "$fs" ; parent_fs="$2" ; ftl_pmode "$parent_fs" ; } || { fs=/tmp/ftl/$$ ; mkdir -p $fs ; cdir ; }
 
 while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -1}" in
 	q|Q|Z  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || quit ;;
@@ -30,6 +30,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	\|     ) kepanes 1 ;;
 	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) 
 			((${preview:-$preview_all})) || { wcpreview ; tcpreview ; } ; cdir ;;
+	\\     ) ((pdir_only ^= 1)) ; list ;;
 	\!     ) [[ $e ]] && ((pignore[${e}] ^= 1)) && cdir ;;
 	\-     ) ((zoom = zoom == 2 ? 0 : zoom + 1)) ; tcpreview ; cdir ;;
 	' '|y|Y) tag_flip "${files[file]}" ; ((nfiles == 1)) && list || { [[ $REPLY == Y ]] && R=k || R=j ; } ;;
@@ -71,13 +72,13 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]})" || delete ;;
 	\:     ) prompt ': ' -e ; [[ $REPLY ]] && shell ; cdir ;;
 	0      ) ((gpreview)) && synch $parent_fs ;;
-esac ; done #§¶½~+\&%¤$#", 7-9 external commands , keep _ for user commands
+esac ; done #§¶½~+&%¤$#", 7-9 external commands , keep _ for user commands
 }
 
 cdir() # dir, search, select
 {
 new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return 
-files=() ; files_color= ; mime=() ; search="${2:-${dir_file[$new_dir]:-README}}" ; select="$3" ; found= ; nfiles=0 
+files=() ; files_color= ; mime=() ; search="${2:-${dir_file[$new_dir]:-$find_auto}}" ; select="$3" ; found= ; nfiles=0 
 
 read -r LINES COLS < <(tmux display -p -t $my_pane '#{pane_height} #{pane_width}')
 ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS = (COLS - 1) * (100 - ${zooms[zoom]}) / 100))
@@ -95,9 +96,9 @@ while true ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}$e ; }
 	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$p" ;
-	
-	((!found)) && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
+	[[ -z $found ]] && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
 done 
+
 in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; parse_path ; refresh ; list ${select:-$found} ;
 }
 
@@ -134,7 +135,8 @@ ftl_imode() { (($1)) && { tfilters[tab]="$ifilter$" ; dir_file[$PWD]= ; } || tfi
 get_mime()  { [[ ${mime[file]} ]] || mime+=($(mimetype -b "${files[@]:${#mime[@]}:((file + 10))}" 2>/dev/null)) ; mtype="${mime[file]}" ; false ; }
 kepanes()   { for p in ${epanes[@]} ; do tmux killp -t $p ; done ; epanes=() : sleep 0.01 ; tcpreview ; (($1)) && cdir ; }
 kmplayer()  { ((mplayer)) && kill $mplayer &>/dev/null || pkill mplayer ; } 
-pdir()      { [[ -d "$n" ]] && { (($in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id 0 || { ctsplit "$(ftl_cmd)" ; in_pdir=1 ; } ; } || { in_pdir= ; false ; } ; }
+pdir()      { [[ -d "$n" ]] && { (($in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id 0 || { ctsplit "$(ftl_cmd)" ; in_pdir=1 ; } ; } || pdir_only ; }
+pdir_only() { in_pdir= ; ((pdir_only)) && { wcpreview ; tcpreview ; true ; } || false  ; }
 phtml()     { [[ $e == 'html' ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { get_mime ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ ^($ifilter)$ ]] && pw3image || { tbcolor 67 67 && false ; } ; }
@@ -197,4 +199,4 @@ synch()     { { for r in pdir pindex pimode sort_type show_size show_dir_size pf
 tag_flip()  { [[ ${tags[$1]} ]] && unset -v 'tags[$1]' || tags[$1]='▪' ; } 
 tag_read()  { tags=() ; IFS=$'\n' readarray -t stags < "$1/tags" ; for stag in "${stags[@]}" ; do tags[${stag//\\ / }]='▪' ; done ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
-ftl $@
+ftl "$@"
