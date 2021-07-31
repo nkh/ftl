@@ -10,7 +10,7 @@ $> ftl
 
 tmux     - ftl is a tmux based filemanager
 terminal $EDITOR - $EDITOR is extensively used to provide live previews
-lscolors <https://> - colors files according to LS_COLORS
+lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_COLORS
 rg       - to locate files containing a specific text
 fzf      - to locate file and to present a picker
 awk, sed, numfmt, sponge, ...
@@ -50,7 +50,7 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 
 ##Commands
 
-	q|Q|Z  ) close tab, q: save current file in &3, Q: don't save it, Z: close all tabs
+	q|Q|Z  ) close tab, Q: save current file in &3, Q, Z: close all tabs
 	z      ) make preview the active pane and quit
 	g|G    ) go to first file, go to last files in directory 
 	B|j    ) next file
@@ -75,6 +75,7 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	o      ) show/hide files
 	O      ) show/hide directories
 	i      ) enter/exit image mode
+	I      ) fzfi, find images using ueberzurg
 	R      ) reverse sort
 	s      ) show/hide file size
 	S      ) show/hide dir size
@@ -83,7 +84,7 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	F      ) clear filter
 	b|n|N  ) find entry in directory
 	m      ) mark directory
-	\'     ) go to mark, \'\' takes you to the previous directory
+	\'     ) go to mark, \'\' takes you to the previous directory, \'f to previous session location
 	\;     ) clear persistent marks
 	\,     ) add persistent mark
 	\}     ) fzf persistent mark
@@ -97,6 +98,7 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	\*     ) set maximum listing depth
 	\=     ) sort by name, size, or date
 	w|W    ) w: open in external viewer, W: open and detach in external viewer
+	a      ) kill mplayer started with w
 	c      ) copy
 	r      ) rename or bulk rename
 	M      ) mkdir

@@ -1,5 +1,5 @@
 #!/bin/env bash
-cdf() { l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && { d=$(head -n 1 $l) ; [[ -d "$d" ]] && cd $d || cd $(dirname "$d") ; } ; rm -f $l ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
+cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && { d="$(head -n 1 $l)" ;  cd "$(dirname "$d")" ; } ; } ;[[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
 ftl() # fd_directory, parent fs. © Nadim Khemir 2021, Artistic licence 2.0
 {
@@ -10,8 +10,8 @@ tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; show_size
 sort_type=0 ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡦 ≣ )
 
 [[ $1 ]] && { dir=$(/bin/cat $1) && [[ -d $dir ]] || exit 1 ; } # todo: tmux, pass quoted arguments to shell
-[[ $2 ]] && { fs="$2/$$" ; mkdir -p $fs ; parent_fs="$2" ; ftl_pmode "$parent_fs" ; } || { fs=/tmp/ftl/$$ ; mkdir -p $fs ; }
-mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null ; stty -echo ; ((gpreview)) || { echo -en '\e[?1049h' ; cdir ; } ; old_dir
+echo -en '\e[?1049h' ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null ; stty -echo ; prev_dir
+[[ $2 ]] && { fs="$2/$$" ; mkdir -p $fs ; parent_fs="$2" ; ftl_pmode "$parent_fs" ; } || { fs=/tmp/ftl/$$ ; mkdir -p $fs ; cdir ; }
 
 while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -1}" in
 	q|Q|Z  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || quit ;;
@@ -77,10 +77,9 @@ esac ; done #§¶½~+\&%¤$#", 7-9 external commands , keep _ for user commands
 cdir() # dir, search, select
 {
 new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return 
-files=() ; files_color= ; mime=() ; search="$2" ; select="$3" ; found= ; nfiles=0 
+files=() ; files_color= ; mime=() ; search="${2:-${dir_file[$new_dir]:-README}}" ; select="$3" ; found= ; nfiles=0 
 
 read -r LINES COLS < <(tmux display -p -t $my_pane '#{pane_height} #{pane_width}')
-
 ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS = (COLS - 1) * (100 - ${zooms[zoom]}) / 100))
 ((lines = LINES - 1, center = lines / 2)) ; ((img_x = COLS * 10)) ; 
 
@@ -97,7 +96,7 @@ while true ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}$e ; }
 	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$p" ;
 	
-	[[ "$p" == "$search" ]] && found=$nfiles ; ((nfiles++))
+	((!found)) && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
 done 
 in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; parse_path ; refresh ; list ${select:-$found} ;
 }
@@ -164,7 +163,7 @@ close_tab() { ((${#tabs[@]} > 1)) && { unset -v 'tabs[tab]' ; tabs=("${tabs[@]}"
 delete()    { prompt "delete$1? [y|N]: " -n1 && [[ $REPLY == y ]] && { eval rm -rf $(selection ' ') ; tags=() ; mime=() ; } ; cdir ; }
 dir()       { ((show_dirs)) && files d filter2 ; ((show_files)) && files f filter ; }
 dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>/dev/null | wc -l) ; } 
-edit()      { tcpreview ; echo -en '\e[?1049l' ; "${EDITOR}" "${files[file]}"; echo -en '\e[?1049h\e[?25l' ; cdir ; }
+edit()      { tcpreview ; echo -en '\e[?1049h' ; "${EDITOR}" "${files[file]}"; echo -en '\e[?1049h\e[?25h' ; cdir ; }
 ffind()     { [[ $1 == n ]] && { ((from= file + 1)) ; to=$nfiles ; inc='++' ; } || { ((from = file - 1)) ; to=-1 ; inc='--' ; } ; _ffind ; }
 _ffind()    { for((i=$from ; i != $to ; i$inc)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; break ; } ; done ; }
 files()     { find "$PWD/" -mindepth 1 -maxdepth $max_depth ${show_hidden:+\( ! -iname ".*" \)} -type $1,l -xtype $1 -printf "${find_formats[sort_type]}" 2>/dev/null | $2 ; }
@@ -172,18 +171,18 @@ filter()    { rg "${tfilters[tab]}" | rg "${filters[tab]}" | filter2 ; }
 filter2()   { ${sort_filters[sort_type]} | tee >(cat >&4) | lscolors >&5 ; }
 fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
 fsstate()   { selection '\n' 1 >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; fsstate2 "$1" ; } ; }
-fsstate2()  { echo -e "${dir_file[$PWD]}\n$imode\n$sort_type\n$show_size\n$show_dir_size\n${filters[tab]}" >>${1:-$fs}/ftl ; }
+fsstate2()  { echo -e "${dir_file[${files[file]}]}\n$imode\n$sort_type\n$show_size\n$show_dir_size\n${filters[tab]}" >>${1:-$fs}/ftl ; }
 fzf_go()    { [[ "$1" ]] && cdir "$(dirname "$1")" "$(basename "$1")" || { refresh ; list ; } }
 fzf_tag()   { [[ "$1" ]] && while read f ; do tags[$PWD/$f]='▪' ; done <<<$1 ; }
 header()    { h="${@} $((tab+1))/${#tabs[@]} $filter_tag${sort_name[sort_type]} ${#tags[@]}" ; header_pos "$h" ; echo -e "\e[K\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
-location()  { true 2>/dev/null >&3 && { [[ $REPLY == 'q' ]] && selection '\n' >&3 || :>&3 ; } ; }
+location()  { true 2>/dev/null >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&3 || :>&3 ; } ; }
 mkapipe()   { for n in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $n<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles - 1 ? nfiles - 1 : nf)) ; dir_file[$PWD]=$nf ; list ; }
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
 my_pane()   { while read -s pi pp ; do _my_pane $pp && my_pane=$pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 _my_pane()  { [[ $$ == $1 ]] || [[ $(ps -o pid --no-headers --ppid $1 | rg $$) ]] ; }
-old_dir()   { [[ -e /tmp/ftl/ftl ]] && { read od ; read op ; od="$(dirname "${od:- }")" ; } < /tmp/ftl/ftl ; marks[f]="$od" ; dir_file[${od:- }]=$op ; }
+prev_dir()  { [[ -e /tmp/ftl/ftl ]] && { read pd ; read pp ; od="$(dirname "${pd:- }")" ; } < /tmp/ftl/ftl ; marks[f]="$pd" ; dir_file[${pd:- }]=$pp ; }
 parse_path(){ n="${files[file]}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 prompt()    { stty echo ; echo -ne '\e[999B\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
 quit()      { kepanes ; wcpreview ; tcpreview ; fsstate "/tmp/ftl" ; rm -rf $fs ; quit2 ; ((exit_mplayer)) && kmplayer ; exit 0 ; }
@@ -191,7 +190,7 @@ quit2()     { location ; stty echo ; tbcolor 236 52 ; kill $w3iproc &>/dev/null 
 refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 rg_go()     { [[ "$1" ]] && { g=${1%%:*} && nd="$PWD/"$(dirname "$g") && cdir "$nd" "$(basename "$g")" ; } || { refresh ; list ; } ; }
 selection() { ((${#tags[@]})) && printf "%q$1" "${!tags[@]}" || { [[ -z $2 ]] && ((nfiles)) && printf "%q$1" "${files[file]}" ; } ; }
-shell()     { tcpreview ; echo -en '\e[?1049l' ; parse_path ; t=$(selection ' ') ; shellrun ; read -sn 1 ; echo -en '\e[?1049h' ; }
+shell()     { tcpreview ; echo -en '\e[?1049h' ; parse_path ; t=$(selection ' ') ; shellrun ; read -sn 1 ; echo -en '\e[?1049l' ; }
 shellrun()  { [[ $REPLY =~ "\$t" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in $t ; do eval "$REPLY" ; echo '$?': $? ; done ; } 
 synch()     { { for r in pdir pindex pimode sort_type show_size show_dir_size pfilter ; do read $r ; done ; } < $parent_fs/ftl
 		 filter[tab]="$pfilter" ; [[ $pfilter ]] && filter="~" ; ftl_imode "$pimode" ; tag_read "$parent_fs" ; cdir "$pdir" '' "$pindex" ; }
