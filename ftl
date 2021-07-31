@@ -9,7 +9,7 @@ pw3start ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PW
 tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
 sort_type=0 ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡦 ≣ )
 
-[[ $1 ]] && { dir=$(/bin/cat $1) && [[ -d $dir ]] || exit 1 ; } # todo: tmux, pass quoted arguments to shell
+[[ $1 ]] && { dir=$1 && [[ -d $dir ]] || { echo ftl: \'$1\', no such directory ; exit 1 ; } ; }
 echo -en '\e[?1049h' ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null ; stty -echo ; prev_dir
 [[ $2 ]] && { fs="$2/$$" ; mkdir -p $fs ; parent_fs="$2" ; ftl_pmode "$parent_fs" ; } || { fs=/tmp/ftl/$$ ; mkdir -p $fs ; cdir ; }
 
@@ -128,7 +128,7 @@ eimage()    { [[ $e =~ ^($ifilter)$ ]] && fim "$n" ; }
 emedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { ((! detached)) && { kmplayer ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
 epdf()      { [[ $e == 'pdf' ]] && { ((detached)) && (zathura "$n" &) || zathura "$n" ; } ; }
 etext()     { tcpreview ; tmux sp -h -c "$PWD" "$EDITOR '$n'" ; }
-ftl_cmd()   { echo "ftl <(echo '${1:-$n}') $fs " ; }
+ftl_cmd()   { d=${1:-$n} ; echo "ftl ${d@Q} $fs " ; }
 ftl_pmode() { gpreview=1 ; preview_all=0 ; external=0 ; synch $parent_fs ; }
 ftl_imode() { (($1)) && { tfilters[tab]="$ifilter$" ; dir_file[$PWD]= ; } || tfilters[tab]= ; }
 get_mime()  { [[ ${mime[file]} ]] || mime+=($(mimetype -b "${files[@]:${#mime[@]}:((file + 10))}" 2>/dev/null)) ; mtype="${mime[file]}" ; false ; }
