@@ -1,6 +1,6 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-
+#todo: global history update order , multiple filter layer: bla | bleh | ..., and edit the current filter
 ftl() # fd_directory, parent fs. © Nadim Khemir 2021, Artistic licence 2.0
 {
 my_pane ; mkapipe 4 5 6 ; declare -A dir_file filters tfilter pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -27,7 +27,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	[1-4]  ) ((tab = $REPLY - 1 , tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
 	a      ) kmplayer ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
-	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && cp "$( ((${#tags[@]})) && echo "${!tags[@]}" || echo "${files[file]}")" "$REPLY" ; cdir ;;
+	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { cp "${selection[@]}" "$REPLY" ; tags=() ; } ; cdir ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
 	E      ) cdir "$(awk '!seen[$0]++' $fs/history | lscolors | fzf --ansi --tac --info=inline --layout=reverse)" ;;
 	e      ) cdir "$(awk '!seen[$0]++' /tmp/ftl/history | lscolors | fzf --ansi --tac --info=inline --layout=reverse)" ;;
@@ -36,7 +36,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	H      ) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm /tmp/ftl/history 2>/dev/null ; list ;;
 	i      ) ((imode ^= 1)) ; ftl_imode $imode ; cdir ;;
 	I      ) tcpreview ; fzf_go "$(fzfi -q '.jpg | .jpeg | .png | .gif ')" ;;
-	L      ) while read f ; do ln -s -b "$f" "$PWD" ; done <<< "$(selection '\n')" ; tags=() ; cdir ;;
+	L      ) for f in "${selection[@]}" ; do ln -s -b "$f" "$PWD" ; done ; tags=() ; cdir ;;
 	M      ) prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" ; cdir "$PWD/$REPLY" ;;
 	m      ) prompt 'M' -n 1 && [[ -n $REPLY ]] && marks[$REPLY]=$(dirname "${files[file]}") ; list ;;
 	o|O    ) [[ $REPLY == o ]] && { ((show_files ^= 1)) ; true ; } || ((show_dirs ^= 1)) ; cdir ;;
@@ -50,7 +50,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	u|U    ) [[ $REPLY == u ]] && for p in "${files[@]}" ; do tags["$p"]='▪' ; done || tags=() ; list ;;
 	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; ((${preview:-$preview_all})) || { wcpreview ; tcpreview ; } ; cdir ;;
 	w|W    ) external=1 ; [[ $REPLY == W  ]] && detached=1 ; list ;;
-	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; eval chmod $mode $(selection ' ') ; cdir ;;
+	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	' '|y|Y) tag_flip "${files[file]}" ; ((nfiles == 1)) && list || { [[ $REPLY == Y ]] && R=k || R=j ; } ;;
 	\!     ) [[ $e ]] && ((pignore[${e}] ^= 1)) && cdir ;;
 	\>|\<  )  tcpreview ; [[ $REPLY == \> ]] && epane || epane '-h -b' -R ; cdir ;;
@@ -105,7 +105,7 @@ in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center =
 
 list()
 {
-[[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file >= nfiles ? nfiles - 1 : file))
+[[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file >= nfiles ? nfiles - 1 : file)) ; selection
 ((nfiles)) && { parse_path ; fsstate ; echo -en '\e[?25l\e[H' ; wcpreview ; } || { header "\e[33m<Empty>" && tcpreview && return ; }
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center))
 
@@ -163,7 +163,7 @@ by_name()   { sort $show_reversed -t ' ' -k2 | tee >(cut -f 1 -d ' ' >&6) | cut 
 by_size()   { sort $show_reversed -n         | tee >(cut -f 1 -d ' ' >&6) | cut -f 2- -d' ' ; }
 by_date()   { sort $show_reversed -n         | tee >(cut -f 2 -d ' ' >&6) | cut -f 3- -d' ' ; }
 close_tab() { ((${#tabs[@]} > 1)) && { unset -v 'tabs[tab]' ; tabs=("${tabs[@]}") ; ((tab--)) ; R=$'\t' ; true ; } ; }
-delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { eval rm -rf "$(selection ' ')" ; tags=() ; mime=() ; cdir ; } ; }
+delete()    { prompt "delete$1? [y|d]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rm -rf "${selection[@]}" ; tags=() ; mime=() ; cdir ; } ; }
 dir()       { ((show_dirs)) && files d filter2 ; ((show_files)) && files f filter ; }
 dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>/dev/null | wc -l) ; } 
 edit()      { tcpreview ; echo -en '\e[?1049h' ; "${EDITOR}" "${files[file]}"; echo -en '\e[?1049h\e[?25h' ; cdir ; }
@@ -174,7 +174,7 @@ files()     { find "$PWD/" -mindepth 1 -maxdepth $max_depth ${show_hidden:+\( ! 
 filter()    { rg "${tfilters[tab]}" | rg "${filters[tab]}" | filter2 ; }
 filter2()   { ${sort_filters[sort_type]} | tee >(cat >&4) | lscolors >&5 ; }
 fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
-fsstate()   { selection '\n' 1 >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; fsstate2 "$1" ; } ; }
+fsstate()   { ((${#tags[@]})) && printf "%s\n" "${selection[@]}" >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; fsstate2 "$1" ; } ; }
 fsstate2()  { echo -e "${dir_file[${files[file]}]}\n$imode\n$sort_type\n$show_size\n$show_dir_size\n${filters[tab]}" >>${1:-$fs}/ftl ; }
 fzf_go()    { [[ "$1" ]] && cdir "$(dirname "$1")" "$(basename "$1")" || { refresh ; list ; } }
 fzf_tag()   { [[ "$1" ]] && while read f ; do tags[$PWD/$f]='▪' ; done <<<$1 ; }
@@ -193,9 +193,9 @@ quit()      { wcpreview ; tcpreview ; fsstate "/tmp/ftl" ; rm -rf $fs ; location
 refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 rg_go()     { [[ "$1" ]] && { g=${1%%:*} && nd="$PWD/"$(dirname "$g") && cdir "$nd" "$(basename "$g")" ; } || { refresh ; list ; } ; }
 run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; } ; "$@" ; ((run_maxed)) && { wmctrl -ia $aw ; } ; }
-selection() { ((${#tags[@]})) && printf "%q$1" "${!tags[@]}" || { [[ -z $2 ]] && ((nfiles)) && echo ${files[file]@Q} ; } ; }
-shell()     { tcpreview ; echo -en '\e[?1049h' ; parse_path ; s="$(selection ' ')" ; shellrun ; read -sn 1 ; echo -en '\e[?1049l' ; }
-shellrun()  { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in $s ; do eval "$REPLY" ; echo '$?': $? ; done ; } 
+selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
+shell()     { tcpreview ; echo -en '\e[?1049h' ; parse_path ; s="${selection[@]}" ; shellrun ; read -sn 1 ; echo -en '\e[?1049l' ; }
+shellrun()  { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in "${selection[@]}" ; do eval "$REPLY" ; echo '$?': $? ; done ; } 
 synch()     { { for r in pdir pindex pimode sort_type show_size show_dir_size pfilter ; do read $r ; done ; } < $parent_fs/ftl
 		 filter[tab]="$pfilter" ; [[ $pfilter ]] && filter="~" ; ftl_imode "$pimode" ; tag_read "$parent_fs" ; cdir "$pdir" '' "$pindex" ; }
 tag_flip()  { [[ ${tags[$1]} ]] && unset -v 'tags[$1]' || tags[$1]='▪' ; } 
