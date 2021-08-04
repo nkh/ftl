@@ -1,6 +1,6 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-#todo: global history update order , multiple filter layer: bla | bleh | ..., and edit the current filter
+#todo: multiple filter layer: bla | bleh works but ble & bla doesn't, is there a rexeg for that?
 ftl() # fd_directory, parent fs. © Nadim Khemir 2021, Artistic licence 2.0
 {
 my_pane ; mkapipe 4 5 6 ; declare -A dir_file filters tfilter pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -16,8 +16,8 @@ echo -en '\e[?1049h' ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null ; stt
 while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -1}" in
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	h|D    ) [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
-	j|B|k|A) [[ $REPLY == j || "$REPLY" == B ]] && move 1 || move -1 ;;
-	l|C|'' ) [[ -f "${files[file]}" ]] && [[ $REPLY == '' ]] && edit || cdir "${files[file]}" ;;
+	j|B|k|A) ((nfiles)) && { [[ $REPLY == j || "$REPLY" == B ]] && move 1 || move -1 ; } ;;
+	l|C|'' ) ((nfiles)) && { [[ -f "${files[file]}" ]] && [[ $REPLY == '' ]] && edit || cdir "${files[file]}" ; } ;;
 	5|6    ) [[ $REPLY == 5 ]] && move -$LINES || move $LINES ;;
 	J|K    ) [[ $REPLY == K ]] && movep U || movep D ;;
 	q|Q|Z  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || quit ;;
@@ -29,8 +29,8 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { cp "${selection[@]}" "$REPLY" ; tags=() ; } ; cdir ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
-	E      ) cdir "$(awk '!seen[$0]++' $fs/history | lscolors | fzf --ansi --tac --info=inline --layout=reverse)" ;;
-	e      ) cdir "$(awk '!seen[$0]++' /tmp/ftl/history | lscolors | fzf --ansi --tac --info=inline --layout=reverse)" ;;
+	E      ) cdir "$(tac $fs/history | awk '!seen[$0]++' | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
+	e      ) cdir "$(tac /tmp/ftl/history | awk '!seen[$0]++' | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
 	F      ) filters[tab]= ; filter_tag= ; tcpreview ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	H      ) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm /tmp/ftl/history 2>/dev/null ; list ;;
@@ -87,7 +87,7 @@ read -r LINES COLS LEFT WIDTH< <(tmux display -p -t $my_pane '#{pane_height} #{p
 
 [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
 cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; }
-((gpreview)) || echo "$PWD" | tee -a $fs/history >> /tmp/ftl/history ; [[ "$PWD" == / ]] && sep= || sep=/
+((gpreview)) || [[ "$PPWD" != "$PWD" ]] && echo "$PWD" | tee -a $fs/history >> /tmp/ftl/history ; [[ "$PWD" == / ]] && sep= || sep=/
 
 dir &
 while true ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
@@ -174,7 +174,7 @@ files()     { find "$PWD/" -mindepth 1 -maxdepth $max_depth ${show_hidden:+\( ! 
 filter()    { rg "${tfilters[tab]}" | rg "${filters[tab]}" | filter2 ; }
 filter2()   { ${sort_filters[sort_type]} | tee >(cat >&4) | lscolors >&5 ; }
 fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
-fsstate()   { ((${#tags[@]})) && printf "%s\n" "${selection[@]}" >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; fsstate2 "$1" ; } ; }
+fsstate()   { printf "%s\n" "${selection[@]}" >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; fsstate2 "$1" ; } ; }
 fsstate2()  { echo -e "${dir_file[${files[file]}]}\n$imode\n$sort_type\n$show_size\n$show_dir_size\n${filters[tab]}" >>${1:-$fs}/ftl ; }
 fzf_go()    { [[ "$1" ]] && cdir "$(dirname "$1")" "$(basename "$1")" || { refresh ; list ; } }
 fzf_tag()   { [[ "$1" ]] && while read f ; do tags[$PWD/$f]='▪' ; done <<<$1 ; }
