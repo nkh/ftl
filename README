@@ -82,7 +82,8 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	s      ) show/hide file size
 	S      ) show/hide dir size
 	\^     ) show/hide entry stat in header
-	f      ) filter entries, filter is per tab
+	f      ) filter1, filter is per tab
+	7      ) filter2, filter is per tab
 	F      ) clear filter
 	b|n|N  ) find entry in directory
 	m      ) mark directory

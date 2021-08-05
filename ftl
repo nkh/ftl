@@ -1,9 +1,9 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-#todo: multiple filter layer: bla | bleh works but ble & bla doesn't, is there a rexeg for that?
+
 ftl() # fd_directory, parent fs. © Nadim Khemir 2021, Artistic licence 2.0
 {
-my_pane ; mkapipe 4 5 6 ; declare -A dir_file filters tfilter pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
+my_pane ; mkapipe 4 5 6 ; declare -A dir_file filters filters2 tfilter pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
 preview_all=${preview_all:-1} ; pdir_only=0 ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml get_mime pperl pshell ptext ptype) 
 pw3start ; find_auto=README ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; imode=0 ; zoom=0 ; zooms=(80 50 35) 
 tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
@@ -25,14 +25,15 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 
 	0      ) ((gpreview)) && synch $parent_fs ;;
 	[1-4]  ) ((tab = $REPLY - 1 , tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
+	7      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	a      ) kmplayer ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { cp "${selection[@]}" "$REPLY" ; tags=() ; } ; cdir ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
 	E      ) cdir "$(tac $fs/history | awk '!seen[$0]++' | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
 	e      ) cdir "$(tac /tmp/ftl/history | awk '!seen[$0]++' | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
-	F      ) filters[tab]= ; filter_tag= ; tcpreview ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
+	F      ) filters[tab]= ; filters2[tab]= ; filter_tag= ; tcpreview ; cdir ;;
 	H      ) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm /tmp/ftl/history 2>/dev/null ; list ;;
 	i      ) ((imode ^= 1)) ; ftl_imode $imode ; cdir ;;
 	I      ) tcpreview ; fzf_go "$(fzfi -q '.jpg | .jpeg | .png | .gif ')" ;;
@@ -73,7 +74,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	\?     ) tcpreview ; rg_go "$(fzfr)" ;;
 	_      ) wcpreview ; tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$opi ; list ; tmux selectp -t $shell_id ;;
 	\-     ) ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; tcpreview ; cdir ;;
-esac ; done #§¶½~&%¤#$+, 7-9 external commands
+esac ; done #§¶½~&%¤#$+89
 }
 
 cdir() # dir, search, select
@@ -118,7 +119,7 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 	done
 
 ((in_quick_display)) && return ; old_in_vipreview=$in_vipreview
-((external)) && { echo -en '\e[?1049l' ; { edir || eimage || emedia || epdf || ehtml || etext ; } && { echo -en '\e[?1049h' ; external= ; detached= ; list ; } && return ; }
+((external)) && { echo -en '\e[?1049l' ; edir || eimage || emedia || epdf || ehtml || etext  && { echo -en '\e[?1049h' ; external= ; detached= ; list ; return ; } ; }
 ((${preview:-$preview_all})) && { preview= ; for v in ${previewers[@]} ; do $v && vcpreview && return ; done ; }
 wcpreview ; tcpreview
 }
@@ -171,7 +172,7 @@ epane()     { [[ -d "$n" ]] && tsplit "$(ftl_cmd "$n")" "50%" "$1" "$2" || tspli
 ffind()     { [[ $1 == n ]] && { ((from= file + 1)) ; to=$nfiles ; inc='++' ; } || { ((from = file - 1)) ; to=-1 ; inc='--' ; } 
 		for((i=$from ; i != $to ; i$inc)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
 files()     { find "$PWD/" -mindepth 1 -maxdepth $max_depth ${show_hidden:+\( ! -iname ".*" \)} -type $1,l -xtype $1 -printf "${find_formats[sort_type]}" 2>/dev/null | $2 ; }
-filter()    { rg "${tfilters[tab]}" | rg "${filters[tab]}" | filter2 ; }
+filter()    { rg "${tfilters[tab]}" | rg "${filters[tab]}" | rg "${filters2[tab]}" | filter2 ; }
 filter2()   { ${sort_filters[sort_type]} | tee >(cat >&4) | lscolors >&5 ; }
 fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
 fsstate()   { printf "%s\n" "${selection[@]}" >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; fsstate2 "$1" ; } ; }
