@@ -1,6 +1,7 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 #todo: multi pane: next pane
+
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
 my_pane ; mkapipe 4 5 6 ; declare -A dir_file pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -31,8 +32,8 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { cp "${selection[@]}" "$REPLY" ; tags=() ; } ; cdir ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
-	E      ) cdir "$(tac $fs/history | awk '!seen[$0]++' | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
-	e      ) cdir "$(tac /tmp/ftl/history | awk '!seen[$0]++' | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
+	E      ) cdir "$(tac $fs/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
+	e      ) cdir "$(tac /tmp/ftl/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	F      ) filters[tab]= ; filters2[tab]= ; filter_tag= ; tcpreview ; cdir ;;
 	H      ) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm /tmp/ftl/history 2>/dev/null ; list ;;
@@ -47,7 +48,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	r      ) ((${#tags[@]})) && bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir ;;
 	S      ) ((show_dir_size ^= 1)) ; cdir ;;
 	s      ) ((show_size ^= 1)) ; cdir ;;
-	T      ) fzf_tag "$(fd . --color=always | fzf -m --ansi --info=inline --layout=reverse --marker '▪')" ; list ;;
+	T      ) echo -en '\e[?1049l' ; fzf_tag "$(fd . --color=always | fzf -m --ansi --info=inline --layout=reverse --marker '▪')" ; echo -en '\e[?1049h' ; list ;;
 	t      ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
 	u|U    ) [[ $REPLY == u ]] && for p in "${files[@]}" ; do tags["$p"]='▪' ; done || tags=() ; list ;;
 	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; ((${preview:-$preview_all})) || { wcpreview ; tcpreview ; } ; cdir ;;
@@ -74,13 +75,10 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	\{     ) tcpreview ; fzf_go "$(fzfppv -L)" ;;
 	\~     ) tcpreview ; rg_go "$(fzfr)" ;;
 	_      ) wcpreview ; tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$opi ; list ; tmux selectp -t $shell_id ;;
-	\-     ) [[ $pane_id ]] && { ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; geometry ; read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}')
-		 ((x = (($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; tmux resizep -t $pane_id -x $x &>/dev/null ; rdir ; } ;;
+	\-     ) [[ $pane_id ]] && { ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; } ;;
 	\$     ) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
-	\+     ) read -sn1 ; case "${REPLY: -1}" in
-			\>|\<  ) [[ $REPLY == \> ]] && epane || epane '-h -b' -R ; cdir ;;
-			\+     ) ((epane += 1, epane >= ${#epanes[@]})) && epane=0 ; tmux selectp -t ${epanes[$epane]} &>/dev/null ;;
-			esac ;;
+	\>|\<  ) [[ $REPLY == \> ]] && epane || epane '-h -b' -R ; cdir ;;
+	\+     ) ((epane += 1, epane >= ${#epanes[@]})) && epane=0 ; tmux selectp -t ${epanes[$epane]} &>/dev/null ;;
 esac ; done #§¶½~&%¤#_+89
 }
 
@@ -113,7 +111,7 @@ list()
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center))
 
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat=
-header "$((file+1))/${nfiles}$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R") ;
+header "$((file+1))/${nfiles}$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R")
 for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 	do
 		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="$cursor_color$cursor\e[m"
@@ -204,5 +202,7 @@ synch_read(){ { for r in pdir pindex pimode sort_type show_size show_dir_size pf
 tag_flip()  { [[ ${tags[$1]} ]] && unset -v 'tags[$1]' || tags[$1]='▪' ; } 
 tag_read()  { tags=() ; IFS=$'\n' readarray -t stags < "$1/tags" ; for stag in "${stags[@]}" ; do tags[${stag//\\ / }]='▪' ; done ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
+tresize()   { tmux resizep -t $1 -x $2 &>/dev/null ; rdir ; }
 tsplit()    { tmux sp ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" ; sleep 0.01 ; pane_id=$(tmux display -p '#{pane_id}') && tmux selectp ${4:--L} ; true ; }
+zoom()      { geometry ; read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') ; ((x = (($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; tresize $pane_id $x ;}
 ftl "$@"
