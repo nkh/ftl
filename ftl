@@ -1,7 +1,6 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 #todo: multi pane: next pane
-
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
 my_pane ; mkapipe 4 5 6 ; declare -A dir_file pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -48,7 +47,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	r      ) ((${#tags[@]})) && bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir ;;
 	S      ) ((show_dir_size ^= 1)) ; cdir ;;
 	s      ) ((show_size ^= 1)) ; cdir ;;
-	T      ) echo -en '\e[?1049l' ; fzf_tag "$(fd . --color=always | fzf -m --ansi --info=inline --layout=reverse --marker '▪')" ; echo -en '\e[?1049h' ; list ;;
+	T      ) echo -en '\e[?1049h' ; fzf_tag "$(fd . --color=always | fzf-tmux -p 90%  -m --ansi --info=inline --layout=reverse --marker '▪')" ; echo -en '\e[?1049h' ; list ;;
 	t      ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
 	u|U    ) [[ $REPLY == u ]] && for p in "${files[@]}" ; do tags["$p"]='▪' ; done || tags=() ; list ;;
 	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; ((${preview:-$preview_all})) || { wcpreview ; tcpreview ; } ; cdir ;;
@@ -56,7 +55,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	' '|y|Y) tag_flip "${files[file]}" ; ((nfiles == 1)) && list || { [[ $REPLY == Y ]] && R=k || R=j ; } ;;
 	\?     ) vipreview "$(dirname "$0")/README_ftl.md" ; in_pdir=0 ;;
-	\!     ) [[ $e ]] && ((pignore[${e}] ^= 1)) && cdir ;;
+	\#     ) [[ $e ]] && ((pignore[${e}] ^= 1)) && cdir ;;
 	$'\t'  ) ((tab += 1, tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
 	\,     ) { /bin/cat $fs/../marks 2>/dev/null ; echo "$n" ; } | awk '!seen[$0]++' | sponge $fs/../marks ;;
 	\|     ) kepanes 1 ;;
@@ -79,7 +78,7 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	\$     ) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
 	\>|\<  ) [[ $REPLY == \> ]] && epane || epane '-h -b' -R ; cdir ;;
 	\+     ) ((epane += 1, epane >= ${#epanes[@]})) && epane=0 ; tmux selectp -t ${epanes[$epane]} &>/dev/null ;;
-esac ; done #§¶½~&%¤#_+89
+esac ; done #§¶½~&%¤#!89
 }
 
 cdir() { get_dir "$@" ; in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; parse_path ; refresh ; list ${select:-$found} ; }
@@ -194,8 +193,8 @@ refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 rg_go()     { [[ "$1" ]] && { g=${1%%:*} && nd="$PWD/"$(dirname "$g") && cdir "$nd" "$(basename "$g")" ; } || { refresh ; list ; } ; }
 run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; } ; "$@" ; ((run_maxed)) && { wmctrl -ia $aw ; } ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
-shell()     { tcpreview ; echo -en '\e[?1049h' ; parse_path ; s="${selection[@]}" ; shell_run ; read -sn 1 ; echo -en '\e[?1049l' ; }
-shell_run() { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in "${selection[@]}" ; do eval "$REPLY" ; echo '$?': $? ; done ; } 
+shell()     { tcpreview ; echo -en '\e[?1049l' ; parse_path ; s="${selection[@]}" ; shell_run ; read -sn 1 ; echo -en '\e[?1049h' ; }
+shell_run() { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in "${selection[@]}" ; do eval "echo ftl\> $REPLY ; $REPLY" ; echo '$?': $? ; done ; } 
 shell_pane(){ wcpreview ; tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$opi ; list ; tmux selectp -t $shell_id ; }
 synch()     { synch_read ; filters2[tab]="$pfil2" ; filters[tab]="$pfil" ; [[ $pfi ]] && filter_tag="~" ; ftl_imode "$pimode" ; tag_read "$parent_fs" ; cdir "$pdir" '' "$pindex" ; }
 synch_read(){ { for r in pdir pindex pimode sort_type show_size show_dir_size pfil pfil2 ; do read $r ; done ; } < $parent_fs/ftl ; }

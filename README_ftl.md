@@ -15,65 +15,64 @@ ftl - terminal file manager, tmux based
 	6      ) page up
 	J|K    ) scroll preview 
 	
-	t      ) create new tab
-	$'\t'  ) switch tab
-	\>|\<  ) extra pane
-	\|     ) close extra panes
-	[1-4]  ) switch to given tab
-	_|v    ) +: switch preview on/off for all files, v:preview current file 
-	-      ) change preview size
-	\\     ) show only directory preview
-	+      ) open shell pane, you can also use tmux directly
-	' '|y|Y) tag/untag current file, tgs are shared among the tabs
-	T      ) fzf tag
-	u|U    ) tag all files, untag all files
-	.      ) show/hide hidden files
-	o      ) show/hide files
-	O      ) show/hide directories
-	i      ) enter/exit image mode
-	I      ) fzfi, find images using ueberzurg
-	R      ) reverse sort
-	s      ) show/hide file size
-	S      ) show/hide dir size
-	\^     ) show/hide entry stat in header
-	f      ) filter1, filter is per tab
-	7      ) filter2, filter is per tab
-	F      ) clear filter
+	a      ) kill mplayer
 	b|n|N  ) find entry in directory
-	m      ) mark directory
-	\'     ) go to mark, \'\' takes you to the previous directory
-	\;     ) clear persistent marks
-	\,     ) add persistent mark
-	\}     ) fzf persistent mark
+	c      ) copy
+	d      ) delete
 	e      ) fzf current session directory history
 	E      ) fzf global directory history
+	f      ) filter1, filter is per tab
+	F      ) clear filter
+	i      ) enter/exit image mode
+	I      ) fzfi, find images using ueberzurg
 	K      ) clear global directory history
-	\?     ) show this file
+	L      ) symlink selection
+	m      ) mark directory
+	M      ) mkdir
+	O      ) show/hide directories
+	o      ) show/hide files
+	p|P    ) p: copy selection, P: move selection
+	r      ) rename or bulk rename
+	R      ) reverse sort
+	S      ) show/hide dir size
+	s      ) show/hide file size
+	t      ) create new tab
+	T      ) fzf tag
+	u|U    ) tag all files, untag all files
+	v|V    ) +: switch preview on/off for all files, v:preview current file 
+	w|W    ) w: open in external viewer, W: open and detach in external viewer
+	x|X    ) chmod a+x, a-x
+	' '|y|Y) tag/untag current file, tgs are shared among the tabs
+	-      ) change preview size
+	\=     ) sort by name, size, or date
+	\'     ) go to mark, \'\' takes you to the previous directory
+	\}     ) fzf persistent mark
+	\,     ) add persistent mark
+	\;     ) clear persistent marks
+	\>|\<  ) extra pane
+	\|     ) close extra panes
 	\@     ) cd
+	$'\t'  ) switch tab
+	[1-4]  ) switch to given tab
+	7      ) filter2, filter is per tab
+	\!     ) run shell command
+	\*     ) set maximum listing depth
+	\^     ) show/hide entry stat in header
+	.      ) show/hide hidden files
+	\\     ) show only directory preview
+	\?     ) show this file
+	+      ) next extra pane
 	/      ) fzf to file
 	\{     ) fzf to file with preview
 	\~     ) rg to file
-	\*     ) set maximum listing depth
-	\=     ) sort by name, size, or date
-	w|W    ) w: open in external viewer, W: open and detach in external viewer
-	a      ) kill mplayer started with w
-	c      ) copy
-	r      ) rename or bulk rename
-	M      ) mkdir
-	p|P    ) p: copy selection, P: move selection
-	L      ) symlink selection
-	x|X    ) chmod a+x, a-x
-	d      ) delete
-	\!     ) run shell command
 
 #DOCUMENTATION
 
 There are many promising file managers for the terminal from fff to nnn, ranger, etc ... 
 
-ftl is Written in Bash, as it packs a punch (sometimes it punches you).
+ftl is Written in Bash, Bash packs a punch (sometimes it punches you).
 
-I wanted a file manager that would use tmux and give "live" preview. I use a tiling manager,
-external applications are started as a window on the side of ftl.
+I wanted a file manager that would use tmux and give "live" preview. it matches well with a tiling manager,
 
 #DEPENDENCIES
 
@@ -83,13 +82,13 @@ lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_CO
 rg       - to locate files containing a specific text
 fzf      - to locate file and to present a picker
 awk, sed, numfmt, sponge, ...
-fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool ...
+fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool ...
 xdotool, wmctrl
 divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
 
 ##installation
 
-ftl is a single script, put it in the PATH, install the dependencies and run.
+ftl is a single script, put it in the PATH, install the dependencies *TODO package dependencies* and run.
 
 ##Display
 
@@ -106,13 +105,13 @@ The directory entries are colored with lscolors, if preview is on, a preview pan
 
 ##Image mode
 
-Only show images in the listing and directory preview; with multiple tabs, sorting images is easy.
+Only show images in the listing and directory preview; with multiple tabs, makes sorting images easy.
 
 #TODO
 
 - Handle SIGWINCH
 - keyboard buffer flushing
-- fzf scripts preview via vim
+- fzf scripts preview via vim not bat
 - vim file opener using ftl
 - use inotify
  
@@ -162,8 +161,9 @@ SIGWINCH is not handled yet
 
 Artistic License 2.0
 
-© Nadim Khemir, CPAN/Github ID: NKH
+© Nadim Khemir
 mailto:nadim.khemir@gmail.com
+CPAN/Github ID: NKH
 
 #=SEE ALSO
 
