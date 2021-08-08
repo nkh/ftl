@@ -3,26 +3,26 @@ cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$
 #todo: multi pane: next pane
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
-my_pane ; mkapipe 4 5 6 ; declare -A dir_file pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
+mkapipe 4 5 6 ; declare -A dir_file pignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
 preview_all=${preview_all:-1} ; pdir_only=0 ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml get_mime pperl pshell ptext ptype) 
-pw3start ; find_auto=README ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; imode=0 ; zoom=0 ; zooms=(80 60 40 20) 
+find_auto=README ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; imode=0 ; zoom=0 ; zooms=(80 60 40 20) 
 tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
 sort_type=0 ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ )
 
 [[ "$1" ]] && { dir="$1" ; [[ -d "$dir" ]] || { echo ftl: \'$1\', no such directory ; exit 1 ; } ; }
-echo -en '\e[?1049h' ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null ; stty -echo 
+echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null
 [[ "$2" ]] && { fs="$2/$$" ; parent_fs="$2" ; } || fs=/tmp/ftl/$$ ; mkdir -p $fs
 [[ "$3" ]] && { gpreview=1 ; preview_all=0 ; external=0 ; synch $parent_fs ; } || cdir
 
 while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -1}" in
+	q|Q|Z  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || quit ;;
+	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	h|D    ) [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
 	j|B|k|A) ((nfiles)) && { [[ $REPLY == j || "$REPLY" == B ]] && move 1 || move -1 ; } ;;
-	l|C|'' ) ((nfiles)) && { [[ -f "${files[file]}" ]] && [[ $REPLY == '' ]] && edit || cdir "${files[file]}" ; } ;;
+	l|C|'' ) ((nfiles)) && { [[ -f "${files[file]}" ]] && { [[ $REPLY == '' ]] && edit ; true ; } ||  cdir "${files[file]}" ; } ;;
 	5|6    ) [[ $REPLY == 5 ]] && move -$LINES || move $LINES ;;
 	J|K    ) [[ $REPLY == K ]] && movep U || movep D ;;
-	q|Q|Z  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || quit ;;
-	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
 
 	0      ) ((gpreview)) && synch $parent_fs ;;
 	[1-4]  ) ((tab = $REPLY - 1 , tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
@@ -31,8 +31,8 @@ while true; do [[ $R ]] && { REPLY=$R ; R= ; } || read  -sn 1 ; case "${REPLY: -
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { cp "${selection[@]}" "$REPLY" ; tags=() ; } ; cdir ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
-	E      ) cdir "$(tac $fs/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	e      ) cdir "$(tac /tmp/ftl/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
+	E      ) cdir "$(tac $fs/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	F      ) filters[tab]= ; filters2[tab]= ; filter_tag= ; tcpreview ; cdir ;;
 	H      ) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm /tmp/ftl/history 2>/dev/null ; list ;;
