@@ -2,59 +2,13 @@
 
 ftl - terminal file manager, tmux based
 
-#SYNOPSIS
-
-$> ftl
-
-#DEPENDENCIES
-
-tmux     - ftl is a tmux based filemanager
-terminal $EDITOR - $EDITOR is extensively used to provide live previews
-lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_COLORS
-rg       - to locate files containing a specific text
-fzf      - to locate file and to present a picker
-awk, sed, numfmt, sponge, ...
-fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool ...
-xdotool, wmctrl
-divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
-
-#DOCUMENTATION
-
-There are many promising file for the terminal from fff to nnn, ranger, etc ... 
-
-Written in Bash, not my favorite language but it packs a punch (sometimes it punches you).
-
-I wanted a file manager that would use tmux and give "live" preview. I use a tiling manager,
-external applications are started as a window on the side of ftl.
-
-##installation
-
-ftl is a single script, put it in the PATH, install the dependencies and run.
-
-##Display
-
-The display consists of a header and a listing of the files in a directory, possibly filtered,
-and an optional preview
-
-###header components
-
-directory tilde(filter on) current_file/total_files current_tab/total_tabs selected_files file_stat
-
-###listing
-
-The directory entries are colored with lscolors, if preview is on, a preview pane is displayed
-
-##Image mode
-
-Only show images in the listing and directory preview; with multiple tabs, sorting images is easy.
-
 ##Commands
 
 	q|Q|Z  ) close tab, Q: save current file in &3, Q, Z: close all tabs
 	z      ) make preview the active pane and quit
-	g|G    ) go to first file, go to last files in directory 
-	B|j    ) next file
-	A|k    ) previous file
+	g|G    ) go to first line, go to last lines in directory 
+	B|j    ) next line
+	A|k    ) previous line
 	D|h    ) parent directory
 	C|l|'' ) change to selected directory or open file in $EDITOR
 	5      ) page down
@@ -94,10 +48,11 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	e      ) fzf current session directory history
 	E      ) fzf global directory history
 	K      ) clear global directory history
+	\?     ) show this file
 	\@     ) cd
 	/      ) fzf to file
 	\{     ) fzf to file with preview
-	\?     ) rg to file
+	\~     ) rg to file
 	\*     ) set maximum listing depth
 	\=     ) sort by name, size, or date
 	w|W    ) w: open in external viewer, W: open and detach in external viewer
@@ -110,6 +65,49 @@ Only show images in the listing and directory preview; with multiple tabs, sorti
 	x|X    ) chmod a+x, a-x
 	d      ) delete
 	\!     ) run shell command
+
+#DOCUMENTATION
+
+There are many promising file managers for the terminal from fff to nnn, ranger, etc ... 
+
+ftl is Written in Bash, as it packs a punch (sometimes it punches you).
+
+I wanted a file manager that would use tmux and give "live" preview. I use a tiling manager,
+external applications are started as a window on the side of ftl.
+
+#DEPENDENCIES
+
+tmux     - ftl is a tmux based file manager
+terminal $EDITOR - $EDITOR is extensively used to provide live previews
+lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_COLORS
+rg       - to locate files containing a specific text
+fzf      - to locate file and to present a picker
+awk, sed, numfmt, sponge, ...
+fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool ...
+xdotool, wmctrl
+divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
+
+##installation
+
+ftl is a single script, put it in the PATH, install the dependencies and run.
+
+##Display
+
+The display consists of a header and a listing of the files in a directory, possibly filtered,
+and an optional preview
+
+###header components
+
+directory tilde(filter on) current_file/total_files current_tab/total_tabs selected_files file_stat
+
+###listing
+
+The directory entries are colored with lscolors, if preview is on, a preview pane is displayed
+
+##Image mode
+
+Only show images in the listing and directory preview; with multiple tabs, sorting images is easy.
+
 #TODO
 
 - Handle SIGWINCH
