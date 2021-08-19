@@ -1,6 +1,6 @@
 external_bindings()
 {
-((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; header "~$to_search" ; esac && return ;
+((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; header "~$to_search" ; esac && return
 
 case "${REPLY: -1}" in
 	#\_ ) echo -en '\e[?25l\e[H' ; header "*ran plugin*" ;;
