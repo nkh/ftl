@@ -4,6 +4,8 @@ ftl - terminal file manager, tmux based
 
 ##Commands
 
+TODO: NOT Up TO DATE
+
 	q|Q|Z  ) close tab, Q: save current file in &3, Q, Z: close all tabs
 	z      ) make preview the active pane and quit
 	g|G    ) go to first line, go to last lines in directory 
@@ -72,7 +74,7 @@ There are many promising file managers for the terminal from fff to nnn, ranger,
 
 ftl is Written in Bash, Bash packs a punch (sometimes it punches you).
 
-I wanted a file manager that would use tmux and give "live" preview. it matches well with a tiling manager,
+I wanted a file manager that would use tmux and give "live" preview. It matches well with a tiling manager,
 
 #DEPENDENCIES
 
@@ -89,6 +91,13 @@ divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug),
 ##installation
 
 ftl is a single script, put it in the PATH, install the dependencies *TODO package dependencies* and run.
+
+README_ftl.md, this file, should also be where you put ftl if you want "inline help"
+
+ftl.eb implements external binding, put it where you put ftl if you want to use it. It contains an incremental
+search example.
+
+You can also symlink the files.
 
 ##Display
 
