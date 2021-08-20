@@ -73,9 +73,8 @@ case "${REPLY: -1}" in
 	\#     ) [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ;;
 	\"     ) ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; ((zoom == 0)) && R='-' ; cdir ;;
 	+      ) ((pdir_only ^= 1)) ; list ;;
-	\%     ) [[ $e ]] && { ((lignore[${e}] ^= 1)) ; cdir ; } ;;
-	\&     ) lignore=() ; cdir ;;
-	@      ) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "$REPLY" || list ;;
+	\%|\&  ) [[ $REPLY == \% ]] && { [[ $e ]] && ((lignore[${e}] ^= 1)); } || lignore=() ; cdir ;;
+	@      ) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	\*     ) prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>/dev/null && max_depth=$REPLY && cdir ;;
 	\!     ) tcpreview ; cmd=$(cat /tmp/ftl/commands | awk '!seen[$0]++' | fzf --tac --info=inline --layout=reverse)
 		 prompt 'ftl> ' -ei "$cmd" ; [[ $REPLY ]] && { echo $REPLY >>/tmp/ftl/commands ; shell ; } ; cdir ;;
@@ -90,7 +89,7 @@ case "${REPLY: -1}" in
 	\>|\<  ) [[ $REPLY == \> ]] && np=$(pane) || np=$(pane '-h -b' -R) ; cdir ; sstate ;;
 	#       ) [[ $REPLY ==  ]] && { ((show_files ^= 1)) ; true ; } || ((show_dirs ^= 1)) ; cdir ;;
 	#       ) cat $fs/tags | xsel -b -i ;; 
-esac #+¶½¤, ~ interferes with page up/down
+esac #¶½¤, ~ interferes with page up/down
 }
 
 cdir() { get_dir "$@" ; in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; parse_path ; refresh ; list ${select:-$found} ; }
@@ -107,7 +106,7 @@ cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; }
 line=0 ; dir &
 while : ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; list $found ; in_quick_display=1 ; }
-	[[ "$p" =~ '.' ]] && { e=${p##*.} ; ((lignore[$e])) && continue ; } ; pl=${#p}
+	[[ "$p" =~ '.' ]] && { e=${p##*.} ; ((lignore[${e@Q}])) && continue ; } ; pl=${#p}
 	 
 	((show_size)) && { [[ -d "$p" ]] && { ((show_dir_size)) && pc=$(dsize "$p")" $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
 	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-3d\e[m $pc" $line ; ((pl += 4)) ; }

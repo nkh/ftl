@@ -77,9 +77,9 @@ ftl - terminal file manager, tmux based
 
 #DOCUMENTATION
 
-There are many promising file managers for the terminal from fff to nnn, ranger, etc ... 
+There are many promising file managers for the terminal, fff to nnn, ranger, etc ... 
 
-ftl is Written in Bash, Bash packs a punch (sometimes it punches you).
+ftl is Written in Bash (packs a punch, sometimes it punches you).
 
 I wanted a file manager that would use tmux and give "live" preview. It matches well with a tiling manager,
 
@@ -91,7 +91,7 @@ lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_CO
 rg       - to locate files containing a specific text
 fzf      - to locate file and to present a picker
 awk, sed, numfmt, sponge, ...
-fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool ...
+fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
 xdotool, wmctrl
 divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
 
