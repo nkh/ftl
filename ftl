@@ -1,6 +1,6 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-#todo: own preview + preview panes files. cursor at wrong place on exit, use mimemagic, rip
+#todo: own preview + preview panes files. cursor at wrong place on exit
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -177,7 +177,7 @@ by_date()   { sort $show_reversed -n         | tee >(cut -f 2 -d ' ' >&6) | cut 
 close_tab() { ((${#tabs[@]} > 1)) && { unset -v 'tabs[tab]' ; tabs=("${tabs[@]}") ; ((tab--)) ; R=$'\t' ; true ; } ; }
 ctsplit()   { [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null  || tsplit "$1" ; }
 copy()      { [[ -d "$1" ]] && dir=r || dir= ; tscommand "cp -v$dir $(printf "'%s' " "${@:2}") '$1'" ; } 
-delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rm -rf "${selection[@]}" ; tags=() ; mime=() ; cdir ; } ; }
+delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir ; } ; }
 dir()       { ((show_dirs)) && files d filter2 ; ((show_files)) && files f filter ; }
 dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>/dev/null | wc -l) ; } 
 edit()      { tcpreview ; echo -en '\e[?1049h' ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; cdir ; }
@@ -194,8 +194,8 @@ geometry()  { read -r LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_hei
 header()    { h="${@} $((tab+1))/${#tabs[@]} $filter_tag${sort_name[sort_type]}$show_reversed ${#tags[@]}" ; header_pos "$h" ; echo -e "\e[?25l\e[H\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 location()  { true 2>/dev/null >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&3 || :>&3 ; } ; }
-mime_get()  { ((remote_preview)) && mtype=$(mimetype -b "$n") || mime_cache ; false ; }
-mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimetype -b "${files[@]:${#mime[@]}:((file + 10))}" 2>/dev/null)) ; mtype="${mime[file]}" ; false ; }
+mime_get()  { ((remote_preview)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
+mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>/dev/null | sed 's/^[^:]*: //')) ; mtype="${mime[file]}" ; false ; }
 mkapipe()   { for n in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $n<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles - 1 ? nfiles - 1 : nf)) ; dir_file[$PWD]=$nf ; list ; }
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
