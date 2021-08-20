@@ -2,6 +2,10 @@
 
 ftl - terminal file manager, tmux based
 
+![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
+![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
+![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/tiled.png)
+
 ##Commands
 
 	q|Q|Z  ) close tab, Q: save current file in &3, Q, Z: close all tabs
