@@ -1,6 +1,6 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-#todo: own preview + preview panes files. cursor at wrong place on exit
+#todo: own preview + preview panes files. handling of ftl instances common files, cursor at wrong place on exit
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -39,7 +39,7 @@ case "${REPLY: -1}" in
 	e      ) cdir "$(tac /tmp/ftl/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	E      ) cdir "$(tac $fs/history 2>/dev/null | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
-	F      ) filters[tab]= ; filters2[tab]= ; filter_tag= ; tcpreview ; cdir ;;
+	F      ) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; filter_tag= ; tcpreview ; cdir ;;
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	H      ) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm /tmp/ftl/history 2>/dev/null ; list ;;
 	i      ) ((imode ^= 1)) ; ftl_imode $imode ; cdir ;;
@@ -86,7 +86,7 @@ case "${REPLY: -1}" in
 	\}     ) tcpreview ; rg_go "$(fzfr)" ;;
 	\$     ) [[ $REPLY == _ ]] && shell_pane || [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
 	\-     ) [[ $pane_id ]] && { ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; } ;;
-	\>|\<  ) [[ $REPLY == \> ]] && np=$(pane) || np=$(pane '-h -b' -R) ; cdir ; sstate ;;
+	\>|\<|_) [[ $REPLY == \> ]] && np=$(pane) || { [[ $REPLY == \< ]] && np=$(pane '-h -b' -R) || np=$(pane '-v' -U) ; } ; cdir ; sstate ;;
 	#       ) [[ $REPLY ==  ]] && { ((show_files ^= 1)) ; true ; } || ((show_dirs ^= 1)) ; cdir ;;
 	#       ) cat $fs/tags | xsel -b -i ;; 
 esac #¶½¤, ~ interferes with page up/down
@@ -135,7 +135,6 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 
 preview()
 {
-#((gpreview)) && return # ???! why would ftl preview call preview? pdir->cdir->preview? 
 ((main || gpreview)) || { pane_read && echo -en "$n\n$fs\n" >$parent_fs/preview && for p in "${panes[@]}" ; do tmux send -t $p 9 &>/dev/null ; done ; return ; }
 old_in_vipreview=$in_vipreview
 ((external)) && { echo -en '\e[?1049l' ; edir || eimage || emedia || epdf || ehtml || etext  && { echo -en '\e[?1049h' ; external= ; detached= ; list ; return ; } ; }
@@ -203,9 +202,9 @@ mplayer_k() { ((mplayer)) && kill $mplayer &>/dev/null || pkill mplayer ; }
 my_pane()   { while read -s pi pp ; do _my_pane $pp && my_pane=$pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 _my_pane()  { [[ $$ == $1 ]] || [[ $(ps -o pid --no-headers --ppid $1 | rg $$) ]] ; }
 pane()      { pane_read ; [[ -d "$n" ]] && arg="$n" || arg="$PWD" ; tcpreview ; tsplit "preview_all=0 ftl ${arg@Q} $parent_fs" "30%" "$1" $2 && { np=$pane_id ; panes+=($np) ; pane_id= ; }
-		 { printf "%s\n" "${panes[@]}" ; echo $my_pane ; } | sort -u >$parent_fs/panes ; echo $np ; }
+		 { printf "%s\n" "${panes[@]}" ; echo $my_pane ; } >$parent_fs/panes ; echo $np ; }
 pane_k()    { ((main)) && { pane_read && for p in "${panes[@]}" ; do [[ $p != $my_pane ]] && tmux send -t $p Z &>/dev/null ; done ; } && rm $parent_fs/panes && panes=() ; }
-pane_read() { panes=() ; [[ -e $parent_fs/panes ]] && readarray -t panes < $parent_fs/panes || false ; }
+pane_read() { [[ -s $parent_fs/panes ]] && readarray -t panes < <(tmux list-panes -F "#{pane_left} #{pane_id}" | sort -h | grep -f $parent_fs/panes | cut -d' ' -f 2) || false ; }
 parse_path(){ n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 prompt()    { stty echo ; echo -ne '\e[999B\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
 quit()      { wcpreview ; tcpreview ; sstate "/tmp/ftl" ; pane_k ; rm -rf $fs ; location ; stty echo ; [[ $parent_fs == $fs ]] && tbcolor 236 52 ;  refresh "\e[?25h\e[?1049l"
@@ -231,4 +230,4 @@ tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo ftl\> ${1@Q}
 tsplit()    { tmux sp ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tmux selectp ${4:--L} ; true ; } ; }
 zoom()      { geometry ; read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') ; ((x = (($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; tresize $pane_id $x ;}
 
-external_bindings() { false ; } ; [[ -e "$(dirname "$0")/ftl.eb.sh" ]] && source "$(dirname "$0")/ftl.eb.sh" ; ftl "$@"
+external_bindings() { false ; } ; source "$(dirname "$0")/ftl.eb.sh" &>/dev/null; ftl "$@"
