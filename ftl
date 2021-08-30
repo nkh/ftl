@@ -1,6 +1,8 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 #todo: own preview + preview panes files. handling of ftl instances common files, cursor at wrong place on exit
+#todo: synch dirs to diff 2 dirs, commands for image optimisation, external, sourced on demand?, montage
+#bug: download/movies, _, P .. error about space, lots of 9 send
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -49,9 +51,10 @@ case "${REPLY: -1}" in
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]=$(dirname "${files[file]}") ; list ;;
 	o|O    ) pane_read ; tp=("${panes[@]}" "${panes[@]}") ; [[ $REPLY == O ]] && read -d'\n' -a tp < <(printf '%s\n' "${tp[@]}" | tac)
 		pf=0 ; for p in "${tp[@]}" ; do ((pf)) && tmux selectp -t $p &>/dev/null && tpop $p && tmux send -t $p 0 && break || [[ $p == $my_pane ]] && pf=1 ; done ;;
-	p|P    ) ((${#tags[@]})) && { [[ $REPLY == p ]] && copy "$PWD" "${!tags[@]}" || mv "${!tags[@]}" "$PWD" ; tags=() ; cdir ; } ;;
-	R      ) [[ $show_reversed ]] && show_reversed= || show_reversed=-r ; cdir ;;
-	r      ) ((${#tags[@]})) && bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir ;;
+	p|P    ) ((${#tags[@]})) && { [[ $REPLY == p ]] && copy "$PWD" "${!tags[@]}" || tscommand "mv $(printf "'%s' " "${!tags[@]}") '$PWD'" ; tags=() ; cdir ; } ;;
+	“      ) ((folder_image_preview)) && folder_image_preview=0 || folder_image_preview=1 ;; #AltGr v
+	r      ) [[ $show_reversed ]] && show_reversed= || show_reversed=-r ; cdir ;;
+	R      ) ((${#tags[@]})) && bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir ;;
 	s|S    ) [[ $REPLY == S ]] && ((show_dir_size ^= 1)) || ((show_size ^= 1)) ; cdir ;;
 	T      ) echo -en '\e[?1049h' ; fzf_tag "$(fd . --color=always | fzf-tmux -p 90%  -m --ansi --info=inline --layout=reverse --marker '▪')" ; echo -en '\e[?1049h' ; list ;;
 	t      ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
@@ -103,12 +106,12 @@ files=() ; files_color=() ; mime=() ; search="${2:-${dir_file[$new_dir]:-$find_a
 cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; }
 ((gpreview)) || [[ "$PPWD" != "$PWD" ]] && echo "$PWD" | tee -a $fs/history >> /tmp/ftl/history ; [[ "$PWD" == / ]] && sep= || sep=/
 
-line=0 ; dir &
+line=0 ; sum=0; dir &
 while : ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; list $found ; in_quick_display=1 ; }
 	[[ "$p" =~ '.' ]] && { e=${p##*.} ; ((lignore[${e@Q}])) && continue ; } ; pl=${#p}
 	 
-	((show_size)) && { [[ -d "$p" ]] && { ((show_dir_size)) && pc=$(dsize "$p")" $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
+	((show_size)) && { ((sum += size)) ; [[ -d "$p" ]] && { ((show_dir_size)) && pc=$(dsize "$p")" $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
 	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-3d\e[m $pc" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}$e ; }
@@ -123,7 +126,8 @@ list()
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center))
 
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat=
-header "$((file+1))/${nfiles}$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R")
+((show_size)) && sum=$(numfmt --to=iec --format ' %4f' $sum) || sum=
+header "$((file+1))/${nfiles}$sum$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R")
 for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 	do
 		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="$cursor_color$cursor\e[m"
@@ -148,7 +152,9 @@ eimage()    { [[ $e =~ ^($ifilter)$ ]] && fim "$n" ; }
 emedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { ((! detached)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
 epdf()      { [[ $e == 'pdf' ]] && { ((detached)) && (zathura "$n" &) || run_maxed zathura "$n" ; true ; } ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; external= ; cdir ; }
-pdir()      { [[ -d "$n" ]] && { (($in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id 0 || { arg=${1:-$p} ; ctsplit "ftl ${arg@Q} $fs 1" ; in_pdir=1 ; } ; } || pdir_only ; }
+pdir()      { [[ -d "$n" ]] && { ((imode)) && pdir_image || pdir_dir ; } || pdir_only ; }
+pdir_dir()  { (($in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id 0 || { arg=${1:-$p} ; ctsplit "ftl ${arg@Q} $fs 1" ; in_pdir=1 ; } ; }
+pdir_image(){ ((folder_image_preview)) && [[ -e "$n/montage.png" ]] && pw3image "$n/montage.png" ; }
 pdir_only() { in_pdir= ; ((pdir_only)) && { wcpreview ; tcpreview ; true ; } || false  ; }
 phtml()     { [[ $e == 'html' ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
