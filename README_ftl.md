@@ -81,7 +81,7 @@ ftl - terminal file manager, tmux based
 
 #DOCUMENTATION
 
-There are many promising file managers for the terminal, fff to nnn, ranger, etc ... 
+There are many promising file managers for the terminal, fff to nnn, clifm, ranger, etc ... 
 
 ftl is Written in Bash (packs a punch, sometimes it punches you).
 

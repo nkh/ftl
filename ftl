@@ -1,8 +1,8 @@
 #!/bin/env bash
 cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-#todo: own preview + preview panes files. handling of ftl instances common files, cursor at wrong place on exit
+#todo: own preview + preview panes files; handling of ftl instances common files; cursor at wrong place on exit
 #todo: synch dirs to diff 2 dirs, commands for image optimisation, external, sourced on demand?, montage
-#bug: download/movies, _, P .. error about space, lots of 9 send
+#bug: preview overriden
 ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
 {
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
@@ -33,7 +33,7 @@ case "${REPLY: -1}" in
 	7      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	8      ) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	9      ) ((main)) && { remote_preview=1 ; op=$(tmux display -p '#{pane_id}') ; tmux selectp -t $my_pane
-		 read n parent_fs <$fs/preview ; parse_path "$n" ; preview=1 ; preview ; tmux selectp -t $op; remote_preview=0 ; parent_fs=$fs ; } ;;
+		 { read n ; read parent_fs ; } <$fs/preview ; parse_path "$n" ; preview=1 ; preview ; tmux selectp -t $op ; remote_preview=0 ; parent_fs=$fs ; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
