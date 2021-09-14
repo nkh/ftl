@@ -1,7 +1,7 @@
 #!/bin/env bash
-cdf() { mkdir -p /tmp/ftl ; l=/tmp/ftl/location ; ftl 3>$l ; [[ -e $l ]] && d="$(head -n 1 $l)" && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-
-ftl() # fd_directory, parent fs, preview. © Nadim Khemir 2021, Artistic licence 2.0
+cdf() { d=/tmp/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
+# bug: pane own preview in horizontal and vertical mode doesn't show directories ? should give full path to viewer
+ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2021, Artistic licence 2.0
 {
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
 : ${preview_all:=1} ; : ${pdir_only:=0} ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptype) 
@@ -30,8 +30,8 @@ case "${REPLY: -1}" in
 	[1-4]  ) ((tab = $REPLY - 1, tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
 	7      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	8      ) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
-	9      ) ((main)) && { remote=1 ; op=$(tmux display -p '#{pane_id}') ; tmux selectp -t $my_pane ; { read n ; read parent_fs ; } <$fs/preview ; parse_path "$n"
-		 preview=1 ; preview ; tmux selectp -t $op ; remote=0 ; parent_fs=$fs ; kbd_flush ; } ;;
+	9      ) ((main && preview_all)) && { remote=1 ; op=$(tmux display -p '#{pane_id}') ; tmux selectp -t $my_pane ; { read n ; read parent_fs ; } <$fs/preview
+		 parse_path "$n" ; preview=1 ; preview ; tmux selectp -t $op ; remote=0 ; parent_fs=$fs ; kbd_flush ; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
@@ -233,7 +233,7 @@ tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-bor
 tpop() { read -r PLEFT PTOP< <(tmux display -p -t $1 '#{pane_left} #{pane_top}') && tmux popup -E -h 3 -w 3 -x $PLEFT -y $(($PTOP + 3)) "sleep 0.07 ; true" ; }
 tresize()   { tmux resizep -t $1 -x $2 &>/dev/null ; rdir ; }
 tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo ftl\> ${1@Q} ; $1 ; echo \$\?: $? ; read -sn2 -t 1800" ; }
-tsplit()    { tmux sp ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tmux selectp ${4:--L} ; true ; } ; }
+tsplit()    { tmux sp -e n="$n" ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tmux selectp ${4:--L} ; true ; } ; }
 zoom()      { geometry ; read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') ; ((x = (($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; tresize $pane_id $x ;}
 
 external_bindings() { false ; } ; source "$(dirname "$0")/ftl.eb.sh" &>/dev/null; ftl "$@"
