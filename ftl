@@ -53,7 +53,7 @@ case "${REPLY: -1}" in
 	“      ) ((folder_image_preview)) && folder_image_preview=0 || folder_image_preview=1 ;; #AltGr v
 	r      ) [[ $show_reversed ]] && show_reversed= || show_reversed=-r ; cdir ;;
 	R      ) ((${#tags[@]})) && bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir ;;
-	s|S    ) [[ $REPLY == S ]] && ((show_dir_size ^= 1)) || ((show_size ^= 1)) ; cdir ;;
+	s      ) ((show_size ^= 1)) || { ((show_size ^= 1)) ; ((show_dir_size ^= 1)) ; } || show_size=0 ; cdir ;;
 	T      ) echo -en '\e[?1049h' ; fzf_tag "$(fd . --color=always | fzf-tmux -p 90%  -m --ansi --info=inline --layout=reverse --marker '▪')" ; echo -en '\e[?1049h' ; list ;;
 	t      ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
 	u|U    ) [[ $REPLY == u ]] && for p in "${files[@]}" ; do tags["$p"]='▪' ; done || tags=() ; list ;;
