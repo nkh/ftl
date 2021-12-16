@@ -63,7 +63,7 @@ case "${REPLY: -1}" in
 	' '|y  ) tag_flip "${files[file]}" ; ((nfiles == 1)) && list || { [[ $REPLY == Y ]] && R=k || R=j ; } ;;
 	Z|q|Q  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || quit ;;
 	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
-	\?     ) vipreview "$(dirname "$0")/README_ftl.md" ; in_pdir=0 ;;
+	\?     ) vipreview "$(dirname "$0")/README.md" ; in_pdir=0 ;;
 	$'\t'  ) ((tab += 1, tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
 	\:     ) prompt ':' ; printf -v line '%d' "$REPLY" 2>/dev/null ; list $((line > 0 ? (line -1) : 0)) ;; 
 	\'     ) read -n 1 ; [[ -n ${marks[$REPLY]} ]] && cdir ${marks[$REPLY]} || list ;;
