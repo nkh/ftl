@@ -93,13 +93,13 @@ case "${REPLY: -1}" in
 esac
 }
 
-cdir() { get_dir "$@" ; in_quick_display=0 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; parse_path ; refresh ; list ${select:-$found} ; }
-get_dir() # dir, search, select
+cdir() { get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list ${3:-$found} ; }
+get_dir() # dir, search
 {
 new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return 
 geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS = (COLS - 1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_x = (LEFT + COLS) * 10))
 
-files=() ; files_color=() ; mime=() ; search="${2:-${dir_file[$new_dir]:-$find_auto}}" ; select="$3" ; found= ; nfiles=0 
+files=() ; files_color=() ; mime=() ; nfiles=0 ; search=${2:-$(((dir_file[$PWD])) || echo "$find_auto")} ; found=
 
 [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
 cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; }
@@ -114,15 +114,15 @@ while : ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc 
 	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-3d\e[m $pc" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}$e ; }
-	files_color[$nfiles]="$pcl" ;  files[$nfiles]="$PWD$sep$p" ; [[ -z $found ]] && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
+	files_color[$nfiles]="$pcl" ;  files[$nfiles]="$PWD$sep$p" ; [[ -n "$search" && -z "$found" ]] && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
 done 
-((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
+in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
 }
 
-list()
+list() # select
 {
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file >= nfiles ? nfiles - 1 : file)) ; selection ; sstate "$parent_fs"
-((nfiles)) && { parse_path ; echo -en '\e[?25l\e[H' ; wcpreview ; } || { header "\e[33m<Empty>" && tcpreview && return ; }
+((nfiles)) && { parse_path ; wcpreview ; } || { header "\e[33m<Empty>" && tcpreview && return ; }
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center))
 
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat=

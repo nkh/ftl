@@ -4,11 +4,8 @@ ftl - terminal file manager, tmux based
 
 ##Commands
 
-?   ) show this file
-q   ) quit
-''  ) cd to selected entry or open file
-
-j|B ) next entry                                 0|9 ) internal usage
+q   ) quit                                       ?   ) show this file
+j|B ) next entry                                 ''  ) cd to selected entry or open file
 k|A ) previous entry                             :   ) go to entry
 h|D ) parent directory                           *   ) set maximum listing depth
 l|C ) cd to selected entry or open file          @   ) cd
@@ -46,7 +43,8 @@ y   ) tag/untag current file                     ' ' ) tag/untag current file
 Y   ) copy selection to clipboard
 Z   ) close all tabs                             $   ) shell pane
 z   ) make preview the active pane and quit      !   ) run shell command
-q|Q ) close tab, close and write to &3
+q|Q ) close tab, close and write to &3           0|9 ) internal usage
+
 
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
