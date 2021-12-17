@@ -59,17 +59,19 @@ ftl is Written in Bash (packs a punch, sometimes it punches you).
 
 I wanted a file manager that would use tmux and give "live" preview. It matches well with a tiling manager,
 
+This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs
+
 # DEPENDENCIES
 
-tmux     - ftl is a tmux based file manager
-terminal $EDITOR - $EDITOR is extensively used to provide live previews
-lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_COLORS
-rg       - to locate files containing a specific text
-fzf      - to locate file and to present a picker
-awk, sed, numfmt, sponge, ...
-fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
-xdotool, wmctrl
-divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
+- tmux     - ftl is a tmux based file manager
+- terminal $EDITOR - $EDITOR is extensively used to provide live previews
+- lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_COLORS
+- rg       - to locate files containing a specific text
+- fzf      - to locate file and to present a picker
+- awk, sed, numfmt, sponge, ...
+- fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
+- xdotool, wmctrl
+- divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
 
 ## Installation
 
@@ -84,8 +86,7 @@ You can also symlink the files.
 
 ## Display
 
-The display consists of a header and a listing of the files in a directory, possibly filtered,
-and an optional preview
+The display consists of a header and a listing of the files in a directory, possibly filtered, and an optional preview
 
 ### header components
 
@@ -117,32 +118,32 @@ videos and if you need help send me a mail.
 
 ## Variables
 
-dir_file    selected file in a directory, ftl remembers where you were
-filters     each tab has its filter
-epanes      extra panes 
-pane_id     id of preview pane
-my_pane     own pane
-tfilter     used in image mode
-marks       bookmarks, marks=([0]=dir [1]=dir ...), preset bookmarks
-tags        list of tagged files
-show_dirs   directory toggle
-preview_all preview toggle
-ifilter     extension of files considered images
-zooms       preview pane sizes in percent
-fs          directory where ftl saves the current selection and temporary files
+- dir_file    selected file in a directory, ftl remembers where you were
+- filters     each tab has its filter
+- epanes      extra panes 
+- pane_id     id of preview pane
+- my_pane     own pane
+- tfilter     used in image mode
+- marks       bookmarks, marks=([0]=dir [1]=dir ...), preset bookmarks
+- tags        list of tagged files
+- show_dirs   directory toggle
+- preview_all preview toggle
+- ifilter     extension of files considered images
+- zooms       preview pane sizes in percent
+- fs          directory where ftl saves the current selection and temporary files
 
 ## Functions
 
-ftl       variable setup and switch for the commands
-cdir      get list of files in directory and colorize them
-list      list directory files
-ftl_pmode setup directory preview
-ftl_imode setup image mode
-c*        close previews
-e*        external viewers
-p*        "internal" viewers
-t*        tmux function
-vipreview text preview in $EDITOR
+- ftl       variable setup and switch for the commands
+- cdir      get list of files in directory and colorize them
+- list      list directory files
+- ftl_pmode setup directory preview
+- ftl_imode setup image mode
+- c*        close previews
+- e*        external viewers
+- p*        "internal" viewers
+- t*        tmux function
+- vipreview text preview in $EDITOR
 ...
 
 # BUGS AND LIMITATIONS
