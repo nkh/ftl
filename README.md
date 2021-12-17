@@ -1,9 +1,9 @@
-#NAME
+# NAME
 
 ftl - terminal file manager, tmux based
 
-##Commands
-
+## Commands
+```
 q   ) quit                                       ?   ) show this file
 j|B ) next entry                                 ''  ) cd to selected entry or open file
 k|A ) previous entry                             :   ) go to entry
@@ -45,12 +45,13 @@ Z   ) close all tabs                             $   ) shell pane
 z   ) make preview the active pane and quit      !   ) run shell command
 q|Q ) close tab, close and write to &3           0|9 ) internal usage
 
+```
 
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/tiled.png)
 
-#DOCUMENTATION
+# DOCUMENTATION
 
 There are many promising file managers for the terminal, fff to nnn, clifm, ranger, vimfm, etc ... 
 
@@ -58,7 +59,7 @@ ftl is Written in Bash (packs a punch, sometimes it punches you).
 
 I wanted a file manager that would use tmux and give "live" preview. It matches well with a tiling manager,
 
-#DEPENDENCIES
+# DEPENDENCIES
 
 tmux     - ftl is a tmux based file manager
 terminal $EDITOR - $EDITOR is extensively used to provide live previews
@@ -70,7 +71,7 @@ fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbn
 xdotool, wmctrl
 divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
 
-##installation
+## Installation
 
 ftl is a single script, put it in the PATH, install the dependencies *TODO package dependencies* and run.
 
@@ -81,24 +82,24 @@ search example.
 
 You can also symlink the files.
 
-##Display
+## Display
 
 The display consists of a header and a listing of the files in a directory, possibly filtered,
 and an optional preview
 
-###header components
+### header components
 
 directory tilde(filter on) current_file/total_files current_tab/total_tabs selected_files file_stat
 
-###listing
+### listing
 
 The directory entries are colored with lscolors, if preview is on, a preview pane is displayed
 
-##Image mode
+## Image mode
 
 Only show images in the listing and directory preview; with multiple tabs, makes sorting images easy.
 
-#TODO
+# TODO
 
 - Handle SIGWINCH
 - keyboard buffer flushing
@@ -106,7 +107,7 @@ Only show images in the listing and directory preview; with multiple tabs, makes
 - vim file opener using ftl
 - use inotify
  
-#PATCHING ftl (with gratitude to Larry wall, and not just for patch)
+# PATCHING ftl (with gratitude to Larry wall, and not just for patch)
 
 There's no documentation, the code is *dense* with long lines but there's hope as
 the call stack is seldom more than 2 deep.
@@ -114,7 +115,7 @@ the call stack is seldom more than 2 deep.
 The description of the main variables and functions should get you going, watch the
 videos and if you need help send me a mail.
 
-##Variables
+## Variables
 
 dir_file    selected file in a directory, ftl remembers where you were
 filters     each tab has its filter
@@ -130,7 +131,7 @@ ifilter     extension of files considered images
 zooms       preview pane sizes in percent
 fs          directory where ftl saves the current selection and temporary files
 
-##Functions
+## Functions
 
 ftl       variable setup and switch for the commands
 cdir      get list of files in directory and colorize them
@@ -144,11 +145,11 @@ t*        tmux function
 vipreview text preview in $EDITOR
 ...
 
-#BUGS AND LIMITATIONS
+# BUGS AND LIMITATIONS
 
 SIGWINCH is not handled yet
 
-=LICENSE AND COPYRIGHT
+# LICENSE AND COPYRIGHT
 
 Artistic License 2.0
 
@@ -156,7 +157,7 @@ Artistic License 2.0
 mailto:nadim.khemir@gmail.com
 CPAN/Github ID: NKH
 
-#=SEE ALSO
+# SEE ALSO
 
 ranger
 fff
