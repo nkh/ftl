@@ -100,7 +100,7 @@ get_dir() # dir, search
 new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return 
 geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS = (COLS - 1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_x = (LEFT + COLS) * 10))
 
-files=() ; files_color=() ; mime=() ; nfiles=0 ; search=${2:-$(((dir_file[$PWD])) || echo "$find_auto")} ; found=
+files=() ; files_color=() ; mime=() ; nfiles=0 ; search=${2:-$(((dir_file[$new_dir])) || echo "$find_auto")} ; found= ; shopt -s nocasematch
 
 [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
 cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; }
@@ -117,7 +117,8 @@ while : ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc 
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}$e ; }
 	files_color[$nfiles]="$pcl" ;  files[$nfiles]="$PWD$sep$p" ; [[ -n "$search" && -z "$found" ]] && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
 done 
-in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
+
+shopt -u nocasematch ; in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
 }
 
 list() # select
@@ -134,7 +135,7 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 		echo -ne "\e[K$cursor${files_color[i]}\e[m" ; ((i != bottom)) && echo
 	done
 
-((in_quick_display)) && return ; preview 
+((!in_quick_display)) && preview 
 }
 
 preview()

@@ -31,8 +31,8 @@ O|o ) next/previous pane                         >|<|\_ ) extra pane
 p|P ) p: copy selection, P: move selection       
 r   ) rename or bulk rename                      ^   ) show/hide entry stat in header
 R   ) reverse sort                               =   ) sort by name, size, or date
-S   ) show/hide dir size                         \(  ) show/hide directories
-s   ) show/hide file size                        \)  ) show/hide files
+s   ) show/hide dir size                         \(  ) show/hide directories
+S   ) separate editor preview                    \)  ) show/hide files
 t   ) create new tab                             tab ) switch tab
 T   ) fzf tag                                    1-4 ) switch to given tab
 u|U ) tag all files, untag all files             
