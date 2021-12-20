@@ -4,7 +4,7 @@ ftl - terminal file manager, tmux based
 
 ## Commands
 ```
-q   ) quit                                       ?   ) show this file
+q|Q ) close tab, close and write to &3           ?   ) show this file
 j|B ) next entry                                 ''  ) cd to selected entry or open file
 k|A ) previous entry                             :   ) go to entry
 h|D ) parent directory                           *   ) set maximum listing depth
@@ -20,19 +20,19 @@ E   ) cd in directory history                    }   ) rg to file
 f   ) filter1, filter is per tab                 .   ) show/hide hidden files
 F   ) clear filter                               7   ) 2nd filter, per tab
 H   ) clear global directory history             8   ) reverse filter, per tab
-i   ) enter/exit image mode                      ½   ) filter images away
-I   ) fzfi, find images using ueberzurg          |   ) close extra panes
+i   ) image/no image mode                        \(  ) fzfi, find images using ueberzurg 
+I   ) create empty file
 J|K ) scroll preview                             %   ) disable extension from listing
 L   ) symlink selection                          &   ) re-enable all extensions
 m   ) mark directory                             '   ) go to mark
 M   ) mkdir                                      +   ) show only directory preview
 n|N ) find next/previous                         
 O|o ) next/previous pane                         >|<|\_ ) extra pane
-p|P ) p: copy selection, P: move selection       
+p|P ) p: copy selection, P: move selection       |   ) close extra panes
 r   ) rename or bulk rename                      ^   ) show/hide entry stat in header
 R   ) reverse sort                               =   ) sort by name, size, or date
-s   ) show/hide dir size                         \(  ) show/hide directories
-S   ) separate editor preview                    \)  ) show/hide files
+s   ) show/hide dir size                         \)  ) show/hide directories and files
+S   ) separate editor preview                    
 t   ) create new tab                             tab ) switch tab
 T   ) fzf tag                                    1-4 ) switch to given tab
 u|U ) tag all files, untag all files             
@@ -40,10 +40,9 @@ v|V ) preview on/off, v: preview current file    #   ) flip-flop preview for ext
 w|W ) w: ext. viewer, W: ext. detached viewer    -   ) change preview size
 x|X ) chmod a+x, a-x                             "   ) flip-flop image preview
 y   ) tag/untag current file                     ' ' ) tag/untag current file
-Y   ) copy selection to clipboard
-Z   ) close all tabs                             $   ) shell pane
-z   ) make preview the active pane and quit      !   ) run shell command
-q|Q ) close tab, close and write to &3           0|9 ) internal usage
+Y   ) copy selection to clipboard                $   ) shell pane
+Z   ) close all tabs                             !   ) run shell command
+z   ) make preview the active pane and quit      0|9 ) internal usage
 
 ```
 
