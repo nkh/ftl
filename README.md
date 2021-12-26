@@ -56,7 +56,7 @@ There are many promising file managers for the terminal, fff to nnn, clifm, rang
 
 ftl is Written in Bash (packs a punch, sometimes it punches you).
 
-I wanted a file manager that would use tmux and give "live" preview. It matches well with a tiling manager,
+I wanted a file manager that would use tmux and give "live" preview and works well with a tiling manager,
 
 This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs
 
@@ -70,18 +70,18 @@ This is definitely not production quality, it's for the fun of it, but it's good
 - awk, sed, numfmt, sponge, ...
 - fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
 - xdotool, wmctrl
-- divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ...
+- divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ... soon
 
 ## Installation
 
 ftl is a single script, put it in the PATH, install the dependencies *TODO package dependencies* and run.
 
-README_ftl.md, this file, should also be where you put ftl if you want "inline help"
+README.md, this file, should also be where you put ftl if you want "inline help"
 
-ftl.eb implements external binding, put it where you put ftl if you want to use it. It contains an incremental
+ftl.eb implements optional external binding, put it where you put ftl if you want to use it. It contains an incremental
 search example.
 
-You can also symlink the files.
+best is to  symlink the files from the repo.
 
 ## Display
 
