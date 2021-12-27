@@ -8,25 +8,25 @@ q|Q ) close tab, close and write to &3           ?   ) show this file
 j|B ) next entry                                 ''  ) cd to selected entry or open file
 k|A ) previous entry                             :   ) go to entry
 h|D ) parent directory                           *   ) set maximum listing depth
-l|C ) cd to selected entry or open file          @   ) cd
+l|C ) cd to selected entry or open file          ŋ   ) cd
 g|G ) first entry, last entry                    /   ) fzf to file
 5|6 ) page down/up                               \   ) fzf to directory        
 a   ) kill mplayer                               {   ) fzf to file with preview
 b   ) find entry in directory                    ;   ) fzf persistent mark
 c   ) copy selection                             §   ) clear persistent marks
 d   ) delete                                     ,   ) add persistent mark
-e   ) cd in global directory history                    
-E   ) cd in directory history                    }   ) rg to file
+e   ) cd in global directory history             ©   ) compress/decompress       
+E   ) cd in directory history                    «   ) encrypt/decrypt
 f   ) filter1, filter is per tab                 .   ) show/hide hidden files
 F   ) clear filter                               7   ) 2nd filter, per tab
 H   ) clear global directory history             8   ) reverse filter, per tab
 i   ) image/no image mode                        \(  ) fzfi, find images using ueberzurg 
-I   ) create empty file
+I   ) create empty file                          }   ) rg to file
 J|K ) scroll preview                             %   ) disable extension from listing
 L   ) symlink selection                          &   ) re-enable all extensions
 m   ) mark directory                             '   ) go to mark
 M   ) mkdir                                      +   ) show only directory preview
-n|N ) find next/previous                         
+n|N ) find next/previous                         ½   ) open new ftl in pane 
 O|o ) next/previous pane                         >|<|\_ ) extra pane
 p|P ) p: copy selection, P: move selection       |   ) close extra panes
 r   ) rename or bulk rename                      ^   ) show/hide entry stat in header

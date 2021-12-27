@@ -4,7 +4,7 @@ cdf() { d=/tmp/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)
 ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2021, Artistic licence 2.0
 {
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
-: ${preview_all:=1} ; : ${pdir_only:=0} ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptype) 
+: ${preview_all:=1} ; : ${pdir_only:=0} ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype) 
 : ${find_auto:=README} ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; : ${imode:=0} ; : ${zoom:=0} ; zooms=(70 50 30) 
 tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
 : ${sort_type:=0} ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ )
@@ -78,7 +78,9 @@ case "${REPLY: -1}" in
 	\"     ) ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; ((zoom == 0)) && R='-' ; cdir ;;
 	+      ) ((pdir_only ^= 1)) ; list ;;
 	\%|\&  ) [[ $REPLY == \% ]] && { [[ $e ]] && ((lignore[${e}] ^= 1)); } || lignore=() ; cdir ;;
-	@      ) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
+	©      ) [[ $e =~ tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir ;;
+	»      ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || { gpg -e -u "nadim.kemir" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; } ; cdir ;;
+	ŋ      ) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	\*     ) prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>/dev/null && max_depth=$REPLY && cdir ;;
 	\!     ) tcpreview ; cmd=$(cat /tmp/ftl/commands | awk '!seen[$0]++' | fzf --tac --info=inline --layout=reverse)
 		 prompt 'ftl> ' -ei "$cmd" ; [[ $REPLY ]] && { echo $REPLY >>/tmp/ftl/commands ; shell ; } ; cdir ;;
@@ -166,6 +168,7 @@ pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == 'pdf' ]] && { pdftotext -l 3 "$n" "$fs/$f.txt" 2>/dev/null && vipreview "$fs/$f.txt" ; } ; }
 pperl()     { [[ $mtype =~ ^application/x-perl$ ]] && [[ -s "$n" ]] && vipreview "$n" ; }
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
+ptar()      { [[ $e =~ tar ]] && tar --list --verbose -f "$f" >"$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 ptype()     { ctsplit "echo $mtype ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 pw3image()  { tbcolor 0 0 ; tcpreview ; sleep 0.01 ; w3p=1 ; echo -e "0;1;$img_x;0;0;0;;;;;${1:-$n}\n4;\n3;" >&7 ; }
 pw3start()  { ((w3iproc)) || { mkapipe 7 ; { <&7 /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$! ; } ; }
@@ -214,7 +217,7 @@ pane()      { pane_read ; [[ -d "$n" ]] && arg="$n" || arg="$PWD" ; tcpreview ; 
 		 { printf "%s\n" "${panes[@]}" ; echo $my_pane ; } >$parent_fs/panes ; echo $np ; }
 pane_k()    { ((main)) && { pane_read && for p in "${panes[@]}" ; do [[ $p != $my_pane ]] && tmux send -t $p Z &>/dev/null ; done ; } && rm $parent_fs/panes && panes=() ; }
 pane_read() { [[ -s $parent_fs/panes ]] && readarray -t panes < <(tmux list-panes -F "#{pane_left} #{pane_id}" | sort -h | grep -f $parent_fs/panes | cut -d' ' -f 2) || false ; }
-parse_path(){ n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
+parse_path(){ n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f#*.}" || e= ; }
 prompt()    { stty echo ; echo -ne '\e[999B\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
 quit()      { wcpreview ; tcpreview ; sstate "/tmp/ftl" ; pane_k ; rm -rf $fs ; quit2 ; tmux killp -t $shell_id &> /dev/null ; tmux kill-session -t ftl$$ &>/dev/null ; exit 0 ; }
 quit2()     { location ; stty echo ;  [[ $parent_fs == $fs ]] && tbcolor 236 52 ;  ((exit_mplayer)) && mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; }
