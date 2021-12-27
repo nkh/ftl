@@ -15,8 +15,8 @@ a   ) kill mplayer                               {   ) fzf to file with preview
 b   ) find entry in directory                    ;   ) fzf persistent mark
 c   ) copy selection                             §   ) clear persistent marks
 d   ) delete                                     ,   ) add persistent mark
-e   ) cd in global directory history             ©   ) compress/decompress       
-E   ) cd in directory history                    «   ) encrypt/decrypt
+e   ) cd in global directory history             «   ) password encrypt/decrypt to file
+E   ) cd in directory history                    »   ) public key encrypt/decrypt to screen
 f   ) filter1, filter is per tab                 .   ) show/hide hidden files
 F   ) clear filter                               7   ) 2nd filter, per tab
 H   ) clear global directory history             8   ) reverse filter, per tab
@@ -32,7 +32,7 @@ p|P ) p: copy selection, P: move selection       |   ) close extra panes
 r   ) rename or bulk rename                      ^   ) show/hide entry stat in header
 R   ) reverse sort                               =   ) sort by name, size, or date
 s   ) show/hide dir size                         \)  ) show/hide directories and files
-S   ) separate editor preview                    
+S   ) separate editor preview                    ©   ) compress/decompress
 t   ) create new tab                             tab ) switch tab
 T   ) fzf tag                                    1-4 ) switch to given tab
 u|U ) tag all files, untag all files             
