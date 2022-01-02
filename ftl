@@ -9,12 +9,12 @@ GPGID=nadim.kemir ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags mar
 tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
 : ${sort_type:=0} ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ )
 
-[[ "$1" ]] && { [[ -d "$1" ]] && dir="$1" ; } || { [[ -f $1 ]] && dir=$(dirname "$1") ; search="${1##*/}" ; }  || { echo ftl: \'$1\', no such path ; exit 1 ; }
+[[ "$1" ]] && { [[ -d "$1" ]] && dir="$1" ; } || { [[ -f $1 ]] && dir=$(dirname "$1") ; search="${1##*/}" ; } || { echo ftl: \'$1\', no such path ; exit 1 ; }
 echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane ; mkdir -p /tmp/ftl/thumbs ; pushd "$dir" &>/dev/null
 [[ "$2" ]] && { fs=$2/$$ ; parent_fs=$2 ; } || { fs=/tmp/ftl/$$ ; parent_fs=$fs ; main=1 ; } ; mkdir -p $fs
 [[ "$3" ]] && { gpreview=1 ; preview_all=0 ; external=0 ; synch $parent_fs "$search" ; } || cdir "$dir" "$search"
 
-while : ; do [[ $R ]] && { REPLY=$R ; R= ; } ||  read -sn 1 ; external_bindings || bindings ; done 
+while : ; do [[ $R ]] && { REPLY=$R ; R= ; } ||  read -sn 1 ; ext_bindings || bindings ; done 
 }
 
 bindings()
@@ -83,6 +83,7 @@ case "${REPLY: -1}" in
 	«      ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
 	»      ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
 	ŋ      ) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
+	þ      ) ((no_ext_tag^=1)) ; cdir ;;
 	\*     ) prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>/dev/null && max_depth=$REPLY && cdir ;;
 	\!     ) tcpreview ; cmd=$(cat /tmp/ftl/commands | awk '!seen[$0]++' | fzf --tac --info=inline --layout=reverse)
 		 prompt 'ftl> ' -ei "$cmd" ; [[ $REPLY ]] && { echo $REPLY >>/tmp/ftl/commands ; shell ; } ; cdir ;;
@@ -102,24 +103,25 @@ esac
 cdir() { get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list ${3:-$found} ; }
 get_dir() # dir, search
 {
-new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return 
+new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return
 geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS = (COLS - 1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_x = (LEFT + COLS) * 10))
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search=${2:-$(((dir_file[$new_dir])) || echo "$find_auto")} ; found= ; shopt -s nocasematch
 
 [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
-cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; }
+cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; } ; ((no_ext_tag)) || ext_dir
 ((gpreview)) || [[ "$PPWD" != "$PWD" ]] && echo "$PWD" | tee -a $fs/history >> /tmp/ftl/history ; [[ "$PWD" == / ]] && sep= || sep=/
 
-line=0 ; sum=0 ; local LANG=C LC_ALL=C ; dir &
+a=(*) ; ((${#a[@]}>999)) && pad=4 || ((${#a[@]}>99)) && pad=3 || pad=2; line=0 ; sum=0 ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 -t 0.04 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; list $found ; in_quick_display=1 ; }
 	[[ "$p" =~ '.' ]] && { e=${p##*.} ; ((lignore[${e@Q}])) && continue ; } ; pl=${#p}
- 
+
+	((no_ext_tag)) || { ext_tag "$p" etag letag ; pc="$etag$pc" ; ((pl+=letag)) ; }
 	((show_size)) && { ((sum += size)) ; [[ -d "$p" ]] && { ((show_dir_size)) && pc=$(dsize "$p")" $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
-	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-3d\e[m $pc" $line ; ((pl += 4)) ; }
+	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-${pad}d\e[m $pc" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}$e ; }
-	files_color[$nfiles]="$pcl" ;  files[$nfiles]="$PWD$sep$p" ; [[ -n "$search" && -z "$found" ]] && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
+	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$p" ; [[ -n "$search" && -z "$found" ]] && [[ $p =~ ^$search ]] && found=$nfiles ; ((nfiles++))
 done 
 
 shopt -u nocasematch ; in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
@@ -244,4 +246,4 @@ tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo ftl\> ${1@Q}
 tsplit()    { tmux sp -t $my_pane -e n="$n" ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tmux selectp ${4:--L} ; } ; }
 zoom()      { geometry ; read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') ; ((x = (($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; tresize $pane_id $x ;}
 
-external_bindings() { false ; } ; source "$(dirname "$0")/ftl.eb" &>/dev/null ; ftl "$@"
+ext_dir() { : ; } ; ext_tag() { : ; } ; ext_bindings() { false ; } ; d0="$(dirname "$0")/" ; . "$d0/ftl.et" ; . "$d0/ftl.eb" 2>&- ; ftl "$@"

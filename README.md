@@ -35,7 +35,7 @@ s   ) show/hide dir size                         \)  ) show/hide directories and
 S   ) separate editor preview                    ©   ) compress/decompress
 t   ) create new tab                             tab ) switch tab
 T   ) fzf tag                                    1-4 ) switch to given tab
-u|U ) tag all files, untag all files             
+u|U ) tag all files, untag all files             þ   ) show/hide external file tags
 v|V ) preview on/off, v: preview current file    #   ) flip-flop preview for extension
 w|W ) w: ext. viewer, W: ext. detached viewer    -   ) change preview size
 x|X ) chmod a+x, a-x                             "   ) flip-flop image preview
@@ -54,9 +54,9 @@ z   ) make preview the active pane and quit      0|9 ) internal usage
 
 There are many promising file managers for the terminal, fff to nnn, clifm, ranger, vimfm, etc ... 
 
-ftl is Written in Bash (packs a punch, sometimes it punches you).
+ftl is Written in Bash (the language that packs a punch and sometimes punches you).
 
-I wanted a file manager that would use tmux and give "live" preview and works well with a tiling manager,
+I wanted a file manager that would use tmux and give me "live" preview and works well with a tiling manager,
 
 This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs
 
@@ -69,19 +69,19 @@ This is definitely not production quality, it's for the fun of it, but it's good
 - fzf      - to locate file and to present a picker
 - awk, sed, numfmt, sponge, ...
 - fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
-- xdotool, wmctrl
+- xdotool, wmctrl, expect
 - divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ... soon
 
 ## Installation
 
-ftl is a single script, put it in the PATH, install the dependencies *TODO package dependencies* and run.
+ftl is a single script, put it in the PATH, install the dependencies *TODO: package dependencies* and run.
 
-README.md, this file, should also be where you put ftl if you want "inline help"
+README.md: this file, is also the inline help
 
-ftl.eb implements optional external binding, put it where you put ftl if you want to use it. It contains an incremental
-search example.
+Some optional files:
 
-best is to  symlink the files from the repo.
+ftl.eb: example of how to add extra binding. It contains an incremental search example.
+ftl.et: example of how to tag files with their git status
 
 ## Display
 
@@ -121,7 +121,7 @@ videos and if you need help send me a mail.
 - filters     each tab has its filter
 - epanes      extra panes 
 - pane_id     id of preview pane
-- my_pane     own pane
+- my_pane     own pane id
 - tfilter     used in image mode
 - marks       bookmarks, marks=([0]=dir [1]=dir ...), preset bookmarks
 - tags        list of tagged files
@@ -147,7 +147,8 @@ videos and if you need help send me a mail.
 
 # BUGS AND LIMITATIONS
 
-SIGWINCH is not handled yet
+- SIGWINCH is not handled 
+- No automatic synch with file system 
 
 # LICENSE AND COPYRIGHT
 
