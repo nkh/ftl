@@ -1,13 +1,13 @@
 declare -A git_tags
 ext_dir()
 {
-git_tags=() ; not_git=1
+git_tags=() ; is_git=0
 git rev-parse HEAD &>/dev/null && 
 	{
 	readarray -t lines < <(unbuffer git status -s 2>/dev/null)
-	not_git=0 ;  local file
+	is_git=1 ; local file
 	for line in "${lines[@]}" ; do file=${line#*[m } ; file=${file%/} ; git_tags[$file]=${line%$file*} ; done
 	}
 }
  
-ext_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; ((not_git||no__ext)) || { r2="${git_tags[$1]:-   }" ; r3=3 ; } ; }
+ext_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; (( is_git && etag )) && { r2="${git_tags[$1]:-   }" ; r3=3 ; } ; }

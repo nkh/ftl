@@ -2,7 +2,7 @@
 
 ftl - terminal file manager, tmux based
 
-## Commands
+## Commands shortcuts
 ```
 q|Q ) close tab, close and write to &3           ?   ) show this file
 j|B ) next entry                                 ''  ) cd to selected entry or open file
@@ -18,8 +18,8 @@ d   ) delete                                     ,   ) add persistent mark
 e   ) cd in global directory history             «   ) password encrypt/decrypt to file
 E   ) cd in directory history                    »   ) public key encrypt/decrypt to screen
 f   ) filter1, filter is per tab                 .   ) show/hide hidden files
-F   ) clear filter                               7   ) 2nd filter, per tab
-H   ) clear global directory history             8   ) reverse filter, per tab
+F   ) clear filter                               €   ) 2nd filter, per tab
+H   ) clear global directory history             ¥   ) reverse filter, per tab
 i   ) image/no image mode                        \(  ) fzfi, find images using ueberzurg 
 I   ) create empty file                          }   ) rg to file
 J|K ) scroll preview                             %   ) disable extension from listing
@@ -27,11 +27,11 @@ L   ) symlink selection                          &   ) re-enable all extensions
 m   ) mark directory                             '   ) go to mark
 M   ) mkdir                                      +   ) show only directory preview
 n|N ) find next/previous                         ½   ) open new ftl in pane 
-O|o ) next/previous pane                         >|<|\_ ) extra pane
+O|o ) next/previous pane                         >|<|_ ) extra pane
 p|P ) p: copy selection, P: move selection       |   ) close extra panes
 r   ) rename or bulk rename                      ^   ) show/hide entry stat in header
 R   ) reverse sort                               =   ) sort by name, size, or date
-s   ) show/hide dir size                         \)  ) show/hide directories and files
+s   ) show/hide dir size                         )   ) show/hide directories and files
 S   ) separate editor preview                    ©   ) compress/decompress
 t   ) create new tab                             tab ) switch tab
 T   ) fzf tag                                    1-4 ) switch to given tab
@@ -39,10 +39,11 @@ u|U ) tag all files, untag all files             þ   ) show/hide external file 
 v|V ) preview on/off, v: preview current file    #   ) flip-flop preview for extension
 w|W ) w: ext. viewer, W: ext. detached viewer    -   ) change preview size
 x|X ) chmod a+x, a-x                             "   ) flip-flop image preview
-y   ) tag/untag current file                     ' ' ) tag/untag current file
-Y   ) copy selection to clipboard                $   ) shell pane
-Z   ) close all tabs                             !   ) run shell command
-z   ) make preview the active pane and quit      0|9 ) internal usage
+y|Y ) tag/untag current file                     !   ) run shell command
+Z   ) close all tabs                             $   ) shell pane
+z   ) make preview the active pane and quit      ←   ) copy selection to clipboard
+                                                 ' ' ) leader key
+                                                 0|8|9 ) internal usage
 
 ```
 
@@ -52,9 +53,9 @@ z   ) make preview the active pane and quit      0|9 ) internal usage
 
 # DOCUMENTATION
 
-There are many promising file managers for the terminal, fff to nnn, clifm, ranger, vimfm, etc ... 
+There are many promising file managers for the terminal, from fff to nnn, clifm, ranger, vimfm, etc ... 
 
-ftl is Written in Bash (the language that packs a punch and sometimes punches you).
+ftl is Written in Bash, the language that packs a real punch and sometimes punches you.
 
 I wanted a file manager that would use tmux and give me "live" preview and works well with a tiling manager,
 
@@ -69,7 +70,7 @@ This is definitely not production quality, it's for the fun of it, but it's good
 - fzf      - to locate file and to present a picker
 - awk, sed, numfmt, sponge, ...
 - fzf-tmux, fim, zathura, qutebrowse, rw3m, w3mimgdisplay, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
-- xdotool, wmctrl, expect
+- xdotool, wmctrl, expect, inotifywait
 - divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ... soon
 
 ## Installation
@@ -148,7 +149,6 @@ videos and if you need help send me a mail.
 # BUGS AND LIMITATIONS
 
 - SIGWINCH is not handled 
-- No automatic synch with file system 
 
 # LICENSE AND COPYRIGHT
 
