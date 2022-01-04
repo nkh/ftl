@@ -43,7 +43,8 @@ y|Y ) tag/untag current file                     !   ) run shell command
 Z   ) close all tabs                             $   ) shell pane
 z   ) make preview the active pane and quit      ←   ) copy selection to clipboard
                                                  ' ' ) leader key
-                                                 0|8|9 ) internal usage
+                                                 8   ) refresh
+                                                 0|9 ) internal usage
 
 ```
 
@@ -148,7 +149,8 @@ videos and if you need help send me a mail.
 
 # BUGS AND LIMITATIONS
 
-No installer
+no installer
+image preview is not fitted to terminal, and bleeds on other pane
 
 # LICENSE AND COPYRIGHT
 
