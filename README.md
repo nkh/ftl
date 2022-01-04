@@ -148,7 +148,7 @@ videos and if you need help send me a mail.
 
 # BUGS AND LIMITATIONS
 
-- SIGWINCH is not handled 
+No installer
 
 # LICENSE AND COPYRIGHT
 
