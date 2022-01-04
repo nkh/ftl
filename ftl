@@ -1,7 +1,7 @@
 #!/bin/env bash
 cdf() { d=/tmp/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
-ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2021, Artistic licence 2.0
+ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
 GPGID=nadim.kemir ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]=/home/nadim/nadim [2]=/home/nadim/nadim/downloads)
 : ${preview_all:=1} ; : ${pdir_only:=0} ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype) 
@@ -105,7 +105,7 @@ cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : n
 get_dir() # dir, search
 {
 new_dir=${1:-$PWD} ; [[ -d "$new_dir" ]] || return
-geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS = (COLS - 1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_x = (LEFT+COLS) * 10, img_w=0, img_h=0))
+geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_x=(LEFT+COLS) * 10, img_w=(WIDTH-COLS)*10, img_h=((LINES-1))*20))
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search=${2:-$(((dir_file[$new_dir])) || echo "$find_auto")} ; found= ; shopt -s nocasematch
 
 [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
@@ -175,11 +175,13 @@ pperl()     { [[ $mtype =~ ^application/x-perl$ ]] && [[ -s "$n" ]] && vipreview
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
 ptar()      { [[ $f =~ \.tar ]] && tar --list --verbose -f "$f" >"$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 ptype()     { ctsplit "echo $f ; echo $mtype ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
-pw3image()  { trap '' WINCH ; tbcolor 0 0 ; tcpreview ; sleep 0.01 ; w3p=1 ; echo -e "0;1;$img_x;0;$img_w;$img_h;;;;;${1:-$n}\n4;\n3;" >&7 ; } 
+pw3image()  { trap '' WINCH ; tbcolor 0 0 ; tcpreview ; sleep 0.01 ; w3p=1 ; image="${1:-$n}" ; read -r w h < <(identify -format '%w %h' "$image")
+		((w==0 || h==0)) && { h=1 ; w=1 ; } ; rw=0 ; rh=0 ; ((w>img_w || h>img_h)) && pw3scale ; echo -e "0;1;$img_x;0;$rw;$rh;;;;;$image\n4;\n3;" >&7 ; }
+pw3scale()  { { read rw ; read rh ; } < <(echo "scale=2 ; if($w>$h) r=$img_w/$w  else r=$img_h/$h ; scale=0 ; $w*r/1; $h*r/1" | bc) ; }
 pw3start()  { ((w3iproc)) || { mkapipe 7 ; { <&7 /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$! ; } ; }
 tcpreview() { [[ "$pane_id" ]] && tmux killp -t $pane_id &> /dev/null ; sleep 0.01 ; pane_id= ; in_vipreview= ; }
 vipreview() { ((in_vipreview)) && { tmux send -t $pane_id ":e $(sed -E 's/\$/\\$/g' <<<"$1")" C-m ; } || ctsplit "$EDITOR -R ${1@Q}" ; ((in_vipreview++)) ; true ; }
-vcpreview() { ((old_in_vipreview == in_vipreview)) && in_vipreview= ; true ; } 
+vcpreview() { ((old_in_vipreview == in_vipreview)) && in_vipreview= ; true ; }
 wcpreview() { ((w3p)) && { ctsplit 'read -sn 100' ; sleep 0.01 ; w3p= ; } ; trap 'winch=1' WINCH ; true ; }
 
 bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
@@ -205,7 +207,7 @@ ftl_imode() { (($1)) && { ntfilter= ; tfilters[tab]="$ifilter$" ; dir_file[$PWD]
 ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter='-v' ; dir_file[$PWD]= ; }
 fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$1" ||  cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$1" ]] && while read f ; do tags[$PWD/$f]='▪' ; done <<<$1 ; }
-geometry()  { read -r LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_height} #{pane_width} #{pane_left}') ; }
+geometry()  { read -r WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 header()    { h="${@} $((tab+1))/${#tabs[@]} $filter_tag${sort_name[sort_type]}$show_reversed ${#tags[@]}" ; header_pos "$h" ; echo -e "\e[?25l\e[H\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
