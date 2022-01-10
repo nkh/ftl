@@ -1,4 +1,4 @@
-external_bindings()
+ext_bindings()
 {
 # incremental search, binding: b
 ((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; esac && return

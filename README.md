@@ -29,8 +29,8 @@ M   ) mkdir                                      +   ) show only directory previ
 n|N ) find next/previous                         ½   ) open new ftl in pane 
 O|o ) next/previous pane                         >|<|_ ) extra pane
 p|P ) p: copy selection, P: move selection       |   ) close extra panes
-r   ) rename or bulk rename                      ^   ) show/hide entry stat in header
-R   ) reverse sort                               =   ) sort by name, size, or date
+r   ) reverse sort                               ^   ) show/hide entry stat in header
+R   ) rename or bulk rename                      =   ) sort by name, size, or date
 s   ) show/hide dir size                         )   ) show/hide directories and files
 S   ) separate editor preview                    ©   ) compress/decompress
 t   ) create new tab                             tab ) switch tab
@@ -103,11 +103,9 @@ Only show images in the listing and directory preview; with multiple tabs, makes
 
 # TODO
 
-- Handle SIGWINCH
 - keyboard buffer flushing
 - fzf scripts preview via vim not bat
 - vim file opener using ftl
-- use inotify
  
 # PATCHING ftl (with gratitude to Larry wall, and not just for patch)
 
@@ -150,7 +148,6 @@ videos and if you need help send me a mail.
 # BUGS AND LIMITATIONS
 
 no installer
-image preview is not fitted to terminal, and bleeds on other pane
 
 # LICENSE AND COPYRIGHT
 
