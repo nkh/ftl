@@ -20,7 +20,7 @@ E   ) cd in directory history                    »   ) public key encrypt/decry
 f   ) filter1, filter is per tab                 .   ) show/hide hidden files
 F   ) clear filter                               €   ) 2nd filter, per tab
 H   ) clear global directory history             ¥   ) reverse filter, per tab
-i   ) image/no image mode                        \(  ) fzfi, find images using ueberzurg 
+i   ) image/no image mode                        (   ) fzfi, find images using ueberzurg 
 I   ) create empty file                          }   ) rg to file
 J|K ) scroll preview                             %   ) disable extension from listing
 L   ) symlink selection                          &   ) re-enable all extensions
@@ -42,6 +42,7 @@ x|X ) chmod a+x, a-x                             "   ) flip-flop image preview
 y|Y ) tag/untag current file                     !   ) run shell command
 Z   ) close all tabs                             $   ) shell pane
 z   ) make preview the active pane and quit      ←   ) copy selection to clipboard
+                                                 µ   ) mail
                                                  ' ' ) leader key
                                                  8   ) refresh
                                                  0|9 ) internal usage
