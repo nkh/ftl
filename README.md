@@ -13,7 +13,7 @@ g|G ) first entry, last entry                    /   ) fzf to file
 5|6 ) page down/up                               \   ) fzf to directory        
 a   ) kill mplayer                               {   ) fzf to file with preview
 b   ) find entry in directory                    ;   ) fzf persistent mark
-c   ) copy selection                             §   ) clear persistent marks
+c   ) copy selection                             ĸ   ) clear persistent marks
 d   ) delete                                     ,   ) add persistent mark
 e   ) cd in global directory history             «   ) password encrypt/decrypt to file
 E   ) cd in directory history                    »   ) public key encrypt/decrypt to screen
@@ -33,8 +33,7 @@ r   ) reverse sort                               ^   ) show/hide entry stat in h
 R   ) rename or bulk rename                      =   ) sort by name, size, or date
 s   ) show/hide dir size                         )   ) show/hide directories and files
 S   ) separate editor preview                    ©   ) compress/decompress
-t   ) create new tab                             tab ) switch tab
-T   ) fzf tag                                    1-4 ) switch to given tab
+t|T ) fzf tag directory/with subdirectories      1-4 ) switch to given tab
 u|U ) tag all files, untag all files             þ   ) show/hide external file tags
 v|V ) preview on/off, v: preview current file    #   ) flip-flop preview for extension
 w|W ) w: ext. viewer, W: ext. detached viewer    -   ) change preview size
@@ -42,6 +41,8 @@ x|X ) chmod a+x, a-x                             "   ) flip-flop image preview
 y|Y ) tag/untag current file                     !   ) run shell command
 Z   ) close all tabs                             $   ) shell pane
 z   ) make preview the active pane and quit      ←   ) copy selection to clipboard
+                                                 §   ) create new tab
+                                                 tab ) switch tab
                                                  µ   ) mail
                                                  ' ' ) leader key
                                                  8   ) refresh
