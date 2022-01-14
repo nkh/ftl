@@ -14,7 +14,7 @@ echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane ; mkdir -p /tmp/ftl/thum
 [[ "$2" ]] && { fs=$2/$$ ; parent_fs=$2 ; } || { fs=/tmp/ftl/$$ ; parent_fs=$fs ; main=1 ; } ; mkdir -p $fs
 [[ "$3" ]] && { gpreview=1 ; preview_all=0 ; external=0 ; synch $parent_fs "$search" ; } || cdir "$dir" "$search" ; WCOLS=$COLS ; WLINES=$LINES
  
-while : ; do [[ $R ]] && { REPLY=$R ; R= ; } || read -sn 1 -t 0.05 ; [[ $REPLY ]] && { ext_bindings || bindings ; } ; ((winch>10)) && { winch && continue ; } || ((winch++)) ; done 
+while : ; do  ((winch++, winch>15)) && { winch && continue ; } ; [[ $R ]] && { REPLY=$R ; R= ; } || read -sn 1 -t 0.1 ; [[ $REPLY ]] && { ext_bindings || bindings ; } ; done 
 }
 
 bindings()
@@ -251,7 +251,7 @@ tpop()      { read -r PLEFT PTOP< <(tmux display -p -t $1 '#{pane_left} #{pane_t
 tresize()   { tmux resizep -t $1 -x $2 &>/dev/null ; rdir ; }
 tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo ftl\> ${1@Q} ; $1 ; echo \$\?: $? ; read -sn2 -t 1800" ; }
 tsplit()    { tmux sp -t $my_pane -e n="$n" ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tmux selectp ${4:--L} ; } ; }
-winch()     { geometry ; [[ $WCOLS != $COLS || $WLINES != $LINES ]] && cdir ; WCOLS=$COLS ; WLINES=$LINES ; winch= ; }
+winch()     { winch= ; geometry ; { [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && cdir ; }
 zoom()      { geometry ; read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') ; ((x = (($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; tresize $pane_id $x ;}
 
 ext_dir() { : ; } ; ext_tag() { : ; } ; ext_bindings() { false ; } ; d0="$(dirname "$0")/" ; . "$d0/ftl.et" ; . "$d0/ftl.eb" 2>&- ; ftl "$@"
