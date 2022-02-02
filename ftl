@@ -1,11 +1,13 @@
 #!/bin/env bash
 cdf() { d=/tmp/$USER/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
+# path not shortened after scrolling 
+externals() { echo edir eimage emedia epdf ehtml etext ; }
+previewers(){ echo pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype ; }
 
 ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-: ${preview_all:=1} ; : ${pdir_only:=0} ; previewers=(pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype) 
-: ${find_auto:=README} ; quick_display=256 ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; : ${imode:=0} ; : ${zoom:=0} ; zooms=(70 50 30) 
-tbcolor 67 67 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
+: ${preview_all:=1} ; : ${pdir_only:=0} ; : ${find_auto:=README} ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; : ${imode:=0} ; : ${zoom:=0} ; zooms=(70 50 30) 
+tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; ifilter='jpg|jpeg|JPG|png|gif'
 etag=1 ; : ${sort_type:=0} ; find_formats=('%s %P\n' '%s %P\n' '%T@ %s %P\n') ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ )
 GPGID= ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore tags marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl
 
@@ -62,7 +64,7 @@ case "${REPLY: -1}" in
 	w|W    ) external=1 ; [[ $REPLY == W  ]] && detached=1 ; list ;;
 	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	y|Y    ) tag_flip "${files[file]}" ; ((nfiles == 1)) && list || { [[ $REPLY == Y ]] && R=k || R=j ; } ;;
-	Z|q|Q  ) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || pane_close || quit ;;
+	Z|q|Q|\@) [[ $REPLY == Z ]] && { exit_mplayer=1 ; quit ; } || close_tab || pane_close || quit ;;
 	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
 	\§     ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
 	←      ) cat $fs/tags | xsel -b -i ;; 
@@ -94,7 +96,7 @@ case "${REPLY: -1}" in
 	/|\\   ) [[ $REPLY == / ]] && dir= || dir="-t d" ; tcpreview ; fzf_go "$(fd . $dir --color=always -L | fzf --ansi --info=inline --layout=reverse)" ;;
 	\{     ) tcpreview ; fzf_go "$(fzfppv -L)" ;;
 	\}     ) tcpreview ; rg_go "$(fzfr)" ;;
-	\$     ) [[ $REPLY == _ ]] && shell_pane || [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
+	\$|\ß  ) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; [[ $REPLY == \ß ]] && tmux resizep -Z -t $shell_id ;;
 	\-     ) [[ $pane_id ]] && { ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; } ;;
 	\>|\<|_) [[ $REPLY == \> ]] && pane_ftl || { [[ $REPLY == \< ]] && pane_ftl '-h -b' -R || pane_ftl '-v' -U ; } ; cdir ; sstate ;;
 	\)     ) ((show_files ^= 1)) || { ((show_file ^= 1)) ; ((show_dirs ^= 1)) ; } || show_files=0 ; ((show_files || show_dirs)) || { show_files=1 ; show_dirs=0 ; } ; cdir ;;
@@ -149,8 +151,8 @@ preview()
 {
 ((main || gpreview || preview_all)) || { kbd_flush ; pane_read && echo -en "$n\n$fs\n" >$parent_fs/preview && for p in "${panes[@]}" ; do tmux send -t $p 9 &>/dev/null ; done ; return ; }
 old_in_vipreview=$in_vipreview
-((external)) && { edir || eimage || emedia || epdf || ehtml || etext ; external= ; detached= ; sleep 0.01 ; list ; return ; }
-((${preview:-$preview_all})) && { preview= ; for v in ${previewers[@]} ; do $v && vcpreview && return ; done ; }
+((external)) && { external= ; for e in $(externals) ; do $e && { sleep 0.01 ; list ; return ; } ; done ; } ; detached= ; 
+((${preview:-$preview_all})) && { preview= ; for v in $(previewers) ; do $v && vcpreview && return ; done ; }
 wcpreview ; tcpreview
 }
 
@@ -159,7 +161,7 @@ ehtml()     { [[ $e == 'html' ]] && { ((detached)) && { (qutebrowser "$n" 2>/dev
 eimage()    { [[ $e =~ ^($ifilter)$ ]] && run_maxed fim -a "$n" "$PWD" ; }
 emedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { ((! detached)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
 epdf()      { [[ $e == 'pdf' ]] && { ((detached)) && (zathura "$n" &) || run_maxed zathura "$n" ; true ; } ; }
-etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; external= ; list ; }
+etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 pdir()      { [[ -d "$n" ]] && { ((imode)) && pdir_image || pdir_dir ; } || pdir_only ; }
 pdir_dir()  { (($in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id 0 || { arg=${1:-$p} ; ctsplit "ftl ${arg@Q} $fs 1" ; in_pdir=1 ; } ; }
 pdir_image(){ ((folder_image_preview)) && [[ -e "$n/montage.png" ]] && pw3image "$n/montage.png" ; }
@@ -230,8 +232,9 @@ pane_k()    { ((main)) && { pane_read && for p in "${panes[@]}" ; do [[ $p != $m
 pane_read() { [[ -s $parent_fs/panes ]] && readarray -t panes < <(tmux list-panes -F "#{pane_left} #{pane_id}" | sort -h | grep -f $parent_fs/panes | cut -d' ' -f 2) || false ; }
 parse_path(){ n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 prompt()    { stty echo ; echo -ne '\e[999B\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
-quit()      { wcpreview ; tcpreview ; sstate "$ftl_root" ; pane_k ; rm -rf $fs ; quit2 ; tmux killp -t $shell_id &> /dev/null ; tmux kill-session -t ftl$$ &>/dev/null ; exit 0 ; }
+quit()      { wcpreview ; tcpreview ; sstate "$ftl_root" ; pane_k ; rm -rf $fs ; quit2 ; quit_shell ;tmux kill-session -t ftl$$ &>/dev/null ; exit 0 ; }
 quit2()     { inotify_k ; location ; stty echo ; [[ $parent_fs == $fs ]] && tbcolor 236 52 ; ((exit_mplayer)) && mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; }
+quit_shell(){ [[ $REPLY != @ ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir ; in_quick_display=1 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list ; in_quick_display=0 ; }
 refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 rg_go()     { [[ "$1" ]] && { g=${1%%:*} && nd="$PWD/"$(dirname "$g") && cdir "$nd" "$(basename "$g")" ; } || { refresh ; list ; } ; }

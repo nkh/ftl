@@ -4,49 +4,50 @@ ftl - terminal file manager, tmux based
 
 ## Commands shortcuts
 ```
-q|Q ) close tab, close and write to &3           ?   ) show this file
-j|B ) next entry                                 ''  ) cd to selected entry or open file
-k|A ) previous entry                             :   ) go to entry
-h|D ) parent directory                           *   ) set maximum listing depth
-l|C ) cd to selected entry or open file          ŋ   ) cd
-g|G ) first entry, last entry                    /   ) fzf to file
-5|6 ) page down/up                               \   ) fzf to directory        
-a   ) kill mplayer                               {   ) fzf to file with preview
-b   ) find entry in directory                    ;   ) fzf persistent mark
-c   ) copy selection                             ĸ   ) clear persistent marks
-d   ) delete                                     ,   ) add persistent mark
-e   ) cd in global directory history             «   ) password encrypt/decrypt to file
-E   ) cd in directory history                    »   ) public key encrypt/decrypt to screen
-f   ) filter1, filter is per tab                 .   ) show/hide hidden files
-F   ) clear filter                               €   ) 2nd filter, per tab
-H   ) clear global directory history             ¥   ) reverse filter, per tab
-i   ) image/no image mode                        (   ) fzfi, find images using ueberzurg 
-I   ) create empty file                          }   ) rg to file
-J|K ) scroll preview                             %   ) disable extension from listing
-L   ) symlink selection                          &   ) re-enable all extensions
-m   ) mark directory                             '   ) go to mark
-M   ) mkdir                                      +   ) show only directory preview
-n|N ) find next/previous                         ½   ) open new ftl in pane 
-O|o ) next/previous pane                         >|<|_ ) extra pane
-p|P ) p: copy selection, P: move selection       |   ) close extra panes
-r   ) reverse sort                               ^   ) show/hide entry stat in header
-R   ) rename or bulk rename                      =   ) sort by name, size, or date
-s   ) show/hide dir size                         )   ) show/hide directories and files
-S   ) separate editor preview                    ©   ) compress/decompress
-t|T ) fzf tag directory/with subdirectories      1-4 ) switch to given tab
-u|U ) tag all files, untag all files             þ   ) show/hide external file tags
-v|V ) preview on/off, v: preview current file    #   ) flip-flop preview for extension
-w|W ) w: ext. viewer, W: ext. detached viewer    -   ) change preview size
-x|X ) chmod a+x, a-x                             "   ) flip-flop image preview
-y|Y ) tag/untag current file                     !   ) run shell command
-Z   ) close all tabs                             $   ) shell pane
-z   ) make preview the active pane and quit      ←   ) copy selection to clipboard
-                                                 §   ) create new tab
-                                                 tab ) switch tab
-                                                 µ   ) mail
-                                                 ' ' ) leader key
-                                                 8   ) refresh
-                                                 0|9 ) internal usage
+q|Q|@) close, write to &3, keep shell             ?   ) show this file
+j|B  ) next entry                                 ''  ) cd to selected entry or open file
+k|A  ) previous entry                             :   ) go to entry
+h|D  ) parent directory                           *   ) set maximum listing depth
+l|C  ) cd to selected entry or open file          ŋ   ) cd
+g|G  ) first entry, last entry                    /   ) fzf to file
+5|6  ) page down/up                               \   ) fzf to directory        
+a    ) kill mplayer                               {   ) fzf to file with preview
+b    ) find entry in directory                    ;   ) fzf persistent mark
+c    ) copy selection                             ĸ   ) clear persistent marks
+d    ) delete                                     ,   ) add persistent mark
+e    ) cd in global directory history             «   ) password encrypt/decrypt to file
+E    ) cd in directory history                    »   ) public key encrypt/decrypt to screen
+f    ) filter1, filter is per tab                 .   ) show/hide hidden files
+F    ) clear filter                               €   ) 2nd filter, per tab
+H    ) clear global directory history             ¥   ) reverse filter, per tab
+i    ) image/no image mode                        (   ) fzfi, find images using ueberzurg 
+I    ) create empty file                          }   ) rg to file
+J|K  ) scroll preview                             %   ) disable extension from listing
+L    ) symlink selection                          &   ) re-enable all extensions
+m    ) mark directory                             '   ) go to mark
+M    ) mkdir                                      +   ) show only directory preview
+n|N  ) find next/previous                         ½   ) open new ftl in pane 
+O|o  ) next/previous pane                         >|<|_ ) extra pane
+p|P  ) p: copy selection, P: move selection       |   ) close extra panes
+r    ) reverse sort                               ^   ) show/hide entry stat in header
+R    ) rename or bulk rename                      =   ) sort by name, size, or date
+s    ) show/hide dir size                         )   ) show/hide directories and files
+S    ) separate editor preview                    ©   ) compress/decompress
+t|T  ) fzf tag directory/with subdirectories      1-4 ) switch to given tab
+u|U  ) tag all files, untag all files             þ   ) show/hide external file tags
+v|V  ) preview on/off, v: preview current file    #   ) flip-flop preview for extension
+w|W  ) w: ext. viewer, W: ext. detached viewer    -   ) change preview size
+x|X  ) chmod a+x, a-x                             "   ) flip-flop image preview
+y|Y  ) tag/untag current file                     !   ) run shell command
+Z    ) close all tabs                             $|ß ) shell pane, zoomed
+z    ) make preview the active pane and quit      @   ) quit butkeep shellpane if any
+                                                  ←   ) copy selection to clipboard
+                                                  §   ) create new tab
+                                                  tab ) switch tab
+                                                  µ   ) mail
+                                                  ' ' ) leader key
+                                                  8   ) refresh
+                                                  0|9 ) internal usage
 
 ```
 
