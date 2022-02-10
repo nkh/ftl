@@ -1,0 +1,2 @@
+clear ; stty echo ; tput cnorm ; read -p 'ftl filter, file min size: ' ftl_min_size ; tput civis ; stty -echo
+ftl_filter() { while read -a file_data ; do ((${file_data[0]} > ${ftl_min_size:-0})) && echo "${file_data[@]}" ; done ; }

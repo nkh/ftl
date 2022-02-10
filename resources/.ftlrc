@@ -1,0 +1,5 @@
+GPGID=CHANGE.ME ; declare -A marks=([0]=/ [1]=/CHANGE_ME [2]=/CHANGE_ME [3]=/CHANGE_ME)
+
+#previewers(){ echo pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar pnad ptype ; }
+#pnad(){ vipreview ~/.bashrc ; }
+
