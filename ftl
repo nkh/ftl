@@ -1,6 +1,6 @@
 #!/bin/env bash
 cdf() { d=/tmp/$USER/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
-# bug: preview not at right y coordinate
+
 externals() { echo edir eimage emedia epdf ehtml etext ; }
 previewers(){ echo pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype ; }
 type ftl_filter &>/dev/null || eval "ftl_filter(){ cat ; }" ; ext_dir() { : ; } ; ext_tag() { : ; } ; ext_bindings() { false ; } 
@@ -110,7 +110,7 @@ get_dir() # dir, search
 {
 new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$(((dir_file[$PPWD])) || echo "$find_auto")}" ; found= ; shopt -s nocasematch
-geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_x=(LEFT+COLS) * 10, img_w=(WIDTH-COLS)*10, img_h=((LINES-1))*20))
+geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; ((img_y=TOP*20, img_x=(LEFT+COLS) * 10, img_w=(WIDTH-COLS)*10, img_h=((LINES-1))*20))
 
 cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; } ; ((etag)) && ext_dir
 ((gpreview)) || echo "$PWD" | tee -a $fs/history >> $ftl_root/history ; [[ "$PWD" == / ]] && sep= || sep=/
@@ -155,7 +155,7 @@ preview()
 {
 ((main || gpreview || preview_all)) || { kbd_flush ; pane_read && echo -en "$n\n$fs\n" >$parent_fs/preview && for p in "${panes[@]}" ; do tmux send -t $p 9 &>/dev/null ; done ; return ; }
 old_in_vipreview=$in_vipreview
-((external)) && { external= ; for e in $(externals) ; do $e && { sleep 0.01 ; list ; return ; } ; done ; } ; detached= ; 
+((external)) && { for external in $(externals) ; do $external && { sleep 0.01 ; list ; return ; } ; done ; } ; external= ; detached= ; 
 ((${preview:-$preview_all})) && { preview= ; for v in $(previewers) ; do $v && vcpreview && return ; done ; }
 wcpreview ; tcpreview
 }
@@ -164,7 +164,7 @@ edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
 ehtml()     { [[ $e == 'html' ]] && { ((detached)) && { (qutebrowser "$n" 2>&- &) ; } || { tcpreview ; w3m -o confirm_qq=0 "$n" ; } ; } ; } 
 eimage()    { [[ $e =~ ^($ifilter)$ ]] && run_maxed fim -a "$n" "$PWD" ; }
 emedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { ((! detached)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
-epdf()      { [[ $e == 'pdf' ]] && { ((detached)) && (zathura "$n" &) || run_maxed zathura "$n" ; true ; } ; }
+epdf()      { [[ $e == pdf ]] && { ((detached)) && (zathura "$n" &) || run_maxed zathura "$n" ; true ; } ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 pdir()      { [[ -d "$n" ]] && { ((imode)) && pdir_image || pdir_dir ; } || pdir_only ; }
 pdir_dir()  { (($in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id 0 || { arg=${1:-$p} ; ctsplit "ftl ${arg@Q} $fs 1" ; in_pdir=1 ; } ; }
@@ -182,7 +182,7 @@ ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n
 ptar()      { [[ $f =~ \.tar ]] && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
 ptype()     { ctsplit "echo $f ; echo $mtype ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 pw3image()  { tbcolor 0 0 ; tcpreview ; sleep 0.01 ; w3p=1 ; image="${1:-$n}" ; read -r w h < <(identify -format '%w %h' "$image")
-		((w==0 || h==0)) && { h=1 ; w=1 ; } ; rw=0 ; rh=0 ; ((w>img_w || h>img_h)) && pw3scale ; echo -e "0;1;$img_x;0;$rw;$rh;;;;;$image\n4;\n3;" >&7 ; }
+		((w==0 || h==0)) && { h=1 ; w=1 ; } ; rw=0 ; rh=0 ; ((w>img_w || h>img_h)) && pw3scale ; echo -e "0;1;$img_x;$img_y;$rw;$rh;;;;;$image\n4;\n3;" >&7 ; }
 pw3scale()  { { read rw ; read rh ; } < <(bc <<<"scale=2 ; r=rw=$img_w/$w ; rh=$img_h/$h ; if(rh<rw) r=rh ; if(r>1) r=1 ; scale=0 ; $w*r/1; $h*r/1") ; }
 pw3start()  { ((w3iproc)) || { mkapipe 7 ; { <&7 /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$! ; } ; }
 tcpreview() { [[ "$pane_id" ]] && tmux killp -t $pane_id &> /dev/null ; sleep 0.01 ; pane_id= ; in_vipreview= ; }
@@ -213,7 +213,7 @@ ftl_imode() { (($1)) && { ntfilter= ; tfilters[tab]="$ifilter$" ; dir_file[$PWD]
 ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter='-v' ; dir_file[$PWD]= ; }
 fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$1" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$1" ]] && while read f ; do tags[$PWD/$f]='▪' ; done <<<$1 ; }
-geometry()  { read -r WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
+geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 header()    { h="${@} $((tab+1))/${#tabs[@]} $filter_tag${sort_name[sort_type]}$show_reversed ${#tags[@]}" ; header_pos "$h" ; echo -e "\e[?25l\e[H\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
