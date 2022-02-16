@@ -1,11 +1,26 @@
 ext_bindings()
 {
+# handle leader keys + user defined shortcut
+in_leader && return ;
+
 # incremental search, binding: b
 ((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; esac && return
 
 case "${REPLY: -1}" in
 	b  ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
+	' ') in_leader=1 ;;
 	*  ) false ;;
+esac
+}
+
+
+in_leader()
+{
+((!in_leader)) && return 1
+in_leader=
+
+case "${REPLY: -1}" in
+	*  ) tmux popup "echo -n in leader binding ..." ;;
 esac
 }
 

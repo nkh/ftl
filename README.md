@@ -34,7 +34,7 @@ r    ) reverse sort                               ^   ) show/hide entry stat in 
 R    ) rename or bulk rename                      =   ) sort by name, size, or date
 s    ) show/hide dir size                         )   ) show/hide directories and files
 S    ) separate editor preview                    
-$|⇑s ) shell pane, zoomed                          §   ) create new tab
+$|⇑s ) shell pane, zoomed                         §   ) create new tab
 t|T  ) fzf tag directory/with subdirectories      1-4 ) switch to given tab
 ⇑t   ) show/hide external file tags               tab ) switch tab
 u|U  ) tag all files, untag all files             ⇑6  ) reverse filter, per tab
@@ -51,7 +51,6 @@ z    ) make preview the active pane and quit      8   ) refresh
 ```
 
 
-
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/tiled.png)
@@ -62,7 +61,7 @@ There are many promising file managers for the terminal, from fff to nnn, clifm,
 
 ftl is Written in Bash, the language that packs a real punch and sometimes punches you.
 
-I wanted a file manager that would use tmux and give me "live" preview and works well with a tiling manager,
+I wanted a file manager that would use tmux and give me "live" preview and works well with my tiling manager,
 
 This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs
 
@@ -80,7 +79,7 @@ This is definitely not production quality, it's for the fun of it, but it's good
 
 ## Installation
 
-ftl is a single script, put it in the PATH, install the dependencies *TODO: package dependencies* and run.
+clone ftl, put it in the PATH, install the dependencies *TODO: package dependencies* and run.
 
 README.md: this file, is also the inline help
 
@@ -88,6 +87,8 @@ Some optional files:
 
 ftl.eb: example of how to add extra binding. It contains an incremental search example.
 ftl.et: example of how to tag files with their git status
+
+see resources/ for your ftlrc setup and some filter examples
 
 ## Display
 
