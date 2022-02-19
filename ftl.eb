@@ -24,5 +24,11 @@ case "${REPLY: -1}" in
 esac
 }
 
-
+in_shell()
+{
+case "${1: -1}" in
+	q  ) R=q ;;
+	*  ) list ;; 
+esac
+}
 
