@@ -4,47 +4,47 @@ ftl - terminal file manager, tmux based
 
 ## Commands shortcuts (⇑:alt-gr)
 ```
-q|Q|@ ) close, write to &3, keep shell             ?       ) show this file
-a     ) kill sound preview                         j|B     ) next entry
-b     ) find entry in directory                    k|A     ) previous entry
-c     ) copy selection                             h|D     ) parent directory
-⇑c    ) compress/decompress                        l|C|''  ) cd to selected entry or open file
-d     ) delete                                     5|6     ) page down/up
-e     ) cd in global directory history             §|\t|1-4) create tab, switch to tab
-E     ) cd in directory history                    :       ) go to entry
-⇑e    ) clear global directory history             .|·     ) show/hide hidden files/tags               
-f|⇑f  ) filter1, filter2, filter is per tab        ⇑6      ) reverse filter, per tab
-F     ) clear filters                              ⇑d      ) select external filter
-g|G   ) first entry, last entry                    /       ) fzf to file
-⇑g    ) cd                                         \       ) fzf to directory
-i     ) image/no image mode                        {       ) fzf to file with preview
-I     ) create empty file                          }       ) rg to file
-J|K   ) scroll preview                             
-⇑k    ) clear persistent marks                     ,|;     ) add persistent mark, fzf persistent mark
-L     ) symlink selection                          
-m     ) mark directory                             '       ) go to mark
-M     ) mkdir                                      
-⇑m    ) mail
-n|N   ) find next/previous                         ½       ) open new ftl in pane
-O|o   ) sort by name, size, or date                >|<|_   ) extra pane
-p|P   ) p: copy selection, P: move selection       =       ) next pane
-r     ) reverse sort                               |       ) close extra panes
-R     ) rename or bulk rename                      ^       ) show/hide entry stat in header
-s     ) show/hide dir size                         )       ) show/hide directories and files
-S     ) separate editor preview                    (       ) fzfi, find images using ueberzurg 
-$|⇑s  ) shell pane, zoomed                         !       ) run shell command
-t|⇑t|T) fzf tag, +subdir, clear                    
-u|U   ) tag all files, untag all files             ]       ) untag files 
-v|V   ) preview on/off, v: preview current file    #       ) flip-flop preview for extension
-w|W   ) w: ext. viewer, W: ext. detached viewer    -       ) change preview size
-x|X   ) chmod a+x, a-x                             +       ) show only directory preview
-⇑x    ) public key encrypt/decrypt to screen       %|&     ) disable extension, re-enable extensions
-y|Y   ) tag/untag current file                     "       ) flip-flop image preview
-⇑y    ) copy selection to clipboard                *       ) set maximum listing depth
-Z     ) close all tabs                             ' '     ) leader key
-z     ) make preview the active pane and quit      8       ) refresh
-⇑z    ) password encrypt/decrypt to file           0|9     ) internal usage
-                                                  
+q|Q|@  ) close, > &3, keep shell         ?       ) show help
+a      ) kill sound preview              j|B     ) next entry
+b      ) find entry in directory         k|A     ) previous entry
+c      ) copy selection                  h|D     ) parent directory
+⇑c     ) compress/decompress             l|C|''  ) cd or open file
+d      ) delete                          5|6     ) page down/up
+e      ) cd in global history            §|\t|1-4) new tab, nexttab
+E      ) cd in history                   :       ) go to entry
+⇑e     ) clear global history            .|·     ) show/hide dot-files/tags               
+f|⇑f|⇑6) filter1/2, r-filter             ⇑d      ) select external filter
+F      ) clear filters                   %|&     ) disable extension, enable all
+g|G    ) first/last entry                /       ) fzf to file
+⇑g     ) cd                              \       ) fzf to directory
+i      ) image mode                      (       ) fzfi, using ueberzurg
+I      ) new file                        {       ) fzf to file with preview
+J|K    ) scroll preview                  }       ) rg to file
+⇑k     ) clear persistent marks          ,|;     ) persistent mark add/fzf
+L      ) symlink selection              
+m      ) mark directory                  '       ) go to mark
+M      ) mkdir                          
+⇑m     ) mail
+n|N    ) find next/previous              ½       ) open new ftl in pane
+o|O    ) name/size/date sort, reverse    >|<|_   ) extra pane
+p|P    ) copy/move selection             =       ) next pane
+r|⇑r   ) not used                        |       ) close extra panes
+R      ) rename/bulk rename              ^       ) show/hide stat
+s      ) show/hide dir size              )       ) view file/dir mode
+S      ) separate editor preview          
+$|⇑s   ) shell pane, zoomed              !       ) run shell command
+t|⇑t|T ) fzf tag, +subdir, clear         ]       ) untag files            
+u|U    ) tag/untag all files           
+v|V    ) preview on/off, current file    #       ) show/hide extension preview
+w|W    ) external viewer, detached       -       ) change preview size
+x|X    ) chmod a+x, a-x                  +       ) only directory preview
+⇑x     ) PGP encrypt/decrypt             "       ) show/hide image preview
+y|Y    ) tag/untag                       
+⇑y     ) copy to clipboard               *       ) maximum listing depth
+Z      ) close all tabs                  ' '     ) leader key
+z      ) zoom preview and quit           8       ) refresh
+⇑z     ) password encrypt/decrypt        0|9     ) internal usage
+
 ```
 
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
