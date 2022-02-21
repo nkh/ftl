@@ -10,21 +10,18 @@ b      ) find entry in directory         k|A     ) previous entry
 c      ) copy selection                  h|D     ) parent directory
 ⇑c     ) compress/decompress             l|C|''  ) cd or open file
 d      ) delete                          5|6     ) page down/up
-e      ) cd in global history            §|\t|1-4) new tab, nexttab
-E      ) cd in history                   :       ) go to entry
-⇑e     ) clear global history            .|·     ) show/hide dot-files/tags               
+e|E|⇑e ) cd (global) history,clear       §|\t|1-4) new tab, nexttab
 f|⇑f|⇑6) filter1/2, r-filter             ⇑d      ) select external filter
 F      ) clear filters                   %|&     ) disable extension, enable all
 g|G    ) first/last entry                /       ) fzf to file
 ⇑g     ) cd                              \       ) fzf to directory
-i      ) image mode                      (       ) fzfi, using ueberzurg
-I      ) new file                        {       ) fzf to file with preview
-J|K    ) scroll preview                  }       ) rg to file
+i|I    ) new file/directory              ⇑i      ) fzfi, using ueberzurg
+J|K    ) scroll preview                  {       ) fzf to file with preview
 ⇑k     ) clear persistent marks          ,|;     ) persistent mark add/fzf
-L      ) symlink selection              
-m      ) mark directory                  '       ) go to mark
-M      ) mkdir                          
-⇑m     ) mail
+L      ) symlink selection               }       ) rg to file
+m      ) mark directory                  '|⇑'    ) go to mark
+M      ) image mode                      :       ) go to entry
+⇑m     ) mail                            .|⇑.    ) show/hide dot-files/etags
 n|N    ) find next/previous              ½       ) open new ftl in pane
 o|O    ) name/size/date sort, reverse    >|<|_   ) extra pane
 p|P    ) copy/move selection             =       ) next pane
@@ -33,16 +30,15 @@ R      ) rename/bulk rename              ^       ) show/hide stat
 s      ) show/hide dir size              )       ) view file/dir mode
 S      ) separate editor preview          
 $|⇑s   ) shell pane, zoomed              !       ) run shell command
-t|⇑t|T ) fzf tag, +subdir, clear         ]       ) untag files            
-u|U    ) tag/untag all files           
+t|⇑t|T ) fzf tag, +subdir, untag         8       ) refresh
+U|u|⇑u ) un/tag all files, goto tag
 v|V    ) preview on/off, current file    #       ) show/hide extension preview
 w|W    ) external viewer, detached       -       ) change preview size
 x|X    ) chmod a+x, a-x                  +       ) only directory preview
 ⇑x     ) PGP encrypt/decrypt             "       ) show/hide image preview
-y|Y    ) tag/untag                       
+y|Y    ) tag/untag                       :command) commmand mode 
 ⇑y     ) copy to clipboard               *       ) maximum listing depth
-Z      ) close all tabs                  ' '     ) leader key
-z      ) zoom preview and quit           8       ) refresh
+Z|z    ) force quit, zoom and quit       ' '     ) leader key
 ⇑z     ) password encrypt/decrypt        0|9     ) internal usage
 
 ```
@@ -53,9 +49,9 @@ z      ) zoom preview and quit           8       ) refresh
 
 # DOCUMENTATION
 
-There are many promising file managers for the terminal, from fff to nnn, clifm, ranger, vimfm, etc ... 
+There are many promising file managers for the terminal, from fff to nnn, clifm, ranger, vimfm, broot, etc ... 
 
-ftl is Written in Bash, the language that packs a real punch and sometimes punches you.
+ftl is Written in Bash, the language that packs a real punch (and sometimes punches you).
 
 I wanted a file manager that would use tmux and give me "live" preview and works well with my tiling manager,
 
