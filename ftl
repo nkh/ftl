@@ -55,7 +55,7 @@ case "${REPLY: -1}" in
 	${K[k]}) prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$fs/../marks ; list ;;
 	\,     ) { /bin/cat $fs/../marks 2>&- ; echo "$n" ; } | awk '!seen[$0]++' | sponge $fs/../marks ;;
 	\;     ) tcpreview ; fzf_go "$(/bin/cat $fs/../marks | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
-	\'     ) tcpreview ; fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;; #altgr \'
+	\´     ) tcpreview ; fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;; #altgr \'
 	L      ) ((${#tags[@]})) && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && { for f in "${selection[@]}" ; do ln -s -b "$f" "$PWD" ; done ; tags=() ; } ; cdir ;;
 	M      ) ((imode--)) ; ((imode < 0)) && imode=2 ; ((imode == 2)) && ftl_nimode || ftl_imode $imode ; cdir ;;
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]=$(dirname "${files[file]}") ; list ;;
@@ -237,7 +237,7 @@ pane_ftl()  { pane_read ; [[ -d "$n" ]] && arg="$n" || arg="$PWD" ; tcpreview ; 
 pane_close(){ panes_wout "$my_pane" ; ((main && ${#panes[@]})) && { tmux send -t ${panes[0]} q 2>&- ; cat $fs/panes | grep -v "${panes[0]}" | sponge $fs/panes ; } || false ; }
 panes_wout(){ pane_read ; for i in ${!panes[@]} ; do  if [ "${panes[$i]}" == "$1" ] ; then  unset panes[$i] ;  fi ; done ; panes=("${panes[@]}") ; }
 pane_k()    { ((main)) && { pane_read && for p in "${panes[@]}" ; do [[ $p != $my_pane ]] && tmux send -t $p Z &>/dev/null ; done ; } && rm $parent_fs/panes && panes=() ; }
-pane_read() { [[ -s $parent_fs/panes ]] && readarray -t panes < <(tmux list-panes -F "#{pane_left} #{pane_id}" | sort -h | grep -f $parent_fs/panes | cut -d' ' -f 2) || false ; }
+pane_read() { [[ -s $parent_fs/panes ]] && readarray -t panes < <(tmux list-panes -F "#{pane_left} #{pane_id}" | sort -h | grep -w -f $parent_fs/panes | cut -d' ' -f 2) || false ; }
 parse_path(){ n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 prompt()    { stty echo ; echo -ne '\e[999B\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
 quit()      { wcpreview ; tcpreview ; sstate "$ftl_root" ; pane_k ; rm -rf $fs ; quit2 ; quit_shell ;tmux kill-session -t ftl$$ &>/dev/null ; exit 0 ; }
