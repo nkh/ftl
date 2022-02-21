@@ -35,10 +35,9 @@ esac
 
 load_tags()
 {
-# eg: select all files in a directory: fd -a . > $ftl_root/new_tags 
-new_tags_file="$fs/new_tags"
+# eg: select all files in a directory: fd -a . > $ftl_root/load_tags 
 
-[[ -s "$new_tags_file" ]] \
-	&& { <"$new_tags_file" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
-	|| tmux popup "echo -n ftl: no such file '$fs/new_tags'"
+[[ -s "$fs/load_tags" ]] \
+	&& { <"$fs/load_tags" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
+	|| tmux popup "echo -n ftl: no such file '$fs/load_tags'"
 }

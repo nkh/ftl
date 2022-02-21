@@ -25,20 +25,20 @@ M      ) image mode                      :       ) go to entry
 n|N    ) find next/previous              ½       ) open new ftl in pane
 o|O    ) name/size/date sort, reverse    >|<|_   ) extra pane
 p|P    ) copy/move selection             =       ) next pane
-r|⇑r   ) not used                        |       ) close extra panes
+r|⇑r   ) refresh, refresh montage        |       ) close extra panes
 R      ) rename/bulk rename              ^       ) show/hide stat
 s      ) show/hide dir size              )       ) view file/dir mode
 S      ) separate editor preview          
 $|⇑s   ) shell pane, zoomed              !       ) run shell command
-t|⇑t|T ) fzf tag, +subdir, untag         8       ) refresh
+t|⇑t|T ) fzf tag, +subdir, untag         *       ) maximum listing depth
 U|u|⇑u ) un/tag all files, goto tag
-v|V    ) preview on/off, current file    #       ) show/hide extension preview
-w|W    ) external viewer, detached       -       ) change preview size
-x|X    ) chmod a+x, a-x                  +       ) only directory preview
+v|V|⇑v ) preview hide, once, montage     #       ) show/hide extension preview
+w|W    ) external viewer, detached       +       ) change preview size
+x|X    ) chmod a+x, a-x                  -       ) preview directory only
 ⇑x     ) PGP encrypt/decrypt             "       ) show/hide image preview
 y|Y    ) tag/untag                       :command) commmand mode 
-⇑y     ) copy to clipboard               *       ) maximum listing depth
-Z|z    ) force quit, zoom and quit       ' '     ) leader key
+⇑y     ) copy to clipboard               ' '     ) leader key
+Z|z    ) force quit, zoom and quit
 ⇑z     ) password encrypt/decrypt        0|9     ) internal usage
 
 ```
@@ -158,7 +158,8 @@ CPAN/Github ID: NKH
 
 ranger
 fff
+clifm
 lfm
 nnn
 vifm
-
+...
