@@ -11,3 +11,5 @@ git rev-parse HEAD &>/dev/null &&
 }
  
 ext_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; (( is_git && etag )) && { r2="${git_tags[$1]:-   }" ; r3=3 ; } ; }
+
+# vim: set filetype=sh :
