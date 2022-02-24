@@ -2,7 +2,7 @@
 
 ftl - terminal file manager, tmux based
 
-## Commands shortcuts (⇑:alt-gr)
+## Commands shortcuts (⇑: alt-gr, ⇈: shift+alt-gr)
 ```
 q|Q|@  ) close, > &3, keep shell         ?       ) show help
 a      ) kill sound preview              j|B     ) next entry
@@ -31,6 +31,7 @@ s      ) show/hide dir size              )       ) view file/dir mode
 S      ) separate editor preview          
 $|⇑s   ) shell pane, zoomed              !       ) run shell command
 t|⇑t|T ) fzf tag, +subdir, untag         *       ) maximum listing depth
+⇈t     ) tail file preview
 U|u|⇑u ) un/tag all files, goto tag
 v|V|⇑v ) preview hide, once, montage     #       ) show/hide extension preview
 w|W    ) external viewer, detached       +       ) change preview size
