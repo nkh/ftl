@@ -12,8 +12,8 @@ c      ) copy selection                  h|D     ) parent directory
 d      ) delete                          5|6     ) page down/up
 e|E|⇑e ) cd (global) history,clear       §|\t|1-4) new tab, nexttab
 ⇈e     ) stat file (commmand example)
-f|⇑f|⇑6) filter1/2, r-filter             ⇑d      ) select external filter
-F      ) clear filters                   %|&     ) disable extension, enable all
+f|⇑F|⇑f) filter1/2, external filter      ⇑6      ) reverse filter
+⇑d     ) clear filters                   %|&     ) disable extension, enable all
 g|G    ) first/last entry                /       ) fzf to file
 ⇑g     ) cd                              \       ) fzf to directory
 i|I    ) new file/directory              ⇑i      ) fzfi, using ueberzurg

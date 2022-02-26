@@ -10,7 +10,7 @@ ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2022, Artistic licen
 : ${preview_all:=1} ; : ${pdir_only:=} ; : ${find_auto:=README} ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; : ${imode:=0} ; : ${zoom:=0} ; zooms=(70 50 30) 
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; ifilter='webp|jpg|jpeg|JPG|png|gif'
 etag=0 ; : ${sort_type:=0} ; find_format='%s %T@ %P\n' ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ )
-GPGID= ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore tail tags marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl
+GPGID= ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore fexts tail tags marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl
 
 echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane ; mkdir -p $ftl_root/thumbs ; pushd "$dir" &>/dev/null
 [[ "$1" ]] && { [[ -d "$1" ]] && dir="$1" ; } || { [[ -f $1 ]] && dir=$(dirname "$1") ; search="${1##*/}" ; } || { echo ftl: \'$1\', no such path ; exit 1 ; }
@@ -40,13 +40,13 @@ case "${REPLY: -1}" in
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
-	${K[d]}) p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf) ; [[ $file ]] && . $p/$file ; cdir ;;
+	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter= ; fexts=() ; eval "ftl_filter(){ /bin/cat ; }" ; filter_tag= ; tcpreview ; cdir ;;
 	e      ) cdir "$(tac $ftl_root/history 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	E      ) cdir "$(tac $fs/history 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
 	${K[e]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ftl_root/history 2>&- ; list ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
-	F      ) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter= ; filter_tag= ; tcpreview ; cdir ;;
-	${K[f]}) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
+	F      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
+	${K[f]}) p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && . $p/$file $fs ; cdir ;;
 	${K[6]}) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	${K[g]}) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
@@ -144,9 +144,8 @@ list() # select
 {
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file >= nfiles ? nfiles - 1 : file)) ; selection ; sstate "$fs"
 ((nfiles)) && { parse_path ; wcpreview ; } || { header "\e[33m<Empty>" && tcpreview && return ; }
-((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center))
-
-geometry ; WCOLS=$COLS ; WLINES=$LINES
+((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center)) ; geometry
+ 
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat=
 header "$pdir_only$([[ $imode != 0 ]] && echo im:$imode' ')$montage_preview$((file+1))/${nfiles}$hsum$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R")
 

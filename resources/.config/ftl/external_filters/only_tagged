@@ -1,0 +1,4 @@
+filter_tag="~"
+ftl_filter() { while read -a file_data ; do [[ "${tags[$PWD/${file_data[2]}]}" ]] && echo "${file_data[@]}" ; done ; }
+
+# vim: set filetype=sh :

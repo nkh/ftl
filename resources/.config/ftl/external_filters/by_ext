@@ -1,0 +1,17 @@
+for ext in $(for i in $PWD/* ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | sort -u | lscolors | fzf-tmux -m --ansi --info=inline --layout=reverse)
+	do 
+		fexts[$ext]=1
+		filter_tag="~"
+	done
+
+ftl_filter()
+{
+printf "fexts: %s\n" "${!fexts[@]}" >> ftl_log
+while read -a file_data
+	do
+		fn="${file_data[2]}" ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
+		{ [[ -d "$fn" ]] || { [[ "$fn" =~ '.' ]] && [[ "${fexts[$ext]}" == 1 ]] ; } ; } && echo "${file_data[@]}"
+	done
+}
+
+# vim: set filetype=sh :
