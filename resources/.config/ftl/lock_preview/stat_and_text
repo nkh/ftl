@@ -1,0 +1,5 @@
+mkdir -p $(dirname "$fs/lock_preview/$n")
+{ echo -e ">>> LOCKED PREVIEW: stat_and_text\n" ;stat $n ; echo -e "\n<<< LOCKED PREVIEW" ; } > $fs/lock_preview/$n
+
+# vim: set filetype=sh :
+

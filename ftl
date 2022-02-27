@@ -2,7 +2,7 @@
 cdf() { d=/tmp/$USER/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
 externals() { echo edir eimage emedia epdf ehtml etext ; }
-previewers(){ echo pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype ; }
+previewers(){ echo plock pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar ptype ; }
 type ftl_filter &>/dev/null || eval "ftl_filter(){ /bin/cat ; }" ; ext_dir() { : ; } ; ext_tag() { : ; } ; ext_bindings() { false ; } 
 
 ftl() # directory, parent fs, preview. © Nadim Khemir 2020-2022, Artistic licence 2.0
@@ -58,6 +58,8 @@ case "${REPLY: -1}" in
 	\;     ) tcpreview ; fzf_go "$(/bin/cat $fs/../marks | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
 	\´     ) tcpreview ; fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;; #altgr \'
 	L      ) ((${#tags[@]})) && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && { for f in "${selection[@]}" ; do ln -s -b "$f" "$PWD" ; done ; tags=() ; } ; cdir ;;
+	${K[l]}) rm "$fs/lock_preview/$n" ; list ;;
+	${SK[l]}) p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && . $p/$file $fs ; list ;;
 	M      ) ((imode--)) ; ((imode < 0)) && imode=2 ; ((imode == 2)) && ftl_nimode || ftl_imode $imode ; cdir ;;
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]=$(dirname "${files[file]}") ; list ;;
 	${K[m]}) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
@@ -88,7 +90,7 @@ case "${REPLY: -1}" in
 	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
 	${K[z]}) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
 	\§     ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
-	\?     ) vipreview "$(dirname "$0")/README.md" ; in_pdir=0 ;;
+	\?     ) vipreview ~/.config/ftl/README.md ; in_pdir=0 ;;
 	$'\t'  ) ((${#tabs[@]} > 1)) && { ((tab += 1, tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ; } ;;
 	½      ) tcpreview ; tsplit "ftl ${files[file]} '' 0" 50% -h -R ; ftl2_pane=$pane_id ; pane_id= ; cdir ; tmux send -t $ftl2_pane v ;;
 	\:     ) prompt ':' ; [[ $REPLY =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY -1) : 0)) || shell_command "$REPLY" ;; 
@@ -181,6 +183,7 @@ pdir_only() { [[ "$pdir_only" ]]  && { wcpreview ; tcpreview ; true ; } || false
 phtml()     { [[ $e == 'html' ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ ^($ifilter)$ ]] && pw3image || { tbcolor 67 67 && false ; } ; }
+plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" ; }
 pmedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && ctsplit "exiftool ${n@Q} | /bin/less ; read -sn1" ; }
 pmp4()      { [[ $e =~ mp4|flv ]] && { t="$ftl_root/thumbs/$f.jpg" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
@@ -270,4 +273,4 @@ tsplit()    { tmux sp $5 -t $my_pane -e n="$n" ${3:--h} -l ${2:-${zooms[zoom]}%}
 winch()     { winch= ; geometry ; { ((!w3p)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; }  && cdir ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
-d0="$(dirname "$0")/" ; . "$d0/ftl.et" ; . "$d0/ftl.eb" 2>&- ; ftl "$@"
+. ~/.config/ftl/ftl.et ; . ~/.config/ftl/ftl.eb ; ftl "$@"

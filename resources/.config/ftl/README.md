@@ -20,6 +20,7 @@ i|I    ) new file/directory              ⇑i      ) fzfi, using ueberzurg
 J|K    ) scroll preview                  {       ) fzf to file with preview
 ⇑k     ) clear persistent marks          ,|;     ) persistent mark add/fzf
 L      ) symlink selection               }       ) rg to file
+⇈l|⇑l  ) lock/unlock entry preview
 m      ) mark directory                  '|⇑'    ) go to mark
 M      ) image mode                      :       ) go to entry
 ⇑m     ) mail                            .|⇑.    ) show/hide dot-files/etags
@@ -73,13 +74,13 @@ This is definitely not production quality, it's for the fun of it, but it's good
 
 ## Installation
 
-clone ftl, put it in the PATH, install the dependencies *TODO: package dependencies* and run.
+clone ftl, put it in the PATH, link resource/.config/ftl in ~/.config, install the dependencies *TODO: package dependencies*.
 
-README.md: this file, is also the inline help
+README.md: this file, is the inline help
 
 Some optional files:
 
-ftl.eb: example of how to add extra binding. It contains an incremental search example.
+ftl.eb: example of how to add extra binding. It contains, among other, an incremental search example.
 ftl.et: example of how to tag files with their git status
 
 see resources/ for your ftlrc setup and some filter examples
