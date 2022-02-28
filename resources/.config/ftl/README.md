@@ -41,8 +41,8 @@ x|X    ) chmod a+x, a-x                  -       ) preview directory only
 ⇑x     ) PGP encrypt/decrypt             "       ) show/hide image preview
 y|Y    ) tag/untag                       :command) commmand mode 
 ⇑y     ) copy to clipboard               ' '     ) leader key
-Z|z    ) force quit, zoom and quit
-⇑z     ) password encrypt/decrypt        0|9     ) internal usage
+Z|z    ) force quit, zoom and quit       0       ) refresh
+⇑z     ) password encrypt/decrypt        8|9     ) internal usage
 
 ```
 
