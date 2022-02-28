@@ -58,7 +58,7 @@ case "${REPLY: -1}" in
 	\;     ) tcpreview ; fzf_go "$(/bin/cat $fs/../marks | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
 	\´     ) tcpreview ; fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;; #altgr \'
 	L      ) ((${#tags[@]})) && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && { for f in "${selection[@]}" ; do ln -s -b "$f" "$PWD" ; done ; tags=() ; } ; cdir ;;
-	${K[l]}) rm "$fs/lock_preview/$n" ; list ;;
+	${K[l]}) rm "$fs/lock_preview/$n" 2>&- ; list ;;
 	${SK[l]}) p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && . $p/$file $fs ; list ;;
 	M      ) ((imode--)) ; ((imode < 0)) && imode=2 ; ((imode == 2)) && ftl_nimode || ftl_imode $imode ; cdir ;;
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]=$(dirname "${files[file]}") ; list ;;
@@ -149,7 +149,7 @@ list() # select
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center)) ; geometry
  
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat=
-header "$pdir_only$([[ $imode != 0 ]] && echo im:$imode' ')$montage_preview$((file+1))/${nfiles}$hsum$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R")
+header "${pdir_only}ᵐ$imode$hsplit$montage_preview $((file+1))/${nfiles}$hsum$stat"$( ((sort_type == 2 && show_date)) && date -r "${files[file]}" +" %D-%R")
 
 for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 	do
