@@ -25,9 +25,9 @@ m      ) mark directory                  '|⇑'    ) go to mark
 M      ) image mode                      :       ) go to entry
 ⇑m     ) mail                            .|⇑.    ) show/hide dot-files/etags
 n|N    ) find next/previous              ½       ) open new ftl in pane
-o|O    ) name/size/date sort, reverse    >|<|_   ) extra pane
+o|O    ) name/size/date sort, reverse    >|<|_|\|) extra pane
 p|P    ) copy/move selection             =       ) next pane
-r|⇑r   ) refresh, refresh montage        |       ) close extra panes
+r|⇑r   ) refresh, refresh montage        
 R      ) rename/bulk rename              ^       ) show/hide stat
 s      ) show/hide dir size              )       ) view file/dir mode
 S      ) separate editor preview          
