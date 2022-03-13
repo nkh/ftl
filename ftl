@@ -13,10 +13,9 @@ etag=0 ; : ${sort_type:=0} ; find_format='%s %T@ %P\n' ; sort_filters=(by_name b
 GPGID= ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore fexts tail tags marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl
 
 echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane ; mkdir -p $ftl_root/thumbs ; pushd "$dir" &>/dev/null
-[[ "$1" ]] && { [[ -d "$1" ]] && dir="$1" ; } || { [[ -f $1 ]] && dir=$(dirname "$1") ; search="${1##*/}" ; } || { echo ftl: \'$1\', no such path ; exit 1 ; }
-[[ "$2" ]] && { fs=$2/$$ ; parent_fs=$2 ; } || { fs=$ftl_root/$$ ; parent_fs=$fs ; main=1 ; } ; mkdir -p $fs
-[[ "$3" ]] && { gpreview=1 ; preview_all=0 ; external=0 ; synch $parent_fs/ftl "$search" ; } || cdir "$dir" "$search"
-[[ "$4" ]] && { search="$4" ; }
+[[ "$1" ]] && { [[ -d "$1" ]] && dir="$1" ; search="$2" ; } || { [[ -f $1 ]] && dir=$(dirname "$1") ; search="${2:-${1##*/}}" ; } || { echo ftl: \'$1\', no such path ; exit 1 ; }
+[[ "$3" ]] && { fs=$3/$$ ; parent_fs=$3 ; } || { fs=$ftl_root/$$ ; parent_fs=$fs ; main=1 ; } ; mkdir -p $fs
+[[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; external=0 ; synch $parent_fs/ftl "$search" ; } || cdir "$dir" "$search"
  
 while : ; do  ((winch++, winch>10)) && { winch && continue ; } ; { [[ $R ]] && { REPLY=$R ; R= ; } || read -sn 1 -t 0.1 ; } && { ext_bindings || bindings ; } ; done 
 }
@@ -24,6 +23,8 @@ while : ; do  ((winch++, winch>10)) && { winch && continue ; } ; { [[ $R ]] && {
 declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
            SK=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝)
 
+refreshes=0 ;
+redraws=0 ;
 bindings()
 {
 case "${REPLY: -1}" in
@@ -36,7 +37,7 @@ case "${REPLY: -1}" in
 	0      ) ((gpreview)) && synch $parent_fs/ftl || cdir "$PWD" "$f" ;;
 	7      ) ((main)) && list ; pane_read ; tmux selectp -t ${panes[0]} ;;
 	8      ) ((gpreview)) && read n <$parent_fs/preview && cdir "$n" ;;
-	9      ) ((main && preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/preview ; parse_path "$n" ; preview=1 ; preview ; tmux selectp -t $op ; rdc= ; } ;;
+	9      ) ((main && preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/preview ; parse_path "$n" ; preview=1 ; preview ; ((refreshes++)) ; echo -e "\n$refreshes" ; tmux selectp -t $op ; rdc= ; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
@@ -94,7 +95,7 @@ case "${REPLY: -1}" in
 	\§     ) tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; cdir ;;
 	\?     ) vipreview ~/.config/ftl/README.md ; in_pdir=0 ;;
 	$'\t'  ) ((${#tabs[@]} > 1)) && { ((tab += 1, tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ; } ;;
-	½      ) tcpreview ; tsplit "ftl ${files[file]} '' 0" 50% -h -R ; ftl2_pane=$pane_id ; pane_id= ; cdir ; tmux send -t $ftl2_pane v ;;
+	½      ) tcpreview ; tsplit "ftl ${files[file]} '' '' 0" 50% -h -R ; ftl2_pane=$pane_id ; pane_id= ; cdir ; tmux send -t $ftl2_pane v ;;
 	\:     ) prompt ':' ; [[ $REPLY =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY -1) : 0)) || shell_command "$REPLY" ;; 
 	\'     ) read -n 1 ; [[ -n ${marks[$REPLY]} ]] && cdir ${marks[$REPLY]} || list ;;
 	\"     ) ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; ((zoom == 0)) && R='-' ; cdir ;;
@@ -108,9 +109,9 @@ case "${REPLY: -1}" in
 	\$|${K[s]}) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; [[ $REPLY == \ß ]] && tmux resizep -Z -t $shell_id ;;
 	\!     ) tcpreview ; cmd=$(cat $ftl_root/commands | awk '!seen[$0]++' | fzf --tac --info=inline --layout=reverse)
 		 prompt 'ftl> ' -ei "$cmd" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_root/commands ; shell ; } ; cdir ;;
-	\¦|_|\|) declare -A pfm=([¦]='-h -b' [_]=-v) pfn=([¦]=-R) ; np=$(pane_ftl "$n" '' "${pfm[$REPLY]}" ${pfn[$REPLY]}) ; list ; sleep 0.05 ; tmux selectp -t $np ;;
-	\<     ) np=$(pane_ftl "$(dirname "$PWD")" "$(basename "$PWD")" "-h -b" -R) ; list ; sleep 0.05 ; tmux selectp -t $np ;;
-	\>     ) pane_ftl "$PWD" "$f" "-h -b" -R ; cdir "$n" ; tmux send -t $my_pane r ;;
+	\¦|_|\|) declare -A pfm=([¦]='-h -b' [_]=-v) pfn=([¦]=-R) ; np=$(pane_ftl "'$n' '' $parent_fs 0" "${pfm[$REPLY]}" ${pfn[$REPLY]}) ; list ; sleep 0.05 ; tmux selectp -t $np ;;
+	\<     ) np=$(pane_ftl "'$(dirname "$PWD")' '$(basename "$PWD")' $parent_fs 0" "-h -b" -R) ; sleep 0.05 ; tmux selectp -t $np ;;
+	\>     ) pane_ftl "'$PWD' '$f' $parent_fs 0" "-h -b" -R ; cdir "$n" ; tmux send -t $my_pane r ;;
 	\=     ) pane_read ; tp=("${panes[@]}" "${panes[@]}") ; pf=0 ;
 			for p in "${tp[@]}" ; do [[ $p == $my_pane ]] && pf=1 || { ((pf)) && tmux selectp -t $p &>/dev/null && tpop $p && tmux send -t $p r && break ; } ; done ;;
 	\^     ) ((show_stat ^= 1)) ; refresh ; list ;;
@@ -161,6 +162,7 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 	done
 
 ((in_quick_display)) || preview ; geometry ; WCOLS=$COLS ; WLINES=$LINES
+((redraws++)) ; echo -e "\nr: $redraws"
 }
 
 preview()
@@ -179,7 +181,7 @@ emedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { ((! detached)) && { mplayer_k
 epdf()      { [[ $e == pdf ]] && { ((detached)) && (zathura "$n" &) || run_maxed zathura "$n" ; true ; } ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 pdir()      { [[ -d "$n" ]] && { pdir_image || pdir_dir $n ; } || { in_pdir= ; pdir_only ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} $fs 1" ; in_pdir=1 ; } ; }
+pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} '' $fs 1" ; in_pdir=1 ; } ; }
 pdir_image(){ [[ "$montage_preview" ]] && { in_pdir= ; [[ -e "$n/montage.png" ]] || do_montage "$n" ; [[ -e "$n/montage.png" ]] && pw3image "$n/montage.png" ; } ; }
 do_montage(){ < <(IFS='\n' fd -a -t f -e ${ifilter//|/ -e} -d 1 . "$1" | head -n 30) mapfile -t args ; ((${#args[@]})) && montage "${args[@]}" "$1/montage.png" ; }
 pdir_only() { [[ "$pdir_only" ]]  && { wcpreview ; tcpreview ; true ; } || false  ; }
@@ -243,7 +245,7 @@ move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles - 1 ? nfiles - 1 :
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
 mplayer_k() { ((mplayer)) && kill $mplayer &>/dev/null || pkill mplayer ; } 
 my_pane()   { while read -s pi pp ; do [[ $$ == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && my_pane=$pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
-pane_ftl()  { pane_read ; tcpreview ; tsplit "preview_all=0 ftl ${1@Q} $parent_fs" "30%" "$2" $3 && { np=$pane_id ; panes+=($np) ; pane_id= ; }
+pane_ftl()  { pane_read ; tcpreview ; tsplit "preview_all=0 ftl $1" "30%" "$2" $3 && { np=$pane_id ; panes+=($np) ; pane_id= ; }
 		 { printf "%s\n" "${panes[@]}" ; echo $my_pane ; } >$parent_fs/panes ; echo $np ; }
 pane_close(){ pane_read ; ((main && ${#panes[@]} > 1)) && { tmux send -t ${panes[0]} q 2>&- ; cat $fs/panes | grep -v "${panes[0]}" | sponge $fs/panes ; } || false ; }
 pane_event(){ pane_read ; ((${#panes})) && ((!main)) && tmux send -t ${panes[-1]} 7 ; }
