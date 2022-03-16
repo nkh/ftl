@@ -27,7 +27,7 @@ M      ) image mode                      :       ) go to entry
 n N    ) find next/previous              ½       ) open new ftl in pane
 o O    ) name/size/date sort, reverse    > <     ) extra pane
 p P    ) copy/move selection             _ | ¦   ) extra pane
-r ⇑r   ) refresh, refresh montage        =       ) next pane
+r ⇑r   ) refresh, refresh montage        -       ) next pane
 R      ) rename/bulk rename              ^       ) show/hide stat
 s      ) show/hide dir size              )       ) view file/dir mode
 S      ) separate editor preview          
@@ -37,7 +37,7 @@ t ⇑t T ) fzf tag, +subdir, untag         *       ) maximum listing depth
 U u ⇑u ) un/tag all files, goto tag
 v V ⇑v ) preview hide, once, montage     #       ) show/hide extension preview
 w W    ) external viewer, detached       +       ) change preview size
-x X    ) chmod a+x, a-x                  -       ) preview directory only
+x X    ) chmod a+x, a-x                  =       ) preview directory only
 ⇑x     ) PGP encrypt/decrypt             "       ) show/hide image preview
 y Y    ) tag/untag                       :command) commmand mode 
 ⇑y     ) copy to clipboard               ' '     ) leader key
