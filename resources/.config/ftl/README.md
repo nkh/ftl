@@ -6,7 +6,7 @@ ftl - terminal file manager, tmux based
 ```
 q Q @  ) close, > &3, keep shell         ?       ) show help
 a      ) kill sound preview              j B     ) next entry
-b      ) find entry in directory         k A     ) previous entry
+b ⇑b   ) find/fzf entry in directory     k A     ) previous entry
 c      ) copy selection                  h D     ) parent directory
 ⇑c     ) compress/decompress             l C ''  ) cd or open file
 d      ) delete                          5 6     ) page down/up
