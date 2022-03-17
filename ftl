@@ -32,13 +32,13 @@ case "${REPLY: -1}" in
 	5|6    ) [[ $REPLY == 5 ]] && move -$LINES || move $LINES ;;
 	J|K    ) [[ $REPLY == K ]] && movep U || movep D ;;
 	[1-4]  ) ((tab = $REPLY - 1, tab >= ${#tabs[@]})) && tab=0 ; cdir ${tabs[tab]} ;;
-	0      ) ((gpreview)) && synch $pfs/ftl || cdir "$PWD" "$f" ;;
+	0      ) ((gpreview)) && kbd_flush && synch $pfs/ftl || cdir "$PWD" "$f" ;;
 	7      ) ((main)) && list ; sleep 0.01 ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} ;;
 	8      ) ((gpreview)) && read n <$pfs/ftl && cdir "$n" ;;
 	9      ) ((main && preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/ftl ; parse_path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; rdc= ; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
-	${K[b]}) fzf_go "$(listing | fzf --ansi --info=inline --layout=reverse | { ((show_line)) && { perl -pe 's/^.*[0-9]+\ +//g' ; } || /bin/cat ; })" ;;
+	${K[b]}) fzf_go "$({ fd . -H -I -d 1 -t d | sort | lscolors ; fd . -H -I -d 1 -t f | sort | lscolors ; } | fzf --ansi --info=inline --layout=reverse)" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
@@ -163,7 +163,6 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 ((in_quick_display)) || { geo_winch ; preview ; }
 }
 
-
 preview()
 {
 ((main || gpreview || preview_all)) || { kbd_flush ; pane_read ; sstate $pfs ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
@@ -212,7 +211,7 @@ bulkverify(){ echo 'set -e' > $fs/br ; paste $fs/bo $fs/bd | sed 's/^/mv /' >> $
 by_name()   { sort $show_reversed -t ' ' -k3 | tee >(cut -f 1 -d ' ' >&6) | cut -f 3- -d' ' ; }
 by_size()   { sort $show_reversed -n         | tee >(cut -f 1 -d ' ' >&6) | cut -f 3- -d' ' ; }
 by_date()   { sort $([[ -z "$show_reversed" ]] && echo '-r') -t ' ' -k2 | tee >(cut -f 1 -d ' ' >&6) | cut -f 3- -d' ' ; }
-close_tab() { ((${#tabs[@]} > 1)) && { unset -v 'tabs[tab]' ; tabs=("${tabs[@]}") ; ((tab--)) ; R=$'\t' ; true ; } ; }
+close_tab() { ((${#tabs[@]} > 1)) && { unset -v 'tabs[tab]' ; tabs=("${tabs[@]}") ; ((tab--)) ; R=$'\t' ; list ; true ; } ; }
 ctsplit()   { [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
 copy()      { [[ -d "$1" ]] && dir=r || dir= ; tscommand "cp -v$dir $(printf "'%s' " "${@:2}") '$1'" ; } 
 delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir ; } ; }
@@ -238,7 +237,6 @@ inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | 
 inotify_()  { inotifywait --exclude index.lock -e create -e delete "$PWD/" &>/dev/null && tmux send -t "$my_pane" r 2>&- ; } 
 inotify_k() { kill $ino1 $ino2 2>&- ; }
 kbd_flush() { while read -t 0.01 ; do : ; done ; }
-listing()   { for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++)) ; do echo "${files_color[i]}" ; done ; }
 location()  { true 2>&- >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&3 || :>&3 ; } ; }
 mime_get()  { ((rdc)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
 mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>&1 | sed -e "s/cannot.*/n\/a/" -e 's/^.*: //')) ; mtype="${mime[file]}" ; false ; }
