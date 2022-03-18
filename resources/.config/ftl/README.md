@@ -10,7 +10,7 @@ b ⇑b   ) find/fzf entry in directory     k A     ) previous entry
 c      ) copy selection                  h D     ) parent directory
 ⇑c     ) compress/decompress             l C ''  ) cd or open file
 d      ) delete                          5 6     ) page down/up
-e E ⇑e ) cd (global) history,clear       § \t 1-4) new tab, nexttab
+e E ⇑e ) cd (global) history,clear       § \t    ) new tab, nexttab
 ⇈e     ) stat file (commmand example)
 f ⇑F ⇑f) filter1/2, external filter      ⇑6      ) reverse filter
 ⇑d     ) clear filters                   % &     ) disable extension, enable all
