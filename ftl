@@ -104,7 +104,7 @@ case "${REPLY: -1}" in
 	/|${SK[/]}) [[ $REPLY == / ]] && dir= || dir="-t d" ; tcpreview ; fzf_go "$(fd . $dir --no-ignore --color=always -L | fzf --ansi --info=inline --layout=reverse)" ;;
 	\{     ) tcpreview ; fzf_go "$(fzfppv -L)" ;;
 	\}     ) tcpreview ; rg_go "$(fzfr)" ;;
-	\$|${K[s]}) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; [[ $REPLY == \ß ]] && tmux resizep -Z -t $shell_id ;;
+	\$|${K[s]}) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; [[ $REPLY == ${K[s]} ]] && tmux resizep -Z -t $shell_id ;;
 	\!     ) tcpreview ; cmd=$(cat $ftl_root/commands | awk '!seen[$0]++' | fzf --tac --info=inline --layout=reverse)
 		 prompt 'ftl> ' -ei "$cmd" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_root/commands ; shell ; } ; cdir ;;
 	\-     ) pane_read ; tp=("${panes[@]}" $main_pane "${panes[@]}") ; pf=0 ;
@@ -259,7 +259,7 @@ run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ;
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell()     { tcpreview ; echo -en '\e[?1049l' ; parse_path ; s="${selection[@]}" ; shell_run ; read -sn 1 ; echo -en '\e[?1049h' ; }
 shell_run() { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in "${selection[@]}" ; do eval "echo -e '\e[7;34mftl\> $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
-shell_pane(){ wcpreview ; tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U "-e ftl_root=$fs" ; shell_id=$pane_id ; pane_id=$opi ; cdir ; tmux selectp -t $shell_id ; }
+shell_pane(){ wcpreview ; tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U "-e ftl_root=$fs -e ftlname=$n" ; shell_id=$pane_id ; pane_id=$opi ; cdir ; tmux selectp -t $shell_id ; }
 sstate()    { printf "%s\n" "${selection[@]}" >${1:-$fs}/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; sstateftl2 "${1:-$fs}" ; } ; }
 sstateftl2(){ echo -e "${dir_file[${files[file]}]}\n$imode\n$etag\n$sort_type\n$show_size\n$show_dir_size\n${filters[tab]}\n${filters2[tab]}\n" >>$1/ftl ; }
 synch()     { synch_read "$1" ; filters2[tab]="$pfil2" ; filters[tab]="$pfil" ; [[ $pfi ]] && filter_tag="~" ; ftl_imode "$pimode" ; tag_read "$1" ; cdir "$pdir" "$2" "$pindex" ; }
