@@ -1,0 +1,14 @@
+list=$(find $pfs -type d | grep -v $fs | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && print "$_\n"' | fzfpp)
+
+for tag_file in "${list[@]}"
+	do 
+		[[ -e "$tag_file" ]] && <"$tag_file" readarray -t new_tags && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done
+	done
+
+list
+
+# to file
+# to variable available in shell
+
+# vim: set filetype=sh :
+
