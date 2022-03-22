@@ -37,7 +37,8 @@ case "${REPLY: -1}" in
 	9      ) ((preview_all)) && { kbd_flush ; rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/ftl ; path "$n" ; geo_prev ; preview 1 ; path ; tmux selectp -t $op ; rdc=; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
-	${K[b]}) fzf_go "$({ fd . -H -I -d 1 -t d | sort | lscolors ; fd . -H -I -d 1 -t f | sort | lscolors ; } | fzf --ansi --info=inline --layout=reverse)" ;;
+	${K[b]}|${SK[b]}) [[ $REPLY ==  ${K[b]} ]] && fzf_find "-d 1" || fzf_find ;;
+	/|${SK[/]}) [[ $REPLY == / ]] && dir= || dir="-t d" ; tcpreview ; fzf_go "$(fd . $dir --no-ignore --color=always -L | fzf --ansi --info=inline --layout=reverse)" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
@@ -103,7 +104,6 @@ case "${REPLY: -1}" in
 	\*     ) prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && max_depth=$REPLY && cdir ;;
 	.      ) ((show_hidden)) && show_hidden= || show_hidden=1 ; cdir ;;
 	${K[.]}) ((etag^=1)) ; cdir ;;
-	/|${SK[/]}) [[ $REPLY == / ]] && dir= || dir="-t d" ; tcpreview ; fzf_go "$(fd . $dir --no-ignore --color=always -L | fzf --ansi --info=inline --layout=reverse)" ;;
 	\{     ) tcpreview ; fzf_go "$(fzfppv -L)" ;;
 	\}     ) tcpreview ; rg_go "$(fzfr)" ;;
 	\$|${K[s]}) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; [[ $REPLY == ${K[s]} ]] && tmux resizep -Z -t $shell_id ;;
@@ -226,6 +226,7 @@ fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
 ftl_env()   { ftl_env[ftl_pfs]=$pfs ; ftl_env[ftl_fs]=$fs ; for i in "${!ftl_env[@]}" ; do printf -- "${1:--e }$i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { (($1)) && { ntfilter= ; tfilters[tab]="$ifilter$" ; dir_file[$PWD]= ; } || tfilters[tab]= ; }
 ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter='-v' ; dir_file[$PWD]= ; }
+fzf_find()  { fzf_go "$({ fd . -H -I $1 -t d | sort | lscolors ; fd . -H -I $1 -t f | sort | lscolors ; } | fzf --ansi --info=inline --layout=reverse)" ; }
 fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$1" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
