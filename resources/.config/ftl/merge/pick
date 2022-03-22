@@ -7,8 +7,5 @@ for tag_file in "${list[@]}"
 
 list
 
-# to file
-# to variable available in shell
-
 # vim: set filetype=sh :
 

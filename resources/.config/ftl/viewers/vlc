@@ -1,0 +1,4 @@
+[[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { vlc --started-from-file --playlist-enqueue "$n" &>/dev/null & }
+
+# vim: set filetype=sh :
+
