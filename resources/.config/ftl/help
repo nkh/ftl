@@ -1,27 +1,27 @@
-# ftl help
+j B    ) next entry                      q Q @   ) close, > &3, keep shell
+k A    ) previous entry                  ?       ) show help
+h D    ) parent directory                5 6     ) page down/up
+l C '' ) cd or open file                 § \t    ) new tab, nexttab
+g G    ) first/last entry                . ⇑.    ) show/hide dot-files/etags
 
-## Commands shortcuts (⇑: alt-gr, ⇈: shift+alt-gr)
-```
-q Q @  ) close, > &3, keep shell         ?       ) show help
-a      ) kill sound preview              j B     ) next entry
-b ⇑b   ) find/fzf entry in directory     k A     ) previous entry
-c      ) copy selection                  h D     ) parent directory
-⇑c     ) compress/decompress             l C ''  ) cd or open file
-d      ) delete                          5 6     ) page down/up
-e E ⇑e ) cd (global) history,clear       § \t    ) new tab, nexttab
-⇈e     ) stat file (commmand example)
-f F ⇑f) filter1/2, external filter      ⇑6      ) reverse filter
+a      ) kill sound preview              
+b ⇑b   ) find, fzf find dir              / ⇑/    ) fzf find/find all
+c      ) copy selection                  ⇑i      ) fzfi, using ueberzurg
+⇑c     ) compress/decompress             {       ) fzf to file with preview
+d      ) delete                          }       ) rg to file
+e E ⇑e ) cd (global) history,clear       
+⇈e     ) stat file (command example)
+f F ⇑f ) filter1/2, external filter      ⇑6      ) reverse filter
 ⇑d     ) clear filters                   % &     ) disable extension, enable all
-g G    ) first/last entry                /       ) fzf to file
-⇑g     ) cd                              \       ) fzf to directory
-i I    ) new file/directory              ⇑i      ) fzfi, using ueberzurg
-J K    ) scroll preview                  {       ) fzf to file with preview
+⇑g     ) cd                              
+i I    ) new file/directory              
+J K    ) scroll preview                  
 ⇑k     ) clear persistent marks          , ;     ) persistent mark add/fzf
-L      ) symlink selection               }       ) rg to file
+L      ) symlink selection               
 ⇈l ⇑l  ) lock/unlock entry preview
 m      ) mark directory                  ' ⇑'    ) go to mark
 M      ) view mode                       :       ) go to entry
-⇑m     ) synch tags                      . ⇑.    ) show/hide dot-files/etags
+⇑m     ) synch tags                      ´       ) fzf to mark
 ⇈m     ) mail
 n N    ) find next/previous              ½       ) open new ftl in pane
 o O    ) name/size/date sort, reverse    > <     ) extra pane
@@ -38,10 +38,7 @@ v V ⇑v ) preview hide, once, montage     #       ) show/hide extension preview
 w W    ) external viewer, detached       +       ) change preview size
 x X    ) chmod a+x, a-x                  =       ) preview directory only
 ⇑x     ) PGP encrypt/decrypt             "       ) show/hide image preview
-y Y    ) tag/untag                       :command) commmand mode 
+y Y    ) tag/untag                       :command) command mode 
 ⇑y     ) copy to clipboard               ' '     ) leader key
 Z z    ) force quit, zoom and quit       0       ) refresh
 ⇑z     ) password encrypt/decrypt        8 9     ) internal usage
-
-```
-
