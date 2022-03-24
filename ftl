@@ -9,7 +9,7 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 {
 : ${preview_all:=1} ; : ${pdir_only:=} ; : ${find_auto:=README} ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${imode:=0} ; : ${zoom:=0} ; zooms=(70 50 30) 
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show_files=1 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; ifilter='webp|jpg|jpeg|JPG|png|gif'
-etag=0 ; : ${sort_type:=0} ; find_format='%s %T@ %P\n' ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ ) ; imode_glyph=(⁺ ᴵ ᴺ)
+etag=0 ; : ${sort_type:=0} ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ ) ; imode_glyph=(⁺ ᴵ ᴺ)
 GPGID= ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore fexts tail tags ftl_env marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl
 
 echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane=$(pid_2_pane $$) ; mkdir -p $ftl_root/thumbs ; pushd "$dir" &>/dev/null
@@ -220,8 +220,8 @@ dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show
 edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; cdir ; }
 ffind()     { [[ $1 == n ]] && { ((from = file + 1)) ; to=$nfiles ; inc='++' ; } || { ((from = file - 1)) ; to=-1 ; inc='--' ; }
 		for ((i=$from ; i != $to ; i$inc)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
-files()     { find "$PWD/" -mindepth 1 -maxdepth $max_depth ${show_hidden:+\( ! -iname ".*" \)} $1  -printf "$find_format" 2>&- | ftl_filter | $2 ; }
-filter()    { rg $ntfilter "${tfilters[tab]}" | rg "${filters[tab]}" | rg "${filters2[tab]}" | { [[ "${rfilters[tab]}" ]] && cat | rg -v "${rfilters[tab]}" || cat ; } | filter2 ; }
+files()     { find "$PWD/" -mindepth 1 -maxdepth $max_depth ${show_hidden:+\( ! -path "*/.*" \)} $1  -printf '%s %T@ %P\n' 2>&- | ftl_filter | $2 ; }
+filter()    { rg $ntfilter "${tfilters[tab]}" | rg "${filters[tab]}" | rg "${filters2[tab]}" | { [[ "${rfilters[tab]}" ]] && rg -v "${rfilters[tab]}" || cat ; } | filter2 ; }
 filter2()   { ${sort_filters[sort_type]} | tee >(cat >&4) | lscolors >&5 ; }
 fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
 ftl_env()   { ftl_env[ftl_pfs]=$pfs ; ftl_env[ftl_fs]=$fs ; for i in "${!ftl_env[@]}" ; do printf -- "${1:--e }$i=${ftl_env[$i]} " ; done ; }
