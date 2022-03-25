@@ -6,11 +6,10 @@ for ext in $(for i in $PWD/* ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".$
 
 ftl_filter()
 {
-printf "fexts: %s\n" "${!fexts[@]}" >> ftl_log
-while read -a file_data
+while read -r file_data
 	do
-		fn="${file_data[2]}" ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
-		{ [[ -d "$fn" ]] || { [[ "$fn" =~ '.' ]] && [[ "${fexts[$ext]}" == 1 ]] ; } ; } && echo "${file_data[@]}"
+		fn=$(cut -f 3- -d" " <<<"$file_data") ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
+		{ [[ -d "$fn" ]] || { [[ "$fn" =~ '.' ]] && [[ "${fexts[$ext]}" == 1 ]] ; } ; } && echo "$file_data"
 	done
 }
 
