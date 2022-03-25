@@ -12,7 +12,7 @@ tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; show_dirs=1 ; show
 etag=0 ; : ${sort_type:=0} ; sort_filters=(by_name by_size by_date) ; sort_name=( ⍺ 🡕 ≣ ) ; imode_glyph=(⁺ ᴵ ᴺ)
 GPGID= ; mkapipe 4 5 6 ; declare -A dir_file pignore lignore fexts tail tags ftl_env marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl
 
-echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane=$(pid_2_pane $$) ; mkdir -p $ftl_root/thumbs ; pushd "$dir" &>/dev/null
+echo -en '\e[?1049h'  ; stty -echo ; pw3start ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; pushd "$dir" &>/dev/null
 [[ "$1" ]] && { [[ -d "$1" ]] && dir="$1" ; search="$2" ; } || { [[ -f $1 ]] && dir=$(dirname "$1") ; search="${2:-${1##*/}}" ; } || { echo ftl: \'$1\', no such path ; exit 1 ; }
 [[ "$3" ]] && { fs=$3/$$ ; pfs=$3 ; mkdir -p $fs ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs ; echo $my_pane >$fs/pane ; }
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; external=0 ; synch $pfs/ftl "$search" ; } || cdir "$dir" "$search"
@@ -123,7 +123,7 @@ esac
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list "${3:-$found}" ; inotify_s ; }
 get_dir() # dir, search
 {
-new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD"; PWD="$new_dir" ; tabs[tab]="$PWD"
+new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; [[ "$PPWD" != "$PWD" ]] && PPWD="$PWD" ; marks[$'\'']="$PPWD/$"; PWD="$new_dir" ; tabs[tab]="$PWD"
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$(((dir_file[$PPWD])) || echo "$find_auto")}" ; found= ; shopt -s nocasematch ; geo_prev
 
 cd "$PWD" 2>$fs/error || { refresh ; /bin/cat $fs/error ; return ; } ; ((etag)) && ext_dir
@@ -189,8 +189,8 @@ phtml()     { [[ $e == 'html' ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview 
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ ^($ifilter)$ ]] && pw3image || { tbcolor 67 67 && false ; } ; }
 plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" ; }
-pmedia()    { [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && ctsplit "exiftool ${n@Q} | /bin/less ; read -sn1" ; }
-pmp4()      { [[ $e =~ mp4|flv ]] && { t="$ftl_root/thumbs/$f.jpg" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; }
+pmedia()    { [[ $e =~ ^(mp3|mkv)$ ]] && { t="$thumbs/$(head -c100000 "$n" | md5sum | cut -f1 -d' ')" ; [[ -e $t ]] || exiftool "$n" >$t ; ctsplit "/bin/less <$t ; read -sn1" ; } ; }
+pmp4()      { [[ $e =~ mp4|flv ]] && { t="$thumbs/$f.jpg" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == 'pdf' ]] && { pdftotext -l 3 "$n" "$fs/$f.txt" 2>&- && vipreview "$fs/$f.txt" ; } ; }
 pperl()     { [[ $mtype =~ ^application/x-perl$ ]] && [[ -s "$n" ]] && vipreview "$n" ; }
