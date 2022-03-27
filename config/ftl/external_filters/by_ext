@@ -1,3 +1,5 @@
+fexts=()
+
 for ext in $(for i in $PWD/* ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | sort -u | lscolors | fzf-tmux -m --ansi --info=inline --layout=reverse)
 	do 
 		fexts[$ext]=1
@@ -8,7 +10,10 @@ ftl_filter()
 {
 while read -r file_data
 	do
-		fn=$(cut -f 3- -d" " <<<"$file_data") ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
+		# the slowwwww way, left here as an example of when to optimize
+		#fn=$(cut -f 3- <<<"$file_data") ;"
+		
+		fn="${file_data#$'*\t'*$'\t'}" ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
 		{ [[ -d "$fn" ]] || { [[ "$fn" =~ '.' ]] && [[ "${fexts[$ext]}" == 1 ]] ; } ; } && echo "$file_data"
 	done
 }
