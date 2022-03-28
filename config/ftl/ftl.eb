@@ -23,6 +23,7 @@ leader_command()
 ((!leader_command)) && return 1 ; leader_command=
 
 case "${REPLY: -1}" in
+	t  ) R="MM)" ;;
 	*  ) tmux popup "echo -n ftl: running leader command ..." ;;
 esac
 }

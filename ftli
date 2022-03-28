@@ -1,0 +1,29 @@
+#!/bin/env bash
+stty -echo
+tput civis
+
+pw3image()
+{
+image="${1:-$n}" ; read -r w h < <(identify -format '%w %h' "$image") ; image_bg="$HOME/.config/ftl/image_bg.png"
+((w==0 || h==0)) && { h=1 ; w=1 ; } ; rw=0 ; rh=0
+
+read -r TOP LEFT LINES COLS< <(tmux display -t $my_pane -p '#{pane_top} #{pane_left} #{pane_height} #{pane_width}')
+((img_y=TOP*20, img_x=LEFT*10, img_w=COLS*10, img_h=(LINES-1)*20))
+
+((w>img_w || h>img_h)) && \
+	{ { read rw ; read rh ; } < <(bc <<<"scale=2 ; r=rw=$img_w/$w ; rh=$img_h/$h ; if(rh<rw) r=rh ; if(r>1) r=1 ; scale=0 ; $w*r/1; $h*r/1") ; } || \
+	{ rw=$w ; rh=$h ; }
+
+                echo -e "0;1;$img_x;$img_y;$rw;$rh;;;;;$image\n4;\n3;"   >&7 ;
+((rw<img_w)) && echo -e "0;1;$((img_x+rw));$img_y;;;;;;;$image_bg\n4;\n3;" >&7 ;  
+((rh<img_h)) && echo -e "0;1;$img_x;$((img_y+rh));;;;;;;$image_bg\n4;\n3;" >&7
+}
+
+pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
+my_pane=$(pid_2_pane $$)
+
+PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec 7<>$PIPE" && rm $PIPE
+{ <&7 /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$!
+
+[[ -e "$1" ]] && pw3image "$1"
+while read -r n ; do [[ -e "$n" ]] && pw3image "$n"  ; done
