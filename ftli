@@ -4,19 +4,22 @@ tput civis
 
 pw3image()
 {
-image="${1:-$n}" ; read -r w h < <(identify -format '%w %h' "$image") ; image_bg="$HOME/.config/ftl/image_bg.png"
-((w==0 || h==0)) && { h=1 ; w=1 ; } ; rw=0 ; rh=0
+image="${1:-$n}" ; read -r img_w img_h < <(identify -format '%w %h' "$image") ; image_bg="$HOME/.config/ftl/image_bg.png"
+((img_w==0 || img_h==0)) && { img_h=1 ; img_w=1 ; } ; rw=0 ; rh=0
 
 read -r TOP LEFT LINES COLS< <(tmux display -t $my_pane -p '#{pane_top} #{pane_left} #{pane_height} #{pane_width}')
-((img_y=TOP*20, img_x=LEFT*10, img_w=COLS*10, img_h=(LINES-1)*20))
+((img_y=TOP*20, img_x=LEFT*10, pane_w=COLS*10, pane_h=(LINES-1)*20))
 
-((w>img_w || h>img_h)) && \
-	{ { read rw ; read rh ; } < <(bc <<<"scale=2 ; r=rw=$img_w/$w ; rh=$img_h/$h ; if(rh<rw) r=rh ; if(r>1) r=1 ; scale=0 ; $w*r/1; $h*r/1") ; } || \
-	{ rw=$w ; rh=$h ; }
+((img_w > pane_w || img_h > pane_h)) && \
+	{ { read img_sw ; read img_sh ; } < <(bc <<<"scale=2 ; r=rw=$pane_w/$img_w ; rh=$pane_h/$img_h ; if(rh<rw) r=rh ; if(r>1) r=1 ; scale=0 ; $img_w*r/1; $img_h*r/1") ; } || \
+	{ img_sw=$img_w ; img_sh=$img_h ; }
 
-                echo -e "0;1;$img_x;$img_y;$rw;$rh;;;;;$image\n4;\n3;"   >&7 ;
-((rw<img_w)) && echo -e "0;1;$((img_x+rw));$img_y;;;;;;;$image_bg\n4;\n3;" >&7 ;  
-((rh<img_h)) && echo -e "0;1;$img_x;$((img_y+rh));;;;;;;$image_bg\n4;\n3;" >&7
+#echo TOP: $TOP, LEFT: $LEFT, LINES: $LINES, COLS: $COLS
+#echo -e "img_x: $img_x,img_y: $img_y, img_w: $img_w, img_h: $img_h, $img_y, img_sw: $img_sw, img_sh: $img_sh" ,
+
+                echo -e "0;1;$img_x;$img_y;$img_sw;$img_sh;;;;;$image\n4;\n3;"   >&7 ;
+((img_sw < pane_w)) && echo -e "0;1;$((img_x+img_sw));$img_y;((pane_w - (img_x+img_sw)));$pane_h;;;;;$image_bg\n4;\n3;" >&7 ;  
+((img_sh < pane_h)) && echo -e "0;1;$img_x;$((img_y+img_sh));$pane_w;((pane_h - (img_y+img_sh)));;;;;$image_bg\n4;\n3;" >&7
 }
 
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
