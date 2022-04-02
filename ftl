@@ -279,4 +279,4 @@ winch()     { winch= ; geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] ||
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
 type ftl_filter &>/dev/null || eval "ftl_filter(){ cat ; }" ; ext_dir() { : ; } ; ext_tag() { : ; } ; ext_bindings() { false ; } ; . ~/.config/ftl/ftl.et ; . ~/.config/ftl/ftl.eb
-ftl "$@"
+[[ $TMUX ]] && ftl "$@" || echo "ftl: program must be run inside a tmux session"
