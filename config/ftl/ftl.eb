@@ -6,9 +6,6 @@ leader_command && return ;
 # incremental search, binding: b
 ((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; esac && return
 
-# hsplit mode
-[[ "$hsplit" ]] && hsplit && return
-
 case "${REPLY: -1}" in
 	b       ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
 	' '     ) leader_command=1 ;;
@@ -31,7 +28,6 @@ esac
 shell_command()
 {
 [[ "$1" == "load_tags" ]] && { load_tags ; list ; return ; }
-[[ "$1" == "hsplit" ]] && { hsplit ; return ; }
 
 case "${1: -1}" in
 	q  ) R=q ;;
@@ -46,19 +42,6 @@ load_tags()
 [[ -s "$fs/load_tags" ]] \
 	&& { <"$fs/load_tags" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
 	|| tmux popup "echo -n ftl: no such file '$fs/load_tags'"
-}
-
-hsplit()
-{
-# example of two pane horizontal split where the upper pane can control the lower pane
-
-if [[ "$hsplit" ]] ; then
-	[[ $REPLY == q ]] && { tmux send -t $hsplit_pane q ; hsplit= ; } || [[ $REPLY =~ ^(H|J|K|L)$ ]] && tmux send -t $hsplit_pane ${REPLY,,} 
-else
-	hsplit='⬓' ; wcpreview ; tcpreview
-	tsplit "ftl ${files[file]} '' 0" 50% '-v' '-U' ; hsplit_pane=$pane_id ; tmux send -t $hsplit_pane v ; pane_id= ; sleep 0.3
-	tmux selectp -t $my_pane ; cdir
-fi
 }
 
 # vim: set filetype=sh :
