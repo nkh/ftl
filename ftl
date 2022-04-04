@@ -121,7 +121,7 @@ esac
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list "${3:-$found}" ; inotify_s ; }
 get_dir() # dir, search
 {
-new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; [[ "$PPWD" != "$PWD" ]] && { PPWD="$PWD" ; marks[$'\'']="$PPWD/$" ; } ; PWD="$new_dir" ; tabs[tab]="$PWD"
+new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; [[ "$PPWD" != "$PWD" ]] && { PPWD="$PWD" ; marks[$'\'']="$PPWD/$" ; } ; PWD="$new_dir" ; tabs[$tab]="$PWD"
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$(((dir_file[$PPWD])) || echo "$find_auto")}" ; found= ; shopt -s nocasematch ; geo_prev
 
 cd "$PWD" 2>$fs/error || { refresh ; cat $fs/error ; return ; } ; ((etag)) && ext_dir
@@ -148,10 +148,10 @@ list() # select
 {
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs
 
-((ntabs>1)) && tabs=" ᵗ$ntabs" || tabs= ; head="${lglyph[$lmode]}${iglyph[$imode]}$pdir_only${montage_preview}" ; selection 
-((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview ; ((nfiles)) && path || { header "\e[33m<Empty>${head:+$head }$filter_tag$tabs" ; tcpreview ; return ; }
+((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[$lmode]}${iglyph[$imode]}$pdir_only${montage_preview}" ; selection 
+((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview ; ((nfiles)) && path || { header "\e[33m<Empty>${head:+$head }$filter_tag$tabsd" ; tcpreview ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
-((sort_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; header "${head:+$head }$filter_tag$((file+1))/${nfiles}$hsum$stat$date$tabs"
+((sort_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; header "${head:+$head }$filter_tag$((file+1))/${nfiles}$hsum$stat$date$tabsd"
 
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center)) ; geo_winch 
 for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
