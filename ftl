@@ -139,6 +139,7 @@ while : ; do read -s -u 4 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}${e} ; }
 	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$p" ; [[ -n "$search" && -z "$found" ]] && [[ "$p" =~ ^$search ]] && found=$nfiles ; ((nfiles++))
+ 
 done 
 
 shopt -u nocasematch ; in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
@@ -204,10 +205,9 @@ vcpreview() { ((old_in_vipreview == in_vipreview)) && in_vipreview= ; true ; }
 bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
 bulkedit()  { cat $fs/tags | tee $fs/bo > $fs/bd ; $EDITOR $fs/bd ; }
 bulkverify(){ echo 'set -e' > $fs/br ; paste $fs/bo $fs/bd | sed 's/^/mv /' >> $fs/br ; $EDITOR $fs/br ; }
-sort_by()   { sort $reversed ${sort_filters[$sort_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 ctsplit()   { ((in_ftli)) && tcpreview ; { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && ((!in_ftli)) && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
 copy()      { [[ -d "$1" ]] && dir=r || dir= ; tscommand "cp -v$dir $(printf "'%s' " "${@:2}") '$1'" ; } 
-delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir ; } ; }
+delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir "$PWD" "$f" ; } ; }
 dir()       { ((lmode==0||lmode == 1)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode==0||lmode==2)) && files "-type f,l -xtype f" filter ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; } 
@@ -258,6 +258,7 @@ selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { 
 shell()     { tcpreview ; echo -en '\e[?1049l' ; path ; s="${selection[@]}" ; shell_run ; read -sn 1 ; echo -en '\e[?1049h' ; }
 shell_run() { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in "${selection[@]}" ; do eval "echo -e '\e[7;34mftl\> $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
 shell_pane(){ tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$opi ; cdir ; tmux selectp -t $shell_id ; }
+sort_by()   { sort $reversed ${sort_filters[$sort_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sstate()    { printf "%s\n" "${!tags[@]}" >$fs/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; sstateftl2 "${1:-$fs}" ; } ; }
 sstateftl2(){ echo -e "${dir_file[${files[file]}]}\n$imode\n$etag\n$sort_type\n$show_size\n$show_dir_size\n${filters[tab]}\n${filters2[tab]}\n" >>$1/ftl ; }
 synch()     { synch_read "$1/ftl" ; filters2[tab]="$pfil2" ; filters[tab]="$pfil" ; [[ $pfi ]] && filter_tag="~" ; ftl_imode "$pimode" ; tag_read "$1" ; cdir "$pdir" "$2" "$pindex" ; }

@@ -1,7 +1,7 @@
 etag_dir()
 {
 declare -g -A git_tags=() ; is_git=0
-git rev-parse HEAD &>/dev/null && 
+((etag)) && git rev-parse HEAD &>/dev/null && 
 	{
 	readarray -t lines < <(unbuffer git status -s 2>/dev/null)
 	is_git=1 ; local file
