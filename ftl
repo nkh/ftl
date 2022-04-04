@@ -146,10 +146,10 @@ shopt -u nocasematch ; in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=
 
 list() # select
 {
-[[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs ; path
+[[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs
 
 ((ntabs>1)) && tabs=" ᵗ$ntabs" || tabs= ; head="${lglyph[$lmode]}${iglyph[$imode]}$pdir_only${montage_preview}" ; selection 
-((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview ; ((nfiles)) || { header "\e[33m<Empty>${head:+$head }$filter_tag$tabs" ; tcpreview ; return ; }
+((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview ; ((nfiles)) && path || { header "\e[33m<Empty>${head:+$head }$filter_tag$tabs" ; tcpreview ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
 ((sort_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; header "${head:+$head }$filter_tag$((file+1))/${nfiles}$hsum$stat$date$tabs"
 

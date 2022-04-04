@@ -46,8 +46,6 @@ This is definitely not production quality, it's for the fun of it, but it's good
 
 clone ftl, put it in the PATH, link resource/.config/ftl in ~/.config, install the dependencies *TODO: package dependencies*.
 
-README.md: this file, is the inline help
-
 Some optional files:
 
 ftl.eb: example of how to add extra binding. It contains, among other, an incremental search example.
