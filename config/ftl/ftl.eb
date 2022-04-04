@@ -27,12 +27,22 @@ esac
 
 shell_command()
 {
+[[ "$1" =~ ^etags ]] && { load_etags ${1#etags} ; return ; } 
 [[ "$1" == "load_tags" ]] && { load_tags ; list ; return ; }
 
 case "${1: -1}" in
 	q  ) R=q ;;
 	*  ) list ;; 
 esac
+}
+
+load_etags()
+{
+p=~/.config/ftl/external_tags
+
+[[ "$1" ]] && \
+	{ . $p/$1 $fs ; etag=1 ; cdir ; } || \
+	{ file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && { . $p/$file $fs ; etag=1 ; cdir ; } ; }
 }
 
 load_tags()

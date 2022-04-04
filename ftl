@@ -9,7 +9,7 @@ declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→
 ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
 : ${preview_all:=1} ; : ${pdir_only:=} ; : ${find_auto:=README} ; exit_mplayer= ; max_depth=1 ; tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${imode:=0} ; : ${zoom:=0} ; zooms=(70 50 30) 
-tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; lmode=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; etag=0
+tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; lmode=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; : ${etag:=0} ;
 ifilter='webp|jpg|jpeg|JPG|png|gif'; : ${sort_type:=0} ; sort_filters=('-k3' '-n' '-k2') ; sort_name=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; GPGID= ; 
 
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore fexts tail tags ftl_env marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl ; dir_done=9d0471 
@@ -124,16 +124,16 @@ get_dir() # dir, search
 new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; [[ "$PPWD" != "$PWD" ]] && { PPWD="$PWD" ; marks[$'\'']="$PPWD/$" ; } ; PWD="$new_dir" ; tabs[$tab]="$PWD"
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$(((dir_file[$PPWD])) || echo "$find_auto")}" ; found= ; shopt -s nocasematch ; geo_prev
 
-cd "$PWD" 2>$fs/error || { refresh ; cat $fs/error ; return ; } ; ((etag)) && ext_dir
+cd "$PWD" 2>$fs/error || { refresh ; cat $fs/error ; return ; } ; ((etag)) && etag_dir
 ((gpreview)) || echo "$PWD" | tee -a $fs/history >> $ftl_root/history ; [[ "$PWD" == / ]] && sep= || sep=/
 
-declare -A uniq_file ; pad=(*) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; local LANG=C LC_ALL=C ; dir &
+declare -A uniq_file ; pad=(* ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	[[ $p == $dir_done ]] && break ; ((${uniq_file[$p]})) && continue ; uniq_file[$p]=1
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; list $found ; in_quick_display=1 ; }
 	[[ "$p" =~ '.' ]] && { e=${p##*.} ; ((lignore[${e@Q}])) && continue ; } ; pl=${#p}
 	
-	((etag)) && { ext_tag "$p" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
+	((etag)) && { etag_tag "$p" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
 	((show_size)) && { ((sum += size)) ; [[ -d "$p" ]] && { ((show_dir_size)) && pc=$(dsize "$p")" $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
 	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-${pad}d\e[m ${pc/\%/%%}" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
@@ -275,5 +275,5 @@ tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
 winch()     { winch= ; geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; }  && cdir ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
-type ftl_filter &>/dev/null || eval "ftl_filter(){ cat ; }" ; ext_dir() { : ; } ; ext_tag() { : ; } ; ext_bindings() { false ; } ; . ~/.config/ftl/ftl.et ; . ~/.config/ftl/ftl.eb
+type ftl_filter &>/dev/null || eval "ftl_filter(){ cat ; }" ; etag_dir(){ : ; } ; etag_tag(){ : ; } ; ext_bindings(){ false ; } ; . ~/.config/ftl/ftl.eb
 [[ $TMUX ]] && ftl "$@" || echo "ftl: program must be run inside a tmux session"

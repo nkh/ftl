@@ -1,0 +1,4 @@
+etag_dir(){ : ; }
+etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; }
+
+# vim: set filetype=sh :

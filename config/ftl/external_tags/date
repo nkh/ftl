@@ -1,0 +1,11 @@
+etag_dir()
+{
+declare -g -A ext_dates=()
+while read ext_date ext_file ; do
+	ext_dates[$ext_file]=$ext_date
+done < <(find "$PWD/" -mindepth 1 -maxdepth 1 -printf '%Ax-%AH:%AM\t%P\n' 2>&-)
+}
+
+etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; r2="\e[2;39m${ext_dates[$1]} \e[m" ; r3=17 ; }
+
+# vim: set filetype=sh :
