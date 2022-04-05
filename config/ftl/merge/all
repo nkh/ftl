@@ -1,4 +1,4 @@
-list=$(find $pfs -type d | grep -v $fs | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && print "$_\n"')
+list=($(find $pfs -type d | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && print "$_\n"'))
 
 for tag_file in "${list[@]}"
 	do 
@@ -9,7 +9,5 @@ for tag_file in "${list[@]}"
 			done
 
 	done
-
-list
 
 # vim: set filetype=sh :
