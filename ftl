@@ -10,7 +10,7 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 {
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${preview_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) 
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; : ${etag:=0} ;
-ifilter='webp|jpg|jpeg|JPG|png|gif'; : ${sort_type[tab]:=0} ; sort_filters=('-k3' '-n' '-k2') ; sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; GPGID= ; 
+ifilter='webp|jpg|jpeg|JPG|png|gif'; : ${sort_type[tab]:=0} ; sort_filters=('-k3' '-n' '-k2') ; sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; GPGID= ; mh='Creating montage ...'
 
 mkapipe 4 5 6 ; declare -A dir_file pignore lignore fexts tail tags ftl_env marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl ; dir_done=9d0471 
 echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; pushd "$dir" &>/dev/null 
@@ -24,7 +24,7 @@ while : ; do ((winch++, winch>15)) && { winch && continue ; } ; { [[ "$R" ]] && 
 bindings()
 {
 case "${REPLY: -1}" in
-	\?     ) tmux popup -h 90% -w 70% -E "$EDITOR -R ~/.config/ftl/help" ;;
+	\?     ) tmux popup -h 90% -w 70% -E "$EDITOR -R ~/.config/ftl/help" ; list ;;
 	h|D    ) [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
 	j|B|k|A) ((nfiles)) && { [[ $REPLY == j || "$REPLY" == B ]] && move 1 || move -1 ; } ;;
 	l|C|'' ) ((nfiles)) && { [[ -f "${files[file]}" ]] && { [[ $REPLY == '' ]] && edit ; true ; } ||  cdir "${files[file]}" ; } ;;
@@ -42,16 +42,17 @@ case "${REPLY: -1}" in
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy "$REPLY" "${selection[@]}" ; tags=() ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	d      ) ((${#tags[@]})) && delete " (${#tags[@]} selected)" || delete ;;
-	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; fexts=() ; eval "ftl_filter(){ cat ; }" ; filter_tag= ; tcpreview ; cdir ;;
-	e      ) cdir "$(tac $ftl_root/history 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
-	E      ) cdir "$(tac $fs/history 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
-	${K[e]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ftl_root/history 2>&- ; list ;;
-	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
-	F      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
+	e|E    ) [[ $REPLY == E ]] && detached=1 ; external=1 ; list ;;
+	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; fexts=() ; eval "ftl_filter(){ cat ; }" ; ftag= ; tcpreview ; cdir ;;
+	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
+	F      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	${K[f]}) p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && . $p/$file $fs ; cdir ;;
-	${K[6]}) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; filter_tag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
+	${K[6]}) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	${K[g]}) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
+	H|${K[h]}) [[ $REPLY == H ]] && s=$fs || s=$ftl_root ; cdir "$(tac $s/history 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% --ansi --info=inline --layout=reverse)" ;;
+	${SK[h]}) h=$ftl_root/history ; rg -v -f <(tac $h 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -p 80% -m --ansi --info=inline --layout=reverse) $h | sponge $h ;;
+	${SK[d]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ftl_root/history 2>&- ; list ;;
 	${K[i]}) tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
 	i      ) prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ;;
 	I      ) prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" ; cdir "$PWD/$REPLY" ;;
@@ -64,7 +65,7 @@ case "${REPLY: -1}" in
 	${SK[l]}) p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && . $p/$file ; list ;;
 	M      ) ((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ((imode[tab] == 2)) && ftl_nimode || ftl_imode ${imode[tab]} ; cdir ;;
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]="${files[file]}" ; list ;;
-	${K[m]}) p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; cdir ;;
+	${K[m]}) [[ "${tail[$n]}" ]] && unset -v "tail[$n]" || tail[$n]='+$ ' ; list ;;
 	${SK[m]}) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
 	o      ) ((sort_type[tab]++, sort_type[tab] = sort_type[tab] >= ${#sort_filters[@]} ? 0 : sort_type[tab])) ; cdir ;;
 	O      ) [[ ${reversed[tab]} ]] && reversed[tab]= || reversed[tab]=-r ; cdir ;;
@@ -76,7 +77,7 @@ case "${REPLY: -1}" in
 	\$     ) (($in_vipreview)) && in_vipreview= && pane_id= && cdir ;;
 	t|${K[t]}) sdir= ; [[ $REPLY == t ]] && sdir='-d1' ; fzf_tag T "$(fd . -H --color=always $sdir | fzf-tmux -p 90% -m --ansi --info=inline --layout=reverse --marker '▪')" ; list ;;
 	T      ) fzf_tag U "$(cat $fs/tags | lscolors | fzf-tmux -p 90%  -m --ansi --info=inline --layout=reverse --marker '⊟')" ; list ;;
-	${SK[t]}) [[ "${tail[$n]}" ]] && unset -v "tail[$n]" || tail[$n]='+$ ' ; list ;;
+	${SK[t]}) p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; cdir ;;
 	u|U    ) [[ $REPLY == u ]] && for p in "${files[@]}" ; do tags["$p"]='▪' ; done || tags=() ; list ;;
 	${SK[u]}) for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ;;
 	${K[u]}) tcpreview ; fzf_go "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
@@ -151,9 +152,9 @@ list() # select
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs
 
 ((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage_preview}" ; selection 
-((nfiles)) && path || { header "\e[33m∅ ${head:+$head }$filter_tag$tabsd" ; tcpreview ; return ; }
+((nfiles)) && path || { head="\e[33m∅ ${head:+$head }$ftag$tabsd" ; header "$head" ; tcpreview ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
-((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; header "${head:+$head }$filter_tag$((file+1))/${nfiles}$hsum$stat$date$tabsd"
+((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="${head:+$head }$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd" ; header "$head"
 
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center)) ; geo_winch 
 for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
@@ -184,8 +185,8 @@ etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; 
 pcbr()      { [[ $e =~ ^(cbr)$ ]] && { t="$thumbs/$b.$e.jpg" ; { [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; } ; [[ -e $t ]] && pw3image "$t" ; } ; }
 pdir()      { [[ -d "$n" ]] && { pdir_image || pdir_dir "$n" ; } || { in_pdir= ; pdir_only ; } ; }
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} '' $fs 1" ; in_pdir=1 ; sleep 0.1 ; } ; }
-pdir_image(){ [[ "$montage_preview" ]] && { in_pdir= ; [[ -e "$n/montage.png" ]] || do_montage "$n" ; [[ -e "$n/montage.png" ]] && pw3image "$n/montage.png" ; } ; }
-do_montage(){ < <(IFS='\n' fd -a -t f -e ${ifilter//|/ -e} -d 1 . "$1" | head -n 30) mapfile -t args ; ((${#args[@]})) && montage "${args[@]}" "$1/montage.png" ; }
+pdir_image(){ [[ "$montage_preview" ]] && { in_pdir= ; [[ -e "$n/.montage.png" ]] || do_montage "$n" ; [[ -e "$n/.montage.png" ]] && pw3image "$n/.montage.png" ; } ; }
+do_montage(){ < <(IFS='\n' fd -a -t f -e ${ifilter//|/ -e} -d 1 . "$1" | head -n 40) mapfile -t a ; ((${#a[@]})) && header "$mh" && montage "${a[@]}" "$1/.montage.png" && header $head ; }
 pdir_only() { [[ "${pdir_only[tab]}" ]]  && { tcpreview ; true ; } || false  ; }
 phtml()     { [[ $e == 'html' ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
@@ -247,7 +248,7 @@ pane_event(){ pane_read ; ((${#panes})) && ((!main)) && tmux send -t $main_pane 
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 path()      { n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
-prompt()    { stty echo ; echo -ne '\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
+prompt()    { stty echo ; echo -ne '\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; pane_event ; rm -rf $fs ; exit 0 ; }
 quit2()     { inotify_k ; location ; stty echo ; [[ $pfs == $fs ]] && tbcolor 236 52 ; mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; }
 quit_shell(){ [[ $REPLY != @ ]] && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
@@ -262,8 +263,8 @@ shell_pane(){ tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$
 sort_by()   { sort ${reversed[tab]} ${sort_filters[sort_type[tab]]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sstate()    { printf "%s\n" "${!tags[@]}" >$fs/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; sstateftl2 "${1:-$fs}" ; } ; }
 sstateftl2(){ echo -e "${dir_file[${files[file]}]}\n${imode[tab]}\n$etag\n${sort_type[tab]}\n$show_size\n$show_dir_size\n${filters[tab]}\n${filters2[tab]}\n" >>$1/ftl ; }
-synch()     { synch_read "$1/ftl" ; filters2[tab]="$pfil2" ; filters[tab]="$pfil" ; [[ $pfi ]] && filter_tag="~" ; ftl_imode "${imode[tab]}" ; tag_read "$1" ; cdir "$pdir" "$2" "$pindex" ; }
-synch_read(){ [[ -e "$1" ]] && { for r in pdir pindex imode etag sort_type show_size show_dir_size pfil pfil2 ; do read $r ; done ; } <$1 ; imode[tab]=$imode ; sort_type[tab]=$sort_type ;}
+synch()     { synch_read "$1/ftl" ; filters2[tab]="$pfil2" ; filters[tab]="$pfil" ; [[ $pfi ]] && ftag="~" ; ftl_imode "${imode[tab]}" ; tag_read "$1" ; cdir "$pdir" "$2" "$pindex" ; }
+synch_read(){ [[ -e "$1" ]] && { for r in pdir pindex imode[tab] etag sort_type[tab] show_size show_dir_size pfil pfil2 ; do read $r ; done ; } <$1 ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
 tab_next()  { ((tab++)) ; for i in "${tabs[@]:$tab}" FTL_RESET "${tabs[@]}" ; do [[ "$i" == FTL_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; }
 tag_flip()  { [[ ${tags[$1]} ]] && unset -v 'tags[$1]' || tags[$1]='▪' ; } 
