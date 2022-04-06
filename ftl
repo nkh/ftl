@@ -8,7 +8,7 @@ declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→
 
 ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${preview_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; exit_mplayer= ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) 
+tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${preview_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) 
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; : ${etag:=0} ;
 ifilter='webp|jpg|jpeg|JPG|png|gif'; : ${sort_type[tab]:=0} ; sort_filters=('-k3' '-n' '-k2') ; sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; GPGID= ; 
 
@@ -85,14 +85,14 @@ case "${REPLY: -1}" in
 	+      ) ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tresize $pane_id $x || cdir ;; 
 	\=     ) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='⁼' ; list ;;
 	\#     ) [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ;;
-	w      ) external=1 ; [[ $REPLY == W  ]] && detached=1 ; list ;;
-	W      ) p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ;;
+	w      ) [[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { mplayer_k ; ctsplit "mplayer -vo null \"$n\"" ; } ;;
+	W      ) p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ;;
 	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${K[x]}) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
 	y|Y    ) tag_flip "${files[file]}" ; { [[ $REPLY == Y ]] && R="k$R" || R="j$R" ; } ;;
 	${K[y]}) cat $fs/tags | xsel -b -i ;; 
 	q|Q|\@ ) tab_close || pane_close || quit ;;
-	Z      ) ((main)) && { pane_read && for p in "${panes[@]}" ; do tmux send -t $p Z &>/dev/null ; done ; } ; exit_mplayer=1 ; quit ;;
+	Z      ) ((main)) && { pane_read && for p in "${panes[@]}" ; do tmux send -t $p Z &>/dev/null ; done ; } ; quit ;;
 	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
 	${K[z]}) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
 	${SK[s]}|$'\t') [[ $REPLY == ${SK[s]} ]] && { tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; ((ntabs++)) ; } || { ((ntabs > 1)) && tab_next ; } ; cdir ${tabs[tab]} ;;
@@ -204,7 +204,7 @@ tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdi
 vipreview() { ((in_vipreview)) && { tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m ; } || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; ((in_vipreview++)) ; true ; }
 vcpreview() { ((old_in_vipreview == in_vipreview)) && in_vipreview= ; true ; }
 bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
-bulkedit()  { cat $fs/tags | tee $fs/bo > $fs/bd ; $EDITOR $fs/bd ; }
+bulkedit()  { sed "s/.*/'&'/" $fs/tags | tee $fs/bo > $fs/bd ; $EDITOR $fs/bd ; }
 bulkverify(){ echo 'set -e' > $fs/br ; paste $fs/bo $fs/bd | sed 's/^/mv /' >> $fs/br ; $EDITOR $fs/br ; }
 ctsplit()   { ((in_ftli)) && tcpreview ; { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && ((!in_ftli)) && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
 copy()      { tscommand "cp -vr $(printf '%q ' "${@:2}") ${1@Q}" ; } 
@@ -239,7 +239,7 @@ mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles -1 ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[$PWD]=$nf || kbd_flush ; list ; }
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
-mplayer_k() { ((mplayer)) && kill $mplayer &>/dev/null || pkill mplayer ; } 
+mplayer_k() { ((mplayer)) && { kill $mplayer &>/dev/null ; mplayer= ; } ; } 
 pane_extra(){ pane_ftl "'${3:-$n}' '$4' $pfs 0" "$1" "$2" ; list ; sleep 0.05 ; tmux selectp -t $new_pane ; }
 pane_ftl()  { pane_read ; tcpreview ; tsplit "preview_all=0 ftl $1" 30% "$2" $3 ; panes+=($pane_id) ; new_pane=$pane_id ; pane_id= ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tmux send -t ${panes[0]} q 2>&- ; tail -n +2 $pfs/panes | sponge $pfs/panes ; ((! main)) && rm -rf $fs ; } ; }
@@ -249,7 +249,7 @@ path()      { n="${1:-${files[file]}}" ; p="${n%/*}" ; f="${n##*/}" ; b="${f%.*}
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prompt()    { stty echo ; echo -ne '\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; pane_event ; rm -rf $fs ; exit 0 ; }
-quit2()     { inotify_k ; location ; stty echo ; [[ $pfs == $fs ]] && tbcolor 236 52 ; ((exit_mplayer)) && mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; }
+quit2()     { inotify_k ; location ; stty echo ; [[ $pfs == $fs ]] && tbcolor 236 52 ; mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; }
 quit_shell(){ [[ $REPLY != @ ]] && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir ; in_quick_display=1 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list ; in_quick_display=0 ; }
 refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
