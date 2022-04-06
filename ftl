@@ -151,7 +151,7 @@ list() # select
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs
 
 ((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage_preview}" ; selection 
-((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview ; ((nfiles)) && path || { header "\e[33m∅ ${head:+$head }$filter_tag$tabsd" ; tcpreview ; return ; }
+((nfiles)) && path || { header "\e[33m∅ ${head:+$head }$filter_tag$tabsd" ; tcpreview ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
 ((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; header "${head:+$head }$filter_tag$((file+1))/${nfiles}$hsum$stat$date$tabsd"
 
@@ -237,7 +237,7 @@ location()  { true 2>&- >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&
 mime_get()  { ((rdc)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
 mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>&1 | sed -e "s/cannot.*/n\/a/" -e 's/^.*: //')) ; mtype="${mime[file]}" ; false ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
-move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles -1 ? nfiles - 1 : nf)) ; ((nf != file)) && { dir_file[$PWD]=$nf ; list ; } || kbd_flush ; }
+move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles -1 ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[$PWD]=$nf || kbd_flush ; list ; }
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
 mplayer_k() { ((mplayer)) && kill $mplayer &>/dev/null || pkill mplayer ; } 
 pane_extra(){ pane_ftl "'${3:-$n}' '$4' $pfs 0" "$1" "$2" ; list ; sleep 0.05 ; tmux selectp -t $new_pane ; }
@@ -271,7 +271,7 @@ tag_read()  { tags=() ; [[ -e "$1/tags" ]] && { readarray -t stags < "$1/tags" ;
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tpop()      { read -r PLEFT PTOP< <(tmux display -p -t $1 '#{pane_left} #{pane_top}') && tmux popup -E -h 3 -w 3 -x $PLEFT -y $(($PTOP + 3)) "sleep 0.07 ; true" ; }
 tresize()   { tmux resizep -t $1 -x $2 &>/dev/null ; rdir ; }
-tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo ftl\> $1 ; $1 ; echo \$\?: $? ; read -sn2 -t 1800" ; read -sn1 ; }
+tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "date ; echo -e \"\nftl\> $1\n\n\" ; $1 ; echo \$\?: $? ; read -sn5 -t 1800" ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
 winch()     { winch= ; geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; }  && cdir ; }
