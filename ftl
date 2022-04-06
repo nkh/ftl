@@ -1,5 +1,5 @@
 #!/bin/env bash
-cdf() { d=/tmp/$USER/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat > $l) ; cd "$(cat $l)" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
+cdf() { d=/tmp/$USER/ftl ; l=$d/cdf ; mkdir -p $d ; ftl 3> >(cat >$l) ; cd "$(dirname "$(cat $l)")" &>/dev/null; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
 externals() { echo edir eimage emedia epdf ehtml etext ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar pcbr ptype ; }
