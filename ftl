@@ -151,10 +151,10 @@ list() # select
 {
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs
 
-((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage_preview}" ; selection 
-((nfiles)) && path "${files[file]}" || { head="\e[33m∅ ${head:+$head }$ftag$tabsd" ; header "$head" ; tcpreview ; return ; }
+((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage_preview}" ; head=${head:+$head } ; selection 
+((nfiles)) && { path "${files[file]}" ; ((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview ; true ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header "$head" ; tcpreview ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
-((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="${head:+$head }$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd" ; header "$head"
+((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd" ; header "$head"
 
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center)) ; geo_winch 
 for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
