@@ -19,7 +19,7 @@ mkapipe 4 5 6 ; echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; 
 [[ "$3" ]] && { fs=$3/$$ ; pfs=$3 ; mkdir -p $fs ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; echo $my_pane >$fs/pane ; } ; ghistory=$ftl_root/history
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; external=0 ; PPWD="$dir" ; synch $pfs "$search" ; } || { PPWD="$dir" ; cdir "$dir" "$search" ; }
 
-while : ; do ((winch++, winch>15)) && { winch && continue ; } ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.1 ; } && { ext_bindings || bindings ; } ; done 
+while : ; do ((winch++, winch>15)) && { winch && continue ; } ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && { ext_bindings || bindings ; } ; done 
 }
 
 bindings()
@@ -93,7 +93,7 @@ case "${REPLY: -1}" in
 	W      ) p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ;;
 	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${K[x]}) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
-	y|Y    ) tag_flip "${files[file]}" ; { [[ $REPLY == Y ]] && R="k$R" || R="j$R" ; } ;;
+	y|Y    ) tag_flip "${files[file]}" ; [[ $REPLY == y ]] && move 1 || move -1 ; list ;;
 	${K[y]}) cat $fs/tags | xsel -b -i ;; 
 	q|Q|\@ ) tab_close || pane_close || quit ;;
 	Z      ) ((main)) && { pane_read && for p in "${panes[@]}" ; do tmux send -t $p Z &>/dev/null ; done ; } ; quit ;;
@@ -179,7 +179,7 @@ tcpreview
 }
 
 edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
-ehtml()     { [[ $e == 'html' ]] && { ((detached)) && { (qutebrowser "$n" 2>&- &) ; } || { tcpreview ; w3m -o confirm_qq=0 "$n" ; } ; } ; } 
+ehtml()     { [[ $e =~ 'html' ]] && { ((detached)) && { (qutebrowser "$n" 2>&- &) ; } || { tcpreview ; w3m -o confirm_qq=0 "$n" ; } ; } ; } 
 eimage()    { [[ $e =~ ^($ifilter)$ ]] && run_maxed fim -a "$n" "$PWD" ; }
 emedia()    { [[ $e =~ ^($mfilter)$ ]] && { ((! detached)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
 epdf()      { [[ $e == pdf ]] && { ((detached)) && (zathura "$n" &) || run_maxed zathura "$n" ; true ; } ; }
@@ -243,7 +243,7 @@ location()  { true 2>&- >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&
 mime_get()  { ((rdc)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
 mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>&1 | sed -e "s/cannot.*/n\/a/" -e 's/^.*: //')) ; mtype="${mime[file]}" ; false ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
-move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles -1 ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[$PWD]=$nf || kbd_flush ; list ; }
+move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf > nfiles -1 ? nfiles - 1 : nf)) ; ((nf != file)) && { dir_file[$PWD]=$nf ; list ; } || kbd_flush ; }
 movep()     { ((in_vipreview)) && tmux send -t $pane_id C-$1 ; }
 mplayer_k() { ((mplayer)) && { kill $mplayer &>/dev/null ; mplayer= ; } ; } 
 pane_extra(){ pane_ftl "'${3:-$n}' '$4' $pfs 0" "$1" "$2" ; list ; sleep 0.05 ; tmux selectp -t $new_pane ; }
