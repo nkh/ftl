@@ -1,0 +1,3 @@
+[[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$!
+# vim: set filetype=sh :
+

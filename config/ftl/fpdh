@@ -1,0 +1,10 @@
+#!/bin/bash
+event_id=0
+loop() { while : ; do read -t1 && [[ -n "$REPLY" ]] && { ((event_id++)) ; echo -e "${DIM_BLACK}#[$event_id@$(date +%R:%S.%2N)] $RESET$REPLY" ; } ; done ; }
+
+ftl=${1:-$(find  /tmp/$USER/ftl -mindepth 1 -maxdepth 1 -type d | fzf)}
+
+stty -echo
+[[ $ftl ]] && echo $(tmux display -p '#{pane_id}') > $ftl/pdh && read pane <$ftl/pane && tmux send -t $pane 1 && loop || echo fpdh: failed
+stty echo
+

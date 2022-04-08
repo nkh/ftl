@@ -32,6 +32,7 @@ case "${REPLY: -1}" in
 	5|6    ) [[ $REPLY == 5 ]] && move -$LINES || move $LINES ;;
 	J|K    ) [[ $REPLY == K ]] && movep U || movep D ;;
 	0      ) ((gpreview)) && kbd_flush && synch $pfs || cdir "$PWD" "$f" ;;
+	1|2    ) [[ $REPLY == 1 ]] && read pdh <$fs/pdh || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $fs" 20% -v -R ; pane_id= ; cdir ; } ;;
 	7      ) list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ;;
 	8      ) ((gpreview)) && read n <$pfs/prev/ftl && cdir "$n" ;;
 	9      ) ((preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/prev/ftl ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rdc=; } ;;
@@ -214,6 +215,7 @@ dedup()     { awk '!seen[$0]++' ${1} | sponge ${1} ; }
 delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir "$PWD" "$f" ; R=0 ; } || list ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
+def_sub()   { for def in "$@" ; do local sub=${def%%:*} ; local body=${def:((${#sub}+1))} ; type "$sub" &>/dev/null || eval "$sub(){ ${body:-:} ; }" ; done ; } 
 dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; } 
 edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; cdir ; }
 ffind()     { [[ $1 == n ]] && { ((from = file + 1)) ; to=$nfiles ; inc='++' ; } || { ((from = file - 1)) ; to=-1 ; inc='--' ; }
@@ -280,5 +282,4 @@ tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
 winch()     { winch= ; geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; }  && cdir ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
-type ftl_filter &>/dev/null || eval "ftl_filter(){ cat ; }" ; etag_dir(){ : ; } ; etag_tag(){ : ; } ; ext_bindings(){ false ; } ; . ~/.config/ftl/ftl.eb
-[[ $TMUX ]] && ftl "$@" || echo "ftl: program must be run inside a tmux session"
+def_sub pdh "ftl_filter:cat" etag_dir etag_tag 'ext_bindings:false' ; . ~/.config/ftl/ftl.eb ; [[ $TMUX ]] && ftl "$@" || echo "ftl: program must be run inside a tmux session"
