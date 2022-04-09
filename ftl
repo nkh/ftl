@@ -197,8 +197,9 @@ plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" 
 pmedia()    { [[ $e =~ ^(mp3|mkv)$ ]] && { t=$(gen_exift) ; ctsplit "/bin/less <$t ; read -sn1" ; } ; }
 pmp4()      { [[ $e =~ mp4|flv ]] && { t="$thumbs/$f.jpg" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
-ppdf()      { [[ $e == 'pdf' ]] && { pdftotext -l 3 "$n" "$fs/$f.txt" 2>&- && vipreview "$fs/$f.txt" ; } ; }
-pperl()     { [[ $mtype =~ ^application/x-perl$ ]] && [[ -s "$n" ]] && vipreview "$n" ; }
+ppdf()      { [[ $e == 'pdf' ]] && [[ $REPLY == V ]] && ppdfpng || { pdftotext -l 3 "$n" "$fs/$f.txt" 2>&- && vipreview "$fs/$f.txt" ; } ; }
+ppdfpng()   { [[ $e == 'pdf' ]] && { t="$(gen_exift).png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; } ; }
+pperl()     { [[ $mtype =~ ^application/x-perl$ ]] && [[ -s "$n" ]] &&  vipreview "$n" ; }
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
 ptar()      { [[ $f =~ \.tar ]] && ((show_tar)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
 ptype()     { ctsplit "echo '$f' ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
