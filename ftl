@@ -14,7 +14,7 @@ ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type[ta
 
 [[ "$1" ]] && { path "$1" ; [[ -d "$1" ]] && { dir="$p/$f" ; search="$2" ; } || { [[ -f "$1" ]] && { dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 
-declare -A dir_file pignore lignore exift fexts tail tags ftl_env marks=([0]=/ [1]="$HOME") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl ; dir_done=9d0471 
+declare -A dir_file pignore lignore exift fexts tail tags ftl_env marks=([0]=/$ [1]="$HOME/$") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; ftl_root=/tmp/$USER/ftl ; dir_done=9d0471 
 mkapipe 4 5 6 ; echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; pushd "$dir" &>/dev/null 
 [[ "$3" ]] && { fs=$3/$$ ; pfs=$3 ; mkdir -p $fs ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; echo $my_pane >$fs/pane ; } ; ghistory=$ftl_root/history
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; external=0 ; PPWD="$dir" ; synch $pfs "$search" ; } || { PPWD="$dir" ; cdir "$dir" "$search" ; }
@@ -58,9 +58,10 @@ case "${REPLY: -1}" in
 	${K[i]}) tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
 	i      ) prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ;;
 	I      ) prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" ; cdir "$PWD/$REPLY" ;;
-	${K[k]}) prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$fs/../marks ; list ;;
-	\,     ) { cat $fs/../marks 2>&- ; echo "$n" ; } | awk '!seen[$0]++' | sponge $fs/../marks ;;
-	\;     ) tcpreview ; fzf_go "$(cat $fs/../marks | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
+	${K[k]}) prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ;;
+	\'     ) read -n 1 ; [[ -n ${marks[$REPLY]} ]] && cdir "$(dirname "${marks[$REPLY]}")" "$(basename "${marks[$REPLY]}")" || list ;;
+	\,     ) { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ;;
+	\;     ) tcpreview ; fzf_go "$(cat $ftl_root/marks | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
 	\´     ) tcpreview ; fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;; #altgr \'
 	L      ) ((${#tags[@]})) && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && { for f in "${selection[@]}" ; do ln -s -b "$f" "$PWD" ; done ; tags=() ; } ; cdir ;;
 	${K[l]}) rm "$fs/lock_preview/$n" 2>&- ; list ;;
@@ -102,7 +103,6 @@ case "${REPLY: -1}" in
 	${SK[s]}|$'\t') [[ $REPLY == ${SK[s]} ]] && { tabs+=("$PWD") ; ((tab = ${#tabs[@]} - 1)) ; ((ntabs++)) ; } || { ((ntabs > 1)) && tab_next ; } ; cdir ${tabs[tab]} ;;
 	½      ) tcpreview ; tsplit "ftl ${files[file]} '' '' 0" 50% -h -R ; ftl2_pane=$pane_id ; pane_id= ; cdir ; tmux send -t $ftl2_pane v ;;
 	\:     ) prompt ':' ; [[ $REPLY =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY -1) : 0)) || shell_command "$REPLY" ;; 
-	\'     ) read -n 1 ; [[ -n ${marks[$REPLY]} ]] && cdir "$(dirname "${marks[$REPLY]}")" "$(basename "${marks[$REPLY]}")" || list ;;
 	\"     ) ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; ((zoom == 0)) && R="-$R" ; cdir ;;
 	\%|\&  ) [[ $REPLY == \% ]] && { [[ $e ]] && ((lignore[${e}] ^= 1)); } || lignore=() ; cdir ;;
 	\*     ) prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && max_depth[tab]=$REPLY && cdir ;;
