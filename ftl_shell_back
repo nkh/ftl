@@ -1,0 +1,3 @@
+#!/bin/bash
+
+[[ $ftl_pfs ]] && <$ftl_pfs/pane read parent_pane && tmux selectp -t $parent_pane
