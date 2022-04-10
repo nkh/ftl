@@ -8,7 +8,7 @@ b ⇑b      ) find, fzf find dir                    / ⇑/   ) fzf find/find all
 c         ) copy selection                        ⇑i     ) fzfi, using ueberzurg
 ⇑c        ) compress/decompress                   {      ) fzf to file with preview
 d ⇑d ⇈d   ) delete, clear filters/history         }      ) rg to file
-e E       ) external viewer, detached             ' '    ) leader key
+e E ⇑e    ) external viewer, detached, extended   ' '    ) leader key
 ⇈e        ) stat file (example )
 f F ⇑f    ) filter1/2, external filter            ⇑6     ) reverse filter
 H ⇑h ⇈h   ) fzf history, global, edit
