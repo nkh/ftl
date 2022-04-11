@@ -9,7 +9,7 @@ leader_command && return ;
 case "${REPLY: -1}" in
 	b       ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
 	' '     ) leader_command=1 ;;
-	${SK[e]}) tcpreview && tsplit "stat '$n' ; read -sn1" ;; # example of output in preview pane
+	${SK[s]}) tcpreview && tsplit "stat '$n' ; read -sn1" ;; # example of output in preview pane
 	*       ) false ;;
 esac
 }

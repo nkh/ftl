@@ -4,13 +4,12 @@ h D       ) parent directory                      5 6    ) page down/up
 l C ''    ) cd or open file                       ⇈s \t  ) new tab, nexttab
 g G ⇑g    ) first/last entry, cd                  :      ) go to entry
 a         ) kill sound preview                    . ⇑.   ) show/hide dot-files/etags
-b ⇑b      ) find, fzf find dir                    / ⇑/   ) fzf find/find all
+b ⇑b ⇈b   ) find, fzf find/all                    / ⇑/   ) fzf find/find dirs
 c         ) copy selection                        ⇑i     ) fzfi, using ueberzurg
 ⇑c        ) compress/decompress                   {      ) fzf to file with preview
 d ⇑d ⇈d   ) delete, clear filters/history         }      ) rg to file
 e E ⇑e    ) external viewer, detached, extended   ' '    ) leader key
-⇈e        ) stat file (example )
-f F ⇑f    ) filter1/2, external filter            ⇑6     ) reverse filter
+f F ⇑f ⇈f ) filter1/2, external, reverse           
 H ⇑h ⇈h   ) fzf history, global, edit
 i I       ) new file/directory                  
 J K       ) scroll preview                        % &    ) disable extension, enable all
@@ -21,21 +20,23 @@ m         ) mark directory and file               ' ⇑'   ) go/fzf to mark
 M         ) view mode                             )      ) view file/dir mode
 ⇑m        ) file preview at end                         
 ⇈m        ) mail
-n N       ) find next/previous                    ½      ) open new ftl in pane
-o O       ) name/size/date sort, reverse          > <    ) extra pane
-p P       ) copy/move selection                   _ | ¦  ) extra pane
+n N       ) find next/previous                    
+o O       ) sort type, reverse                   
+⇑o ⇈O     ) merge tags, fzf                       > <    ) extra pane
+p P ⇑p    ) copy/move selection, to clipboard     _ | ¦  ) extra pane
 r ⇑r      ) refresh, refresh montage              -      ) next pane
 R         ) rename/bulk rename                    ^      ) show/hide stat
 s S       ) shell pane, zoomed                    !      ) run shell command
-⇑s        ) show/hide dir size                    $      ) detach editor preview          
-t ⇑t T ⇈t ) fzf tag,+subdir, untag, synch         *      ) maximum listing depth
-U u ⇑u    ) un/tag all entries, goto tag          ⇈u     ) tag all files
+⇑s        ) show/hide size                        $      ) detach editor preview          
+⇈s        ) stat file (extra binding)
+t T ⇑t ⇈t ) fzf tag,+subdir, all files, all       *      ) maximum listing depth
+U u ⇑u    ) untag all, fzf, goto
 v V ⇑v    ) preview hide, once, montage           #      ) show/hide extension preview
-w W       ) mplayer, extra viewer                 +      ) change preview size
+w W       ) local mplayer, extra viewers          +      ) change preview size
 x X       ) chmod a+x, a-x                        =      ) preview directory only
 ⇑x        ) PGP encrypt/decrypt                   "      ) show/hide image preview
-y Y ⇑y    ) tag/untag, copy to clipboard          :      ) command mode 
+y Y       ) tag/untag                             :      ) command mode 
 Z z       ) force quit, zoom and quit             0      ) refresh
-⇑z        ) password encrypt/decrypt              8 9    ) internal usage
+⇑z        ) password encrypt/decrypt              1-9    ) internal usage
 
 commands: q, etags, load_tags
