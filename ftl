@@ -54,7 +54,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	${K[g]}) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	H|${K[h]}) [[ $REPLY == H ]] && h=$fs/history || h=$ghistory ; dedup $h ; fzf_go "$(tac $h 2>&- | lscolors | fzf-tmux -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
-	${SK[h]}) dedup $ghistory ; rg -v -x -f <(tac $ghistory 2>&- | lscolors | fzf-tmux -p 80% -m --ansi --info=inline --layout=reverse) $ghistory | sponge $ghistory ;;
+	${SK[h]}) dedup $ghistory ; rg -v -x -F -f <(tac $ghistory 2>&- | lscolors | fzf-tmux -p 80% -m --ansi --info=inline --layout=reverse) $ghistory | sponge $ghistory ;;
 	${SK[d]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghistory 2>&- ; list ;;
 	${K[i]}) tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
 	i      ) prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ;;
