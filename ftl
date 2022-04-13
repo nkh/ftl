@@ -1,7 +1,7 @@
 #!/bin/env bash
 cdf() { P=$(mktemp -u) && mkfifo $P && exec 3<>$P && rm $P ; ftl ; read -ru 3 d ; [[ "$d" ]] && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
-externals() { echo edir eimage emedia epdf ehtml etext ; }
+externals() { echo ewith edir eimage emedia epdf ehtml etext ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr ptype ; }
 declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
            SK=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
@@ -53,7 +53,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${SK[f]}) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["$PWD"] = nfiles - 1)) || dir_file["$PWD"]=0 ; list ;;
 	${K[g]}) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
-	H|${K[h]}) [[ $REPLY == H ]] && h=$fs/history || h=$ghistory ; dedup $h ; fzf_go "$(tac $h 2>&- | lscolors | fzf-tmux -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
+	H|${K[h]}|¨) [[ $REPLY == H ]] && h=$fs/history || h=$ghistory ; dedup $h ; fzf_go "$(tac $h 2>&- | lscolors | fzf-tmux -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
 	${SK[h]}) dedup $ghistory ; rg -v -x -F -f <(tac $ghistory 2>&- | lscolors | fzf-tmux -p 80% -m --ansi --info=inline --layout=reverse) $ghistory | sponge $ghistory ;;
 	${SK[d]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghistory 2>&- ; list ;;
 	${K[i]}) tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
@@ -171,37 +171,38 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 
 preview()
 {
-((main || gpreview || preview_all)) || { kbd_flush ; pane_read ; sstate $pfs/prev ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
+((main || gpreview || preview_all)) || { pane_read ; sstate $pfs/prev ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
 
 old_in_vipreview=$in_vipreview
 ((emode)) && { for external in $(externals) ; do $external && { sleep 0.01 ; emode=0 ; list ; return ; } ; done ; } ; emode=0 ; 
-((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { exmode=0 ; geo_winch && vcpreview && return ; } ; done ; exmode=0 ; }
+((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { exmode=0 ; geo_winch ; return ; } ; done ; exmode=0 ; }
 tcpreview
 }
 
+ewith()     { w=$(rg -v -x -F -f <(echo -e "$n\n$e\$mime") ~/.config/ftl/open_with | cut -f 2- | fzf-tmux -p 80% -m --ansi --info=inline) ; [[ "$w" ]] && { "$w" "$n" ; true ; } ; }
 edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
-ehtml()     { [[ $e =~ 'html' ]] && { ((emode == 2)) && { (qutebrowser "$n" 2>&- &) ; } || { tcpreview ; w3m -o confirm_qq=0 "$n" ; } ; } ; } 
+ehtml()     { [[ $e =~ html ]] && { ((emode == 2)) && { (qutebrowser "$n" 2>&- &) ; } || { tcpreview ; w3m -o confirm_qq=0 "$n" ; } ; } ; } 
 eimage()    { [[ $e =~ ^($ifilter)$ ]] && run_maxed fim -a "$n" "$PWD" ; }
 emedia()    { [[ $e =~ ^($mfilter)$ ]] && { ((emode == 1)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
 epdf()      { [[ $e == pdf ]] && { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) || ((emode == 1)) && run_maxed mupdf "$n" ; true ; } ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
-pcbr()      { [[ $e =~ ^(cbr)$ ]] && { t="$thumbs/$b.$e.jpg" ; { [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; } ; [[ -e $t ]] && pw3image "$t" ; } ; }
+pcbr()      { [[ $e == cbr ]] && { t="$thumbs/$b.$e.jpg" ; { [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; } ; [[ -e $t ]] && pw3image "$t" || pw3image ; } ; }
 pdir()      { [[ -d "$n" ]] && { pdir_image || pdir_dir "$n" ; } || { in_pdir= ; pdir_only ; } ; }
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} '' $fs 1" ; in_pdir=1 ; sleep 0.1 ; } ; }
 pdir_image(){ [[ "$montage_preview" ]] && { in_pdir= ; [[ -e "$n/.montage.png" ]] || do_montage "$n" ; [[ -e "$n/.montage.png" ]] && pw3image "$n/.montage.png" ; } ; }
 do_montage(){ < <(IFS='\n' fd -a -t f -e ${ifilter//|/ -e} -d 1 . "$1" | head -n 40) mapfile -t a ; ((${#a[@]})) && header "$mh" && montage "${a[@]}" "$1/.montage.png" && header $head ; }
 pdir_only() { [[ "${pdir_only[tab]}" ]]  && { tcpreview ; true ; } || false  ; }
-phtml()     { [[ $e == 'html' ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
+phtml()     { [[ $e == html ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ ^($ifilter)$ ]] &&  pw3image ; }
 plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" ; }
-pmp3()      { [[ $e =~ mp3 ]] && { pmlive || { t=$(gen_exift) ; ctsplit "/bin/less <$t ; read -sn1" ; } ; } ; }
+pmp3()      { [[ $e == mp3 ]] && { pmlive || { t=$(gen_exift) ; ctsplit "/bin/less <$t ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$f.png" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; } ; }
 pmlive()    { [[ $REPLY == V ]] && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null \"$n\"" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
-ppdf()      { [[ $e == 'pdf' ]] && { [[ $REPLY == V ]] && ppdfpng || { mutool draw -o "$fs/$f.txt" "$n" $( ((exmode)) || echo 1-3) 2>/dev/null && vipreview "$fs/$f.txt" ; } ; } ; }
-ppdfpng()   { [[ $e == 'pdf' ]] && { t="$(gen_uidf).png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; } ; }
-pperl()     { [[ $mtype =~ ^application/x-perl$ ]] && [[ -s "$n" ]] &&  vipreview "$n" ; }
+ppdf()      { [[ $e == pdf ]] && { [[ $REPLY == V ]] && ppdfpng || { mutool draw -o "$fs/$f.txt" "$n" $( ((exmode)) || echo 1-3) 2>/dev/null && vipreview "$fs/$f.txt" ; } ; true ; } ; }
+ppdfpng()   { echo ppdfpng ; t="$(gen_uidf).png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
+pperl()     { [[ $mtype == application/x-perl ]] && [[ -s "$n" ]] &&  vipreview "$n" ; }
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
 ptar()      { [[ $f =~ \.tar ]] && { ((show_tar)) || [[ $REPLY == V ]] ; } && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
 ptype()     { ctsplit "echo '$f' ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
