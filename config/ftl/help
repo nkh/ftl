@@ -1,3 +1,5 @@
+⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader
+
 j B       ) next entry                            q Q @  ) close, > &3, keep shell
 k A       ) previous entry                        ?      ) show help
 h D       ) parent directory                      5 6    ) page down/up
@@ -28,7 +30,7 @@ r ⇑r      ) refresh, refresh montage              -      ) next pane
 R         ) rename/bulk rename                    ^      ) show/hide stat
 s S       ) shell pane, zoomed                    !      ) run shell command
 ⇑s        ) show/hide size                        $      ) detach editor preview          
-⇈s        ) stat file (extra binding)
+˽s        ) stat file (extra binding)
 t T ⇑t ⇈t ) fzf tag,+subdir, all files, all       *      ) maximum listing depth
 U u ⇑u    ) untag all, fzf, goto
 v V ⇑v    ) preview hide, once, montage           #      ) show/hide extension preview

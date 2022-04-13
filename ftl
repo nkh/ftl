@@ -241,7 +241,7 @@ header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
 inotify_()  { inotifywait --exclude index.lock -e create -e delete "$PWD/" &>/dev/null && tmux send -t "$my_pane" r 2>&- ; } 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
-kbd_flush() { [[ $REPLY != $'\e' && $REPLY != "[" ]] &&  while read -t 0.01 ; do : ; done ; }
+kbd_flush() { [[ $REPLY != $'\e' && $REPLY != "[" && $leader_command != 1 ]] &&  while read -t 0.01 ; do : ; done ; }
 location()  { true 2>&- >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&3 || :>&3 ; } ; }
 mime_get()  { ((rdc)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
 mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>&1 | sed -e "s/cannot.*/n\/a/" -e 's/^.*: //')) ; mtype="${mime[file]}" ; false ; }

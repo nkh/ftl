@@ -1,7 +1,7 @@
 ext_bindings()
 {
 # handle leader keys + user defined shortcut
-leader_command && return ;
+((leader_command)) && { leader_command ; return ; }
 
 # incremental search, binding: b
 ((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; esac && return
@@ -9,7 +9,6 @@ leader_command && return ;
 case "${REPLY: -1}" in
 	b       ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
 	' '     ) leader_command=1 ;;
-	${SK[s]}) tcpreview && tsplit "stat '$n' ; read -sn1" ;; # example of output in preview pane
 	*       ) false ;;
 esac
 }
@@ -17,9 +16,10 @@ esac
 
 leader_command()
 {
-((!leader_command)) && return 1 ; leader_command=
+leader_command=
 
 case "${REPLY: -1}" in
+	s  ) tcpreview && tsplit "stat '$n' ; read -sn1" ;; # example of output in preview pane
 	t  ) R="MM)" ;;
 	*  ) tmux popup "echo -n ftl: running leader command ..." ;;
 esac
