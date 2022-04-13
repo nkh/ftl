@@ -10,7 +10,7 @@ c         ) copy selection                        ⇑i     ) fzfi, using ueberzu
 d ⇑d ⇈d   ) delete, clear filters/history         }      ) rg to file
 e E ⇑e    ) external viewer, detached, extended   ' '    ) leader key
 f F ⇑f ⇈f ) filter1/2, external, reverse           
-H ⇑h ⇈h   ) fzf history, global, edit
+H ⇑h ¨ ⇈h ) fzf history, global, global, edit
 i I       ) new file/directory                  
 J K       ) scroll preview                        % &    ) disable extension, enable all
 ⇑k        ) clear persistent marks                , ;    ) persistent mark add/fzf

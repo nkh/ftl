@@ -20,7 +20,7 @@ mkapipe 4 5 6 ; echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; 
 declare -A marks=([0]=/$ [1]="$HOME/$") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc; marks[$"'"]="$(tail -n1 $ghistory)"
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; emode=0 ; PPWD="$dir" ; synch $pfs "$search" ; } || { PPWD="$dir" ; cdir "$dir" "$search" ; }
 
-while : ; do ((kbd_tick++, kbd_tick>15)) && { kbd_flush ; winch && continue ; } ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; done 
+while : ; do winch ; ((kbd_tick++)) ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; ((kbd_tick%10)) && kbd_flush ; done 
 }
 
 bindings()
@@ -173,7 +173,6 @@ preview()
 {
 ((main || gpreview || preview_all)) || { pane_read ; sstate $pfs/prev ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
 
-old_in_vipreview=$in_vipreview
 ((emode)) && { for external in $(externals) ; do $external && { sleep 0.01 ; emode=0 ; list ; return ; } ; done ; } ; emode=0 ; 
 ((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { exmode=0 ; geo_winch ; return ; } ; done ; exmode=0 ; }
 tcpreview
@@ -209,7 +208,6 @@ ptype()     { ctsplit "echo '$f' ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s $
 pw3image()  { image="${1:-$n}" ; ((in_ftli)) &&  { tmux send -t $pane_id "${image}" C-m ; } || { ctsplit "ftli \"${image}\"" ; in_ftli=1 ; } ; sleep 0.05 ; tmux selectp -t $my_pane ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdir= ; pane_id= ; in_vipreview= ; in_ftli= ; sleep 0.01 ; } ; }
 vipreview() { ((in_vipreview)) && { tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m ; } || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; ((in_vipreview++)) ; true ; }
-vcpreview() { ((old_in_vipreview == in_vipreview)) && in_vipreview= ; true ; }
 bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
 bulkedit()  { sed "s/.*/\"&\"/" $fs/tags | tee $fs/bo >$fs/bd ; $EDITOR $fs/bd ; >$fs/br echo 'set -e' ; paste $fs/bo $fs/bd >>$fs/br ; }
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
@@ -243,7 +241,7 @@ header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
 inotify_()  { inotifywait --exclude index.lock -e create -e delete "$PWD/" &>/dev/null && tmux send -t "$my_pane" r 2>&- ; } 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
-kbd_flush() { [[ $REPLY != $'\e' && $REPLY != "[" ]] &&  while read -t 0.01 ; do : ; done ; kbd_tick=0 ; }
+kbd_flush() { [[ $REPLY != $'\e' && $REPLY != "[" ]] &&  while read -t 0.01 ; do : ; done ; }
 location()  { true 2>&- >&3 && { [[ $REPLY == 'Q' ]] && echo "${files[file]}" >&3 || :>&3 ; } ; }
 mime_get()  { ((rdc)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
 mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>&1 | sed -e "s/cannot.*/n\/a/" -e 's/^.*: //')) ; mtype="${mime[file]}" ; false ; }
@@ -257,7 +255,7 @@ pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | 
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 pdh()       { [[ $pdh ]] && tmux send -t $pdh "ftl: $my_pane: ${1//\\n/$'\n'}" ; }
-pdh_flip()  { [[ $pdh ]] && { tmux killp -t $pdh &> /dev/null ; pdh= ; } || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $fs" 20% -v -R ; pane_id= ; cdir ; source config/ftl/pdh ; } ; }
+pdh_flip()  { [[ $pdh ]] && { tmux killp -t $pdh &> /dev/null ; pdh= ; } || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $fs" 20% -v -R ; pane_id= ; cdir ; } ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prompt()    { stty echo ; echo -ne '\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane 7 ; } ; rm -rf $fs ; exit 0 ; }
