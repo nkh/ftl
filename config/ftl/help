@@ -25,7 +25,7 @@ M         ) view mode                             )      ) view file/dir mode
 n N       ) find next/previous                    
 o O       ) sort type, reverse                   
 ⇑o ⇈O     ) merge tags, fzf                       > <    ) extra pane
-p P ⇑p    ) copy/move selection, to clipboard     _ | ¦  ) extra pane
+p P       ) copy/move selection                   _ | ¦  ) extra pane
 r ⇑r      ) refresh, refresh montage              -      ) next pane
 R         ) rename/bulk rename                    ^      ) show/hide stat
 s S       ) shell pane, zoomed                    !      ) run shell command
@@ -37,7 +37,7 @@ v V ⇑v    ) preview hide, once, montage           #      ) show/hide extension
 w W       ) local mplayer, extra viewers          +      ) change preview size
 x X       ) chmod a+x, a-x                        =      ) preview directory only
 ⇑x        ) PGP encrypt/decrypt                   "      ) show/hide image preview
-y Y       ) tag/untag                             :      ) command mode 
+y Y ⇑y    ) tag/untag, to clipboard               :      ) command mode 
 Z z       ) force quit, zoom and quit             0      ) refresh
 ⇑z        ) password encrypt/decrypt              1-9    ) internal usage
 
