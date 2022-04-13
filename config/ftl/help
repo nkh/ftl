@@ -7,7 +7,7 @@ l C ''    ) cd or open file                       ⇈s \t  ) new tab, nexttab
 g G ⇑g    ) first/last entry, cd                  :      ) go to entry
 a         ) kill sound preview                    . ⇑.   ) show/hide dot-files/etags
 b ⇑b ⇈b   ) find, fzf find/all                    / ⇑/   ) fzf find/find dirs
-c         ) copy selection                        ⇑i     ) fzfi, using ueberzurg
+c         ) copy to                               ⇑i     ) fzfi, using ueberzurg
 ⇑c        ) compress/decompress                   {      ) fzf to file with preview
 d ⇑d ⇈d   ) delete, clear filters/history         }      ) rg to file
 e E ⇑e    ) external viewer, detached, extended   ' '    ) leader key

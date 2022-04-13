@@ -5,6 +5,6 @@ loop() { while : ; do read -t1 && [[ -n "$REPLY" ]] && { ((event_id++)) ; echo -
 ftl=${1:-$(find  /tmp/$USER/ftl -mindepth 1 -maxdepth 1 -type d | fzf)}
 
 stty -echo
-[[ $ftl ]] && echo $(tmux display -p '#{pane_id}') > $ftl/pdh && read pane <$ftl/pane && tmux send -t $pane 3 && loop || echo fpdh: failed
+[[ $ftl ]] && echo $(tmux display -p '#{pane_id}') > $ftl/pdh && read pane <$ftl/pane && tmux send -t $pane ¿ && echo "pdh pane: $pane, pid: $$"  && loop || echo fpdh: failed
 stty echo
 
