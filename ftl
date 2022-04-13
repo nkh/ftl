@@ -33,7 +33,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	5|6    ) [[ $REPLY == 5 ]] && { move -$LINES && list ; true ; } || { move $LINES && list ; } ;;
 	J|K    ) [[ $REPLY == K ]] && movep U || movep D ;;
 	0      ) ((gpreview)) && kbd_flush && synch $pfs || cdir "$PWD" "$f" ;;
-	1|2    ) [[ $REPLY == 1 ]] && read pdh <$fs/pdh || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $fs" 20% -v -R ; pane_id= ; cdir ; } ;;
+	2|3  ) [[ $REPLY == 3 ]] && read pdh <$fs/pdh || pdh_flip ;;
 	7      ) list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ;;
 	8      ) ((gpreview)) && read n <$pfs/prev/ftl && cdir "$n" ;;
 	9      ) ((preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/prev/ftl ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rdc=; } ;;
@@ -256,6 +256,8 @@ pane_ftl()  { pane_read ; tcpreview ; tsplit "preview_all=0 ftl $1" 30% "$2" $3 
 pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | sponge $pfs/panes ; tmux send -t ${panes[0]} q 2>&- ; sleep 0.03 ; } ; }
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
+pdh()       { [[ $pdh ]] && tmux send -t $pdh "ftl: $my_pane: ${1//\\n/$'\n'}" ; }
+pdh_flip()  { [[ $pdh ]] && { tmux killp -t $pdh &> /dev/null ; pdh= ; } || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $fs" 20% -v -R ; pane_id= ; cdir ; source config/ftl/pdh ; } ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prompt()    { stty echo ; echo -ne '\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane 7 ; } ; rm -rf $fs ; exit 0 ; }

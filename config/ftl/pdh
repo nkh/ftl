@@ -1,1 +1,0 @@
-pdh() { [[ $pdh ]] && tmux send -t $pdh "ftl: $my_pane: ${1//\\n/$'\n'}" ; }
