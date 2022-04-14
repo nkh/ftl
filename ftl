@@ -27,7 +27,7 @@ while : ; do winch ; ((kbd_tick++)) ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${
 bindings()
 {
 ext_bindings  || case "${REPLY: -1}" in
-	\?     ) tmux popup -h 90% -w 70% -E "$EDITOR -R ~/.config/ftl/help" ; list ;;
+	\?     ) tmux popup -h 90% -w 60% -E "< ~/.config/ftl/help fzf --info=inline --layout=reverse +s" ; list ;;
 	h|D    ) [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
 	j|B|k|A) ((nfiles)) && { [[ $REPLY == j || "$REPLY" == B ]] && { move 1 && list ; true ; } || { move -1 && list ; } ; } ;;
 	l|C|'' ) ((nfiles)) && { [[ -f "${files[file]}" ]] && { [[ $REPLY == '' ]] && edit ; true ; } || cdir "${files[file]}" ; } ;;
@@ -46,7 +46,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview)" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
-	d      ) tag_check && delete " (${#tags[@]} **selected** )" || delete ;;
+	d      ) tag_check && delete_tag || delete '' "${selection[@]}" ;;
 	e|E|${K[e]}) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ;  [[ $REPLY == ${K[e]} ]] && exmode=1 ; list ;;
 	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; fexts=() ; eval "ftl_filter(){ cat ; }" ; ftag= ; tcpreview ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
@@ -216,7 +216,8 @@ ctsplit()   { ((in_ftli)) && tcpreview ; { in_pdir= ; in_vipreview= ; in_ftli= ;
 cp_mv()     { [[ $1 == p ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
 dedup()     { [[ -e "$1" ]] && { awk '!seen[$0]++' ${1} | sponge ${1} ; true ; } ; } 
-delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir "$PWD" "$f" ; R=0 ; } || list ; }
+delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${@:2}" ; read -sn1 ; mime=() ; R=0 ; true ; } || { list ; false ; } ; }
+delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delete " ** tags: ${#ltags[@]} ** " "${!ltags[@]}" && tag_clear $class ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 def_sub()   { for def in "$@" ; do local sub=${def%%:*} ; local body=${def:((${#sub}+1))} ; type "$sub" &>/dev/null || eval "$sub(){ ${body:-:} ; }" ; done ; } 
