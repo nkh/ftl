@@ -1,6 +1,4 @@
-⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader
-
-	j B       ) next entry                           	q Q @  ) close, > &3, keep shell
+	j B       ) next entry                           	q Q @  ) quit, > &3, keep shell
 	k A       ) previous entry                       	?      ) show help
 	h D       ) parent directory                     	5 6    ) page down/up
 	l C ''    ) cd or open file                      	⇈s \t  ) new tab, nexttab
@@ -31,14 +29,14 @@
 	s S       ) shell pane, zoomed                   	!      ) run shell command
 	⇑s        ) show/hide size                       	$      ) detach editor preview          
 	˽s        ) stat file (extra binding)
-	t T ⇑t ⇈t ) fzf tag,+subdir, all files, all      	*      ) maximum listing depth
-	U u ⇑u    ) untag all, fzf, goto
+	t T ⇑t ⇈t ) fzf tag, +subdir, all files, all      	*      ) maximum listing depth
+	U u ⇑u    ) untag all, fzf, goto                 	¡      ) pdh pane                
 	v V ⇑v    ) preview hide, once, montage          	#      ) show/hide extension preview
 	w W       ) local mplayer, extra viewers         	+      ) change preview size
 	x X       ) chmod a+x, a-x                       	=      ) preview directory only
 	⇑x        ) PGP encrypt/decrypt                  	"      ) show/hide image preview
-	y Y ⇑y    ) tag/untag, to clipboard              	:      ) command mode 
-	Z z       ) force quit, zoom and quit            	0      ) refresh
-	⇑z        ) password encrypt/decrypt             	1-9    ) internal usage
+	y Y ⇑y    ) tag/untag, to clipboard              	1-4    ) class tag
+	Z z       ) force quit, zoom and quit            	:      ) command mode
+	⇑z        ) password encrypt/decrypt             	0,7-9  ) refresh, internal usage
 
-commands: q, etags, load_tags
+	commands: q, etags, load_tags

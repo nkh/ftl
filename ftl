@@ -11,7 +11,7 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${preview_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; : ${etag:=0} ; 
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type[tab]:=0} ; sort_filters=('-k3' '-n' '-k2')
-sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ ⁴)
+sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D)
 
 declare -A dir_file pignore lignore exift fexts tail tags ftl_env ; ftl_root=/tmp/$USER/ftl ;  ghistory=$ftl_root/history ; dir_done=56fbb22f2967c198
 mkapipe 4 5 6 ; echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; pushd "$dir" &>/dev/null 
@@ -27,7 +27,7 @@ while : ; do winch ; ((kbd_tick++)) ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${
 bindings()
 {
 ext_bindings  || case "${REPLY: -1}" in
-	\?     ) tmux popup -h 90% -w 60% -E "< ~/.config/ftl/help fzf --info=inline --layout=reverse +s" ; list ;;
+	\?     ) tmux popup -h 90% -w 60% -E "< ~/.config/ftl/help fzf --info=inline --layout=reverse --tiebreak=begin --header='⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader'" ; list ;;
 	h|D    ) [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
 	j|B|k|A) ((nfiles)) && { [[ $REPLY == j || "$REPLY" == B ]] && { move 1 && list ; true ; } || { move -1 && list ; } ; } ;;
 	l|C|'' ) ((nfiles)) && { [[ -f "${files[file]}" ]] && { [[ $REPLY == '' ]] && edit ; true ; } || cdir "${files[file]}" ; } ;;
