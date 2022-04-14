@@ -133,7 +133,7 @@ cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : n
 get_dir() # dir, search
 {
 new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; PWD="$new_dir" ; tabs[$tab]="$PWD" ; [[ "$PWD" == / ]] && sep= || sep=/
-[[ "$PPWD" != "$PWD" ]] && { [[ -d "$n/$" ]] && m="$n" || m="$n" ; marks["'"]="$m" ; PPWD="$PWD" ; ((gpreview)) || echo "$m" | tee -a $fs/history >> $ghistory ; }
+[[ "$PPWD" != "$PWD" ]] && { [[ -d "$n" ]] && m="$n" || m="$n" ; marks["'"]="$m" ; PPWD="$PWD" ; ((gpreview)) || echo "$m" | tee -a $fs/history >> $ghistory ; }
 
 cd "$PWD" 2>$fs/error || { refresh ; cat $fs/error ; return ; } ; inotify_s ; ((etag)) && etag_dir
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$(((dir_file[$PPWD])) || echo "$find_auto")}" ; found= ; shopt -s nocasematch ; geo_prev
@@ -233,7 +233,7 @@ fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { (($1)) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; dir_file[$PWD]= ; } || tfilters[tab]= ; }
 ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; dir_file[$PWD]= ; }
-fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$1" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
+fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$(dirname "$1")" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 gen_exift() { t=$(gen_uidf) ; [[ -e $t ]] || exiftool "$n" >$t ; echo $t ; }
 gen_uidf()   { echo "$thumbs/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; }
