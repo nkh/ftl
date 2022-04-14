@@ -44,7 +44,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	/|${K[b]}) tcpreview ; fzf_go "$({ fd . -H -I -d1 -td | sort | lscolors ; fd . -H -I -d1 -tf | sort | lscolors ; } | fzf_vpreview)" ;;
 	${SK[b]}) tcpreview ; fzf_go "$(fd . -H -I -E'.git/*' | lscolors | fzf_vpreview)" ;;
 	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview)" ;;
-	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { copy_move p "$REPLY" "${selection[@]}" && tags=() ; } ; cdir ;;
+	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	d      ) tag_check && delete " (${#tags[@]} **selected** )" || delete ;;
 	e|E|${K[e]}) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ;  [[ $REPLY == ${K[e]} ]] && exmode=1 ; list ;;
@@ -77,7 +77,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	O      ) [[ ${reversed[tab]} ]] && reversed[tab]= || reversed[tab]=-r ; cdir ;;
 	${K[o]}) source ~/.config/ftl/merge/all ; list ;;
 	${SK[o]}) p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; cdir ;;
-	p|P    ) tag_check && { declare -A ltags; tag_get ltags class ; ((${#ltags[@]})) && copy_move $REPLY "$PWD" "${!ltags[@]}" ; tag_clear $class ; cdir ; } ;;
+	p|P    ) tag_check && cp_mv_tags $REPLY "$PWD" ; cdir ;;
 	r      ) ((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ;;  # directory content change signal
 	${K[r]}) rm "$n/.montage.png" 2>&- ; list ;;
 	R      ) tag_check &&  bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir ;;
@@ -213,7 +213,8 @@ bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || 
 bulkedit()  { sed "s/.*/\"&\"/" $fs/tags | tee $fs/bo >$fs/bd ; $EDITOR $fs/bd ; >$fs/br echo 'set -e' ; paste $fs/bo $fs/bd >>$fs/br ; }
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
 ctsplit()   { ((in_ftli)) && tcpreview ; { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && ((!in_ftli)) && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
-copy_move() { [[ $1 == p ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
+cp_mv()     { [[ $1 == p ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
+cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
 dedup()     { awk '!seen[$0]++' ${1} | sponge ${1} ; } 
 delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${selection[@]}" ; tags=() ; mime=() ; cdir "$PWD" "$f" ; R=0 ; } || list ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
@@ -278,7 +279,7 @@ synch_read(){ [[ -e "$1" ]] && { for r in pdir pindex imode[tab] etag sort_type[
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
 tab_next()  { ((tab++)) ; for i in "${tabs[@]:$tab}" FTL_RESET "${tabs[@]}" ; do [[ "$i" == FTL_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$tag]" ; done ; pdh "tag_check: ${#tags[@]}\n" ; ((${#tags[@]} != 0)) ; }
-tag_class() { declare -A ntags ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; echo "$(printf "%s\n" "${!ntags[@]}" | fzf -1 )" ; }
+tag_class() { declare -A ntags ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux --reverse --info=inline -1 )" ; }
 tag_clear() { pdh "class: $1\n" ; for t in "${!tags[@]}" ; do [[ $1 == ${tags[$t]} ]] && unset -v "tags[$t]" ; done ; }
 tag_flip()  { [[ ${tags[$1]} ]] && unset -v "tags[$1]" || tags[$1]=${2:-▪} ; } 
 tag_get() { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
