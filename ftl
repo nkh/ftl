@@ -1,7 +1,7 @@
 #!/bin/env bash
 cdf() { P=$(mktemp -u) && mkfifo $P && exec 3<>$P && rm $P ; ftl ; read -ru 3 d ; [[ "$d" ]] && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
-externals() { echo ewith edir eimage emedia epdf ehtml etext ; }
+externals() { echo ewith emedia edir eimage epdf ehtml etext ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr ptype ; }
 declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
            SK=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
@@ -21,7 +21,7 @@ mkapipe 4 5 6 ; echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; 
 declare -A marks=([0]=/$ [1]="$HOME/$") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc; marks[$"'"]="$(tail -n1 $ghistory)"
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; emode=0 ; PPWD="$dir" ; synch $pfs "$search" ; } || { PPWD="$dir" ; cdir "$dir" "$search" ; }
 
-while : ; do winch ; ((kbd_tick++)) ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; ((kbd_tick%10)) && kbd_flush ; done 
+while : ; do winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; kbd_flush ; done 
 }
 
 bindings()
@@ -46,7 +46,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview)" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	d      ) tag_check && delete_tag || delete '' "${selection[@]}" ;;
-	e|E    ) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ; list ;;
+	e|E    ) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ; preview ;;
 	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; fexts=() ; eval "ftl_filter(){ cat ; }" ; ftag= ; tcpreview ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	F      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
@@ -171,17 +171,17 @@ preview()
 {
 ((main || gpreview || preview_all)) || { pane_read ; sstate $pfs/prev ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
 
-((emode)) && { for external in $(externals) ; do $external && { sleep 0.01 ; emode=0 ; list ; return ; } ; done ; } ; emode=0 ; 
-((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { extmode=0 ; geo_winch ; return ; } ; done ; extmode=0 ; }
+((emode)) && { for external in $(externals) ; do $external && { sleep 0.1 ; emode=0 ; return ; } ; done ; } ; emode=0 ; 
+((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { extmode=0 ; return ; } ; done ; extmode=0 ; }
 tcpreview
 }
 
-ewith()     { w=$(rg -v -x -F -f <(echo -e "$n\n$e\$mime") ~/.config/ftl/open_with | cut -f 2- | fzf-tmux -p 80% -m --ansi --info=inline) ; [[ "$w" ]] && { "$w" "$n" ; true ; } ; }
+ewith()     { . ~/.config/ftl/open_with ; }
 edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
 ehtml()     { [[ $e =~ html ]] && { ((emode == 2)) && { (qutebrowser "$n" 2>&- &) ; } || { tcpreview ; w3m -o confirm_qq=0 "$n" ; } ; } ; } 
-eimage()    { [[ $e =~ ^($ifilter)$ ]] && run_maxed fim -a "$n" "$PWD" ; }
-emedia()    { [[ $e =~ ^($mfilter)$ ]] && { ((emode == 1)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$! || vlc "$n" &>/dev/null & } ; }
-epdf()      { [[ $e == pdf ]] && { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) || ((emode == 1)) && run_maxed mupdf "$n" ; true ; } ; }
+eimage()    { [[ $e =~ $ifilter ]] && run_maxed fim -a "$n" "$PWD" ; }
+emedia()    { [[ $e =~ $mfilter ]] && { ((emode == 1)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } || vlc "$n" &>/dev/null & } ; R="r$R" ; }
+epdf()      { [[ $e == pdf ]] && { ((emode == 2)) && { (mupdf "$n" 2>/dev/null &) ; true ; } || { run_maxed mupdf "$n" ; true ; } ; } ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 pcbr()      { [[ $e == cbr ]] && { t="$thumbs/$b.$e.jpg" ; { [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; } ; [[ -e $t ]] && pw3image "$t" ; } ; }
 pdir()      { [[ -d "$n" ]] && { pdir_image || pdir_dir "$n" ; } || { in_pdir= ; pdir_only ; } ; }
@@ -212,8 +212,8 @@ bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1
 ctsplit()   { ((in_ftli)) && tcpreview ; { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && ((!in_ftli)) && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
 cp_mv()     { [[ $1 == p ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
-dedup()     { [[ -s "$1" ]] && { awk '!seen[$0]++' ${1} | sponge ${1} ; true ; } ; } 
-delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${@:2}" ; read -sn1 ; mime=() ; R=0 ; true ; } || { list ; false ; } ; }
+dedup()     { [[ -s "$1" ]] && { awk '!seen[$0]++' "$1" | sponge "$1" ; true ; } ; } 
+delete()    { prompt "delete$1? [y|d|N]: " -n1 && [[ $REPLY == y || $REPLY == d ]] && { rip "${@:2}" ; mime=() ; R=0 ; true ; } || { list ; false ; } ; }
 delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delete " ** tags: ${#ltags[@]} ** " "${!ltags[@]}" && tag_clear $class ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
@@ -232,8 +232,8 @@ ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; dir_file[$PWD]= ;
 fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$(dirname "$1")" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 gen_exift() { t=$(gen_uidf) ; [[ -e $t ]] || exiftool "$n" >$t ; echo $t ; }
-gen_uidf()   { echo "$thumbs/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; }
-geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
+gen_uidf()  { echo "$thumbs/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; }
+geometry()  { read -r TOP WIDTH LINES COLS LEFvT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
 header()    { h="${@} ${sglyph[sort_type[tab]]}${reversed[tab]}$( ((${#tags[@]})) && echo " ${#tags[@]}")" ; header_pos "$h" ; echo -e "\e[H\e[K\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
@@ -278,7 +278,7 @@ tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${
 tab_next()  { ((tab++)) ; for i in "${tabs[@]:$tab}" FTL_RESET "${tabs[@]}" ; do [[ "$i" == FTL_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$tag]" ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { declare -A ntags ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux --reverse --info=inline -1 )" ; }
-tag_clear() { pdh "class: $1\n" ; for t in "${!tags[@]}" ; do [[ $1 == ${tags[$t]} ]] && unset -v "tags[$t]" ; done ; }
+tag_clear() { for t in "${!tags[@]}" ; do [[ $1 == ${tags[$t]} ]] && unset -v "tags[$t]" ; done ; }
 tag_flip()  { [[ ${tags[$1]} ]] && unset -v "tags[$1]" || tags[$1]=${2:-▪} ; } 
 tag_get() { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 tag_read()  { tags=() ; [[ -e "$1/tags" ]] && { readarray -t stags < "$1/tags" ; for stag in "${stags[@]}" ; do [[ "$stag" ]] && tags[${stag//\\ / }]='▪' ; done ; } ; }
@@ -288,7 +288,7 @@ tresize()   { tmux resizep -t $1 -x $2 &>/dev/null ; rdir ; }
 tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "date ; echo -e \"\nftl\> $1\n\n\" ; $1 ; echo \$\?: $? ; read -sn5 -t 1800" ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
-winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; }  && cdir ; }
+winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && R="0$R" ; } 
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
 def_sub "ftl_filter:cat" etag_dir etag_tag 'ext_bindings:false' ; . ~/.config/ftl/ftl.eb ; [[ $TMUX ]] && ftl "$@" || echo "ftl: program must be run inside a tmux session"

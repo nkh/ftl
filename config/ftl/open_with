@@ -1,2 +1,15 @@
+players=$( < <( cat <<EOF
+cbr	zathura
 cbr	mcomix
 application/vnd.comicbook-rar	mcomix
+application/vnd.comicbook-rar	zathura
+EOF
+) rg -F -f <(echo -e "$n\n$e\n$mtype"))
+
+[[ "$players" ]] && \
+	{
+	w=$(echo "$players" | fzf-tmux -0 -1 -p 80% -m --ansi --info=inline | cut -f 2-)
+	[[ "$w" ]] && { ($w "$n" &) ; tcpreview ; sleep 0.4 ; true ; }
+	}
+
+# vim: set filetype=sh :
