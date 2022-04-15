@@ -45,7 +45,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${SK[b]}) tcpreview ; fzf_go "$(fd . -HI -E'.git/*' | lscolors | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
 	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
-	d      ) tag_check && delete_tag || delete '' "${selection[@]}" ;;
+	d      ) tag_check && { delete_tag ; true ; } || delete '' "${selection[@]}" ;;
 	e|E    ) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ; preview ;;
 	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; fexts=() ; eval "ftl_filter(){ cat ; }" ; ftag= ; tcpreview ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
