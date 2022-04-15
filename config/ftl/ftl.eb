@@ -1,14 +1,14 @@
 ext_bindings()
 {
-# handle leader keys + user defined shortcut
+# handle leader + user defined shortcut
 ((leader_command)) && { leader_command ; return ; }
 
 # incremental search, binding: b
 ((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; esac && return
 
 case "${REPLY: -1}" in
-	b       ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
 	' '     ) leader_command=1 ;;
+	b       ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
 	*       ) false ;;
 esac
 }
@@ -19,39 +19,44 @@ leader_command()
 leader_command=
 
 case "${REPLY: -1}" in
+	c  ) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
+	m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
 	s  ) tcpreview && tsplit "stat '$n' ; read -sn1" ;; # example of output in preview pane
 	t  ) R="MM)" ;;
-	*  ) tmux popup "echo -n ftl: running leader command ..." ;;
+	x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
+	z  ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
+	*  ) tmux popup "echo -n ftl: unknown leader command '$REPLY'" ;;
 esac
 }
 
 shell_command()
 {
-[[ "$1" =~ ^etags ]] && { load_etags ${1#etags} ; return ; } 
-[[ "$1" == "load_tags" ]] && { load_tags ; list ; return ; }
+[[ "$1" =~ ^etags ]] && \
+	{
+	p=~/.config/ftl/external_tags ; etags_file="${1#etags}"
+
+	[[ "$etags_file" ]] && \
+		{ . $p/$etags_file $fs ; etag=1 ; cdir ; } || \
+		{ etags_file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && { . $p/$etags_file $fs ; etag=1 ; cdir ; } ; }
+
+	return
+	}
+
+[[ "$1" == "load_tags" ]] && \
+	{
+	# eg: select all files in a directory: fd -a . > $ftl_root/load_tags 
+	[[ -s "$fs/load_tags" ]] \
+		&& { <"$fs/load_tags" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
+		|| tmux popup "echo -n ftl: no such file '$fs/load_tags'"
+
+	return
+	}
+
 
 case "${1: -1}" in
 	q  ) R=q ;;
 	*  ) list ;; 
 esac
-}
-
-load_etags()
-{
-p=~/.config/ftl/external_tags
-
-[[ "$1" ]] && \
-	{ . $p/$1 $fs ; etag=1 ; cdir ; } || \
-	{ file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && { . $p/$file $fs ; etag=1 ; cdir ; } ; }
-}
-
-load_tags()
-{
-# eg: select all files in a directory: fd -a . > $ftl_root/load_tags 
-
-[[ -s "$fs/load_tags" ]] \
-	&& { <"$fs/load_tags" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
-	|| tmux popup "echo -n ftl: no such file '$fs/load_tags'"
 }
 
 # vim: set filetype=sh :

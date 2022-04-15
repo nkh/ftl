@@ -1,43 +1,46 @@
-	j B       ) next entry                           	q Q @  ) quit, > &3, keep shell
-	k A       ) previous entry                       	?      ) show help
-	h D       ) parent directory                     	5 6    ) page down/up
-	l C ''    ) cd or open file                      	⇈s \t  ) new tab, nexttab
-	g G ⇑g    ) first/last entry, cd                 	:      ) go to entry
-	a         ) kill sound preview                   	. ⇑.   ) show/hide dot-files/etags
+	j B       ) next entry                           	?      ) show help
+	k A       ) previous entry                       	5 6    ) page down/up
+	h D       ) parent directory                     	⇈s \t  ) new tab, nexttab
+	l C ''    ) cd or open file                      	> <    ) extra pane
+	g G ⇑g    ) first/last entry, cd                 	_ | ¦  ) extra pane
+	a         ) kill sound preview                   	-      ) next pane
 	b ⇑b ⇈b   ) find, fzf find/all                   	/ ⇑/   ) fzf find/find dirs
 	c         ) copy to                              	⇑i     ) fzfi, using ueberzurg
-	⇑c        ) compress/decompress                  	{      ) fzf to file with preview
-	d ⇑d ⇈d   ) delete, clear filters/history        	}      ) rg to file
-	e E       ) external viewer, detached            	' '    ) leader key
-	f F ⇑f ⇈f ) filter1/2, external, reverse         	 
-	H ⇑h ¨ ⇈h ) fzf history, global, global, edit
-	i I       ) new file/directory                  
-	J K       ) scroll preview                       	% &    ) disable extension, enable all
+	d ⇑d ⇈d   ) delete, clear filters/history        	{      ) fzf to file with preview
+	e E       ) external viewer, detached            	}      ) rg to file
+	f F ⇑f ⇈f ) filter1/2, external, reverse         	:      ) go to entry
+	H ⇑h ¨ ⇈h ) fzf history, global, global, edit    	 
+	i I       ) new file/directory                   	 
+	J K       ) scroll preview                       	
 	⇑k        ) clear persistent marks               	, ;    ) persistent mark add/fzf
-	L         ) symlink selection                  
-	⇈l ⇑l     ) lock/unlock entry preview
+	L         ) symlink selection                    	
+	⇈l ⇑l     ) lock/unlock entry preview            	
 	m         ) mark directory and file              	' ⇑'   ) go, fzf to mark
-	M         ) view mode                            	)      ) file or dir mode
-	⇑m        ) file preview at end                  	      
-	⇈m        ) mail
+	M         ) file or image view mode              	)      ) file or dir view mode
+	⇑m        ) file preview at end                  	=      ) preview directory only      
 	n N       ) find next/previous                   	
 	o O       ) sort type, reverse                   	
-	⇑o ⇈O     ) merge tags, fzf                      	> <    ) extra pane
-	p P       ) copy/move selection                  	_ | ¦  ) extra pane
-	r ⇑r      ) refresh, refresh montage             	-      ) next pane
-	R         ) rename/bulk rename                   	^      ) show/hide stat
+	⇑o ⇈O     ) merge tags, fzf                      	
+	p P       ) copy/move selection                  	
+	r ⇑r      ) refresh, refresh montage             	
+	R         ) rename/bulk rename                   	$      ) detach editor preview
 	s S       ) shell pane, zoomed                   	!      ) run shell command
-	⇑s        ) show/hide size                       	$      ) detach editor preview          
-	˽s        ) stat file (extra binding)
-	t T ⇑t ⇈t ) fzf tag, +subdir, all files, all     	*      ) maximum listing depth
-	U u ⇑u    ) untag all, fzf, goto                 	¡      ) pdh pane                
+	⇑s        ) show/hide size                       	. ⇑.   ) show/hide dot-files/etags
+	t T ⇑t    ) fzf tag, +subdir, to clipboard       	*      ) maximum listing depth
+	U u ⇑u    ) untag all, fzf, goto                 	^      ) show/hide stat                
 	v V ⇈v    ) preview hide, once, montage          	#      ) show/hide extension preview
-	⇑v        ) ext. mode (media, pdf, tar)          	
+	⇑v        ) ext. preview mode (media, pdf, tar)  	"      ) show/hide image preview
 	w W       ) local mplayer, extra viewers         	+      ) change preview size
-	x X       ) chmod a+x, a-x                       	=      ) preview directory only
-	⇑x        ) PGP encrypt/decrypt                  	"      ) show/hide image preview
-	y Y ⇑y    ) tag/untag, to clipboard              	1-4    ) class tag
-	Z z       ) force quit, zoom and quit            	:      ) command mode
-	⇑z        ) password encrypt/decrypt             	0,7-9  ) refresh, internal usage
+	x X       ) chmod a+x, a-x                       	% &    ) hide extension, enable all
+	y Y ⇑y ⇈y ) tag/untag, files, all                	1-4    ) class tag
+	Z z       ) force quit, zoom and quit            	q Q @  ) quit, > &3, keep shell
 
-	commands: q, etags, load_tags
+	' '       ) leader key                           	:      ) command: q, etags, load_tags
+			s ) stat file                    	0, 7-9 ) refresh, internal usage
+			c ) compress/decompress          	¡      ) pdh pane
+			m ) mail                         
+			x ) PGP encrypt/decrypt
+			z ) password encrypt/decrypt
+
+
+
