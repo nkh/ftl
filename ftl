@@ -47,7 +47,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${K[c]}) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	d      ) tag_check && delete_tag || delete '' "${selection[@]}" ;;
-	e|E|${K[e]}) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ;  [[ $REPLY == ${K[e]} ]] && exmode=1 ; list ;;
+	e|E    ) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ; list ;;
 	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; fexts=() ; eval "ftl_filter(){ cat ; }" ; ftag= ; tcpreview ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
 	F      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; dir_file[$PWD]= ; tcpreview ; cdir '' ;;
@@ -90,7 +90,8 @@ ext_bindings  || case "${REPLY: -1}" in
 	u      ) fzf_tag U "$(cat $fs/tags | lscolors | fzf-tmux -p 90%  -m --ansi --info=inline --layout=reverse --marker '⊟')" ; list ;;
 	${K[u]}) tcpreview ; tag_check ; fzf_go "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf --ansi --info=inline --layout=reverse)" ;;
 	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; ((${preview:-$preview_all})) || tcpreview ; cdir ;;
-	${K[v]}) [[ "$montage_preview" ]] && montage_preview= || montage_preview="⠶" ; list ;;
+	${K[v]}) extmode=1 ; list ;;
+	${SK[v]}) [[ "$montage_preview" ]] && montage_preview= || montage_preview="⠶" ; list ;;
 	+      ) ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tresize $pane_id $x || cdir ;; 
 	\=     ) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='⁼' ; list ;;
 	\#     ) [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ;;
@@ -175,7 +176,7 @@ preview()
 ((main || gpreview || preview_all)) || { pane_read ; sstate $pfs/prev ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
 
 ((emode)) && { for external in $(externals) ; do $external && { sleep 0.01 ; emode=0 ; list ; return ; } ; done ; } ; emode=0 ; 
-((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { exmode=0 ; geo_winch ; return ; } ; done ; exmode=0 ; }
+((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { extmode=0 ; geo_winch ; return ; } ; done ; extmode=0 ; }
 tcpreview
 }
 
@@ -198,13 +199,13 @@ pimage()    { [[ $e =~ ^($ifilter)$ ]] &&  pw3image ; }
 plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" ; }
 pmp3()      { [[ $e == mp3 ]] && { pmlive || { t=$(gen_exift) ; ctsplit "/bin/less <$t ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$f.png" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; } ; }
-pmlive()    { [[ $REPLY == V ]] && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null \"$n\"" ; true ; } ; }
+pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null \"$n\"" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
-ppdf()      { [[ $e == pdf ]] && { [[ $REPLY == V ]] && ppdfpng || { mutool draw -o "$fs/$f.txt" "$n" $( ((exmode)) || echo 1-3) 2>/dev/null && vipreview "$fs/$f.txt" ; } ; true ; } ; }
+ppdf()      { [[ $e == pdf ]] && { ((extmode)) && ppdfpng || { mutool draw -o "$fs/$f.txt" "$n" $( ((extmode)) || echo 1-3) 2>/dev/null && vipreview "$fs/$f.txt" ; } ; true ; } ; }
 ppdfpng()   { echo ppdfpng ; t="$(gen_uidf).png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 pperl()     { [[ $mtype == application/x-perl ]] && [[ -s "$n" ]] &&  vipreview "$n" ; }
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
-ptar()      { [[ $f =~ \.tar ]] && { ((show_tar)) || [[ $REPLY == V ]] ; } && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
+ptar()      { [[ $f =~ \.tar ]] && ((show_tar || extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
 ptype()     { ctsplit "echo '$f' ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 pw3image()  { image="${1:-$n}" ; ((in_ftli)) &&  { tmux send -t $pane_id "${image}" C-m ; } || { ctsplit "ftli \"${image}\"" ; in_ftli=1 ; } ; sleep 0.05 ; tmux selectp -t $my_pane ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdir= ; pane_id= ; in_vipreview= ; in_ftli= ; sleep 0.01 ; } ; }
