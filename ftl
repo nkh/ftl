@@ -41,9 +41,9 @@ ext_bindings  || case "${REPLY: -1}" in
 	9      ) ((preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/prev/ftl ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rdc=; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
-	/|${K[b]}) tcpreview ; fzf_go "$({ fd . -H -I -d1 -td | sort | lscolors ; fd . -H -I -d1 -tf | sort | lscolors ; } | fzf_vpreview)" ;;
-	${SK[b]}) tcpreview ; fzf_go "$(fd . -H -I -E'.git/*' | lscolors | fzf_vpreview)" ;;
-	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview)" ;;
+	/|${K[b]}) tcpreview ; fzf_go "$({ fd . -HI -d1 -td | sort | lscolors ; fd . -HI -d1 -tf | sort | lscolors ; } | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
+	${SK[b]}) tcpreview ; fzf_go "$(fd . -HI -E'.git/*' | lscolors | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
+	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	d      ) tag_check && delete_tag || delete '' "${selection[@]}" ;;
 	e|E    ) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ; preview ;;
