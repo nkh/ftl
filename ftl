@@ -153,7 +153,7 @@ list() # select
 [[ $1 ]] && dir_file[$PWD]=$1 ; file=${dir_file[$PWD]:-0} ; ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; sstate $fs ; selection
 
 ((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage_preview}" ; head=${head:+$head } 
-((nfiles)) && { path "${files[file]}" ; ((flipi^=1)) ; flip="${flips[$flipi]}" ; true ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header "$head" ; tcpreview ; return ; }
+((nfiles)) && { path "${files[file]}" ; ((flipi^=1)) ; flip="${flips[$flipi]}" ; true ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header "$head" ; tcpreview ; geo_winch ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
 ((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd" ; header "$head"
 
