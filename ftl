@@ -41,9 +41,9 @@ ext_bindings  || case "${REPLY: -1}" in
 	9      ) ((preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/prev/ftl ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rdc=; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
-	/|${K[b]}) tcpreview ; fzf_go "$({ fd . -HI -d1 -td | sort | lscolors ; fd . -HI -d1 -tf | sort | lscolors ; } | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
-	${SK[b]}) tcpreview ; fzf_go "$(fd . -HI -E'.git/*' | lscolors | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
-	${SK[/]}) tcpreview ; fzf_go "$(fd . -td --no-ignore --color=always -L | sort | fzf_vpreview --reverse --color="header:39" --header="$PWD")" ;;
+	/|${K[b]}) tcpreview ; fzf_go "$({ fd . -HI -d1 -td | sort ; fd . -HI -d1 -tf -tl | sort ; } | fzf_vpreview --reverse --header="$PWD")" ;;
+	${SK[b]}) tcpreview ; fzf_go "$(fd . -HI -E'.git/*' | fzf_vpreview --reverse --header="$PWD")" ;;
+	${SK[/]}) tcpreview ; fzf_go "$(fd . -td -I -L | fzf_vpreview --reverse --header="$PWD")" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	d      ) tag_check && { delete_tag ; true ; } || delete '' "${selection[@]}" ;;
 	e|E    ) [[ $REPLY == e ]] && emode=1 ; [[ $REPLY == E ]] && emode=2 ; preview ;;
@@ -229,7 +229,7 @@ fsize()     { numfmt --to=iec --format '\e[94m%4f\e[m' $1 ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { (($1)) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; dir_file[$PWD]= ; } || tfilters[tab]= ; }
 ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; dir_file[$PWD]= ; }
-fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$(dirname "$1")" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
+fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$1" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 gen_exift() { t=$(gen_uidf) ; [[ -e $t ]] || exiftool "$n" >$t ; echo $t ; }
 gen_uidf()  { echo "$thumbs/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; }
