@@ -3,7 +3,11 @@ GPGID=CHANGE.ME ; declare -A marks=([0]=/ [1]=/CHANGE_ME/dir/filename [2]=/CHANG
 #previewers(){ echo pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar pnad ptype ; }
 #pnad(){ vipreview ~/.bashrc ; }
 
-. ~/.config/ftl/external_tags/git ; etag=1
+#. ~/.config/ftl/external_tags/git ; etag=1
+#RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
+#my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
+#RM=my_delete
+
 
 # vim: set filetype=sh :
 
