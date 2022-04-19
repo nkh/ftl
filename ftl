@@ -34,7 +34,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	5|6    ) [[ $REPLY == 5 ]] && { move -$LINES && list ; true ; } || { move $LINES && list ; } ;;
 	J|K    ) [[ $REPLY == K ]] && movep U || movep D ;;
 	0      ) ((gpreview)) && kbd_flush && synch $pfs || cdir "$PWD" "$f" ;;
-	1|2|3|4) [[ ${tags[${files[file]}]} == ${tglyph[$REPLY]} ]] && unset -v "tags[${files[file]}]" || tags[${files[file]}]=${tglyph[$REPLY]} ; move 1 ; list ;;
+	1|2|3|4) [[ ${tags[${files[file]}]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[${files[file]}]' || tags[${files[file]}]=${tglyph[$REPLY]} ; move 1 ; list ;;
 	¿|¡    ) [[ $REPLY == ¿ ]] && read pdh <$fs/pdh || pdh_flip ;;
 	7      ) list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ;;
 	8      ) ((gpreview)) && read n <$pfs/prev/ftl && cdir "$n" ;;
@@ -70,7 +70,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${SK[l]}) p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && . $p/$file ; list ;;
 	M      ) ((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ((imode[tab] == 2)) && ftl_nimode || ftl_imode ${imode[tab]} ; cdir ;;
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]="${files[file]}" ;;
-	${K[m]}) [[ "${tail[$n]}" ]] && unset -v "tail[$n]" || tail[$n]='+$ ' ; list ;;
+	${K[m]}) [[ "${tail[$n]}" ]] && unset -v 'tail[$n]' || tail[$n]='+$ ' ; list ;;
 	o      ) ((sort_type[tab]++, sort_type[tab] = sort_type[tab] >= ${#sort_filters[@]} ? 0 : sort_type[tab])) ; cdir ;;
 	O      ) [[ ${reversed[tab]} ]] && reversed[tab]= || reversed[tab]=-r ; cdir ;;
 	${K[o]}) source ~/.config/ftl/merge/all ; list ;;
@@ -230,7 +230,7 @@ ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" 
 ftl_imode() { (($1)) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; dir_file[$PWD]= ; } || tfilters[tab]= ; }
 ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; dir_file[$PWD]= ; }
 fzf_go()    { [[ "$1" ]] && { [[ -d "$1" ]] && cdir "$1" || cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
-fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
+fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v 'tags[$f]' || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 gen_exift() { t=$(gen_uidf) ; [[ -e $t ]] || exiftool "$n" >$t ; echo $t ; }
 gen_uidf()  { echo "$thumbs/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFvT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
@@ -276,10 +276,10 @@ synch()     { synch_read "$1/ftl" ; filters2[tab]="$pfil2" ; filters[tab]="$pfil
 synch_read(){ [[ -e "$1" ]] && { for r in pdir pindex imode[tab] etag sort_type[tab] show_size show_dir_size pfil pfil2 ; do read $r ; done ; } <$1 ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
 tab_next()  { ((tab++)) ; for i in "${tabs[@]:$tab}" FTL_RESET "${tabs[@]}" ; do [[ "$i" == FTL_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; }
-tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$tag]" ; done ; ((${#tags[@]} != 0)) ; }
+tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { declare -A ntags ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux --reverse --info=inline -1 )" ; }
-tag_clear() { for t in "${!tags[@]}" ; do [[ $1 == ${tags[$t]} ]] && unset -v "tags[$t]" ; done ; }
-tag_flip()  { [[ ${tags[$1]} ]] && unset -v "tags[$1]" || tags[$1]=${2:-▪} ; } 
+tag_clear() { for t in "${!tags[@]}" ; do [[ "$1" == "${tags[$t]}" ]] && unset -v 'tags[$t]' ; done ; }
+tag_flip()  { [[ ${tags[$1]} ]] && unset -v 'tags[$1]' || tags[$1]=${2:-▪} ; } 
 tag_get() { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 tag_read()  { tags=() ; [[ -e "$1/tags" ]] && { readarray -t stags < "$1/tags" ; for stag in "${stags[@]}" ; do [[ "$stag" ]] && tags[${stag//\\ / }]='▪' ; done ; } ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
