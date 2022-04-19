@@ -10,6 +10,9 @@ EOF
 	{
 	w=$(echo "$players" | fzf-tmux -0 -1 -p 80% -m --ansi --info=inline | cut -f 2-)
 	[[ "$w" ]] && { ($w "$n" &) ; tcpreview ; sleep 0.4 ; true ; }
+	} || \
+	{
+	tmux split-window -l 50% mimeopen "$n"
 	}
 
 # vim: set filetype=sh :
