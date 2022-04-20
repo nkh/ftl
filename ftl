@@ -37,8 +37,8 @@ ext_bindings  || case "${REPLY: -1}" in
 	1|2|3|4) [[ ${tags[${files[file]}]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[${files[file]}]' || tags[${files[file]}]=${tglyph[$REPLY]} ; move 1 ; list ;;
 	¿|¡    ) [[ $REPLY == ¿ ]] && read pdh <$fs/pdh || pdh_flip ;;
 	7      ) list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ;;
-	8      ) ((gpreview)) && read n <$pfs/prev/ftl && cdir "$n" ;;
-	9      ) ((preview_all)) && { rdc=8 ; op=$(tmux display -p '#{pane_id}') ; read n <$fs/prev/ftl ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rdc=; } ;;
+	8      ) ((gpreview)) && read n <$pfs/prev/n && cdir "$n" ;;
+	9      ) ((preview_all)) && { rdc=8 ; read op <$fs/prev/pane ; read n <$fs/prev/n ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rcd= ; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	/|${K[b]}) tcpreview ; fzf_go "$({ fd . -HI -d1 -td | sort ; fd . -HI -d1 -tf -tl | sort ; } | fzf_vpreview --reverse --header="$PWD")" ;;
@@ -169,7 +169,7 @@ for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
 
 preview()
 {
-((main || gpreview || preview_all)) || { pane_read ; sstate $pfs/prev ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
+((main || gpreview || preview_all)) || { pane_read ; echo "$n" >$pfs/prev/n ; echo $my_pane >$pfs/prev/pane ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
 
 ((emode)) && { for external in $(externals) ; do pdh "$external\n" ; $external && { sleep 0.1 ; emode=0 ; return ; } ; done ; } ; emode=0 ; 
 ((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { extmode=0 ; return ; } ; done ; extmode=0 ; }
@@ -185,7 +185,7 @@ epdf()      { [[ $e == pdf ]] && { ((emode == 2)) && { (mupdf "$n" 2>/dev/null &
 etext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; } ; }
 pcbr()      { [[ $e == cbr ]] && { t="$thumbs/$b.$e.jpg" ; { [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; } ; [[ -e $t ]] && pw3image "$t" ; } ; }
 pdir()      { [[ -d "$n" ]] && { pdir_image || pdir_dir "$n" ; } || { in_pdir= ; pdir_only ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} '' $fs 1" ; in_pdir=1 ; sleep 0.1 ; } ; }
+pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} '' $fs 1" ; in_pdir=1 ; sleep 0.01 ; } ; }
 pdir_image(){ [[ "$montage_preview" ]] && { in_pdir= ; [[ -e "$n/.montage.png" ]] || do_montage "$n" ; [[ -e "$n/.montage.png" ]] && pw3image "$n/.montage.png" ; } ; }
 do_montage(){ < <(IFS='\n' fd -a -t f -e ${ifilter//|/ -e} -d 1 . "$1" | head -n 40) mapfile -t a ; ((${#a[@]})) && header "$mh" && montage "${a[@]}" "$1/.montage.png" && header $head ; }
 pdir_only() { [[ "${pdir_only[tab]}" ]]  && { tcpreview ; true ; } || false  ; }
