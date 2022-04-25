@@ -2,6 +2,8 @@
 stty -echo
 tput civis
 
+image_bg="$HOME/.config/ftl/image_bg.png"
+
 pw3image()
 {
 image="$1" ; 
@@ -12,7 +14,7 @@ read -r TOP LEFT LINES COLS< <(tmux display -t $my_pane -p '#{pane_top} #{pane_l
 
 [[ "$image" ]] || { echo -e "0;1;$img_x;$img_y;;;;;;;$image_bg\n4;\n3;" >&7 ; echo erasing image ; return ; }
 
-read -r img_w img_h < <(identify -format '%w %h' "$image") ; image_bg="$HOME/.config/ftl/image_bg.png"
+read -r img_w img_h < <(identify -format '%w %h' "$image") ;
 ((img_w==0 || img_h==0)) && { img_h=1 ; img_w=1 ; } ; rw=0 ; rh=0
 
 ((img_w > pane_w || img_h > pane_h)) && \
