@@ -2,7 +2,7 @@
 cdf() { P=$(mktemp -u) && mkfifo $P && exec 3<>$P && rm $P ; ftl ; read -ru 3 d ; [[ "$d" ]] && cd "$(dirname "$d")" ; } ; [[ ${BASH_SOURCE[0]} != $0 ]] && return ;
 
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
-previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr ptype ; }
+previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
 declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
            SK=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
 
@@ -18,7 +18,7 @@ mkapipe 4 5 6 ; echo -en '\e[?1049h'  ; stty -echo ; my_pane=$(pid_2_pane $$) ; 
 
 [[ "$1" ]] && { path "$1" ; [[ -d "$1" ]] && { dir="$p/$f" ; search="$2" ; } || { [[ -f "$1" ]] && { dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 [[ "$3" ]] && { fs=$3/$$ ; pfs=$3 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghistory ; echo $my_pane >$fs/pane ; } ;
-declare -A marks=([0]=/$ [1]="$HOME/$") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc; marks[$"'"]="$(tail -n1 $ghistory)"
+fsp=$pfs/prev ; declare -A marks=([0]=/$ [1]="$HOME/$") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc; marks[$"'"]="$(tail -n1 $ghistory)"
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; emode=0 ; PPWD="$dir" ; synch $pfs "$search" ; } || { PPWD="$dir" ; cdir "$dir" "$search" ; }
 
 while : ; do winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; kbd_flush ; done 
@@ -38,7 +38,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	¿|¡    ) [[ $REPLY == ¿ ]] && read pdh <$fs/pdh || pdh_flip ;;
 	7      ) list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ;;
 	8      ) ((gpreview)) && read n <$pfs/prev/n && cdir "$n" ;;
-	9      ) ((preview_all)) && { rdc=8 ; read op <$fs/prev/pane ; read n <$fs/prev/n ; path "$n" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rcd= ; } ;;
+	9      ) ((preview_all)) && { rdc=8 ; read op <$fsp/pane ; read rn <$fsp/n ; qd=1 ; list ; qd= ; path "$rn" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rcd= ; } ;;
 	a      ) mplayer_k ;;
 	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	/|${K[b]}) tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview --cycle --reverse --header="$PWD")" ;;
@@ -87,7 +87,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	U      ) tags=() ; list ;;
 	u      ) tag_check && { fzf_tag U "$(cat $fs/tags | lscolors | fzf-tmux -p 90%  -m --cycle --ansi --info=inline --layout=reverse --marker '⊟')" ; list ; } ;;
 	${K[u]}) tag_check && fzf_go "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux --tac -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
-	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; ((${preview:-$preview_all})) || tcpreview ; cdir ;;
+	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ;;
 	${K[v]}|${SK[v]}) [[ $REPLY == ${K[v]} ]] && extmode=1 || extmode=2 ; list ;;
 	+      ) ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tresize $pane_id $x || cdir ;; 
 	\=     ) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='⁼' ; list ;;
@@ -135,17 +135,17 @@ files=() ; files_color=() ; mime=() ; nfiles=0 ; [[ "$2" ]] && dir_file[${tab}_$
 declare -A uniq_file ; pad=(* ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	[[ $p == $dir_done ]] && break ; ((${uniq_file[$p]})) && continue ; uniq_file[$p]=1
-	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; list $found ; in_quick_display=1 ; }
+	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; list $found ; qd=1 ; }
 	[[ "$p" =~ '.' ]] && { e=${p##*.} ; ((lignore[${e@Q}])) && continue ; } ; pl=${#p}
 	((etag)) && { etag_tag "$p" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
-	((show_size)) && { ((sum += size)) ; [[ -d "$p" ]] && { ((show_dir_size)) && pc=$(dsize "$p")" $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
+	((show_size)) && { ((sum += size)) ; [[ -d "$p" ]] && { ((show_dir_size)) && pc="$(dsize "$p") $pc" || pc="     $pc" ; } || pc=$(fsize $size)" $pc" ; pl=$((pl + 5)) ; }
 	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
-	((${#p} > ($COLS - 1))) && { [[ "$p" =~ '.' ]] && e=….${p##*.} || e=… ; pcl=${pcl:0:((${#pcl} - ${#e}))}${e} ; }
+	((pl > (COLS - 1))) && { [[ "$p" =~ '.' ]] && e=${p##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }
 	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$p" ; [[ -n "$search" && -z "$found" ]] && [[ "${p:0:${#search}}" == "$search" ]] && found=$nfiles ; ((nfiles++))
 done 
 
-shopt -u nocasematch ; in_quick_display=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum= ; flipi=1 ; flips=(' ' ' ') #space, EM-space
+shopt -u nocasematch ; qd=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum= ; flipi=1 ; flips=(' ' ' ') #space, EM-space
 }
 
 list() # select
@@ -154,25 +154,26 @@ list() # select
 
 ((ntabs>1)) && tabsd=" ᵗ$ntabs" || tabsd= ; head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage_preview}" ; head=${head:+$head } 
 ((nfiles)) && { path "${files[file]}" ; ((flipi^=1)) ; flip="${flips[$flipi]}" ; true ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header "$head" ; tcpreview ; geo_winch ; return ; }
-((in_ftli)) && [[ ! $e =~ ^($ifilter)$ ]] && tcpreview # smooth transition from image to non image
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ; 
-((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd" ; header "$head"
+((sort_type[tab] == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd$flip" ; header "$head"
 
-((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center)) ; geo_winch 
-for((i=$top ; i <= ((bottom = top + lines - 1, bottom < 0 ? 0 : bottom)) ; i++))
+((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center, bottom = top + lines - 1, bottom = bottom < 0 ? 0 : bottom)) ; geo_winch 
+for((i=$top ; i <= bottom ; i++))
 	do
-		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor"
+		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
 		echo -ne "\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo
 	done
 
-((in_quick_display)) || { geo_winch ; preview ; }
+for(( ; i < ((LINES - 1)) ; i++)) ; do echo -ne "$flip" ; ((i != LINES)) && echo ; done
+
+((qd)) || { geo_winch ; preview ; }
 }
 
-preview()
+preview() # force_preview
 {
-((main || gpreview || preview_all)) || { pane_read ; echo "$n" >$pfs/prev/n ; echo $my_pane >$pfs/prev/pane ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
+((main || gpreview || preview_all)) || { pane_read ; echo "$n" >$fsp/n ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 9 &>/dev/null ; return ; }
 
-((emode)) && { for external in $(externals) ; do pdh "$external\n" ; $external && { sleep 0.1 ; emode=0 ; return ; } ; done ; } ; emode=0 ; 
+((emode)) && { for external in $(externals) ; do $external && { sleep 0.1 ; emode=0 ; return ; } ; done ; } ; emode=0 ; 
 ((${1:-${preview:-$preview_all}})) && { preview= ; for v in $(previewers) ; do $v && { extmode=0 ; return ; } ; done ; extmode=0 ; }
 tcpreview
 }
@@ -184,7 +185,8 @@ eimage()    { [[ $e =~ $ifilter ]] && run_maxed fim -a "$n" "$PWD" ; }
 emedia()    { [[ $e =~ $mfilter ]] && { ((emode == 1)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } || (vlc "$n" &>/dev/null &) ; R="r$R" ; } ;  }
 epdf()      { [[ $e == pdf ]] && { ((emode == 2)) && { (mupdf "$n" 2>/dev/null &) ; true ; } || { run_maxed mupdf "$n" ; true ; } ; } ; }
 etext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; } ; }
-pcbr()      { [[ $e == cbr ]] && { t="$thumbs/$b.$e.jpg" ; { [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; } ; [[ -e $t ]] && pw3image "$t" ; } ; }
+pcbr()      { [[ $e == cbr ]] && { t="$thumbs/$b.$e.jpg" ; [[ -e $t ]] || cbr_cover "$n" "$t" 2>/dev/null ; [[ -e $t ]] && pw3image "$t" ; true ; } ; }
+pcbz()      { [[ $e == cbz ]] && { t="$thumbs/$b.$e.jpg" ; [[ -e $t ]] || cbconvert thumbnail "$n" --outfile "$t" &>/dev/null ; [[ -e $t ]] && pw3image "$t" ; } ; }
 pdir()      { [[ -d "$n" ]] && { pdir_image || pdir_dir "$n" ; } || { in_pdir= ; pdir_only ; } ; }
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${rdc:-0} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} '' $fs 1" ; in_pdir=1 ; sleep 0.01 ; } ; }
 pdir_image(){ [[ "$montage_preview" ]] && { in_pdir= ; [[ -e "$n/.montage.png" ]] || do_montage "$n" ; [[ -e "$n/.montage.png" ]] && pw3image "$n/.montage.png" ; } ; }
@@ -192,7 +194,7 @@ do_montage(){ < <(IFS='\n' fd -a -t f -e ${ifilter//|/ -e} -d 1 . "$1" | head -n
 pdir_only() { [[ "${pdir_only[tab]}" ]]  && { tcpreview ; true ; } || false  ; }
 phtml()     { [[ $e == html ]] &&  w3m -dump "$n" > "$fs/$f.txt" && vipreview "$fs/$f.txt" ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
-pimage()    { [[ $e =~ ^($ifilter)$ ]] &&  pw3image ; }
+pimage()    { [[ $e =~ $ifilter ]] &&  pw3image ; }
 plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" ; }
 pmp3()      { [[ $e == mp3 ]] && { pmlive || { t=$(gen_exift) ; ctsplit "/bin/less <$t ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$f.png" ; [[ -f "$t" ]] || ffmpegthumbnailer -i "$n" -o "$t" -s 1024 ; pw3image "$t" ; true ; } ; } ; }
@@ -204,16 +206,16 @@ pperl()     { [[ $mtype == application/x-perl ]] && [[ -s "$n" ]] &&  vipreview 
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
 ptar()      { [[ $f =~ \.tar ]] && ((show_tar || extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
 ptype()     { ctsplit "echo '$f' ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
-pw3image()  { image="${1:-$n}" ; ((in_ftli)) && { tmux send -t $pane_id "${image}" C-m ; } || { ctsplit "ftli \"${image}\"" ; in_ftli=1 ; } ; sleep 0.05 ; tmux selectp -t $my_pane ; }
+pw3image()  { image="${1:-$n}" ; ((in_ftli)) && tmux send -t $pane_id "${image}" C-m || { ctsplit "ftli $pfs \"${image}\"" ; in_ftli=1 ; sleep 0.05 ; tmux selectp -t $my_pane ; } ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdir= ; pane_id= ; in_vipreview= ; in_ftli= ; sleep 0.01 ; } ; }
-vipreview() { ((in_vipreview)) && { tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m ; } || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; ((in_vipreview++)) ; true ; }
+vipreview() { ((in_vipreview)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_vipreview=1 ; true ; }
 bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
 bulkedit()  { sed "s/.*/\"&\"/" $fs/tags | tee $fs/bo >$fs/bd ; $EDITOR $fs/bd ; >$fs/br echo 'set -e' ; paste $fs/bo $fs/bd >>$fs/br ; }
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
 ctsplit()   { { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
 cp_mv()     { [[ $1 == p ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
-dedup()     { [[ -s "$1" ]] && { awk '!seen[$0]++' "$1" | sponge "$1" ; true ; } ; } 
+dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; } 
 delete()    { prompt "delete$1? [y|d|N|c]: " -n1 && [[ $REPLY =~ y|d|c ]] && { [[ $REPLY == c ]] && $RM "$n" || $RM "${@:2}" ; mime=() ; cdir ; true ; }  || { list ; false ; } ; }
 delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delete " *tags: ${#ltags[@]}* " "${!ltags[@]}" ; [[ $REPLY =~ y|d ]] && tag_clear $class ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
@@ -237,7 +239,7 @@ gen_uidf()  { echo "$thumbs/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; 
 geometry()  { read -r TOP WIDTH LINES COLS LEFvT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
-header()    { h="${@} ${sglyph[sort_type[tab]]}${reversed[tab]}$( ((${#tags[@]})) && echo " ${#tags[@]}")" ; header_pos "$h" ; echo -e "\e[H\e[K\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
+header()    { h="${@}${sglyph[sort_type[tab]]}${reversed[tab]}$( ((${#tags[@]})) && echo " ${#tags[@]}")" ; header_pos "$h" ; echo -e "\e[H\e[K\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
 inotify_()  { inotifywait --exclude index.lock -e create -e delete -e move "$PWD/" &>/dev/null && tmux send -t "$my_pane" r 2>&- ; } 
@@ -258,11 +260,11 @@ path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/"
 pdh()       { [[ $pdh ]] && tmux send -t $pdh "ftl: $my_pane: ${1//\\n/$'\n'}" ; }
 pdh_flip()  { [[ $pdh ]] && { tmux killp -t $pdh &> /dev/null ; pdh= ; } || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $fs" 20% -v -R ; pane_id= ; cdir ; } ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
-prompt()    { stty echo ; echo -ne '\e[0;H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
+prompt()    { stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane 7 ; } ; rm -rf $fs ; exit 0 ; }
 quit2()     { inotify_k ; location ; stty echo ; [[ $pfs == $fs ]] && tbcolor 236 52 ; mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; }
 quit_shell(){ [[ $REPLY != @ ]] && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
-rdir()      { get_dir ; in_quick_display=1 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list ; in_quick_display=0 ; }
+rdir()      { get_dir ; qd=1 ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; refresh ; list ; qd=0 ; }
 refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 rg_go()     { [[ "$1" ]] && { g=${1%%:*} && nd="$PWD/"$(dirname "$g") && cdir "$nd" "$(basename "$g")" ; } || { refresh ; list ; } ; }
 run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; } ; "$@" 2>/dev/null ; ((run_maxed)) && { wmctrl -ia $aw ; } ; }

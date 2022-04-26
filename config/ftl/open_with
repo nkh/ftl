@@ -1,8 +1,10 @@
 players=$( < <( cat <<EOF
 cbr	zathura
-cbr	mcomix
-application/vnd.comicbook-rar	mcomix
+cbz	zathura
 application/vnd.comicbook-rar	zathura
+cbr	mcomix
+cbz	mcomix
+application/vnd.comicbook-rar	mcomix
 EOF
 ) rg -F -f <(echo -e "$n\n$e\n$mtype"))
 
