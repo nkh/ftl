@@ -15,6 +15,9 @@ read -r TOP LEFT LINES COLS< <(tmux display -t $my_pane -p '#{pane_top} #{pane_l
 [[ "$image" == FTL_ERASE_BG ]] && { echo -e "0;1;$img_x;$img_y;$pane_w;$pane_h;;;;;$image_bg\n4;\n3;" >&7 ; return ; }
 [[ -e "$image" ]] || return ; 
 
+# for images that take too long to display, kill the displaying process and display new image
+#kill $w3iproc &>/dev/null ; { <&7 /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$!
+
 read -r img_w img_h < <(identify -format '%w %h' "$image") ;
 ((img_w==0 || img_h==0)) && { img_h=1 ; img_w=1 ; } ; rw=0 ; rh=0
 
@@ -22,7 +25,9 @@ read -r img_w img_h < <(identify -format '%w %h' "$image") ;
 	{ { read img_sw ; read img_sh ; } < <(bc <<<"scale=2 ; r=rw=$pane_w/$img_w ; rh=$pane_h/$img_h ; if(rh<rw) r=rh ; if(r>1) r=1 ; scale=0 ; $img_w*r/1; $img_h*r/1") ; } || \
 	{ img_sw=$img_w ; img_sh=$img_h ; }
 
-echo -e "0;1;$img_x;$img_y;$img_sw;$img_sh;;;;;$image\n4;\n3;" >&7 ;
+                       echo -e "0;1;$img_x;$img_y;$img_sw;$img_sh;;;;;$image\n4;\n3;" >&7 ;
+# ((img_sw < pane_w)) && echo -e "0;1;$((img_x+img_sw));$img_y;$((pane_w - img_sw));$img_sh;;;;;$image_bg\n4;\n3;" >&7
+# ((img_sh < pane_h)) && echo -e "0;1;$img_x;$((img_y+img_sh));$pane_w;$((pane_h - img_sh));;;;;$image_bg\n4;\n3;" >&7
 
 #echo TOP: $TOP, LEFT: $LEFT, LINES: $LINES, COLS: $COLS, LINES: $LINES, COLS: $COLS, RIGHT: $((img_x + pane_w)), pane_w: $pane_w, pane_h: $pane_h
 #echo -e "img_x: $img_x,img_y: $img_y, img_w: $img_w, img_h: $img_h, $img_y, img_sw: $img_sw, img_sh: $img_sh"
