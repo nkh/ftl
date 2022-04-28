@@ -2,7 +2,6 @@ sort_glyph() { echo e ; }
 ftl_sort()
 {
 entry=0
-
 while read -r file_data
 	do
 		fe="${file_data#$'*\t'*$'\t'}" ; names+=("$fe") ; ext= ; [[ "$fe" =~ '.' ]] && ext=".${fe##*.}"
@@ -10,8 +9,7 @@ while read -r file_data
 		sort_data+=("$entry	$fe	$ext") ; ((entry++))
 	done
 
-#printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1 | { while read i ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done ; }
-#printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1 | { while read i ; do echo "$i" >> ftl_indexes ; echo "${sizes[i]}" >>ftl_sizes ; echo "${names[i]}" >>ftl_names ; done ; }
+#printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1 | { error input from read ; while read i ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done ; }
 for i in $(printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done
 }
 
