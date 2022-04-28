@@ -37,7 +37,7 @@ shell_command()
 
 	[[ "$etags_file" ]] && \
 		{ . $p/$etags_file $fs ; etag=1 ; cdir ; } || \
-		{ etags_file=$(cd $p ; fd | fzf-tmux --reverse --info=inline) ; [[ $file ]] && { . $p/$etags_file $fs ; etag=1 ; cdir ; } ; }
+		{ etags_file=$(cd $p ; fd | fzf-tmux -p 80% --reverse --info=inline) ; [[ $file ]] && { . $p/$etags_file $fs ; etag=1 ; cdir ; } ; }
 
 	return
 	}

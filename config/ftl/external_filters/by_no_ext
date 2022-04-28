@@ -1,6 +1,7 @@
 declare -g -A fnexts=()
 
-for ext in $(for i in $(fd . -d 1 -I -H $PWD) ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | sort -u | lscolors | fzf-tmux -m --ansi --info=inline --layout=reverse)
+for ext in $(for i in $(fd . -d 1 -I -H $PWD) ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
+		sort -u | lscolors | fzf-tmux -m --ansi --info=inline --layout=reverse)
 	do 
 		fnexts[$ext]=1
 		filter_tag="~"
