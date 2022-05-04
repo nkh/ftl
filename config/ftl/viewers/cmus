@@ -1,0 +1,3 @@
+[[ $e =~ $mfilter ]] && { tmux new-session -s cmus -d "$(which cmus)" 2> /dev/null ; cmus-remote -q "${selection[@]}" ; cmus-remote -Q | grep 'status playing' || cmus-remote -p ; } 
+# vim: set filetype=sh :
+

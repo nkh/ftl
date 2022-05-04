@@ -5,12 +5,12 @@
 	g G ⇑g    ) first/last entry, cd                 	_ | ¦  ) extra pane
 	a         ) kill sound preview                   	-      ) next pane or viewer
 	b ⇑b ⇈b   ) find, fzf find/all                   	/ ⇑/   ) fzf find/find dirs
-	c         ) copy to                              	⇑i     ) fzfi, using ueberzurg
+	c         ) copy to                              	⇈i     ) fzfi, using ueberzurg
 	d ⇑d ⇈d   ) delete, clear filters/history        	{      ) fzf to file with preview
 	e E       ) external viewer, detached            	}      ) rg to file
 	f F ⇑f ⇈f ) filter1/2, external, reverse         	:      ) go to entry
 	H ⇑h ¨ ⇈h ) fzf history, global, global, edit    	:      ) command: q, etags, load_tags 
-	i I       ) new file/directory                   	' '    ) leader key 
+	i I ⇑i    ) new file/directory, bulk                   	' '    ) leader key 
 	J K       ) scroll preview                       	
 	⇑k        ) clear persistent marks               	, ;    ) persistent mark add/fzf
 	L         ) symlink selection                    	
