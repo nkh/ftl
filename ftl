@@ -3,8 +3,8 @@ cdf() { P=$(mktemp -u) && mkfifo $P && exec 3<>$P && rm $P ; ftl ; read -ru 3 d 
 
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
-declare -A K=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
-           SK=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
+declare -A A=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
+           SA=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
 
 ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
@@ -42,54 +42,54 @@ ext_bindings  || case "${REPLY: -1}" in
 	a      ) mplayer_k ;;
 	/|n|N  ) how=$REPLY ; [[ $how == '/' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
 	b      ) tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
-	${K[b]}) tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
-	${SK[b]}) tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
+	${A[b]}) tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
+	${SA[b]}) tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	d      ) tag_check && { delete_tag ; true ; } || delete '' "${selection[@]}" ;;
 	e|E    ) [[ $REPLY == e ]] && emode=1 || emode=2 ; preview ;;
-	${K[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
+	${A[d]}) filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
 	f      ) prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	F      ) prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
-	${K[f]}) p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux -p 80% --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file $fs ; cdir '' "$f";;
-	${SK[f]}) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
+	${A[f]}) p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux -p 80% --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file $fs ; cdir '' "$f";;
+	${SA[f]}) prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
 	g|G    ) [[ $REPLY == G ]] && ((dir_file["${tab}_$PWD"] = nfiles - 1)) || dir_file["${tab}_$PWD"]=0 ; list ;;
-	${K[g]}) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
-	H|${K[h]}|¨) [[ $REPLY == H ]] && h=$fs/history || h=$ghistory ; dedup $h && fzf_go "$(<$h lscolors | fzf-tmux --tac -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
-	${SK[h]}) dedup $ghistory && rg -v -x -F -f <(<$ghistory lscolors | fzf-tmux --tac -p 80% -m --ansi --cycle --info=inline --layout=reverse) $ghistory | sponge $ghistory ;;
-	${SK[d]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghistory 2>&- ; list ;;
-	${SK[i]}) tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
-	${K[i]})  tcpreview ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-) { if(m-/$-) { print "mkdir $_" } else { print "touch $_" } }' $fs/bc && bash $fs/bc ; cdir ;;
+	${A[g]}) prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
+	H|${A[h]}|¨) [[ $REPLY == H ]] && h=$fs/history || h=$ghistory ; dedup $h && fzf_go "$(<$h lscolors | fzf-tmux --tac -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
+	${SA[h]}) dedup $ghistory && rg -v -x -F -f <(<$ghistory lscolors | fzf-tmux --tac -p 80% -m --ansi --cycle --info=inline --layout=reverse) $ghistory | sponge $ghistory ;;
+	${SA[d]}) prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghistory 2>&- ; list ;;
+	${SA[i]}) tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
+	${A[i]})  tcpreview ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-) { if(m-/$-) { print "mkdir $_" } else { print "touch $_" } }' $fs/bc && bash $fs/bc ; cdir ;;
 	i      ) prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ;;
 	I      ) prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ;;
-	${K[k]}) prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ;;
+	${A[k]}) prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ;;
 	\'     ) read -n 1 ; [[ -n ${marks[$REPLY]} ]] && cdir "$(dirname "${marks[$REPLY]}")" "$(basename "${marks[$REPLY]}")" || list ;;
 	\,     ) { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ;;
 	\;     ) tcpreview ; fzf_go "$(cat $ftl_root/marks | lscolors | fzf --cycle --ansi --info=inline --layout=reverse)" ;;
 	\´     ) tcpreview ; fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf --cycle --ansi --info=inline --layout=reverse)" ;; #altgr \'
 	L      ) tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && { for f in "${selection[@]}" ; do ln -s -b "$f" "$PWD" ; done ; tags=() ; } ; cdir ;;
-	${K[l]}) rm "$fs/lock_preview/$n" 2>&- ; list ;;
-	${SK[l]}) p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux -p 80% --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; list ;;
+	${A[l]}) rm "$fs/lock_preview/$n" 2>&- ; list ;;
+	${SA[l]}) p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux -p 80% --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; list ;;
 	M      ) ((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ((imode[tab] == 2)) && ftl_nimode || ftl_imode ${imode[tab]} ; cdir '' "$f";;
 	m      ) read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]="${files[file]}" ;;
-	${K[m]}) [[ "$montage_preview" ]] && montage_preview= || montage_preview="⠶" ; list ;;
-	${SK[m]}) rm "$n/.montage.png" 2>&- ; list ;;
+	${A[m]}) [[ "$montage_preview" ]] && montage_preview= || montage_preview="⠶" ; list ;;
+	${SA[m]}) rm "$n/.montage.png" 2>&- ; list ;;
 	o      ) ((sort_type[tab]++, sort_type[tab] = sort_type[tab] >= ${#sort_filters[@]} ? 0 : sort_type[tab])) ; cdir '' "$f" ;;
 	O      ) [[ ${reversed[tab]} ]] && reversed[tab]= || reversed[tab]=-r ; cdir '' "$f";;
-	${K[o]}) source ~/.config/ftl/merge/all ; list ;;
-	${SK[o]}) p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux -p 80% --header 'Merge tags:' --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; cdir ;;
+	${A[o]}) source ~/.config/ftl/merge/all ; list ;;
+	${SA[o]}) p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux -p 80% --header 'Merge tags:' --cycle --reverse --info=inline) ; [[ $file ]] && . $p/$file ; cdir ;;
 	p|P    ) tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f";;
 	r      ) ((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ;;  # directory content change signal
 	R      ) tag_check &&  bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" ; } ; cdir '' "$f" ;;
-	${K[s]}) ((show_size ^= 1)) || { ((show_size ^= 1)) ; ((show_dir_size ^= 1)) ; } || show_size=0 ; cdir ;;
+	${A[s]}) ((show_size ^= 1)) || { ((show_size ^= 1)) ; ((show_dir_size ^= 1)) ; } || show_size=0 ; cdir ;;
 	\$     ) ((in_vipreview)) && in_vipreview= && pane_id= && cdir ;;
 	t|T    ) fzf_tag T "$(fd -H --color=always $([[ $REPLY == t ]] && echo '-d1') | fzf-tmux -p 80% -m --cycle --ansi --info=inline --layout=reverse --marker '▪')" ; list ;;
-	${K[t]}) printf "%q " "${selection[@]}" | xsel -b -i ;; 
-	${SK[t]}) [[ "${tail[$n]}" ]] && unset -v "tail[$n]" || tail[$n]='+$ ' ; list ;;
+	${A[t]}) printf "%q " "${selection[@]}" | xsel -b -i ;; 
+	${SA[t]}) [[ "${tail[$n]}" ]] && unset -v "tail[$n]" || tail[$n]='+$ ' ; list ;;
 	U      ) tags=() ; list ;;
 	u      ) tag_check && { fzf_tag U "$(cat $fs/tags | lscolors | fzf-tmux -p 80%  -m --cycle --ansi --info=inline --layout=reverse --marker '⊟')" ; list ; } ;;
-	${K[u]}) tag_check && fzf_go "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux --tac -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
+	${A[u]}) tag_check && fzf_go "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux --tac -p 80% --cycle --ansi --info=inline --layout=reverse)" ;;
 	v|V    ) [[ $REPLY == V  ]] && preview=1 || ((preview_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ;;
-	${K[v]}|${SK[v]}) [[ $REPLY == ${K[v]} ]] && extmode=1 || extmode=2 ; list ;;
+	${A[v]}|${SA[v]}) [[ $REPLY == ${A[v]} ]] && extmode=1 || extmode=2 ; list ;;
 	+      ) ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tresize $pane_id $x || cdir ;; 
 	\=     ) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='⁼' ; list ;;
 	\#     ) [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ;;
@@ -97,18 +97,18 @@ ext_bindings  || case "${REPLY: -1}" in
 	W      ) p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ;;
 	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	y|Y    ) tag_flip "${files[file]}" ; [[ $REPLY == y ]] && { move 1 ; true ; } || move -1 ; list ;;
-	${K[y]}) for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ;;
-	${SK[y]}) for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ;;
+	${A[y]}) for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ;;
+	${SA[y]}) for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ;;
 	q|Q|\@ ) tab_close || pane_close || quit ;;
 	Z      ) ((main)) && { pane_read && for p in "${panes[@]}" ; do tmux send -t $p Z &>/dev/null ; done ; } ; quit ;;
 	z      ) quit2 ; [[ $pane_id ]] && { tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
-	${SK[s]}|$'\t') [[ $REPLY == $'\t' ]] && tab_next || { [[ -d "$f" ]] && tabs+=("$n") || tabs+=("$PWD") ; ((tab=${#tabs[@]}-1, ntabs++)) ; } ; cdir ${tabs[tab]} ;;
+	${SA[s]}|$'\t') [[ $REPLY == $'\t' ]] && tab_next || { [[ -d "$f" ]] && tabs+=("$n") || tabs+=("$PWD") ; ((tab=${#tabs[@]}-1, ntabs++)) ; } ; cdir ${tabs[tab]} ;;
 	\:     ) prompt ':' ; [[ $REPLY =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY -1) : 0)) || shell_command "$REPLY" ;; 
 	\"     ) ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; ((zoom == 0)) && R="-$R" ; cdir ;;
 	\%|\&  ) [[ $REPLY == \% ]] && { [[ $e ]] && ((lignore[${e}] ^= 1)); } || lignore=() ; cdir ;;
 	\*     ) prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && max_depth[tab]=$REPLY && cdir '' "$f" ;;
 	.      ) ((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ;;
-	${K[.]}) ((etag^=1)) ; cdir ;;
+	${A[.]}) ((etag^=1)) ; cdir ;;
 	\{     ) tcpreview ; fzf_go "$(fzfppv -L)" ;;
 	\}     ) tcpreview ; rg_go "$(fzfr)" ;;
 	s|S    ) [[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; [[ $REPLY == S ]] && tmux resizep -Z -t $shell_id ;;
