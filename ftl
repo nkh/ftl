@@ -40,10 +40,10 @@ ext_bindings  || case "${REPLY: -1}" in
 	8      ) ((gpreview)) && read n <$pfs/prev/n && cdir "$n" ;;
 	9      ) ((preview_all)) && { rdc=8 ; read op <$fsp/pane ; read rn <$fsp/n ; qd=1 ; list ; qd= ; path "$rn" ; geo_prev ; preview 1 ; tmux selectp -t $op ; kbd_flush ; rcd= ; } ;;
 	a      ) mplayer_k ;;
-	b|n|N  ) how=$REPLY ; [[ $how == 'b' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
-	/|${K[b]}) tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
-	${SK[b]}) tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
-	${SK[/]}) tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
+	/|n|N  ) how=$REPLY ; [[ $how == '/' ]] && { prompt "find: " -e to_search ; how=n ; } ; ffind $how ;;
+	b      ) tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
+	${K[b]}) tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
+	${SK[b]}) tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
 	c      ) prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	d      ) tag_check && { delete_tag ; true ; } || delete '' "${selection[@]}" ;;
 	e|E    ) [[ $REPLY == e ]] && emode=1 || emode=2 ; preview ;;
@@ -93,7 +93,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	+      ) ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tresize $pane_id $x || cdir ;; 
 	\=     ) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='⁼' ; list ;;
 	\#     ) [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ;;
-	w      ) source ~/.config/ftl/viewers/cmus ; tags=() ; list ;; # ~/.config/ftl/viewers/mplayer_local
+	w      ) [[ $e =~ $mfilter ]] && { (~/.config/ftl/viewers/cmus "${selection[@]}" & ) ; ((${#tags[@]})) && { tags=() ; list ; } ; } ;;
 	W      ) p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ;;
 	x|X    ) [[ $REPLY == x ]] && mode=a+x || mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	y|Y    ) tag_flip "${files[file]}" ; [[ $REPLY == y ]] && { move 1 ; true ; } || move -1 ; list ;;

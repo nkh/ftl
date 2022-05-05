@@ -4,7 +4,7 @@
 	l C ''    ) cd or open file                      	> <    ) extra pane
 	g G ⇑g    ) first/last entry, cd                 	_ | ¦  ) extra pane
 	a         ) kill sound preview                   	-      ) next pane or viewer
-	b ⇑b ⇈b   ) find, fzf find/all                   	/ ⇑/   ) fzf find/find dirs
+	b ⇑b ⇈b   ) fzf find/all/dirs                    	/      ) find
 	c         ) copy to                              	⇈i     ) fzfi, using ueberzurg
 	d ⇑d ⇈d   ) delete, clear filters/history        	{      ) fzf to file with preview
 	e E       ) external viewer, detached            	}      ) rg to file
