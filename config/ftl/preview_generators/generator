@@ -1,0 +1,7 @@
+#!/bin/bash
+for g in $(fd . ~/.config/ftl/preview_generators/ -t f -d 1 -E generator)
+	do 
+		ext=$(basename $g)
+		mkdir -p "$1/$ext"
+		fd "\.$ext$" -t f -d 1 --exec "$g" {/} "$1/$ext"
+	done

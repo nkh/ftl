@@ -1,0 +1,9 @@
+#!/bin/bash
+exec 2>> "$2/generators_log"
+
+[[ -f "$2/$1.png" ]] || 
+	{
+	ffmpegthumbnailer -i "$1" -o "$2/$1.png" -s 1024
+	}
+
+
