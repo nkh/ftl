@@ -1,9 +1,17 @@
 GPGID=CHANGE.ME ; declare -A marks=([0]=/ [1]=/CHANGE_ME/dir/filename [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename)
 
-#previewers(){ echo pdir pignore pmp4 pimage pmedia ppdf phtml mime_get pperl pshell ptext ptar pnad ptype ; }
-#pnad(){ vipreview ~/.bashrc ; }
+externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
+previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
 
+#p_your_viewer(){ vipreview ~/.bashrc ; }
+
+declare -A A=( [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
+           SA=([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
+
+# use external tags
 #. ~/.config/ftl/external_tags/git ; etag=1
+
+# how you want your files deleted
 #RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
 #my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 #RM=my_delete

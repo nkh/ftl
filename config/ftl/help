@@ -33,7 +33,7 @@
 	w W       ) local mplayer, extra viewers         	+      ) change preview size
 	x X       ) chmod a+x, a-x                       	% &    ) hide extension, enable all
 	y Y ⇑y ⇈y ) tag/untag, files, all                	1-4    ) class tag
-	Z z       ) force quit, zoom and quit            	q Q @  ) quit, > &3, keep shell
+	q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom
 	                           	
 	˽s        ) stat file                            	0, 7-9 ) refresh, internal usage
 	˽c        ) compress/decompress                  	¡      ) pdh pane
