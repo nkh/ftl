@@ -4,12 +4,12 @@ ext_bindings()
 ((leader_command)) && { leader_command ; return ; }
 
 # incremental search, binding: b
-((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind n ; esac && return
+((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind "${C[find_next]}" ; esac && return
 
 case "${REPLY: -1}" in
-	' '     ) leader_command=1 ;;
-	/       ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
-	*       ) false ;;
+	' '        ) leader_command=1 ;;
+	${C[find]} ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
+	*          ) false ;;
 esac
 }
 
@@ -54,8 +54,8 @@ shell_command()
 
 
 case "${1: -1}" in
-	q  ) R=q ;;
-	*  ) list ;; 
+	${C[quit]} ) R=${C[quit]} ;;
+	*          ) list ;; 
 esac
 }
 
