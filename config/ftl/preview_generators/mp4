@@ -1,5 +1,5 @@
 #!/bin/bash
-exec 2>> "$2/generators_log"
+exec 2>>"$2/generators_log"
 
 [[ -f "$2/$1.png" ]] || 
 	{
