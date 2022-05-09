@@ -52,6 +52,7 @@ declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=�
 		[go_fzf]="\{"
 		[go_rg]="\}"
 		[history]="H"
+		[hexedit]="${A[x]}"
 		[image_fzf]="${SA[i]}"
 		[image_mode]="M"
 		[link]="L"
