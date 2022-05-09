@@ -81,7 +81,7 @@ declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=�
 		[preview_lock]="${SA[l]}"
 		[preview_lock_cl]="${A[l]}"
 		[preview_m1]="${A[v]}"
-		[preview_m2]="|${SA[v]}"
+		[preview_m2]="${SA[v]}"
 		[preview_once]="V"
 		[preview_show_fzf]="W"
 		[preview_show]="w"

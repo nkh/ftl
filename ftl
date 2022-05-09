@@ -216,8 +216,8 @@ pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less <$(gen_exift) 
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$e/$f.png" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; true ; } ; } ; }
 pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null \"$n\"" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
-ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f.txt" ; [[ -e $t ]] || $pgen/pdf "$f" "$thumbs/pdf" && vipreview "$t" ; } ; true ; } ; }
-ppdfpng()   { t="$thumbs/$ext/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
+ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
+ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 pperl()     { [[ $mtype == application/x-perl ]] && [[ -s "$n" ]] &&  vipreview "$n" ; }
 ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
 ptar()      { [[ $f =~ \.tar ]] && ((show_tar || extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 tar --list --verbose -f "$f" >"$fp" ; vipreview "$fp" ; } ; }
@@ -261,7 +261,7 @@ inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | 
 inotify_()  { inotifywait --exclude index.lock -e create -e delete -e move "$PWD/" &>/dev/null && tmux send -t "$my_pane" r 2>&- ; }
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 kbdf()      { [[ $REPLY != $'\e' && $REPLY != "[" && $leader_command != 1 ]] &&  while read -t 0.01 ; do : ; done ; }
-cdfl()      { : ; } #true 2>&- >&3 && { [[ $REPLY == ${C[quit]} ]] && ((! in_Q)) && echo "${files[file]}" >&3 || echo >&3 ; } ; }
+cdfl()      { true 2>&- >&3 && { [[ $REPLY == ${C[quit]} ]] && ((! in_Q)) && echo "${files[file]}" >&3 || echo >&3 ; } ; }
 mime_get()  { ((rdc)) && mtype=$(mimemagic "$n") || mime_cache ; false ; }
 mime_cache(){ [[ ${mime[file]} ]] || mime+=($(mimemagic "${files[@]:${#mime[@]}:((file + 10))}" 2>&1 | sed -e "s/cannot.*/n\/a/" -e 's/^.*: //')) ; mtype="${mime[file]}" ; false ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
