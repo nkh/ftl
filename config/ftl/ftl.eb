@@ -21,7 +21,7 @@ leader_command=
 case "${REPLY: -1}" in
 	c  ) [[ $f =~ \.tar ]] && tar -xf "$f" || { prompt 'tar.bz2 file: ' -e ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" ; } ; tags=() ; cdir '' "$REPLY" ;;
 	m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
-	s  ) tcpreview && tsplit "stat '$n' ; read -sn1" ;; # example of output in preview pane
+	s  ) tcpreview && tsplit "stat '$n' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ; read -sn1" ;;
 	t  ) R="MM)" ;;
 	x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
 	z  ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;

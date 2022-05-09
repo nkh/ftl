@@ -36,13 +36,13 @@ ext_bindings  || case "${REPLY: -1}" in
 	7)			list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; R=0 ;;
 	8)			((gpreview)) && read n <$pfs/prev/n && cdir "$n" ;;
 	9)			pane_prev ;;
-	${C[pdh]}) 		tcpreview ; tsplit "$HOME/.config/ftl/fpdh $pfs" 20% -v -R ; pane_id= ; cdir ;;
-	${C[pdh_kill]})		[[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux killp -t $pdh &>/dev/null ; : >$pfs/pdh ; } ;;
+	${C[pdh]}) 		[[ -f $pfs/pdh ]] && { R="$R${C[pdh_kill]}" ; } || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $pfs" 20% -v -R ; pane_id= ; } ; cdir ;;
+	${C[pdh_kill]})		[[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux killp -t $pdh &>/dev/null ; rm $pfs/pdh ; } ;;
 	${C[cd]})		prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	${C[chmod_x]})		mode=a+x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${C[chmod_minus_x]})	mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${C[clear_filters]})	filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
-	${C[command_fzf]})	prompt "ftl> " -ei "$(awk '!seen[$0]++' $ftl_cmds | fzf-tmux $fzf_opt --cycle --tac)" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_cmds ; shell ; } ; cdir ;;
+	${C[command_fzf]})	prompt "ftl> " -ei "$(shell_hist)" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_cmds ; shell_run shell_eval ; } ; cdir ;;
 	${C[command_prompt]})	prompt ':' ; [[ $REPLY =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY - 1) : 0)) || shell_command "$REPLY" ;;
 	${C[copy]})		prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${C[copy_clipboard]})	printf "%q " "${selection[@]}" | xsel -b -i ;;
@@ -112,6 +112,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${C[refresh]})		((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ;;  # directory content change signal
 	${C[rename]})		tag_check &&  bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" && f="$REPLY" ; } ; cdir '' "$f" ;;
 	${C[shell]})		[[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
+	${C[shell_view]})	shell_run ;;
 	${C[shell_zoomed]})	[[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; tmux resizep -Z -t $shell_id ;;
 	${C[show_etag]})	((etag^=1)) ; cdir ;;
 	${C[show_hidden]})	((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ;;
@@ -285,9 +286,10 @@ refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 rg_go()     { [[ "$1" ]] && { g=${1%%:*} && nd="$PWD/"$(dirname "$g") && cdir "$nd" "$(basename "$g")" ; } || { refresh ; list ; } ; }
 run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; } ; "$@" 2>/dev/null ; ((run_maxed)) && { wmctrl -ia $aw ; } ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
-shell()     { tcpreview ; echo -en '\e[?1049l' ; path "${files[file]}" ; s="${selection[@]}" ; shell_run ; read -sn 1 ; echo -en '\e[?1049h' ; }
-shell_run() { [[ $REPLY =~ "\$s" ]] && { eval "$REPLY" ; echo '$?': $? ; } || for n in "${selection[@]}" ; do eval "echo -e '\e[2;40;33m[$(date -R)] $PWD > $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
+shell_eval(){ s="${selection[@]}" ; for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
+shell_hist(){ [[ -f $ftl_cmds ]] && awk '!seen[$0]++' $ftl_cmds | fzf-tmux $fzf_opt --cycle --tac ; }
 shell_pane(){ tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$opi ; cdir ; tmux selectp -t $shell_id ; }
+shell_run() { tcpreview ; echo -en '\e[?1049l' ; ${1:-:} ; read -sn 1 ; echo -en '\e[?1049h' ; }
 sort_by()   { sort ${reversed[tab]} ${sort_filters[sort_type[tab]]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[sort_type[tab]]} ; }
 sstate()    { printf "%s\n" "${!tags[@]}" >$fs/tags ; ((!nfiles)) && echo >${1:-$fs}/ftl || { echo "${files[file]}" >${1:-$fs}/ftl ; sstateftl2 "${1:-$fs}" ; } ; }
