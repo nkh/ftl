@@ -76,7 +76,7 @@ ext_bindings  || case "${REPLY: -1}" in
 	${C[ghistory_clear]})	prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ;;
 	${C[ghistory_edit]})	dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ;;
 	${C[image_fzf]})	tcpreview ; fzf_go "$(fzfi -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
-	${C[image_mode]})	((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ((imode[tab] == 2)) && ftl_nimode || ftl_imode ${imode[tab]} ; cdir '' "$f";;
+	${C[image_mode]})	((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ftl_imode ; cdir '' "$f";;
 	${C[link]})		tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags=() && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ;;
 	${C[mark_fzf]})		fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --ansi)" ;;
 	${C[mark_go]})		read -n 1 ; [[ -n ${marks[$REPLY]} ]] && cdir "$(dirname "${marks[$REPLY]}")" "$(basename "${marks[$REPLY]}")" || list ;;
@@ -247,8 +247,7 @@ filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg "${filters[tab]}" | rg
 filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
 filter_rst(){ eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[sort_type[tab]]} ; }' ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
-ftl_imode() { (($1)) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; }
-ftl_nimode(){ tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; }
+ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
 fzf_go()    { [[ "$1" ]] && { cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 gen_exift() { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; [[ -e $t ]] || ~/.config/ftl/preview_generators/$e "$f" "$thumbs/$e" ; echo $t ; }
@@ -293,10 +292,10 @@ shell_run() { tcpreview ; echo -en '\e[?1049l' ; ${1:-:} ; read -sn 1 ; echo -en
 sort_by()   { sort ${reversed[tab]} ${sort_filters[sort_type[tab]]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[sort_type[tab]]} ; }
 save_state(){ declare -p tags >$fs/tags ; ((!nfiles)) && { : >${1:-$fs}/ftl ; return ; } ; >${1:-$fs}/ftl echo "\
-		sdir=${files[file]}	; sindex=${dir_file[${tab}_${files[file]}]}	; sort_type[tab]=${sort_type[tab]}	; imode[tab]=${imode[tab]}	
-		ftag=$ftag		; filters[tab]=${filters[tab]}			; filters2[tab]=${filters2[tab]} 
-		etag=$etag		; show_size=$show_size				; show_dir_size=$show_dir_size " ; }
-prev_synch(){ tab=0 ; . "$1/ftl" ; ftl_imode "${imode[tab]}" ; . "$1/tags" ; cdir "$sdir" "$2" "$sindex" ; }
+		sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; sort_type[tab]=${sort_type[tab]}	; imode[tab]=${imode[tab]}
+		ftag=$ftag		; filters[tab]=\"${filters[tab]}\"		; filters2[tab]=\"${filters2[tab]}\" 
+		etag=$etag		; show_size=$show_size				; show_dir_size=$show_dir_size" ; }
+prev_synch(){ . "$1/tags" ; . "$1/ftl" ; ftl_imode "${imode[tab]}" ; cdir "$sdir" "$2" "$sindex" ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
 tab_next()  { ((tab++)) ; for i in "${tabs[@]:$tab}" TAB_RESET "${tabs[@]}" ; do [[ "$i" == TAB_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; true ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$tag]" ; done ; ((${#tags[@]} != 0)) ; }
