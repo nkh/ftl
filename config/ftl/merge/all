@@ -2,12 +2,11 @@ list=($(find $pfs -type d | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && pr
 
 for tag_file in "${list[@]}"
 	do 
-		[[ -e "$tag_file" ]] && <"$tag_file" readarray -t new_tags && \
-		for p in "${new_tags[@]}"
-			do 
-				tags["$p"]='▪'
-			done
-
+		[[ -e "$tag_file" ]] && < <(. "$tag_file" ; printf "%s\n" "${!tags[@]}") readarray -t new_tags && \
+			for p in "${new_tags[@]}"
+				do 
+					tags["$p"]='▪'
+				done
 	done
 
 # vim: set filetype=sh :
