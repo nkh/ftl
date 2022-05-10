@@ -1,17 +1,19 @@
 #!/bin/bash
 
-[[ "$1" == "montage_clear" ]]     && { [[ -f "$3/$4" ]] || { rm "$2/thumbs/$4" ; } ; exit ; }
-[[ "$1" == "montage_thumbnail" ]] && { [[ -f "$2/thumbs/$4" ]] || { vipsthumbnail "$3/$4" ; mv "$3/tn_$4" "$2/thumbs/$4" ; } ; exit ; }
+[[ "$1" == "montage_clear" ]]     && { [[ -f "$3/${4%.*}.jpg" || -f "$3/${4%.*}.png" ]] || { rm "$2/thumbs/$4" ; : >$2/thumbs/ftl_remove ; } ; exit ; }
+[[ "$1" == "montage_thumbnail" ]] && { [[ -f "$2/thumbs/${4%.*}.jpg" ]] || { vipsthumbnail "$3/$4" ; mv "$3/tn_${4%.*}.jpg" "$2/thumbs/${4%.*}.jpg" ; : >$2/thumbs/ftl_add ; } ; exit ; }
 
 dir="$1/montage/$2" ; mkdir -p "$dir/thumbs" 2>&-
 
 fd '\.jpg$' "$dir/thumbs" -d 1 -t f --exec "$0" montage_clear     "$dir" "$2" "{/}" 
-fd '\.jpg$' "$2"          -d 1 -t f --exec "$0" montage_thumbnail "$dir" "$2" "{/}" 
+fd '\.(jpg|png)$' "$2"    -d 1 -t f --exec "$0" montage_thumbnail "$dir" "$2" "{/}" 
 
-[ -n "$(find $dir/thumbs -prune -empty)" ] ||
+[[ -f $dir/thumbs/ftl_remove || -f $dir/thumbs/ftl_add ]]
+#[ -n "$(find $dir/thumbs -prune -empty)" ] ||
 	{
 	montage -geometry 160x160 "$dir/thumbs/*.jpg" "$dir/montage_large.jpg"
 	vipsthumbnail --size '1200x>' "$dir/montage_large.jpg" -o "$dir/montage.jpg" 
 	rm "$dir/montage_large.jpg" 2>&- 
+	rm -f $dir/thumbs/ftl_remove $dir/thumbs/ftl_add
 	}
 
