@@ -3,12 +3,15 @@ ext_bindings()
 # handle leader + user defined shortcut
 ((leader_command)) && { leader_command ; return ; }
 
-# incremental search, binding: b
-((inc_search)) && case "${REPLY: -1}" in '') inc_search=0 ; cursor_color='\e[7;34m' ; list ;; *) to_search="$to_search$REPLY" ; ffind "${C[find_next]}" ; esac && return
+# incremental search
+((incremental_search)) && case "${REPLY: -1}" in 
+	'') incremental_search=0 ; cursor_color='\e[7;34m' ; REPLY="${C[refresh]}" ;;
+	 *) to_search="$to_search$REPLY" ; REPLY="${C[find_next]}"
+esac && return 1
 
 case "${REPLY: -1}" in
 	' '        ) leader_command=1 ;;
-	${C[find]} ) to_search= ; inc_search=1 ; cursor_color='\e[7;35m' ; list ;;
+	${C[find]} ) to_search= ; incremental_search=1 ; cursor_color='\e[7;35m' ; list ;;
 	*          ) false ;;
 esac
 }

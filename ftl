@@ -15,12 +15,12 @@ mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; t
 fsp=$pfs/prev ; declare -A marks=([0]=/$ [1]="$HOME/$") ; . ~/.ftlrc || . ~/.config/ftl/ftlrc; marks[$"'"]="$(tail -n1 $ghist)"
 [[ "$4" == 1 ]] && { gpreview=1 ; preview_all=0 ; emode=0 ; PPWD="$dir" ; prev_synch $pfs "$search" ; } || { PPWD="$dir" ; cdir "$dir" "$search" ; }
 
-while : ; do winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; kbdf ; done
+while : ; do winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; kbdf ; REPLY= ; done
 }
 
 bindings()
 {
-ext_bindings  || case "${REPLY: -1}" in
+ext_bindings || case "${REPLY: -1}" in
 	${C[hexedit]})		tcpreview ; ctsplit "hexedit ${n@Q}" ;;
 	${C[help]})		<~/.config/ftl/help fzf-tmux $fzf_opt --tiebreak=begin --header="$(echo -e "\t\t\t")""⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader" ; list ;;
 	h|D)			[[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
@@ -59,9 +59,9 @@ ext_bindings  || case "${REPLY: -1}" in
 	${C[filter_ext]})	p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux ) ; [[ $file ]] && . $p/$file $fs ; cdir '' "$f";;
 	${C[filter]})		prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	${C[filter_reverse]}) 	prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
-	${C[find]})		prompt "find: " -e to_search ; ffind ${C[find_next]} ;;
-	${C[find_next]})	ffind $REPLY ;;
-	${C[find_previous]})	ffind $REPLY ;;
+	${C[find]})		prompt "find: " -e to_search ; R="${C[find_next]}" ;;
+	${C[find_next]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
+	${C[find_previous]})	for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
 	${C[find_fzf_all]})	tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
 	${C[find_fzf_dirs]})	tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
 	${C[find_fzf]})		tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview +m --cycle --reverse --header="$PWD")" ;;
@@ -240,8 +240,6 @@ dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 def_sub()   { for def in "$@" ; do local sub=${def%%:*} ; local body=${def:((${#sub}+1))} ; type "$sub" &>/dev/null || eval "$sub(){ ${body:-:} ; }" ; done ; }
 dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
 edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; cdir ; }
-ffind()     { [[ $1 == ${C[find_next]} ]] && { ((from = file + 1)) ; to=$nfiles ; inc='++' ; } || { ((from = file - 1)) ; to=-1 ; inc='--' ; }
-		for ((i=$from ; i != $to ; i$inc)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
 files()     { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1  -printf '%s\t%T@\t%P\n' 2>&- | ftl_filter | $2 ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg "${filters[tab]}" | rg "${filters2[tab]}" | { [[ "${rfilters[tab]}" ]] && rg -v "${rfilters[tab]}" || cat ; } | filter2 ; }
 filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
