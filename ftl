@@ -226,7 +226,7 @@ ptype()     { ctsplit "echo '$f' ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s $
 pw3image()  { image="${1:-$n}" ; ((in_ftli)) && tmux send -t $pane_id "${image}" C-m || { ctsplit "ftli $pfs \"${image}\"" ; in_ftli=1 ; sleep 0.05 ; tmux selectp -t $my_pane ; } ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdir= ; pane_id= ; in_vipreview= ; in_ftli= ; sleep 0.01 ; } ; }
 vipreview() { ((in_vipreview)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_vipreview=1 ; true ; }
-bulkrename(){ tcpreview ; bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
+bulkrename(){ bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
 bulkedit()  { sed "s/.*/\"&\"/" $fs/tags | tee $fs/bo >$fs/bd ; $EDITOR $fs/bd && { >$fs/br echo 'set -e' ; paste $fs/bo $fs/bd >>$fs/br ; } ; }
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
 ctsplit()   { { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
