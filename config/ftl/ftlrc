@@ -2,20 +2,32 @@ GPGID=CHANGE.ME ; declare -A marks=([0]=/ [1]=/CHANGE_ME/dir/filename [2]=/CHANG
 
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
+# p_your_viewer(){ vipreview ~/.bashrc ; }
 
-#p_your_viewer(){ vipreview ~/.bashrc ; }
+# preview_all=1
+# find_auto=README 
+# zoom=0 ; zooms=(70 50 30) 
+# show_line=1
+# show_size=0
+# show_date=1
+# show_tar=0
+# ifilter='webp|jpg|jpeg|JPG|png|gif'
+# mfilter='mp3|mp4|flv|mkv'
+# tbcolor='67 67'
+# cursor_color='\e[7;34m' 
+# quick_display=256
 
 # use external tags
 #. ~/.config/ftl/external_tags/git ; etag=1
 
 # how you want your files deleted
-#RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
-#my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
-#RM=my_delete
+# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
+# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
+# RM=my_delete
 
-declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥) \
-           SA= ([a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷) \
-           C=(  [help]="\?"
+declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
+declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
+declare -A C=(  [help]="\?"
 		[bottom]="G"
 		[cd]="${A[g]}"
 		[chmod_minus_x]="X"
@@ -31,8 +43,10 @@ declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=�
 		[delete]="d"
 		[depth]="\*"
 		[editor_detach]="\$"
-		[external]="e"
+		[external1]="e"
 		[external2]="E"
+		[external3]="${A[e]}"
+		[external4]="${SA[e]}"
 		[file_dir_mode]="\)"
 		[filter2]="F"
 		[filter_ext]="${A[f]}"
