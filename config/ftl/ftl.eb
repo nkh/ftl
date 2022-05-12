@@ -34,7 +34,7 @@ esac
 
 shell_command()
 {
-[[ "$1" =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY - 1) : 0)) && return
+[[ "$1" =~ ^[0-9]+$ ]] && list $((REPLY - 1)) && return
 
 [[ "$1" =~ ^etags ]] && \
 	{
