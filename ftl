@@ -5,9 +5,9 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${preview_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; : ${etag:=0} ;
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type[tab]:=0} ; sort_filters=('-k3' '-n' '-k2')
-sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; fzf_opt="-p 80% --cycle --reverse --info=inline" ; pgen="$HOME/.config/ftl/preview_generators"
+sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; fzf_opt="-p 80% --cycle --reverse --info=inline" ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators"
 
-declare -A dir_file pignore lignore tail tags ntags ftl_env ; ftl_root=$HOME/.config/ftl/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; dir_done=56fbb22f2967 ; RM="rm -rf"
+declare -A dir_file pignore lignore tail tags ntags ftl_env ; ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; dir_done=56fbb22f2967 ; RM="rm -rf"
 mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; $pushd "$dir" &>/dev/null
 
 [[ "$1" ]] && { path "$1" ; [[ -d "$1" ]] && { dir="$p/$f" ; search="$2" ; } || { [[ -f "$1" ]] && { dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
@@ -36,14 +36,14 @@ ext_bindings || case "${REPLY: -1}" in
 	7)			list ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; R=0 ;;
 	8)			((gpreview)) && read n <$pfs/prev/n && cdir "$n" ;;
 	9)			pane_prev ;;
-	${C[pdh]}) 		[[ -f $pfs/pdh ]] && { R="$R${C[pdh_kill]}" ; } || { tcpreview ; tsplit "$HOME/.config/ftl/fpdh $pfs" 20% -v -R ; pane_id= ; } ; cdir ;;
+	${C[pdh]}) 		[[ -f $pfs/pdh ]] && { R="$R${C[pdh_kill]}" ; } || { tcpreview ; tsplit "$ftl_cfg/fpdh $pfs" 20% -v -R ; pane_id= ; } ; cdir ;;
 	${C[pdh_kill]})		[[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux killp -t $pdh &>/dev/null ; rm $pfs/pdh ; } ;;
 	${C[cd]})		prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	${C[chmod_x]})		mode=a+x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${C[chmod_minus_x]})	mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${C[clear_filters]})	filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
 	${C[command_fzf]})	prompt "ftl> " -ei "$(shell_hist)" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_cmds ; shell_run shell_eval ; } ; cdir ;;
-	${C[command_prompt]})	prompt ':' ; [[ $REPLY =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY - 1) : 0)) || shell_command "$REPLY" ;;
+	${C[command_prompt]})	echo -ne "\e[H" ; tput cnorm ; stty echo ; command=$(cmd_prompt) ; stty -echo ; tput civis ; [[ "$command" ]] && shell_command "$command" || list ;;
 	${C[copy]})		prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${C[copy_clipboard]})	printf "%q " "${selection[@]}" | xsel -b -i ;;
 	${C[create_bulk]})	tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ;;
@@ -57,9 +57,9 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[external3]})	emode=3 ; preview ;;
 	${C[external4]})	emode=4 ; preview ;;
 	${C[file_dir_mode]})	((lmode[tab]--)) ; ((lmode[tab] < 0)) && lmode[tab]=2 ; cdir '' "$f" ;;
+	${C[filter]})		prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	${C[filter2]})		prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	${C[filter_ext]})	p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux ) ; [[ $file ]] && . $p/$file $fs ; cdir '' "$f";;
-	${C[filter]})		prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	${C[filter_reverse]}) 	prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
 	${C[find]})		prompt "find: " -e to_search ; R="${C[find_next]}" ;;
 	${C[find_next]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
@@ -149,7 +149,7 @@ new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; PWD="$new_dir" ; tabs[$ta
 cd "$PWD" 2>$fs/error || { refresh ; cat $fs/error ; return ; } ; inotify_s ; ((etag)) && etag_dir ; shopt -s nocasematch ; geo_prev
 files=() ; files_color=() ; mime=() ; nfiles=0 ; [[ "$2" ]] && dir_file[${tab}_$PPWD]= ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found=
 
-~/.config/ftl/preview_generators/generator $thumbs &
+$ftl_cfg/generators/generator $thumbs &
 
 declare -A uniq_file ; pad=(* ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 p ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
@@ -184,7 +184,7 @@ for((i=$top ; i <= bottom ; i++))
 		echo -ne "\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo
 	done
 
-for(( ; i < ((LINES - 1)) ; i++)) ; do echo -ne "$flip" ; ((i != LINES)) && echo ; done
+for(( ; i < ((LINES - 1)) ; i++)) ; do echo -ne "\e[K$flip" ; ((i != LINES)) && echo ; done
 
 ((qd)) || { geo_winch ; preview ; }
 }
@@ -232,6 +232,7 @@ vipreview() { ((in_vipreview)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 
 bulkrename(){ bulkedit && bulkverify && { bash $fs/br && tags=() || read -sn 1 ; } ; true ; }
 bulkedit()  { printf "%s\n" "${!tags[@]}" | sed "s/.*/\"&\"/" | tee $fs/bo >$fs/bd ; $EDITOR $fs/bd && { >$fs/br echo 'set -e' ; paste $fs/bo $fs/bd >>$fs/br ; } ; }
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
+cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S 'ftl > ' -f $ftl_cfg/cmd_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 ctsplit()   { { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
 cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
@@ -251,7 +252,7 @@ ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" 
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
 fzf_go()    { [[ "$1" ]] && { cdir "$(dirname "$1")" "$(basename "$1")" ; } || { refresh ; list ; } ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
-gen_exift() { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; [[ -e $t ]] || ~/.config/ftl/preview_generators/$e "$f" "$thumbs/$e" ; echo $t ; }
+gen_exift() { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; [[ -e $t ]] || $ftl_cfg/generators/$e "$f" "$thumbs/$e" ; echo $t ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$preview_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }

@@ -1,5 +1,5 @@
 #!/bin/bash
-for g in $(fd . ~/.config/ftl/preview_generators/ -t f -d 1 -E generator)
+for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 	do 
 		ext=$(basename $g)
 		mkdir -p "$1/$ext"

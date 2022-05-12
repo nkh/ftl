@@ -34,6 +34,8 @@ esac
 
 shell_command()
 {
+[[ "$1" =~ -?[0-9]+ ]] && list $((REPLY > 0 ? (REPLY - 1) : 0)) && return
+
 [[ "$1" =~ ^etags ]] && \
 	{
 	p=~/.config/ftl/external_tags ; etags_file="${1#etags}"
@@ -58,7 +60,7 @@ shell_command()
 
 case "${1: -1}" in
 	${C[quit]} ) R=${C[quit]} ;;
-	*          ) list ;; 
+	*          ) R=${C[$1]} ;; 
 esac
 }
 
