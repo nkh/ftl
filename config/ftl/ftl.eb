@@ -34,7 +34,7 @@ esac
 
 shell_command()
 {
-[[ "$1" =~ ^[0-9]+$ ]] && list $((REPLY - 1)) && return
+[[ "$1" =~ ^[0-9]+$ ]] && { list $(($1 - 1)) ; return 1 ; }
 
 [[ "$1" =~ ^etags ]] && \
 	{
@@ -58,8 +58,10 @@ shell_command()
 	}
 
 
+# handle partial command names, if single match
+#	${C[quit]} ) R=${C[quit]} ;;
+
 case "${1: -1}" in
-	${C[quit]} ) R=${C[quit]} ;;
 	*          ) R=${C[$1]} ;; 
 esac
 }
