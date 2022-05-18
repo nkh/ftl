@@ -1,4 +1,4 @@
-sort_glyph(){ echo ${sglyph[sort_type[tab]]} ; }
+sort_glyph(){ echo ${sglyph[s_type]} ; }
 ftl_sort()  { sort_by ; }
 
 # vim: set filetype=sh :

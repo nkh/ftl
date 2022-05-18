@@ -4,6 +4,8 @@ externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
 # p_your_viewer(){ vipreview ~/.bashrc ; }
 
+# sort_type0=0
+# sort_reversed0=
 # preview_all=1
 # find_auto=README 
 # zoom=0 ; zooms=(70 50 30) 
