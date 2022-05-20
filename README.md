@@ -57,6 +57,8 @@ see resources/ for your ftlrc setup and some filter examples
 
 The display consists of a header and a listing of the files in a directory, possibly filtered, and an optional preview
 
+### tabs, hyperorthodox panes
+
 ### header components
 
 directory tilde(filter on) current_file/total_files current_tab/total_tabs selected_files file_stat

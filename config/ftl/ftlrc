@@ -75,6 +75,7 @@ declare -A C=(  [help]="\?"
 		[link]="L"
 		[mark_fzf]="´" # alt-gr \' 
 		[mark_go]="'"
+		[mark_go_tab]="×"
 		[mark]="m"
 		[montage_clear]="${SA[m]}"
 		[montage_preview]="${A[m]}"
