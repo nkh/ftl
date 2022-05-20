@@ -6,7 +6,7 @@ previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl
 
 # sort_type0=0
 # sort_reversed0=
-# preview_all=1
+# prev_all=1
 # find_auto=README 
 # zoom=0 ; zooms=(70 50 30) 
 # show_line=1
@@ -46,10 +46,10 @@ declare -A C=(  [help]="\?"
 		[delete]="d"
 		[depth]="\*"
 		[editor_detach]="\$"
-		[external1]="e"
-		[external2]="E"
-		[external3]="${A[e]}"
-		[external4]="${SA[e]}"
+		[external_mode1]="e"
+		[external_mode2]="E"
+		[external_mode3]="${A[e]}"
+		[external_mode4]="${SA[e]}"
 		[filter]="f"
 		[file_dir_mode]="\)"
 		[filter2]="F"
@@ -82,11 +82,11 @@ declare -A C=(  [help]="\?"
 		[mplayer_kill]="a"
 		[find_next]="n"
 		[pane_down]="_"
-		[pane_L]="\¦"
 		[pane_left]="\<"
-		[pane_next]="\-"
-		[pane_R]="\|"
 		[pane_right]="\>"
+		[pane_L]="\¦"
+		[pane_R]="\|"
+		[pane_next]="\-"
 		[pdh]="${A[p]}"
 		[pdh_kill]="¿"
 		[preview_down]="J"
@@ -138,6 +138,9 @@ declare -A C=(  [help]="\?"
 		[tag_untag_all]="U"
 		[tag_untag_fzf]="u"
 		[top]="g"
+		[SIG_PANE]=7
+		[SIG_REFRESH]=8
+		[SIG_REMOTE]=9
 		)
 
 # vim: set filetype=sh :
