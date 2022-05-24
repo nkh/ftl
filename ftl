@@ -34,14 +34,14 @@ ext_bindings || case "${REPLY: -1}" in
 	1|2|3|4)		[[ ${tags[${files[file]}]} == ${tglyph[$REPLY]} ]] && unset -v "tags[${files[file]}]" || tags[${files[file]}]=${tglyph[$REPLY]} ; move 1 ; list ;;
 	${C[pdh]}) 		[[ -f $pfs/pdh ]] && { R="${C[pdh_kill]}$R" ; } || { tcpreview ; tsplit "$ftl_cfg/fpdh $pfs" 30% -v -R ; pane_id= ; } ; cdir ;;
 	${C[pdh_kill]})		[[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux killp -t $pdh &>/dev/null ; rm $pfs/pdh ; } ;;
-	${C[cd]})		prompt 'cd: ' -e ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
+	${C[cd]})		prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	${C[chmod_x]})		mode=a+x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${C[chmod_minus_x]})	mode=a-x ; chmod $mode "${selection[@]}" ; cdir ;;
 	${C[clear_filters]})	filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
-	${C[command_fzf]})	prompt "ftl> " -ei "$(shell_hist)" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_cmds ; shell_run shell_eval ; } ; cdir ;;
+	${C[command_fzf]})	prompt "ftl> " -i "$(shell_hist)" ; [[ $REPLY ]] && { echo $REPLY >>$ftl_cmds ; shell_run shell_eval ; } ; cdir ;;
 	${C[command_prompt]})	echo -ne "\e[H" ; tput cnorm ; stty echo ; C=$(cmd_prompt) ; stty -echo ; tput civis ; [[ "$C" ]] && { header "$head" ; shell_command "$C" ; } || list ;;
 	${C[command_mapping]})	for k in "${!C[@]}" ; do echo $k ${C[$k]} ; done | sort | column -c 160 | fzf-tmux $fzf_opt --tiebreak=begin --header="Commands mapping" ; list ;;
-	${C[copy]})		prompt 'cp to: ' -e && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
+	${C[copy]})		prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${C[copy_clipboard]})	printf "%q " "${selection[@]}" | xsel -b -i ;;
 	${C[create_bulk]})	tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ;;
 	${C[create_dir]})	prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ;;
@@ -54,11 +54,11 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[external_mode3]})	emode=3 ; preview ;;
 	${C[external_mode4]})	emode=4 ; preview ;;
 	${C[file_dir_mode]})	((lmode[tab]--)) ; ((lmode[tab] < 0)) && lmode[tab]=2 ; cdir '' "$f" ;;
-	${C[filter]})		prompt "filter: " -ei "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
-	${C[filter2]})		prompt "filter2: " -ei "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
+	${C[filter]})		prompt "filter: " -i "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
+	${C[filter2]})		prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	${C[filter_ext]})	p=~/.config/ftl/external_filters ; file=$(cd $p ; fd | fzf-tmux ) ; [[ $file ]] && . $p/$file $fs ; cdir '' "$f";;
-	${C[filter_reverse]}) 	prompt "rfilter: " -ei "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
-	${C[find]})		prompt "find: " -e to_search ; R="${C[find_next]}" ;;
+	${C[filter_reverse]}) 	prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
+	${C[find]})		prompt "find: " -i to_search ; R="${C[find_next]}" ;;
 	${C[find_next]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
 	${C[find_previous]})	for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
 	${C[find_fzf_all]})	tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --expect=ctrl-t --reverse --header="$PWD")" ;;
@@ -110,7 +110,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[quit_all]})		((main)) && { pane_send "${C[quit]}" ; sleep 0.05 ; R=${C[quit]} ; in_Q=1 ; } || tmux send -t $main_pane ${C[quit_all]}  ;;
 	${C[quit_keep_zoom]})	quit2 ; [[ $pane_id ]] && { echo >$pfs/pane ; tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
 	${C[refresh]})		((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ;;  # directory content change signal
-	${C[rename]})		tag_check &&  bulkrename || { prompt "rename ${files[file]##*/} to: " && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" && f="$REPLY" ; } ; cdir '' "$f" ;;
+	${C[rename]})		tag_check &&  bulkrename || { prompt "rename $f to: " -i "$f" && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" && f="$REPLY" ; } ; cdir '' "$f" ;;
 	${C[shell]})		[[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
 	${C[shell_view]})	shell_run ;;
 	${C[shell_zoomed]})	[[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; tmux resizep -Z -t $shell_id ;;
@@ -176,9 +176,8 @@ list() # select
 
 ((nfiles)) && path "${files[file]}" || path_none ; save_state $fs ; selection
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
-((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header "$head" ; tcpreview ; geo_winch ; return ; }
-
 head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage}" ; head=${head:+$head }
+((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header "$head" ; tcpreview ; geo_winch ; return ; }
 
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
 ((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd$flip" ; header "$head"
@@ -269,7 +268,7 @@ inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 kbdf()      { [[ $REPLY != $'\e' && $REPLY != "[" && $leader_command != 1 ]] && while read -t 0.01 ; do : ; done ; }
 cdfl()      { true 2>&- >&3 && { [[ $REPLY == ${C[quit]} ]] && ((! in_Q)) && echo "${files[file]}" >&3 || echo >&3 ; } ; }
-mime_get()  { [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$(mimemagic "$n")" ; } ;  mtype="${mime[$n]}" ; pdh "$mtype $n\n" ; false ; }
+mime_get()  { [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$(mimemagic "$n")" ; } ;  mtype="${mime[$n]}" ; false ; }
 mime_cache(){ while IFS=$': ' read fm mm ; do mime[$PWD/$fm]="$mm" ; done < <(mimemagic "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }
@@ -285,7 +284,7 @@ path_none() { n= ; p= ; f= ; b= ; e= ; }
 pdh()       { [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "ftl: $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prev_synch(){ read ofs <$fsp/fs ; . "$ofs/tags" ; . "$ofs/ftl" ; ftl_imode "${imode[tab]}" ; [[ $1 ]] && { path "$n" ; preview ; } || cdir "$sdir" '' "$sindex" ; ofs= ; }
-prompt()    { stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
+prompt()    { stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane ${C[SIG_PANE]} ; } ; rm -rf $fs ; exit 0 ; }
 quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor 236 52 ; mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
 quit_shell(){ [[ $REPLY != ${A[q]} ]] && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
@@ -295,7 +294,7 @@ run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ;
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_eval(){ s="${selection[@]}" ; for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
 shell_hist(){ [[ -f $ftl_cmds ]] && awk '!seen[$0]++' $ftl_cmds | fzf-tmux $fzf_opt --cycle --tac ; }
-shell_pane(){ tcpreview ; opi=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$opi ; cdir ; tmux selectp -t $shell_id ; }
+shell_pane(){ tcpreview ; op=$pane_id ; tsplit /bin/bash 30% -v -U ; shell_id=$pane_id ; pane_id=$op ; cdir ; tmux selectp -t $shell_id ; sleep 0.2 ; tmux send -t $shell_id " $f" C-b ; }
 shell_run() { tcpreview ; echo -en '\e[?1049l' ; ${1:-:} ; read -sn 1 ; echo -en '\e[?1049h' ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }

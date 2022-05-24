@@ -5,7 +5,7 @@
 			g G ⇑g    ) first/last entry, cd                 	_ | ¦  ) extra pane
 			a         ) kill sound preview                   	-      ) next pane or viewer
 			b ⇑b ⇈b   ) fzf find/all/dirs                    	/      ) find
-			c         ) copy to                              	⇈i     ) fzfi, using ueberzurg
+			c ⇑c      ) copy to, show command mapping        	⇈i     ) fzfi, using ueberzurg
 			d ⇑d ⇈d   ) delete, clear filters/history        	{      ) fzf to file with preview
 			e E       ) external viewer, detached            	}      ) rg to file
 			f F ⇑f ⇈f ) filter1/2, external, reverse         	:      ) go to entry
