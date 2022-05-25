@@ -74,13 +74,7 @@ shell_command()
 	return
 	}
 
-
-# handle partial command names, if single match
-#	${C[quit]} ) R=${C[quit]} ;;
-
-case "${1: -1}" in
-	*          ) R=${C[$1]} ;; 
-esac
+[[  ${C[$1]} ]] && { R=${C[$1]} ; } || { tscommand "$1" ; cdir ; } ; true
 }
 
 # vim: set filetype=sh :

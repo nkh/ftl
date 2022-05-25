@@ -238,7 +238,7 @@ bulkedit()  { printf "%s\n" "${!tags[@]}" | sed "s/.*/\"&\"/" | tee $fs/bo >$fs/
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
 cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S 'ftl > ' -f $ftl_cfg/cmd_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 ctsplit()   { { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
-cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -vr" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
+cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -r" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
 delete()    { prompt "delete$1? [y|d|N|c]: " -n1 && [[ $REPLY =~ y|d|c ]] && { [[ $REPLY == c ]] && $RM "$n" || $RM "${@:2}" ; mime=() ; cdir "" "" $file ; }  || { list ; false ; } ; }
@@ -254,14 +254,14 @@ filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
 filter_rst(){ eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
-fzf_go()    { { IFS= read e ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { d="$(dirname "$p")" ; [[ -n $e ]] && tab_new "$d" ; cdir "$d" "$(basename "$p")" ; } || list ; }
-fzf_rg_go() { { IFS= read e ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { g=${p%%:*} && d="$PWD/"$(dirname "$g") ; [[ -n $e ]] && tab_new "$d" ; cdir "$d" "$(basename "$g")" ; } || list ; }
+fzf_go()    { { IFS= read m ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { d="$(dirname "$p")" ; [[ -n $m ]] && tab_new "$d" ; cdir "$d" "$(basename "$p")" ; } || list ; }
+fzf_rg_go() { { IFS= read m ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { g=${p%%:*} && d="$PWD/"$(dirname "$g") ; [[ -n $m ]] && tab_new "$d" ; cdir "$d" "$(basename "$g")" ; } || list ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
 gen_exift() { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; [[ -e $t ]] || $ftl_cfg/generators/$e "$f" "$thumbs/$e" ; echo $t ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
-header()    { h="${@}$(sort_glyph)$s_reversed$( ((${#tags[@]})) && echo " ${#tags[@]}")" ; header_pos "$h" ; echo -e "\e[H\e[K\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
+header()    { h="${@}$(sort_glyph)$s_reversed$( ((${#tags[@]})) && echo " ${#tags[@]}")$(tsc_head)" ; header_pos "$h" ; echo -e "\e[H\e[K\e[94m${PWD:hpl} \e[95m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
 inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete -e move "$PWD/" 2>&- | { read a b f ; [[ "$f" ]] && tmux send -t "$my_pane" ${C[refresh]} 2>&- ; } ; }
@@ -314,7 +314,8 @@ tag_flip()  { [[ ${tags[$1]} ]] && unset -v "tags[$1]" || tags[$1]=${2:-▪} ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tpop()      { read -r PLEFT PTOP< <(tmux display -p -t $1 '#{pane_left} #{pane_top}') && tmux popup -E -h 3 -w 3 -x $PLEFT -y $(($PTOP + 3)) "sleep 0.07 ; true" ; }
-tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "date ; echo -e \"\nftl\> $1\n\n\" ; $1 ; echo \$\?: $? ; read -sn5 -t 1800" ; }
+tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
+tsc_head()  { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w > 1)) && echo -e " \e[33m!\e[0m" ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
 winch()     { return ; geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="R=${C[refresh]}$R" && pdh "WINCH" ; }
