@@ -84,6 +84,7 @@ refresh
 rename
 shell
 shell_file
+shell_synch
 shell_view
 shell_zoomed
 show_etag

@@ -114,6 +114,7 @@ declare -A C=(  [help]="\?"
 		[rename]="R"
 		[shell]="s"
 		[shell_file]="X"
+		[shell_synch]="°"
 		[shell_view]="¡"
 		[shell_zoomed]="S"
 		[show_etag]="${A[.]}"
@@ -141,6 +142,7 @@ declare -A C=(  [help]="\?"
 		[SIG_PANE]=7
 		[SIG_REFRESH]=8
 		[SIG_REMOTE]=9
+		[SIG_SYNCH_SHELL]=0
 		)
 
 # vim: set filetype=sh :

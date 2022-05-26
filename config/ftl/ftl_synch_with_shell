@@ -1,0 +1,3 @@
+#!/bin/bash
+
+[[ $ftl_pfs ]] && echo $PWD > $ftl_pfs/synch_with_shell && <$ftl_pfs/pane read parent_pane && tmux send -t $parent_pane 0
