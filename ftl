@@ -27,7 +27,7 @@ ext_bindings || case "${REPLY: -1}" in
 	j|B|k|A)		((nfiles)) && { [[ $REPLY == j || "$REPLY" == B ]] && { move 1 && list ; true ; } || { move -1 && list ; } ; } ;;
 	l|C|'')			((nfiles)) && { [[ -f "${files[file]}" ]] && { [[ $REPLY == '' ]] && edit ; true ; } || cdir "${files[file]}" ; } ;;
 	5|6)			[[ $REPLY == 5 ]] && { move -$LINES && list ; true ; } || { move $LINES && list ; } ;;
-	${C[top]})		dir_file["${tab}_$PWD"]=0 ; list ;;
+	${C[top]})		[[ -f "$n" ]] && dir_file["${tab}_$PWD"]=0 || { i=0 ; for t in "${files[@]:file}" ; do [[ -f "$t" ]] && move $i && break ; ((i++)) ; done ; } ; list ;;
 	${C[bottom]})		((dir_file["${tab}_$PWD"] = nfiles - 1)) ; list ;;
 	${C[preview_down]})	((in_vipreview)) && tmux send -t $pane_id C-D ;;
 	${C[preview_up]})	((in_vipreview)) && tmux send -t $pane_id C-U ;;
@@ -289,7 +289,7 @@ quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev
 quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor 236 52 ; mplayer_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
 quit_shell(){ [[ $REPLY != ${A[q]} ]] && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=1 ; list ; qd=0 ; }
-refresh()   { echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
+refresh()   { echo -ne "\e[?25l$1" ; } ; #{ echo -ne "\e[?25l\e[2J\e[H\e[m$1" ; }
 run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; } ; "$@" 2>/dev/null ; ((run_maxed)) && { wmctrl -ia $aw ; } ; true ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_eval(){ s="${selection[@]}" ; for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
