@@ -5,7 +5,7 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${prev_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
 tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; show_tar=0 ; : ${etag:=0} ;
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=('-k3' '-n' '-k2') ; fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl:214" 
-sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators"
+sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators" ; : ${shell_file:=1} 
 
 declare -A dir_file mime pignore lignore tail tags ntags ftl_env ; ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; dir_done=56fbb22f2967 ; RM="rm -rf"
 mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; $pushd "$dir" &>/dev/null
@@ -108,11 +108,12 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[quit_keep_shell]})	tab_close || pane_close || quit ;;
 	${C[quit_all]})		((main)) && { pane_send "${C[quit]}" ; sleep 0.05 ; R=${C[quit]} ; in_Q=1 ; } || tmux send -t $main_pane ${C[quit_all]}  ;;
 	${C[quit_keep_zoom]})	quit2 ; [[ $pane_id ]] && { echo >$pfs/pane ; tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ;;
-	${C[refresh]})		((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ;;  # directory content change signal
+	${C[refresh]})		((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ;; # directory content change signal
 	${C[rename]})		tag_check &&  bulkrename || { prompt "rename $f to: " -i "$f" && [[ $REPLY ]] && mv "${files[file]}" "$REPLY" && f="$REPLY" ; } ; cdir '' "$f" ;;
-	${C[shell]})		[[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ;;
-	${C[shell_view]})	shell_run ;;
-	${C[shell_zoomed]})	[[ $shell_id ]] && tmux selectp -t $shell_id &>/dev/null || shell_pane ; tmux resizep -Z -t $shell_id ;;
+	${C[shell]})		{ [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ;;
+	${C[shell_file]})	for i in "${selection[@]}" ; do shell_send "'$i'" " " ; done ;;
+	${C[shell_view]})	shell_run ; list ;;
+	${C[shell_zoomed]})	{ [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ;;
 	${C[show_etag]})	((etag^=1)) ; cdir ;;
 	${C[show_hidden]})	((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ;;
 	${C[show_size]})	((show_size ^= 1)) || { ((show_size ^= 1)) ; ((show_dir_size ^= 1)) ; } || show_size=0 ; cdir ;;
@@ -293,8 +294,9 @@ run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ;
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_eval(){ s="${selection[@]}" ; for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
 shell_hist(){ [[ -f $ftl_cmds ]] && awk '!seen[$0]++' $ftl_cmds | fzf-tmux $fzf_opt --cycle --tac ; }
-shell_pane(){ tcpreview ; op=$pane_id ; tsplit bash 30% -v -U ; shell_id=$pane_id ; pane_id=$op ; cdir ; tmux selectp -t $shell_id ; sleep 0.25 ; tmux send -t $shell_id " '$f'" C-b ; }
+shell_pane(){ tcpreview ; op=$pane_id ; tsplit bash 30% -v -U ; shell_id=$pane_id ; pane_id=$op ; sleep 0.25 ; ((shell_file)) && shell_send " '$f'" C-b ; cdir ; }
 shell_run() { tcpreview ; echo -en '\e[?1049l' ; ${1:-:} ; read -sn 1 ; echo -en '\e[?1049h' ; }
+shell_send(){ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "$@" ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }
 save_state(){ declare -p tags >$fs/tags ; ((!nfiles)) && { : >${1:-$fs}/ftl ; return ; } ; >${1:-$fs}/ftl echo "\
