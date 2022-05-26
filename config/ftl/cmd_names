@@ -4,7 +4,6 @@ load_tags
 help
 bottom
 cd
-chmod_minus_x
 chmod_x
 clear_filters
 command_fzf
@@ -84,6 +83,7 @@ quit
 refresh
 rename
 shell
+shell_file
 shell_view
 shell_zoomed
 show_etag
