@@ -212,10 +212,11 @@ epdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/
 etext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; } ; }
 pcbr()      { [[ $e == cbr ]] && { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$f" "$thumbs/cbr" ; pw3image "$t" ; true ; } ; }
 pcbz()      { [[ $e == cbz ]] && { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$f" "$thumbs/cbz" ; pw3image "$t" ; true ; } ; }
-pdir()      { [[ -d "$n" ]] && { [[ "$montage" ]] && pdir_image "$n" || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir "$n" ; } ; } || { in_pdir= ; pdir_only ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${1@Q} $fs 1" ; in_pdir=1 ; } ; }
-pdir_image(){ in_pdir= ; m="$ftl_root/montage/$1/montage.jpg" ; [[ -e "$m" ]] || { header "$mh" ; "$pgen/montage" "$ftl_root" "$1" ; header "$head" ; } ; pw3image "$m" ; }
-pdir_only() { [[ "${pdir_only[tab]}" ]]  && { tcpreview ; true ; } || false  ; }
+pdir()      { [[ -d "$n" ]] && { ((extmode)) && pdir_tree || { [[ "$montage" ]] && pdir_image || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; } ; } || { in_pdir= ; pdir_only ; } ; }
+pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $fs 1" ; in_pdir=1 ; } ; true ; }
+pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header "$mh" ; "$pgen/montage" "$ftl_root" "$n" ; header "$head" ; } ; pw3image "$m" ; true ; }
+pdir_only() { [[ "${pdir_only[tab]}" ]] && { tcpreview ; true ; } || false  ; }
+pdir_tree() { ((extmode==1)) && ctsplit "dust -r -f \"$n\" | cat | tail -n +2 ; read -sn1" || ctsplit "ncdu \"$n\"" ; true ; }
 phtml()     { [[ $e == html ]] &&  { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; } ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ $ifilter ]] && pw3image ; }
