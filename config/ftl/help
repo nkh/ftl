@@ -34,6 +34,6 @@
 			y Y ⇑y ⇈y ) tag/untag, files, all                	1-4    ) class tag
 			q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom       	0, 7-9 ) refresh, internal usage
 
-			˽c        ) compress/decompress                  	˽x        ) PGP encrypt/decrypt
-			˽s        ) stat file                            	˽z        ) password encrypt/decrypt
-			˽m        ) mail
+			˽fc        ) compress/decompress                 	˽fm        ) mail
+			˽fi        ) reduce image size                   	˽fx        ) PGP encrypt/decrypt
+			˽fs        ) stat file                           	˽fz        ) password encrypt/decrypt

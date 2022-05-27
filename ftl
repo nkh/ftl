@@ -295,7 +295,7 @@ run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ;
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_eval(){ s="${selection[@]}" ; for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $REPLY\e[m' ; $REPLY" ; echo '$?': $? ; done ; }
 shell_hist(){ [[ -f $ftl_cmds ]] && awk '!seen[$0]++' $ftl_cmds | fzf-tmux $fzf_opt --cycle --tac ; }
-shell_pane(){ tcpreview ; op=$pane_id ; tsplit bash 30% -v -U ; shell_id=$pane_id ; pane_id=$op ; sleep 0.25 ; ((shell_file)) && shell_send " '$f'" C-b ; cdir ; }
+shell_pane(){ tcpreview ; P=$pane_id; tsplit bash 30% -v -U ; shell_id=$pane_id ; pane_id=$P; sleep 0.3 ; ((shell_file)) && shell_send "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
 shell_run() { tcpreview ; echo -en '\e[?1049l' ; ${1:-:} ; read -sn 1 ; echo -en '\e[?1049h' ; }
 shell_send(){ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "$@" ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
