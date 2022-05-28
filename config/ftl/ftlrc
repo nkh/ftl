@@ -1,4 +1,4 @@
-GPGID=CHANGE.ME ; declare -A marks=([0]=/ [1]=/CHANGE_ME/dir/filename [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename)
+GPGID=CHANGE.ME ; declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename)
 
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
@@ -27,11 +27,10 @@ previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl
 # my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 # RM=my_delete
 
-declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
-declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
+declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
+declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
 declare -A C=(  [help]="\?"
-		[bottom]="G"
-		[cd]="${A[g]}"
+		[cd]="G"
 		[chmod_x]="x"
 		[clear_filters]="${A[d]}"
 		[command_fzf]="!"
@@ -86,7 +85,7 @@ declare -A C=(  [help]="\?"
 		[pane_L]="\¦"
 		[pane_R]="\|"
 		[pane_next]="\-"
-		[pdh]="${A[p]}"
+		[pdh]="¿"
 		[pdh_kill]="¿"
 		[preview_down]="J"
 		[preview_up]="K"
@@ -138,7 +137,7 @@ declare -A C=(  [help]="\?"
 		[tags_merge_all]="${A[o]}"
 		[tag_untag_all]="u"
 		[tag_untag_fzf]="U"
-		[top]="g"
+		[top_file_bottom]="g"
 		[SIG_PANE]=7
 		[SIG_REFRESH]=8
 		[SIG_REMOTE]=9

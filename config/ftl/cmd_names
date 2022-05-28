@@ -2,7 +2,6 @@ etags
 load_tags
 
 help
-bottom
 cd
 chmod_x
 clear_filters
@@ -108,4 +107,5 @@ tag_move
 tags_merge_all
 tag_untag_all
 tag_untag_fzf
-top
+top_file_bottom
+

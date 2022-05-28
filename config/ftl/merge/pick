@@ -1,12 +1,13 @@
 list=$(find $pfs -type d | grep -v $fs | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && print "$_\n"' | fzfpp)
 
 for tag_file in "${list[@]}"
+#sed -e 's/\-A tags/-A new_tags/'
 	do 
-		[[ -e "$tag_file" ]] && < <(. "$tag_file" ; printf "%s\n" "${!tags[@]}") readarray -t new_tags && \
-		for p in "${new_tags[@]}"
-			do 
-				tags["$p"]='▪'
-			done
+		[[ -e "$tag_file" ]] && . "$tag_file" && \
+			for p in "${!new_tags[@]}"
+				do 
+					tags[$p]="${new_tags[$p]}"
+				done
 	done
 
 list

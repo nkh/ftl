@@ -2,7 +2,7 @@
 			k A       ) previous entry                       	5 6    ) page down/up
 			h D       ) parent directory                     	⇈s \t  ) new tab, nexttab
 			l C ''    ) cd or open file                      	> <    ) extra pane
-			g G ⇑g    ) first/last entry, cd                 	_ | ¦  ) extra pane
+			g G       ) top/file/bottom, cd                  	_ | ¦  ) extra pane
 			a         ) kill sound preview                   	-      ) next pane or viewer
 			b ⇑b ⇈b   ) fzf find/all/dirs                    	/      ) find
 			c ⇑c      ) copy to, show command mapping        	⇈i     ) fzfi, using ueberzurg
