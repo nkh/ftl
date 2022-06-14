@@ -221,9 +221,9 @@ phtml()     { [[ $e == html ]] &&  { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $p
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ $ifilter ]] && pw3image ; }
 plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" ; }
-pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less -R <$(gen_exift) ; read -sn1" ; } ; } ; }
+pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less -R <'$(gen_exift)' ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; true ; } ; } ; }
-pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null \"$n\"" ; true ; } ; }
+pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat '$(gen_exift)' ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null \"$n\"" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
@@ -259,7 +259,7 @@ ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]
 fzf_go()    { { IFS= read m ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { d="$(dirname "$p")" ; [[ -n $m ]] && tab_new "$d" ; cdir "$d" "$(basename "$p")" ; } || list ; }
 fzf_rg_go() { { IFS= read m ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { g=${p%%:*} && d="$PWD/"$(dirname "$g") ; [[ -n $m ]] && tab_new "$d" ; cdir "$d" "$(basename "$g")" ; } || list ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
-gen_exift() { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ')" ; [[ -e $t ]] || $ftl_cfg/generators/$e "$f" "$thumbs/$e" ; echo $t ; }
+gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e $t ]] || $ftl_cfg/generators/$e "$f" "$thumbs/$e" ; echo "$t" ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
@@ -325,7 +325,7 @@ tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d "echo -e \"\e[33m$
 tsc_head()  { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w > 1)) && echo -e " \e[33m!\e[0m" ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
-winch()     { return ; geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="R=${C[refresh]}$R" && pdh "WINCH" ; }
+winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh]}$R" && pdh "WINCH" ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
 def_sub 'ftl_sort:sort_by' 'ftl_filter:cat' etag_dir etag_tag 'ext_bindings:false' externals previewers ; . ~/.config/ftl/ftl.eb ; [[ $TMUX ]] && ftl "$@" || echo 'ftl: run in tmux'

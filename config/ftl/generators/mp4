@@ -5,10 +5,6 @@ exec 2>>"$2/generators_log"
 	{
 	ffmpegthumbnailer -i "$1" -o "$2/$1.jpg" -s 1024
 	
-	t="$2/et_$(head -c50000 "$1" | md5sum | cut -f1 -d' ')"
-	[[ -f "$t" ]] || 
-		{
-		exiftool "$1" | piper '^.*?:' blue >$t  
-		}
+	exiftool "$1" | piper '^.*?:' blue >"$2/$1.et"
 	}
 
