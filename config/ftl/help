@@ -21,6 +21,7 @@
 			o O       ) sort type, reverse
 			⇑o ⇈O     ) merge tags, fzf
 			p P       ) copy/move selection
+			q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom
 			r R       ) refresh, rename/bulk rename          	$      ) detach editor preview
 			s S       ) shell pane, zoomed                   	!      ) run shell command
 			⇑s        ) show/hide size                       	¡      ) pdh pane
@@ -32,7 +33,6 @@
 			w W       ) local mplayer, extra viewers         	+      ) change preview size
 			x X       ) chmod a+x, a-x                       	% &    ) hide extension, enable all
 			y Y ⇑y ⇈y ) tag/untag, files, all                	1-4    ) class tag
-			q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom       	0, 7-9 ) refresh, internal usage
 
 			˽fc        ) compress/decompress                 	˽fm        ) mail
 			˽fi        ) reduce image size                   	˽fx        ) PGP encrypt/decrypt

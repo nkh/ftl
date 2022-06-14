@@ -27,6 +27,8 @@ previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl
 # my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 # RM=my_delete
 
+# 0, 7-9 are used by ftl and corresponf to SIG_XXX entries below
+
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
 declare -A C=(  [help]="\?"

@@ -206,7 +206,7 @@ ewith()     { . ~/.config/ftl/open_with ; }
 edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
 ehtml()     { [[ $e =~ html ]] && { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; } ; }
 eimage()    { [[ $e =~ $ifilter ]] && run_maxed fim -a "$n" "$PWD" ; }
-emedia()    { [[ $e =~ $mfilter ]] && { ((emode == 1)) && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } || (vlc "$n" &>/dev/null &) ; R="${C[refresh]}$R" ; } ;  }
+emedia()    { [[ $e =~ $mfilter ]] && { ((emode == 1)) && { mplayer_k ; mplayer -vo null "$n" </dev/null >/dev/null & } || (vlc "$n" &>/dev/null &) ; mplayer=$! ; } ;  }
 epdf()      { [[ $e == pdf ]] && { ((emode == 1)) && epdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) && true ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } ; } ; }
 epdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; true ; }
 etext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; } ; }
