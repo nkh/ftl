@@ -34,6 +34,7 @@
 			x X       ) chmod a+x, a-x                       	% &    ) hide extension, enable all
 			y Y ⇑y ⇈y ) tag/untag, files, all                	1-4    ) class tag
 
-			˽fc        ) compress/decompress                 	˽fm        ) mail
-			˽fi        ) reduce image size                   	˽fx        ) PGP encrypt/decrypt
-			˽fs        ) stat file                           	˽fz        ) password encrypt/decrypt
+			˽fc       ) compress/decompress                  	˽fm    ) mail
+			˽fi       ) reduce image size                    	˽fv    ) reduce video size
+			˽fp       ) reduce pdf size                      	˽fx    ) PGP encrypt/decrypt
+			˽fs       ) stat file                            	˽fz    ) password encrypt/decrypt
