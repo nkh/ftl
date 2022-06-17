@@ -18,14 +18,14 @@
 			m         ) mark directory and file              	' ⇑'   ) go, fzf to mark
 			M ⇑m ⇈m   ) view mode, montage/refresh           	)      ) file/dir view mode
 			n N       ) find next/previous                   	=      ) preview directory only
-			o O       ) sort type, reverse
+			o O       ) sort type, reverse                   	*      ) maximum listing depth
 			⇑o ⇈O     ) merge tags, fzf
-			p P       ) copy/move selection
+			p P ⇈p    ) copy/move selection, move to
 			q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom
 			r R       ) refresh, rename/bulk rename          	$      ) detach editor preview
 			s S       ) shell pane, zoomed                   	!      ) run shell command
-			⇑s        ) show/hide size                       	¡      ) pdh pane
-			t T ⇑t    ) fzf tag, +subdir, to clipboard       	*      ) maximum listing depth
+			⇑s        ) show/hide size                       	¡      ) show shell
+			t T ⇑t    ) fzf tag, +subdir, to clipboard       	¿      ) pdh pane
 			⇈t        ) file preview at end                  	. ⇑.   ) show/hide dot-files/etags
 			U u ⇑u    ) untag all, fzf, goto                 	^      ) show/hide stat
 			v V       ) preview hide, once                   	#      ) show/hide extension preview

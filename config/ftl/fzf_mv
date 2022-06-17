@@ -1,0 +1,32 @@
+read -r -d '' destinations << EOM
+$HOME
+$HOME/downloads
+$HOME/downloads/bikes
+$HOME/downloads/books
+$HOME/downloads/books/bash
+$HOME/downloads/books/computer
+$HOME/downloads/books/dev
+$HOME/downloads/books/div
+$HOME/downloads/books/electronic
+$HOME/downloads/books/rust
+$HOME/downloads/dev2
+$HOME/downloads/dev_programs
+$HOME/downloads/bdz
+$HOME/downloads/music
+$HOME/downloads/images
+$HOME/downloads/images/tools
+$HOME/downloads/memes
+$HOME/downloads/nadim
+$HOME/downloads/pdf
+$HOME/downloads/pictures
+$HOME/downloads/projects
+$HOME/downloads/projects/house
+$HOME/downloads/video
+EOM
+
+to=$(echo -e "$destinations" | sort -r | lscolors | fzf-tmux -0 -1 -p 50% --ansi --cycle --info=inline)
+
+[[ "$to" ]] && { mv "$@" "$to" 2>fzf_mv_log && rm fzf_mv_log || { tmux popup "echo ${RED}Error:$RESET ; cat '$PWD/fzf_mv_log'" ; false ; } ; } 
+
+# vim: set filetype=sh :
+

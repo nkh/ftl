@@ -32,7 +32,6 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[preview_up]})	((in_vipreview)) && tmux send -t $pane_id C-U ;;
 	1|2|3|4)		[[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ;;
 	${C[pdh]}) 		pdh_show ;;
-	${C[pdh_kill]})		pdh_show ;;
 	${C[cd]})		prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
 	${C[chmod_x]})		for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ;;
 	${C[clear_filters]})	filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
@@ -90,7 +89,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[pane_next]})	p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh]} ;;
 	${C[preview]})		((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ;;
 	${C[preview_once]})	preview=1 ; tcpreview ; sleep 0.05 ; cdir ;;
-	${C[preview_dir_only]}) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='⁼' ; list ;;
+	${C[preview_dir_only]}) [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ;;
 	${C[preview_ext_ign]})	[[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ;;
 	${C[preview_hide_ext]})	[[ $e ]] && ((lignore[${e}] ^= 1)) ; cdir ;;
 	${C[preview_hide_cl]})	lignore=() ; cdir ;;
@@ -125,6 +124,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[tag_all_files]})	for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ;;
 	${C[tag_all]})		for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ;;
 	${C[tag_copy]})		tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f";;
+	${C[tag_moveto]})	fzf_mv "${selection[@]}" && tags_clear ;  cdir '' "$f";;
 	${C[tag_move]})		tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f";;
 	${C[tag_flip]})		tag_flip "${files[file]}" ; move 1 ; list ;;
 	${C[tag_flip_up]})	tag_flip "${files[file]}" ; move -1 ; list ;;
@@ -202,7 +202,7 @@ preview() # force_preview
 tcpreview
 }
 
-ewith()     { . ~/.config/ftl/open_with ; }
+ewith()     { . ~/.config/ftl/open_with ; R="${C[refresh]}$R" ; true ; }
 edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
 ehtml()     { [[ $e =~ html ]] && { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; } ; }
 eimage()    { [[ $e =~ $ifilter ]] && run_maxed fim -a "$n" "$PWD" ; }

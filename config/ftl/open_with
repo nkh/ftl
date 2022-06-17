@@ -8,11 +8,12 @@ application/vnd.comicbook-rar	mcomix
 EOF
 ) rg -F -f <(echo -e "$n\n$e\n$mtype"))
 
-[[ "$players" ]] && \
+[[ "$players" ]] &&
 	{
-	w=$(echo "$players" | fzf-tmux -0 -1 -p 80% -m --ansi --info=inline | cut -f 2-)
-	[[ "$w" ]] && { ($w "$n" &) ; tcpreview ; sleep 0.4 ; true ; }
-	} || \
+	{ IFS= read m ; IFS= read p ; } < <(echo "$players" | fzf-tmux -0 -1 -p 80% -m --expect=ctrl-t --info=inline | cut -f 2-)
+
+	[[ "$p" ]] && { [[ $m ]] && { ($p "$n" &) ; tcpreview ; sleep 0.4 ; true ; } || { run_maxed $p "$n" ; true ; } ; }
+	} ||
 	{
 	tmux split-window -l 50% mimeopen "$n"
 	}

@@ -56,7 +56,6 @@ pane_next
 pane_R
 pane_right
 pdh
-pdh_kill
 preview_down
 preview_up
 preview_dir_only
@@ -104,6 +103,7 @@ tag_fzf_all
 tag_goto
 tag_merge
 tag_move
+tag_moveto
 tags_merge_all
 tag_untag_all
 tag_untag_fzf

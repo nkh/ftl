@@ -1,0 +1,10 @@
+do_tag_synch()
+{
+source $pfs/synched_tags
+for p in "${!new_tags[@]}"
+	do 
+		tags[$p]="${new_tags[$p]}"
+	done
+}
+
+# vim: set filetype=sh :
