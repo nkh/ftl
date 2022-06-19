@@ -110,7 +110,26 @@ shell_command()
 	return
 	}
 
-[[  ${C[$1]} ]] && { R=${C[$1]} ; } || { tscommand "$1" ; cdir ; } ; true
+[[  ${C[$1]} ]] && R=${C[$1]} && return
+
+# shell command
+# todo: pass selection to session context
+# todo: keep window open
+
+[[ "$1" =~ ^-s ]] &&
+	{
+	[[ "$1" =~ ^-sl ]] && for n in "${selection[@]}" ; do tscommand "${1#-sl}" "-e n=${n@Q}" ; done \
+		|| { tscommand "${1#-s}" "-e n=${n@Q}" ; }
+
+	cdir ; return
+	}
+
+tcpreview ; s="${selection[@]}" ; echo -en '\e[?1049l'
+
+[[ "$1" =~ ^-l ]] && for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $1\e[m' ; ${1#-l} ; echo «$?»" ; done \
+	|| eval "echo -e '\e[2;33m[$(date -R)] $PWD > $1\e[m' ; $1 ; echo «$?»"
+
+read -sn 1 ; echo -en '\e[?1049h' ; cdir
 }
 
 # vim: set filetype=sh :

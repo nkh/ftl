@@ -5,7 +5,6 @@ help
 cd
 chmod_x
 clear_filters
-command_fzf
 command_prompt
 copy
 copy_clipboard

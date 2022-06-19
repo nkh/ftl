@@ -9,7 +9,7 @@
 			d ⇑d ⇈d   ) delete, clear filters/history        	{      ) fzf to file with preview
 			e E       ) external viewer, detached            	}      ) rg to file
 			f F ⇑f ⇈f ) filter1/2, external, reverse         	:      ) go to entry
-			H ⇑h ¨ ⇈h ) fzf history, global, global, edit    	:      ) command: q, etags, load_tags
+			H ⇑h ¨ ⇈h ) fzf history, global, global, edit    	:      ) shell + commands: q, etags, load_tags
 			i I ⇑i    ) new file/directory, bulk             	' '    ) leader key
 			J K       ) scroll preview
 			⇑k        ) clear persistent marks               	, ;    ) persistent mark add/fzf
@@ -23,8 +23,8 @@
 			p P ⇈p    ) copy/move selection, move to
 			q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom
 			r R       ) refresh, rename/bulk rename          	$      ) detach editor preview
-			s S       ) shell pane, zoomed                   	!      ) run shell command
-			⇑s        ) show/hide size                       	¡      ) show shell
+			s S       ) shell pane, zoomed                   	
+			⇑s        ) show/hide size                       	!      ) view shell
 			t T ⇑t    ) fzf tag, +subdir, to clipboard       	¿      ) pdh pane
 			⇈t        ) file preview at end                  	. ⇑.   ) show/hide dot-files/etags
 			U u ⇑u    ) untag all, fzf, goto                 	^      ) show/hide stat
