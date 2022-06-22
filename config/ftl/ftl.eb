@@ -118,9 +118,7 @@ shell_command()
 
 [[ "$1" =~ ^-s ]] &&
 	{
-	[[ "$1" =~ ^-sl ]] && for n in "${selection[@]}" ; do tscommand "${1#-sl}" "-e n=${n@Q}" ; done \
-		|| { tscommand "${1#-s}" "-e n=${n@Q}" ; }
-
+	[[ "$1" =~ ^-sl ]] && for n in "${selection[@]}" ; do tscommand "${1#-sl}" "-e n=${n@Q}" ; done || { tscommand "${1#-s}" "-e n=${n@Q}" ; }
 	cdir ; return
 	}
 
