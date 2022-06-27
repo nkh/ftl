@@ -7,8 +7,8 @@ tbcolor 67 67 ; quick_display=256 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0}
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=('-k3' '-n' '-k2') ; fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl:214" 
 sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators" ; : ${shell_file:=0} ; auto_tags=1 ; pdhl=
 
-declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; dir_done=56fbb22f2967 ; RM="rm -rf"
-mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; $pushd "$dir" &>/dev/null
+declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; export ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; RM="rm -rf"
+mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; $pushd "$dir" &>/dev/null ; dir_done=56fbb22f2967 
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; } ;
@@ -119,7 +119,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[sort_reverse]})	[[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; cdir '' "$f";;
 	${C[sort]})		((sort_type[tab] = sort_type[tab] + 1 >= ${#sort_filters[@]} ? 0 : sort_type[tab] + 1)) ; cdir '' "$f" ;;
 	${C[tab_new]})		[[ -d "$f" ]] && tab_new "$n" || tab_new "$PWD" ; cdir ${tabs[tab]} ;;
-	${C[tab_next]})		tab_next ; cdir ${tabs[tab]} '' "${dir_file[${tab}_${tabs[tab]}]}";;
+	${C[tab_next]})		ctab=$tab ; tab_next ; ((tab != ctab)) && cdir ${tabs[tab]} '' "${dir_file[${tab}_${tabs[tab]}]}";;
 	${C[tag_all_files]})	for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ;;
 	${C[tag_all]})		for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ;;
 	${C[tag_copy]})		tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f";;
