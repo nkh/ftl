@@ -1,7 +1,7 @@
 GPGID=CHANGE.ME ; declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename)
 
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
-previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext ptar pcbr pcbz ptype ; }
+previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl pshell ptext pcomp pcbr pcbz ptype ; }
 # p_your_viewer(){ vipreview ~/.bashrc ; }
 
 # sort_type0=0
