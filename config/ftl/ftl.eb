@@ -46,6 +46,7 @@ super_leader_command=
 compress()
 {
 new_file=
+[[ $e =~ rar ]] && unrar e "$f" || \
 [[ $e =~ tar ]] && tar -xf "$f" || \
 [[ $e =~ zip ]] && unzip "$f" || \
 { prompt 'tar.bz2 file: ' ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" && new_file="$REPLY" ; }

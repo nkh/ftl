@@ -36,6 +36,8 @@ gmark_fzf
 gmarks_clear
 go_fzf
 go_rg
+goto_alt1
+goto_alt2
 history
 hexedit
 image_fzf

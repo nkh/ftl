@@ -1,6 +1,16 @@
 clear ; stty echo ; tput cnorm ; read -p 'ftl filter, file min size: ' ftl_min_size ; tput civis ; stty -echo
+
+
 filter_tag="~"
-ftl_filter() { while read -a file_data ; do ((${file_data[0]} > ${ftl_min_size:-0})) && printf "%s\t%s\t%s\n" "${file_data[@]}" ; done ; }
+ftl_filter() 
+{
+while IFS=$'\t' read -a file_data
+	do
+ 	pdh "path ${file_data[2]}\n"
+	pdh "size ${file_data[0]}\n"
+		 { [[ -d "${file_data[2]}" ]] || ((${file_data[0]} > ${ftl_min_size:-0})) ; } && printf "%s\t%s\t%s\n" "${file_data[@]}"
+	done
+}
 
 # vim: set filetype=sh :
 

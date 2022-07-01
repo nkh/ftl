@@ -9,7 +9,6 @@ while read -r file_data
 		sort_data+=("$entry	$fe	$ext") ; ((entry++))
 	done
 
-#printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1 | { error input from read ; while read i ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done ; }
 for i in $(printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done
 }
 
