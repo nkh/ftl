@@ -7,7 +7,7 @@ while :
 		read -t1 && [[ -n "$REPLY" ]] && \
 		{ 
 		((event_id++)) ; echo -e "${DIM_BLACK}#[$event_id@$(date +%R:%S.%2N)] $RESET$REPLY" ; 
-		[[ "$REPLY" =~ \! ]] && { cmd="${REPLY#*!}" ; $cmd ; } 
+		[[ "$REPLY" =~ ^\! ]] && { cmd="${REPLY#*!}" ; $cmd ; } 
 		} 
 	done
 }

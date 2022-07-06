@@ -2,11 +2,13 @@ sort_glyph() { echo e ; }
 ftl_sort()
 {
 entry=0
-while read -r file_data
+while IFS=$'\t' read -a file_data
 	do
-		fe="${file_data#$'*\t'*$'\t'}" ; names+=("$fe") ; ext= ; [[ "$fe" =~ '.' ]] && ext=".${fe##*.}"
-		s=${file_data%$'\t'*$'\t'*} ; sizes+=($s)
-		sort_data+=("$entry	$fe	$ext") ; ((entry++))
+		names+=("${file_data[2]}")
+		sizes+=(${file_data[0]})
+		ext= ; [[ "${file_data[2]}" =~ '.' ]] && ext=".${file_data[2]##*.}"
+		sort_data+=("$entry	${file_data[2]}	$ext")
+		((entry++))
 	done
 
 for i in $(printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done
