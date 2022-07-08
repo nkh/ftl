@@ -1,0 +1,29 @@
+declare -g -A keep PWDS
+
+for f in "${!keep[@]}" do ; [[ "$f" =~ "$tab-$PWD/" ]] && unset keep[$f] ; done
+
+OIFS=$IFS ; IFS=$'\n'
+for file in $(\
+		{ find -maxdepth 1 -type d -printf "%f\n" | grep -v '^\.$' | sort -u ; find -maxdepth 1 -type f -printf "%f\n" | sort -u ; } | \
+		lscolors | fzf-tmux -p 80% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-l:select-all \
+		)
+	do 
+		keep["$PWD/$file"]=1
+		PWDS[$PWD]=1
+		filter_tag="~"
+	done
+IFS=$OIFS
+
+ftl_filter()
+{
+[[ ${PWDS["$PWD"]} == 1 ]] && 
+	{
+	while read -r file_data
+		do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat 
+}
+
+# vim: set filetype=sh :

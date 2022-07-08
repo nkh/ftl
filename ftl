@@ -54,7 +54,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[file_dir_mode]})	((lmode[tab]--)) ; ((lmode[tab] < 0)) && lmode[tab]=2 ; cdir '' "$f" ;;
 	${C[filter]})		prompt "filter: " -i "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
 	${C[filter2]})		prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ;;
-	${C[filter_ext]})	p=~/.config/ftl/external_filters ; file=$(cd "$p" ; fd | fzf-tmux --cycle) ; [[ $file ]] && . "$p/$file" $fs ; cdir '' "$f";;
+	${C[filter_ext]})	p=~/.config/ftl/external_filters ; file=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle) ; [[ $file ]] && . "$p/$file" $fs ; cdir '' "$f";;
 	${C[filter_reverse]}) 	prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f";;
 	${C[find]})		prompt "find: " -i to_search ; R="${C[find_next]}" ;;
 	${C[find_next]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;

@@ -1,7 +1,7 @@
 declare -g -A fexts=()
 
 for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
-		sort -u | lscolors | fzf-tmux -m --ansi --info=inline --layout=reverse)
+		sort -u | lscolors | fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse)
 	do 
 		fexts[$ext]=1
 		filter_tag="~"
