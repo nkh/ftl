@@ -1,6 +1,7 @@
 etag_dir()
 {
 declare -g -A ext_dates=()
+
 while read ext_date ext_file ; do
 	ext_dates[$ext_file]=$ext_date
 done < <(find "$PWD/" -mindepth 1 -maxdepth 1 -printf '%Ax-%AH:%AM\t%P\n' 2>&-)

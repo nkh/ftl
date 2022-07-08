@@ -108,5 +108,6 @@ tag_moveto
 tags_merge_all
 tag_untag_all
 tag_untag_fzf
+tag_external
 top_file_bottom
 

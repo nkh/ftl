@@ -93,11 +93,11 @@ shell_command()
 
 [[ "$1" =~ ^etags ]] && \
 	{
-	p=~/.config/ftl/external_tags ; etags_file="${1#etags}"
+	p=~/.config/ftl/external_tags ; file="${1#etags }"
 
-	[[ "$etags_file" ]] && \
-		{ . $p/$etags_file $fs ; etag=1 ; cdir ; } || \
-		{ etags_file=$(cd $p ; fd | fzf-tmux -p 80% --reverse --info=inline) ; [[ $file ]] && { . $p/$etags_file $fs ; etag=1 ; cdir ; } ; }
+	[[ -f "$p/$file" ]] && \
+		{ . $p/$file $fs ; etag=1 ; cdir ; } || \
+		{ file=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $file ]] && { . $p/$file $fs ; etag=1 ; cdir ; } ; }
 
 	return
 	}

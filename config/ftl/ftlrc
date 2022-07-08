@@ -141,6 +141,7 @@ declare -A C=(  [help]="\?"
 		[tag_untag_all]="u"
 		[tag_untag_fzf]="U"
 		[top_file_bottom]="g"
+		[tag_external]="${A[.]}"
 		[SIG_PANE]=7
 		[SIG_REFRESH]=8
 		[SIG_REMOTE]=9

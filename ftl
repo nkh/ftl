@@ -4,7 +4,7 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 {
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${prev_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
 tbcolor 67 67 ; quick_display=512 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; : ${etag:=0} ; flips=(' ' ' ')
-ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=('-k3' '-n' '-k2') ; fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl:214" 
+ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=(-k3 -n -k2) ; fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214" 
 sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators" ; : ${shell_file:=0} ; auto_tags=1 ; pdhl=
 
 declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; export ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; RM="rm -rf"
@@ -136,6 +136,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[tags_merge_all]})	source ~/.config/ftl/merge/all ; list ;;
 	${C[tag_untag_all]})	tags_clear ; list ;;
 	${C[tag_untag_fzf]})	tag_check && { fzf_tag U "$(printf "%s\n" "${!tags[@]}" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '⊟')" ; list ; } ;;
+	${C[tag_external]})	p=~/.config/ftl/external_tags ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ;;
 	${C[SIG_PANE]})		pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh]} ;;
 	${C[SIG_REFRESH]})	((gpreview)) && kbdf && prev_synch ;;
 	${C[SIG_REMOTE]})	((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ;;
