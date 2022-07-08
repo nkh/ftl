@@ -1,0 +1,34 @@
+#!/bin/env bash
+P=$(mktemp -u) && mkfifo $P && exec 3<>$P && rm $P ; prev_all=$3 ftl ; while read -ru 3 -t .05 f ; do [[ "$f" ]] && echo "$f" >> "$1" ; done
+tmux wait -S "$2"
+
+# vim script to use as a file opener
+
+# function! Ftl()
+#     let temp = tempname()
+#     let id=localtime()
+#
+#     if ! has("gui_running")
+#         "exec "silent !echo waiting for signal: ftl_" . id
+#         exec "silent !tmux new-window ftlvim " . shellescape(temp) . " ftl_" . id . " ; tmux wait ftl_" . id
+#     endif
+#
+#     if !filereadable(temp)
+#         redraw!
+#         return
+#     endif
+#
+#     let names = readfile(temp)
+#     if empty(names)
+#         redraw!
+#         return
+#     endif
+#
+#     for name in names
+#         exec 'tabedit ' . fnameescape(name)
+#     endfor
+#
+#     redraw!
+# endfunction
+#
+# nnoremap <leader>f :call Ftl()<cr>
