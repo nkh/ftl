@@ -29,10 +29,11 @@ case "$super_leader_command" in
 		c  ) compress ;;
 		i  ) image_optimize ;;
 		m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
-		p  ) pdf_optimize ;;
+		p  ) [[ $e == pdf ]] && pdf_optimize ;;
+		P  ) [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ;;
 		s  ) tcpreview
 		     tsplit "{ stat '$n' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ;} | piper --global '\w+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn1" ;;
-		v  ) video_optimize ;;
+		v  ) [[ $e == mp4 ]] && video_optimize ;;
 		x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
 		z  ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
 		esac ;;
@@ -63,27 +64,21 @@ true
 
 pdf_optimize()
 {
-[[ $e == pdf ]] &&
-	{
-	cp "$f" "$b.original.$e"
-	ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$f "$b.original.$e"
-	# -dFILTERIMAGE: produces an output where all raster images are removed.
-	# -dFILTERTEXT: produces an output where all text elements are removed.
-	# -dFILTERVECTOR: produces an output where all vector drawings are removed.
-	# also: pdfimages, part of the poppler-utils package
-	cdir '' "$f"
-	}
+cp "$f" "$b.original.$e"
+ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$f "$b.original.$e"
+# -dFILTERIMAGE: produces an output where all raster images are removed.
+# -dFILTERTEXT: produces an output where all text elements are removed.
+# -dFILTERVECTOR: produces an output where all vector drawings are removed.
+# also: pdfimages, part of the poppler-utils package
+cdir '' "$f"
 }
 
 video_optimize()
 {
-[[ $e == mp4 ]] &&
-	{
-	mv "$f" "$b.original.$e"
-	id=ftl$$$(date +%s%N)
-	tmux new-session -d -s $id "ffmpeg -i '$b.original.$e' -vcodec libx265 -crf 24 '$f' ; tmux popup -h 5 echo Done re-encoding '$n'"
-	cdir ''  "$b.original.$e"
-	}
+mv "$f" "$b.original.$e"
+id=ftl$$$(date +%s%N)
+tmux new-session -d -s $id "ffmpeg -i '$b.original.$e' -vcodec libx265 -crf 24 '$f' ; tmux popup -h 5 echo Done re-encoding '$n'"
+cdir ''  "$b.original.$e"
 }
 
 shell_command()
