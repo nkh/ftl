@@ -5,4 +5,5 @@ exec 2>> "$2/generators_log"
 	{
 	unrar p -ierr -inull -c- "$1" "$(rar lb "$1" \*.jpg \*.png | perl -ne '! /\d\D\..*$/ and print' | sort | head -n1)" > "$2/$1.large.jpg"
 	vipsthumbnail --size 600x "$2/$1.large.jpg" -o "$2/$1.jpg"
+	rm "$2/$1.large.jpg" 2>&-
 	}

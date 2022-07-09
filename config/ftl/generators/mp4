@@ -4,7 +4,6 @@ exec 2>>"$2/generators_log"
 [[ -f "$2/$1.jpg" ]] || 
 	{
 	ffmpegthumbnailer -i "$1" -o "$2/$1.jpg" -s 1024
-	
 	exiftool "$1" | piper '^.*?:' blue >"$2/$1.et"
 	}
 

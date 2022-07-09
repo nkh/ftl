@@ -1,7 +1,19 @@
 #!/bin/bash
+
+<"$1/generator_time" read -r start 2>&-
+end=$(date +%s%N)
+
+{ (( start == 0 )) || (( (end - start) < 500000000 )) ; } && exit 0
+
+echo 0 >"$1/generator_time"
+
 for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 	do 
 		ext=$(basename $g)
 		mkdir -p "$1/$ext"
 		fd "\.$ext$" -t f -d 1 --exec "$g" {/} "$1/$ext"
 	done
+
+end=$(date +%s%N)
+echo $end >"$1/generator_time"
+

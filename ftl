@@ -102,7 +102,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[preview_show]})	[[ $e =~ $mfilter ]] && { (~/.config/ftl/viewers/cmus "${selection[@]}" & ) ; ((${#tags[@]})) && { tags_clear ; list ; } ; } ;;
 	${C[preview_show_fzf]})	p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ;;
 	${C[preview_size]})	((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tmux resizep -t $pane_id -x $x &>/dev/null ; rdir '' 0 ;;
-	${C[preview_tail]})	[[ "${tail[$n]}" ]] && unset -v "tail[$n]" || tail[$n]='+$ ' ; list ;;
+	${C[preview_tail]})	[[ "${tail[$n]}" == "+$ " ]] && tail[$n]='+0 ' || tail[$n]='+$ ' ; list ;;
 	${C[quit]})		tab_close || pane_close || quit ;;
 	${C[quit_keep_shell]})	tab_close || pane_close || quit ;;
 	${C[quit_all]})		((main)) && { pane_send "${C[quit]}" ; sleep 0.05 ; R=${C[quit]} ; in_Q=1 ; } || tmux send -t $main_pane ${C[quit_all]}  ;;
@@ -236,7 +236,7 @@ _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@
 ptype()     { ctsplit "echo ${f@Q} ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; true ; }
 pw3image()  { image="${1:-$n}" ; ((in_ftli)) && tmux send -t $pane_id "${image}" C-m || { ctsplit "ftli $pfs \"${image}\"" ; in_ftli=1 ; sleep 0.05 ; tmux selectp -t $my_pane ; } ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdir= ; pane_id= ; in_vipreview= ; in_ftli= ; sleep 0.01 ; } ; }
-vipreview() { ((in_vipreview)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_vipreview=1 ; true ; }
+vipreview() { ((in_vipreview)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_vipreview=1 ; }
 bulkrename(){ bulkedit && bulkverify && { bash $fs/br && tags_clear || read -sn 1 ; } ; true ; }
 bulkedit()  { printf "%s\n" "${!tags[@]}" | sed "s/.*/\"&\"/" | tee $fs/bo >$fs/bd ; $EDITOR $fs/bd && { >$fs/br echo 'set -e' ; paste $fs/bo $fs/bd >>$fs/br ; } ; }
 bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1 $2\n" } || print' $fs/br ; $EDITOR $fs/br ; }
