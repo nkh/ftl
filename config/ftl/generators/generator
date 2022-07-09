@@ -14,6 +14,5 @@ for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 		fd "\.$ext$" -t f -d 1 --exec "$g" {/} "$1/$ext"
 	done
 
-end=$(date +%s%N)
-echo $end >"$1/generator_time"
+date +%s%N >"$1/generator_time"
 

@@ -4,7 +4,8 @@ ftl() # directory, search, pfs, preview. © Nadim Khemir 2020-2022, Artistic lic
 {
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${prev_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
 tbcolor 67 67 ; quick_display=512 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; : ${etag:=0} ; flips=(' ' ' ')
-ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=(-k3 -n -k2) ; fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214" 
+ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=(-k3 -n -k2)
+fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214" ;  fzfp_opt="+m --cycle --expect=ctrl-t --reverse --header='$PWD'"
 sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators" ; : ${shell_file:=0} ; auto_tags=1 ; pdhl=
 
 declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; export ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; RM="rm -rf"
@@ -40,7 +41,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[chmod_x]})		for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ;;
 	${C[clear_filters]})	filters[tab]= ; filters2[tab]= ; rfilters[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
 	${C[command_prompt]})	echo -ne "\e[H" ; tput cnorm ; stty echo ; C=$(cmd_prompt) ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" || list ;;
-	${C[command_mapping]})	for k in "${!C[@]}" ; do echo $k ${C[$k]} ; done | sort | column -c 160 | fzf-tmux $fzf_opt --tiebreak=begin --header="Commands mapping" ; list ;;
+	${C[command_mapping]})	for k in "${!C[@]}" ; do printf "%-17s %-5s\t\n" $k ${shortcuts[$k]} ; done | sort | column -c 150 | fzf-tmux $fzf_opt --tiebreak=begin ; list ;;
 	${C[copy]})		prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${C[copy_clipboard]})	printf "%q " "${selection[@]}" | xsel -b -i ;;
 	${C[create_bulk]})	tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ;;
@@ -61,20 +62,20 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[find]})		prompt "find: " -i to_search ; R="${C[find_next]}" ;;
 	${C[find_next]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
 	${C[find_previous]})	for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
-	${C[find_fzf_all]})	tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview +m --cycle --expect=ctrl-t --reverse --header="$PWD")" ;;
-	${C[find_fzf_dirs]})	tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview +m --cycle --expect=ctrl-t --reverse --header="$PWD")" ;;
-	${C[find_fzf]})		tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview +m --cycle --expect=ctrl-t --reverse --header="$PWD")" ;;
+	${C[find_fzf_all]})	exec 2>&9 ; tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
+	${C[find_fzf_dirs]})	exec 2>&9 ; tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
+	${C[find_fzf]})		exec 2>&9 ; tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
 	${C[gmark]})		{ cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ;;
 	${C[gmark_fzf]})	[[ -e $ftl_root/marks ]] && fzf_go "$(cat $ftl_root/marks | lscolors | fzf-tmux $fzf_opt --cycle --expect=ctrl-t --ansi)" ;;
 	${C[gmarks_clear]})	prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ;;
-	${C[go_fzf]})		tcpreview ; fzf_go "$(fzfppv --expect=ctrl-t)" ;;
-	${C[go_rg]})		tcpreview ; fzf_rg_go "$(fzfr "fzf--expect=ctrl-t")" ;;
+	${C[go_fzf]})		exec 2>&9 ; tcpreview ; fzf_go "$(fzfppv --expect=ctrl-t)" ; exec 2>"$fs/error_log" ;;
+	${C[go_rg]})		exec 2>&9 ; tcpreview ; fzf_rg_go "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/error_log" ;;
 	${C[history]})		h=$fs/history ; dedup $h && fzf_go "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ;;
 	${C[ghistory]})		h=$ghist ; dedup $h && fzf_go "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ;;
 	${C[ghistory2]})	h=$ghist ; dedup $h && fzf_go "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ;;
 	${C[ghistory_clear]})	prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ;;
 	${C[ghistory_edit]})	dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ;;
-	${C[image_fzf]})	tcpreview ; fzf_go "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ;;
+	${C[image_fzf]})	exec 2>&9 ; tcpreview ; fzf_go "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/error_log" ;;
 	${C[image_mode]})	((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ftl_imode ; cdir '' "$f";;
 	${C[link]})		tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags_clear && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ;;
 	${C[mark_fzf]})		fzf_go "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --expect=ctrl-t --ansi)" ;;
@@ -145,13 +146,9 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[SIG_SYNCH_SHELL]})	IFS=$'\n' read -r shell_dir <$pfs/synch_with_shell ; cdir "$shell_dir" ;;
 esac
 
-[[ -s $fs/error_log ]] &&
-	{
-	((gpreview)) && { echo ; echo -e '\e[2J\e[H\e[31mftl error:' ; cat $fs/error_log | tee -a $fs/all_errors_log && rm $fs/error_log ; } \
-		|| tmux popup -w 80% "echo '\e[31m'ftl error: command \'$(cmd_name $REPLY)\' [$REPLY] ; echo ; cat $fs/error_log | tee -a $fs/all_errors_log && rm $fs/error_log"
-	}
-
-exec 2>&9
+[[ -s $fs/error_log ]] && ((gpreview)) && { echo ; echo -e '\e[2J\e[H\e[31mftl error:' ; cat $fs/error_log | tee -a $fs/all_errors_log && rm $fs/error_log ; return ; } 
+[[ -s $fs/error_log ]] && tmux popup -w 80% "echo '\e[31m'ftl error: command \'$(cmd_name $REPLY)\' [$REPLY] ; echo ; cat $fs/error_log | tee -a $fs/all_errors_log && rm $fs/error_log"
+exec 2>&9 ;
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
@@ -309,7 +306,6 @@ rdir()      { get_dir "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, 
 refresh()   { echo -ne "\e[?25l$1" ; } 
 run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; } ; "$@" 2>/dev/null ; ((run_maxed)) && { wmctrl -ia $aw ; } ; true ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
-shell_hist(){ [[ -f $ftl_cmds ]] && awk '!seen[$0]++' $ftl_cmds | fzf-tmux $fzf_opt --cycle --tac ; }
 shell_pane(){ tcpreview ; P=$pane_id; tsplit bash 30% -v -U ; shell_id=$pane_id ; pane_id=$P; sleep 0.3 ; ((shell_file)) && shell_send "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
 shell_send(){ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "$@" ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }

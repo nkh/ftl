@@ -29,8 +29,11 @@ previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl
 
 # 0, 7-9 are used by ftl and corresponf to SIG_XXX entries below
 
-declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]=  [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]=  [y]=¥ [z]=  [.]=˙ [6]=⅝ [/]=÷)
-declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]=@ [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
+declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)
+declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i ['&']=k [Ł]=l [º]=m [Œ]=o [Þ]=p [Ω]=q [®]=r [§]=s [Þ]=t [↑]=u [‘]=v ['>']=x [¥]=y ['<']=z [×]="'" [˙]=. [°]=0 [÷]=/)
+declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
+declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z [·]='.' [¥]=6)
+
 declare -A C=(  [help]="\?"
 		[cd]="G"
 		[chmod_x]="x"
@@ -76,7 +79,7 @@ declare -A C=(  [help]="\?"
 		[link]="L"
 		[mark_fzf]="´" # alt-gr \' 
 		[mark_go]="'"
-		[mark_go_tab]="×"
+		[mark_go_tab]="${SA["'"]}"
 		[mark]="m"
 		[montage_clear]="${SA[m]}"
 		[montage_preview]="${A[m]}"
@@ -115,7 +118,7 @@ declare -A C=(  [help]="\?"
 		[rename]="R"
 		[shell]="s"
 		[shell_file]="X"
-		[shell_synch]="°"
+		[shell_synch]="${SA[0]}"
 		[shell_view]="!"
 		[shell_zoomed]="S"
 		[show_etag]="${SA[.]}"
@@ -147,6 +150,16 @@ declare -A C=(  [help]="\?"
 		[SIG_REMOTE]=9
 		[SIG_SYNCH_SHELL]=0
 		)
+
+declare -A shortcuts
+for k in "${!C[@]}"
+	do
+		{ [[ -n "${LA[${C[$k]}]}" ]]  && shortcuts[$k]="A-${LA[${C[$k]}]}/${C[$k]}" ; } ||
+		{ [[ -n "${LSA[${C[$k]}]}" ]] && shortcuts[$k]="SA-${LSA[${C[$k]}]}/${C[$k]}" ; } ||
+		                                 shortcuts[$k]="${C[$k]}"
+	done
+
+shortcuts[tab_next]="TAB"
 
 # vim: set filetype=sh :
 
