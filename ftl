@@ -151,7 +151,7 @@ get_dir() # dir, search
 new_dir="${1:-$PWD}" ; [[ -d "$new_dir" ]] || return ; cd "$new_dir" || return ; PWD="$new_dir" ; tabs[$tab]="$PWD" ; [[ "$PWD" == / ]] && sep= || sep=/
 [[ "$PPWD" != "$PWD" ]] && { marks["'"]="$n" ; PPWD="$PWD" ; ((gpreview)) || echo "$n" | tee -a $fs/history >> $ghist ; }
 
-inotify_s ; ((etag)) && etag_dir ; shopt -s nocasematch ; geo_prev
+cd "$PWD" || return ; inotify_s ; ((etag)) && etag_dir ; shopt -s nocasematch ; geo_prev
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && . .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
@@ -291,7 +291,7 @@ pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t pane
 pane_send() { pane_read && for p in "${panes[@]}" ; do tmux send -t $p "$1" &>/dev/null ; done ; }
 path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 path_none() { n= ; p= ; f= ; b= ; e= ; }
-pdh()       { ((pdhl)) && echo "$my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
+pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
 pdh_show()  { [[ -f $pfs/pdh ]] && { read P <$pfs/pdh ; tmux killp -t $P &>/dev/null ; rm $pfs/pdh ; } || { tcpreview ; tsplit "$ftl_cfg/fpdh $pfs" 30% -v -R ; pane_id= ; } ; cdir ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl" ; ftl_imode "${imode[tab]}" ; [[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
@@ -330,7 +330,7 @@ tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"
 tsc_head()  { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w > 1)) && echo -e " \e[33m!\e[0m" ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { tmux selectp -t $pane_id ${1:--L} ; }
-winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh]}$R" && pdh "WINCH\n" ; }
+winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh]}$R" ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
 def_sub 'ftl_sort:sort_by' 'ftl_filter:cat' etag_dir etag_tag 'ext_bindings:false' externals previewers ; . ~/.config/ftl/ftl.eb ; [[ $TMUX ]] && ftl "$@" || echo 'ftl: run in tmux'
