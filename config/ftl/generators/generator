@@ -6,6 +6,7 @@ end=$(date +%s%N)
 { (( start == 0 )) || (( (end - start) < 500000000 )) ; } && exit 0
 
 echo 0 >"$1/generator_time"
+{ echo -n "s: " ; date +%c ; } >>"$1/generator_time_all"
 
 for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 	do 
@@ -15,4 +16,5 @@ for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 	done
 
 date +%s%N >"$1/generator_time"
+{ echo -n "e: " ; date +%c ; } >>"$1/generator_time_all"
 
