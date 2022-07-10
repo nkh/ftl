@@ -16,6 +16,7 @@ previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pperl
 # ifilter='webp|jpg|jpeg|JPG|png|gif'
 # mfilter='mp3|mp4|flv|mkv'
 # tbcolor='67 67'
+# rfilter0='\.sw.$'
 # cursor_color='\e[7;34m' 
 # quick_display=256
 
@@ -42,7 +43,6 @@ declare -A C=(	[back]="h"
 		[move_up_arrow]="A"
 		[forward]="l"
 		[forward_arrow]="C"
-		[return_key]=""
 		[page_up]=5
 		[page_down]=6
 
@@ -172,7 +172,6 @@ for k in "${!C[@]}"
 	done
 
 shortcuts[tab_next]="TAB"
-shortcuts[return_key]="RET"
 
 # vim: set filetype=sh :
 
