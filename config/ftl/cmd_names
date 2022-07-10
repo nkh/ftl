@@ -82,10 +82,11 @@ quit
 refresh
 rename
 shell
+shell_pop
+shell_zoomed
 shell_file
 shell_synch
 shell_view
-shell_zoomed
 show_etag
 show_hidden
 show_size

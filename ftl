@@ -305,6 +305,7 @@ run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ;
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_pane(){ tcpreview ; P=$pane_id; tsplit bash 30% -v -U ; shell_id=$pane_id ; pane_id=$P; sleep 0.3 ; ((shell_file)) && shell_send "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
 shell_send(){ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "$@" ; }
+shell_pop() { tmux popup -E -d "$PWD" -w 80%  ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }
 save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
