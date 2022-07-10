@@ -16,13 +16,11 @@ mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; t
 fsp=$pfs/prev ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; marks[$"'"]="$(tail -n1 $ghist)" ; PPWD="$dir" 
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
-while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && bindings ; kbdf ; winch=1 ; REPLY= ; done
+while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && try bindings ; kbdf ; winch=1 ; REPLY= ; done
 }
 
 bindings()
 {
-exec 9>&2 2>"$fs/error_log"
-
 ext_bindings || case "${REPLY: -1}" in
 	${C[hexedit]})		tcpreview ; ctsplit "hexedit ${n@Q}" ;;
 	${C[help]})		<~/.config/ftl/help fzf-tmux $fzf_opt --tiebreak=begin --header="$(echo -e "\t\t\t")""⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader" ; list ;;
@@ -145,10 +143,6 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[SIG_REMOTE]})	((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ;;
 	${C[SIG_SYNCH_SHELL]})	IFS=$'\n' read -r shell_dir <$pfs/synch_with_shell ; cdir "$shell_dir" ;;
 esac
-
-[[ -s $fs/error_log ]] && ((gpreview)) && { echo ; echo -e '\e[2J\e[H\e[31mftl error:' ; cat $fs/error_log | tee -a $fs/all_errors_log && rm $fs/error_log ; return ; } 
-[[ -s $fs/error_log ]] && tmux popup -w 80% "echo '\e[31m'ftl error: command \'$(cmd_name $REPLY)\' [$REPLY] ; echo ; cat $fs/error_log | tee -a $fs/all_errors_log && rm $fs/error_log"
-exec 2>&9 ;
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
@@ -211,6 +205,8 @@ preview() # force_preview
 tcpreview
 }
 
+try()       { exec 9>&2 2>"$fs/error_log" ; "$@" ; exec 2>&9 ; [[ -s $fs/error_log ]] && { ((gpreview)) && eval "$(error_cmds)" || tmux popup -w 80% "$(error_cmds)" ; } ; }
+error_cmds(){ echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/error_log | tee -a $fs/errors_log && rm $fs/error_log ; echo '$(cmd_name $REPLY)'" ; }
 ewith()     { . ~/.config/ftl/open_with ; R="${C[refresh]}$R" ; true ; }
 edir()      { [[ -d "$n" ]] && {  vlc "$n" &>/dev/null & } ; }
 ehtml()     { [[ $e =~ html ]] && { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; } ; }
@@ -250,7 +246,7 @@ bulkverify(){ perl -i -ne '/^([^\t]+)\t([^\t]+)\n/ && { $1 ne $2 && print "mv $1
 cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S 'ftl > ' -f $ftl_cfg/cmd_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 clear_list(){ for(( i=$1 ; i < LINES - 1  ; i++)) ; do echo -ne "\e[K$flip" ; ((i < LINES - 2)) && echo ; done ; }
 ctsplit()   { { in_pdir= ; in_vipreview= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &> /dev/null || tsplit "$1" ; }
-cmd_name()  { for k in "${!C[@]}" ; do [[ "${C[$k]}" == "$1" ]] && { echo $k ; return ; } ; done ; }
+cmd_name()  { for k in "${!C[@]}" ; do [[ "${C[$k]}" == "$1" ]] && { echo "<$$> command: $k, key: ${shortcuts[$k]}" ; return ; } ; done ; }
 cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -r" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { cp_mv $1 "$2" "${!ltags[@]}" ; tag_clear $class ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
@@ -294,7 +290,7 @@ pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t pane
 pane_send() { pane_read && for p in "${panes[@]}" ; do tmux send -t $p "$1" &>/dev/null ; done ; }
 path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
 path_none() { n= ; p= ; f= ; b= ; e= ; }
-pdh()       { ((pdhl)) && echo "ftl: $my_pane: $1" >> ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "ftl: $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
+pdh()       { ((pdhl)) && echo "$my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
 pdh_show()  { [[ -f $pfs/pdh ]] && { read P <$pfs/pdh ; tmux killp -t $P &>/dev/null ; rm $pfs/pdh ; } || { tcpreview ; tsplit "$ftl_cfg/fpdh $pfs" 30% -v -R ; pane_id= ; } ; cdir ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl" ; ftl_imode "${imode[tab]}" ; [[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }

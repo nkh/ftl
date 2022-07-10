@@ -34,7 +34,19 @@ declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
 declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z [·]='.' [¥]=6)
 
-declare -A C=(  [help]="\?"
+declare -A C=(	[back]="h"
+		[back_arrow]="D"
+		[move_down]="j"
+		[move_down_arrow]="B"
+		[move_up]="k"
+		[move_up_arrow]="A"
+		[forward]="l"
+		[forward_arrow]="C"
+		[return_key]=""
+		[page_up]=5
+		[page_down]=6
+
+		[help]="\?"
 		[cd]="G"
 		[chmod_x]="x"
 		[clear_filters]="${A[d]}"
@@ -154,12 +166,13 @@ declare -A C=(  [help]="\?"
 declare -A shortcuts
 for k in "${!C[@]}"
 	do
-		{ [[ -n "${LA[${C[$k]}]}" ]]  && shortcuts[$k]="A-${LA[${C[$k]}]}/${C[$k]}" ; } ||
-		{ [[ -n "${LSA[${C[$k]}]}" ]] && shortcuts[$k]="SA-${LSA[${C[$k]}]}/${C[$k]}" ; } ||
+		{ [[ -n "${LA[${C[$k]}]}" ]]  && shortcuts[$k]="⇑${LA[${C[$k]}]}/${C[$k]}" ; } ||
+		{ [[ -n "${LSA[${C[$k]}]}" ]] && shortcuts[$k]="⇈${LSA[${C[$k]}]}/${C[$k]}" ; } ||
 		                                 shortcuts[$k]="${C[$k]}"
 	done
 
 shortcuts[tab_next]="TAB"
+shortcuts[return_key]="RET"
 
 # vim: set filetype=sh :
 
