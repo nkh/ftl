@@ -1,12 +1,12 @@
 #!/bin/bash
 
-<"$1/generator_time" read -r start 2>&-
-end=$(date +%s%N)
+# <"$1/generator_time" read -r start 2>&-
+# end=$(date +%s%N)
 
-{ (( start == 0 )) || (( (end - start) < 500000000 )) ; } && exit 0
+# { (( start == 0 )) || (( (end - start) < 50000000 )) ; } && exit 0
 
-echo 0 >"$1/generator_time"
-{ echo -n "s: " ; date +%c ; } >>"$1/generator_time_all"
+# echo 0 >"$1/generator_time"
+# { echo -n "s: " ; date +%c ; } >>"$1/generator_time_all"
 
 for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 	do 
@@ -15,6 +15,6 @@ for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
 		fd "\.$ext$" -t f -d 1 --exec "$g" {/} "$1/$ext"
 	done
 
-date +%s%N >"$1/generator_time"
-{ echo -n "e: " ; date +%c ; } >>"$1/generator_time_all"
+# date +%s%N >"$1/generator_time"
+# { echo -n "e: " ; date +%c ; } >>"$1/generator_time_all"
 

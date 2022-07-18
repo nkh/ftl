@@ -5,7 +5,7 @@ ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licenc
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${prev_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
 tbcolor 67 67 ; quick_display=512 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; : ${etag:=0} ; flips=(' ' ' ')
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=(-k3 -n -k2)
-fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214" ;  fzfp_opt="+m --cycle --expect=ctrl-t --reverse --header='$PWD'"
+fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214" ;  fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
 sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators" ; : ${shell_file:=0} ; auto_tags=1 ; pdhl=
 
 declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; export ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; RM="rm -rf"
@@ -61,9 +61,9 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[find]})		prompt "find: " -i to_search ; R="${C[find_next]}" ;;
 	${C[find_next]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
 	${C[find_previous]})	for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ;;
-	${C[find_fzf_all]})	exec 2>&9 ; tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
+	${C[find_fzf_all]})	exec 2>&9 ; tcpreview ; fzf_go "$(fd -HI -E'.git/*' | fzf_vpreview $fzfp_opt --header=${PWD@Q})" ; exec 2>"$fs/error_log" ;;
 	${C[find_fzf_dirs]})	exec 2>&9 ; tcpreview ; fzf_go "$(fd -td -I -L | fzf_vpreview $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
-	${C[find_fzf]})		exec 2>&9 ; tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vpreview $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
+	${C[find_fzf]})		exec 2>&9 ; tcpreview ; fzf_go "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | fzf_vvip $fzfp_opt)" ; exec 2>"$fs/error_log" ;;
 	${C[gmark]})		{ cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ;;
 	${C[gmark_fzf]})	[[ -e $ftl_root/marks ]] && fzf_go "$(cat $ftl_root/marks | lscolors | fzf-tmux $fzf_opt --cycle --expect=ctrl-t --ansi)" ;;
 	${C[gmarks_clear]})	prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ;;
@@ -167,7 +167,7 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
 	((show_size)) && { ((sum += size, pl += 5)) ; [[ -d "$pnc" ]] && { ((show_dir_size)) && pc="$(dsize "$pnc") $pc" || pc="     $pc" ; true ; } \
 			 || { for u in '' K M G T ; do ((size < 1024)) && printf -v pc "\e[94m%4s\e[m $pc" $size$u && break ; ((size/=1024)) ; done  ; } ; }
-	((show_line)) && { ((line++)) ; printf -v pc "\e[2;30m%-${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += 4)) ; }
+	((show_line)) && { ((line++)) ; printf -v pc "\e[2;40;90m%-${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((pl > (COLS - 1))) && { [[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }
 	[[ -f "$pnc" ]] && [[ -z $first_file ]] && first_file=$nfiles
@@ -231,11 +231,12 @@ plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" 
 pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less -R <$(gen_exift) ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; true ; } ; } ; }
 pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null ${n@Q}" ; true ; } ; }
+pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "vmd \"$n\" | /usr/bin/less -R" || ctsplit "lowdown -Tterm \"$n\" | /usr/bin/less -R" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 pperl()     { [[ $mtype == application/x-perl ]] && [[ -s "$n" ]] &&  vipreview "$n" ; }
-ptext()     { { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
+ptext()     { ((! is_bin)) && { [[ $e =~ ^json|yml$ ]] || [[ $mtype =~ ^text ]] ; } && [[ -s "$n" ]] && vipreview "$n" ; }
 pcomp()     { [[ $e == zip ]] && _pcomp unzip -l || { [[ $e == rar ]] && _pcomp unrar list ; } || { [[ $f =~ \.tar ]] && _pcomp tar --list --verbose -f ; } ; }
 _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@" "$f" >"$fp" ; vipreview "$fp" ; } ; }
 ptype()     { ctsplit "echo ${f@Q} ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; true ; }
@@ -279,7 +280,7 @@ inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 kbdf()      { [[ $REPLY != $'\e' && $REPLY != "[" && $leader_command != 1 ]] && while read -t 0.01 ; do : ; done ; }
 cdfl()      { true 2>&- >&3 && { [[ $REPLY == ${C[quit]} ]] && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
-mime_get()  { [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$(mimemagic "$n")" ; } ;  mtype="${mime[$n]}" ; false ; }
+mime_get()  { perl -le "-B qq~$n~ ? exit 0 : exit 1" && is_bin=1 || is_bin=0 ; [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$(mimemagic "$n")" ; } ;  mtype="${mime[$n]}" ; false ; }
 mime_cache(){ while IFS=$': ' read fm mm ; do mime[$PWD/$fm]="$mm" ; done < <(mimemagic "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }
@@ -322,7 +323,7 @@ tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$t
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }
 tags_clear(){ ((stagsi++)) ; tags=() ; true ; }
 tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; }
-tag_clear() { for t in "${!tags[@]}" ; do [[ "$1" == "${tags[$t]}" ]] && { unset -v "tags[$t]" ; ((stagsi++)) ; } ; done ; }
+tag_clear() { for t in "${!tags[@]}" ; do [[ "$1" == "${tags[$t]}" ]] && { unset -v tags["$t"] ; ((stagsi++)) ; } ; done ; }
 tag_flip()  { ((stagsi++)) ; [[ ${tags[$1]} ]] && unset -v "tags[$1]" || tags[$1]=${2:-▪} ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_tags && ostagsi != stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }

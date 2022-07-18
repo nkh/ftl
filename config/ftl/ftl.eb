@@ -108,6 +108,12 @@ shell_command()
 	return
 	}
 
+[[ "$1" =~ ^tree ]] && \
+	{
+	tmux popup -h 80% -w 80% -E -d "$PWD" "${@@Q} -C | less -R"
+	return
+	}
+
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 
 # shell command
