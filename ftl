@@ -21,7 +21,6 @@ while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}"
 
 bindings()
 {
-pdh "$REPLY\n"
 ext_bindings || case "${REPLY: -1}" in
 	${C[hexedit]})		tcpreview ; ctsplit "hexedit ${n@Q}" ;;
 	${C[help]})		<~/.config/ftl/help fzf-tmux $fzf_opt --tiebreak=begin --header="$(echo -e "\t\t\t")""⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader" ; list ;;
@@ -32,8 +31,8 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[top_file_bottom]})	twd="${tab}_$PWD" ; [[ -f "$n" ]] && { (($file == $nfiles - 1)) && dir_file[$twd]=0 || dir_file[$twd]=$nfiles ; } || dir_file[$twd]=$first_file ; list ;;
 	${C[goto_alt1]})	to_search=".$e" ; R="${C[find_next]}" ;;
 	${C[goto_alt2]})	for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ ! "${files[i]##*/}" =~ ".$e" ]] && { list $i ; return ; } ; done ; list ;;
-	${C[preview_down]})	((in_vipreview)) && tmux send -t $pane_id C-D ;;
-	${C[preview_up]})	((in_vipreview)) && tmux send -t $pane_id C-U ;;
+	${C[preview_down]})	((in_vipreview)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ;;
+	${C[preview_up]})	((in_vipreview)) && tmux send -t $pane_id C-U || [[ $pane_id ]] && tmux send -t $pane_id k ;;
 	1|2|3|4)		[[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ;;
 	${C[pdh]}) 		pdh_show ;;
 	${C[cd]})		prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ;;
@@ -231,7 +230,7 @@ plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" 
 pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less -R <$(gen_exift) ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; true ; } ; } ; }
 pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null ${n@Q}" ; true ; } ; }
-pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "vmd \"$n\" | /usr/bin/less -R" || ctsplit "lowdown -Tterm \"$n\" | /usr/bin/less -R" ; true ; } ; }
+pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "vmd \"$n\" | /usr/bin/less -R" || ctsplit "lowdown -Tterm \"$n\" | /usr/bin/less -R -S" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
