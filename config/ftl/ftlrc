@@ -1,33 +1,61 @@
-GPGID=CHANGE.ME ; declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename)
+# directories
+ftl_cfg="$HOME/.config/ftl"
+pgen="$ftl_cfg/generators"
+ftl_root=$ftl_cfg/var
+ftl_cmds=$ftl_root/cmds
+ghist=$ftl_root/history
+thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; 
 
-externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
-previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd pperl pshell ptext pcomp pcbr pcbz ptype ; }
-# p_your_viewer(){ vipreview ~/.bashrc ; }
+# marks
+declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
-# sort_type0=0
-# sort_reversed0=
-# prev_all=1
-# find_auto=README 
-# zoom=0 ; zooms=(70 50 30) 
-# show_line=1
-# show_size=0
-# show_date=1
-# show_tar=0
-# ifilter='webp|jpg|jpeg|JPG|png|gif'
-# mfilter='mp3|mp4|flv|mkv'
-# tbcolor='67 67'
-# rfilter0='\.sw.$'
-# cursor_color='\e[7;34m' 
-# quick_display=256
+#options 
+shell_file=0
+auto_tags=1
+pdhl=
+prev_all=1
+zoom=0 ; zooms=(70 50 30)
+mh='Creating montage ...'
+find_auto=README
+tbcolor 67 67
+cursor_color='\e[7;34m' ;
+quick_display=512
+show_line=1
+show_size=0
+show_date=1
+show_tar=0
 
 # use external tags
-#. ~/.config/ftl/external_tags/git ; etag=1
+etag=0
+#. $ftl_cfg/external_tags/git ; etag=1
+
+sort_type0=0
+sort_reversed0=
+sglyph=( ⍺ 🡕 )
+iglyph=('' ᴵ ᴺ)
+lglyph=('' ᵈ ᶠ)
+tglyph=('' ¹ ² ³ D) 
+ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv';
+fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214"
+fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
+
+GPGID=CHANGE.ME
+PAGER="moar --no-statusbar -no-linenumbers"
 
 # how you want your files deleted
+RM="rm -rf"
 # RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
 # my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 # RM=my_delete
 
+# external viewers and previewers
+externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
+previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd pperl pshell ptext pcomp pcbr pcbz ptype ; }
+# p_your_viewer(){ vipreview ~/.bashrc ; }
+
+CMD_COLS=150 # columns when displaying command mapping in popup
+
+# Keyboard mappings
 # 0, 7-9 are used by ftl and corresponf to SIG_XXX entries below
 
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)

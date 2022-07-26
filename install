@@ -1,0 +1,22 @@
+tmux
+vim
+ack
+ripgrep
+fdfind
+lscolors
+vmd: sudo pip3 install vmd
+lowdown
+zathura
+mcomix
+brew install moar
+rip: cargo install rm-improved
+cp w3mimagedisplay from /usr/lib/w3m to PATH
+apt install mupdf-tools
+apt-install mplayer
+apt install exittool
+apt install fzf
+apt install ffmpegthumbnailer
+nkh: piper, perl, ...
+apt install moreutils
+apt install rlwrap
+image_bg must exist

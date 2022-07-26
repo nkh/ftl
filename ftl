@@ -2,18 +2,13 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-tab=0 ; tabs+=("$PWD") ; ntabs=1 ; : ${prev_all:=1} ; : ${pdir_only[tab]:=} ; : ${find_auto:=README} ; max_depth[tab]=1 ; : ${zoom:=0} ; zooms=(70 50 30) ; mh='Creating montage ...'
-tbcolor 67 67 ; quick_display=512 ; cursor_color='\e[7;34m' ; : ${imode[tab]:=0} ; lmode[tab]=0 ; : ${show_line:=1} ; show_size=0 ; show_date=1 ; : ${etag:=0} ; flips=(' ' ' ')
-ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv'; : ${sort_type0:=0} ; sort_filters=(-k3 -n -k2)
-fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214" ;  fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
-sglyph=( ⍺ 🡕 ) ; iglyph=('' ᴵ ᴺ) ; lglyph=('' ᵈ ᶠ) ; tglyph=('' ¹ ² ³ D) ; ftl_cfg="$HOME/.config/ftl" ; pgen="$ftl_cfg/generators" ; : ${shell_file:=0} ; auto_tags=1 ; pdhl=
-
-declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; export ftl_root=$ftl_cfg/var ; ftl_cmds=$ftl_root/cmds ; ghist=$ftl_root/history ; RM="rm -rf"
-mkapipe 4 5 6 ; echo -en '\e[?1049h' ; stty -echo ; my_pane=$(pid_2_pane $$) ; thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; $pushd "$dir" &>/dev/null ; dir_done=56fbb22f2967 
+. ~/.ftlrc || . ~/.config/ftl/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; mkapipe 4 5 6 
+tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
+echo -en '\e[?1049h' ; stty -echo ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; } ;
-fsp=$pfs/prev ; . ~/.ftlrc || . ~/.config/ftl/ftlrc ; marks[$"'"]="$(tail -n1 $ghist)" ; PPWD="$dir" ; rfilters[tab]=$rfilter0 
+fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
 while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && try bindings ; kbdf ; winch=1 ; REPLY= ; done
@@ -39,7 +34,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[chmod_x]})		for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ;;
 	${C[clear_filters]})	filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ;;
 	${C[command_prompt]})	echo -ne "\e[H" ; tput cnorm ; stty echo ; C=$(cmd_prompt) ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" || list ;;
-	${C[command_mapping]})	for k in "${!C[@]}" ; do printf "%-17s %-5s\t\n" $k ${shortcuts[$k]} ; done | sort | column -c 150 | fzf-tmux $fzf_opt --tiebreak=begin ; list ;;
+	${C[command_mapping]})	for k in "${!C[@]}" ; do printf "%-17s %-5s\t\n" $k ${shortcuts[$k]} ; done | sort | column -c $CMD_COLS | fzf-tmux $fzf_opt --tiebreak=begin ; list ;;
 	${C[copy]})		prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ;;
 	${C[copy_clipboard]})	printf "%q " "${selection[@]}" | xsel -b -i ;;
 	${C[create_bulk]})	tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ;;
@@ -222,7 +217,7 @@ pdir()      { [[ -d "$n" ]] && { ((extmode)) && pdir_tree || { [[ "$montage" ]] 
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$mh" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
 pdir_only() { [[ "${pdir_only[tab]}" ]] && { tcpreview ; true ; } || false  ; }
-pdir_tree() { ((extmode==1)) && ctsplit "dust -r -f \"$n\" | cat | tail -n +2 ; read -sn1" || ctsplit "ncdu \"$n\"" ; true ; }
+pdir_tree() { ctsplit "ncdu \"$n\"" ; true ; }
 phtml()     { [[ $e == html ]] &&  { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; } ; }
 pignore()   { [[ $e ]] && ((pignore["${e@Q}"])) && { mime_get ; in_pdir= ; in_vipreview= ; ptype ; true ; } || false ; }
 pimage()    { [[ $e =~ $ifilter ]] && pw3image ; }
@@ -230,7 +225,7 @@ plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" 
 pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less -R <$(gen_exift) ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; true ; } ; } ; }
 pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null ${n@Q}" ; true ; } ; }
-pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "vmd \"$n\" | /usr/bin/less -R" || ctsplit "lowdown -Tterm \"$n\" | /usr/bin/less -R -S" ; true ; } ; }
+pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "vmd \"$n\" | /usr/bin/less -R" || ctsplit "lowdown -Tterm \"$n\" | $PAGER" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
@@ -276,7 +271,7 @@ inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 kbdf()      { [[ $REPLY != $'\e' && $REPLY != "[" && $leader_command != 1 ]] && while read -t 0.01 ; do : ; done ; }
 cdfl()      { true 2>&- >&3 && { [[ $REPLY == ${C[quit]} ]] && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
-mime_get()  { perl -le "-B qq~$n~ ? exit 0 : exit 1" && is_bin=1 || is_bin=0 ; [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$(mimemagic "$n")" ; } ;  mtype="${mime[$n]}" ; false ; }
+mime_get()  { perl -le "-B qq~$n~ ? exit 0 : exit 1" && is_bin=1 || is_bin=0 ; [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$(mimetype -b "$n")" ; } ; mtype="${mime[$n]}" ; false ; }
 mime_cache(){ while IFS=$': ' read fm mm ; do mime[$PWD/$fm]="$mm" ; done < <(mimemagic "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }
