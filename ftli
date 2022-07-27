@@ -29,6 +29,7 @@ echo -e "0;1;$img_x;$img_y;$img_sw;$img_sh;;;;;$image\n4;\n3;" >&7 ;
 	((img_sh < pane_h)) && echo -e "0;1;$img_x;$((img_y+img_sh));$pane_w;$((pane_h - img_sh));;;;;$image_bg\n4;\n3;" >&7
 	}
 
+# echo CLEAN: $CLEAN_IMAGE, FONT: $FONT_W \* $FONT_H
 # echo TOP: $TOP, LEFT: $LEFT, LINES: $LINES, COLS: $COLS, LINES: $LINES, COLS: $COLS, RIGHT: $((img_x + pane_w)), pane_w: $pane_w, pane_h: $pane_h
 # echo -e "img_x: $img_x,img_y: $img_y, img_w: $img_w, img_h: $img_h, $img_y, img_sw: $img_sw, img_sh: $img_sh"
 # ((img_sw < pane_w)) && echo redraw right $((img_x+img_sw)) $img_y $((pane_w - img_sw)) $img_sh
@@ -54,3 +55,4 @@ image_bg="$HOME/.config/ftl/image_bg.png"
 
 [[ -e "$2" ]] && pw3image "$2"
 while read -r n ; do pw3image "$n" ; done
+

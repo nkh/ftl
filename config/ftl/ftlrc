@@ -17,13 +17,14 @@ prev_all=1
 zoom=0 ; zooms=(70 50 30)
 mh='Creating montage ...'
 find_auto=README
-tbcolor 67 67
 cursor_color='\e[7;34m' ;
 quick_display=512
 show_line=1
 show_size=0
 show_date=1
 show_tar=0
+tbcolor 67 67
+TBCOLORS='236 52'
 
 # use external tags
 etag=0
@@ -39,14 +40,22 @@ ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv';
 fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
 
-GPGID=CHANGE.ME
-PAGER="moar --no-statusbar -no-linenumbers"
+#external commands
+FTLI_CLEAN=0  # set to 1 if not using konsole
+FTLI_W=10
+FTLI_H=19
 
-# how you want your files deleted
+GPGID=CHANGE.ME
+MD_PAGER="moar --no-statusbar -no-linenumbers"
+HEXEDIT=hexedit
+SHRED=shred
+MIMETYPE=mimemagic
+NCDU=ncdu
 RM="rm -rf"
-# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
-# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
-# RM=my_delete
+	# how you want your files deleted
+	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
+	# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
+	# RM=my_delete
 
 # external viewers and previewers
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }

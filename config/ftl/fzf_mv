@@ -1,3 +1,5 @@
+#!/bin/bash
+
 read -r -d '' destinations << EOM
 $HOME/downloads/video
 $HOME/downloads/projects/house

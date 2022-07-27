@@ -8,9 +8,14 @@ vmd: sudo pip3 install vmd
 lowdown
 zathura
 mcomix
+fzf script
+perl
+treewhatever perl module
 brew install moar
 rip: cargo install rm-improved
 cp w3mimagedisplay from /usr/lib/w3m to PATH
+apt install libvips-tools
+apt install unrar
 apt install mupdf-tools
 apt-install mplayer
 apt install exittool
