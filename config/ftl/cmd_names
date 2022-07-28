@@ -38,6 +38,7 @@ go_fzf
 go_rg
 goto_alt1
 goto_alt2
+goto_entry
 history
 hexedit
 image_fzf

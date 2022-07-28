@@ -18,7 +18,10 @@ zoom=0 ; zooms=(70 50 30)
 msg_m='Creating montage ...'
 msg_du='Computing dir sizes ...'
 find_auto=README
-cursor_color0='\e[7;34m' ;
+line_color0="\e[2;40;90m"
+line_color="$line_color0"
+line_color_hi="\e[38;5;240m"
+cursor_color0='\e[7;34m'
 cursor_color="$cursor_color0"
 cursor_color_search='\e[7;35m'
 quick_display=512
@@ -126,6 +129,7 @@ declare -A C=(	[back]="h"
 		[go_rg]="\}"
 		[goto_alt1]="${A[g]}"
 		[goto_alt2]="${SA[g]}"
+		[goto_entry]="ö"
 		[history]="H"
 		[hexedit]="${A[x]}"
 		[image_fzf]="${SA[i]}"
