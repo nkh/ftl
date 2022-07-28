@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-. ~/.ftlrc || . ~/.config/ftl/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env ; mkapipe 4 5 6 
+. ~/.ftlrc || . ~/.config/ftl/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
@@ -112,7 +112,7 @@ ext_bindings || case "${REPLY: -1}" in
 	${C[shell_zoomed]})	{ [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ;;
 	${C[show_etag]})	((etag^=1)) ; cdir ;;
 	${C[show_hidden]})	((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ;;
-	${C[show_size]})	((show_size ^= 1)) || { ((show_size ^= 1)) ; ((show_dir_size ^= 1)) ; } || show_size=0 ; cdir ;;
+	${C[show_size]})	((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((show_size == 3)) && dir_dusize ; cdir ;;
 	${C[show_stat]})	((show_stat ^= 1)) ; refresh ; list ;;
 	${C[sort_reverse]})	[[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; cdir '' "$f";;
 	${C[sort]})		((sort_type[tab] = sort_type[tab] + 1 >= ${#sort_filters[@]} ? 0 : sort_type[tab] + 1)) ; cdir '' "$f" ;;
@@ -159,7 +159,7 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	[[ ! -r "$pnc" ]] && pc="\e[7m$pnc\e[m" ; [[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
 	[[ "$pnc" =~ '.' ]] && { e=${pnc##*.} ; ((lignore[${e@Q}])) && continue ; } ; pl=${#pnc}
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
-	((show_size)) && { ((sum += size, pl += 5)) ; [[ -d "$pnc" ]] && { ((show_dir_size)) && pc="$(dsize "$pnc") $pc" || pc="     $pc" ; true ; } \
+	((show_size)) && { ((sum += size, pl += 5)) ; [[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="     $pc" ; true ; } \
 			 || { for u in '' K M G T ; do ((size < 1024)) && printf -v pc "\e[94m%4s\e[m $pc" $size$u && break ; ((size/=1024)) ; done  ; } ; }
 	((show_line)) && { ((line++)) ; printf -v pc "\e[2;40;90m%-${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += 4)) ; }
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
@@ -215,7 +215,7 @@ pcbr()      { [[ $e == cbr ]] && { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen
 pcbz()      { [[ $e == cbz ]] && { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$f" "$thumbs/cbz" ; pw3image "$t" ; true ; } ; }
 pdir()      { [[ -d "$n" ]] && { ((extmode)) && pdir_tree || { [[ "$montage" ]] && pdir_image || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; } ; } || { in_pdir= ; pdir_only ; } ; }
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
-pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$mh" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
+pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
 pdir_only() { [[ "${pdir_only[tab]}" ]] && { tcpreview ; true ; } || false  ; }
 pdir_tree() { ctsplit "$NCDU \"$n\"" ; true ; }
 phtml()     { [[ $e == html ]] &&  { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; } ; }
@@ -225,7 +225,7 @@ plock()     { [[ -e "$fs/lock_preview/$n" ]] && vipreview "$fs/lock_preview/$n" 
 pmp3()      { [[ $e == mp3 ]] && { pmlive || { ctsplit "/bin/less -R <$(gen_exift) ; read -sn1" ; } ; } ; }
 pmp4()      { [[ $e =~ mkv|mp4|flv ]] && { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; true ; } ; } ; }
 pmlive()    { ((extmode)) && { mplayer_k ; ctsplit "cat $(gen_exift) ; mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null ${n@Q}" ; true ; } ; }
-pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "vmd \"$n\" | $MD_PAGER" || ctsplit "lowdown -Tterm \"$n\" | $MD_PAGER" ; true ; } ; }
+pmd()       { [[ $e =~ ^md|MD$ ]] && { ((extmode)) && ctsplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || ctsplit "$MD_RENDER1 \"$n\" | $MD_PAGER" ; true ; } ; }
 pshell()    { [[ $mtype == 'application/x-shellscript' ]] && vipreview "$n" ; }
 ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
@@ -249,7 +249,9 @@ delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delet
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 def_sub()   { for def in "$@" ; do local sub=${def%%:*} ; local body=${def:((${#sub}+1))} ; type "$sub" &>/dev/null || eval "$sub(){ ${body:-:} ; }" ; done ; }
-dsize()     { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
+dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m%4s\e[m" "${du_size[$PWD/$1]}" ; }
+dir_esize() { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
+dir_dusize(){ header '' "$msg_du" ; declare -Ag du_size="($(du -h | perl -ne '($s, $f) = m/(.*)?\t.\/(.*)/ ; printf qq:['$PWD'/$f]="%4s" :, $s'))" ; header '' "$head" ; }
 edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; emode=0 ; cdir ; }
 files()     { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1  -printf '%s\t%T@\t%P\n' 2>&- | ftl_filter | $2 ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg "${filters[tab]}" | rg "${filters2[tab]}" | { [[ "${rfilters[tab]}" ]] && rg -v "${rfilters[tab]}" || cat ; } | filter2 ; }
@@ -306,7 +308,7 @@ save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$
 			sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
 			imode[tab]=${imode[tab]}; xxx=0						; sort_type[tab]=${sort_type[tab]}
 			ftag=$ftag		; filters[tab]=\"${filters[tab]}\"		; filters2[tab]=\"${filters2[tab]}\" 
-			etag=$etag		; show_size=$show_size				; show_dir_size=$show_dir_size" ; }
+			etag=$etag		; show_size=$show_size" ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
 tab_new()   { dir="$1" ; [[ "$dir" == '.' ]] && dir= ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; rfilters[tab]=$rfilter0 ; }
 tab_next()  { ((tab++)) ; for i in "${tabs[@]:$tab}" TAB_RESET "${tabs[@]}" ; do [[ "$i" == TAB_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; true ; }

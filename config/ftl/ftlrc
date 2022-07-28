@@ -15,12 +15,13 @@ auto_tags=1
 pdhl=
 prev_all=1
 zoom=0 ; zooms=(70 50 30)
-mh='Creating montage ...'
+msg_m='Creating montage ...'
+msg_du='Computing dir sizes ...'
 find_auto=README
 cursor_color='\e[7;34m' ;
 quick_display=512
 show_line=1
-show_size=0
+show_size=0 # 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
 show_date=1
 show_tar=0
 tbcolor 67 67
@@ -41,12 +42,14 @@ fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
 
 #external commands
-FTLI_CLEAN=0  # set to 1 if not using konsole
+FTLI_CLEAN=0 # set to 1 if not using konsole
 FTLI_W=10
 FTLI_H=19
 
 GPGID=CHANGE.ME
 MD_PAGER="moar --no-statusbar -no-linenumbers"
+MD_RENDER1='lowdown -Tterm'
+MD_RENDER2='vmd'
 HEXEDIT=hexedit
 SHRED=shred
 MIMETYPE=mimemagic
