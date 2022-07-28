@@ -5,13 +5,13 @@ ext_bindings()
 [[ "$super_leader_command" ]] && { super_leader_command ; return ; }
 
 ((incremental_search)) && case "${REPLY: -1}" in 
-	'') incremental_search=0 ; cursor_color='\e[7;34m' ; REPLY="${C[refresh]}" ;;
+	'') incremental_search=0 ; cursor_color="$cursor_color0" ; to_search= ; REPLY="${C[refresh]}" ;;
 	 *) to_search="$to_search$REPLY" ; REPLY="${C[find_next]}"
 esac && return 1
 
 case "${REPLY: -1}" in
 	' '        ) leader_command=1 ;;
-	${C[find]} ) to_search= ; incremental_search=1 ; cursor_color='\e[7;35m' ; list ;;
+	${C[find]} ) to_search= ; incremental_search=1 ; cursor_color="$cursor_color_search" ; list ;;
 	*          ) false ;;
 esac
 }
