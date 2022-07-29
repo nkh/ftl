@@ -33,7 +33,7 @@ show_tar=0
 tbcolor 67 67
 TBCOLORS='236 52'
 
-# use external tags
+# external tags
 etag=0
 #. $ftl_cfg/external_tags/git ; etag=1
 
@@ -53,6 +53,12 @@ FTLI_W=10
 FTLI_H=19
 
 GPGID=CHANGE.ME
+
+G_PLAYER=vlc
+T_PLAYER="mplayer -vo null"
+T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null'
+PREVIEW_SHOW="$ftl_cfg/viewers/cmus"
+
 PAGER_ANSI='/usr/bin/less -R'
 MD_PAGER='moar --no-statusbar -no-linenumbers'
 MD_RENDER1='lowdown -Tterm'
@@ -144,7 +150,7 @@ declare -A C=(	[back]="h"
 		[mark]="m"
 		[montage_clear]="${SA[m]}"
 		[montage_preview]="${A[m]}"
-		[mplayer_kill]="a"
+		[player_kill]="a"
 		[find_next]="n"
 		[pane_down]="_"
 		[pane_left]="\<"
@@ -180,7 +186,7 @@ declare -A C=(	[back]="h"
 		[shell]="s"
 		[shell_files]="S"
 		[shell_zoomed]="⍰"
-		#[shell_pop]=""
+		[shell_pop]="⍰"
 		[shell_file]="X"
 		[shell_synch]="${SA[0]}"
 		[shell_view]="!"

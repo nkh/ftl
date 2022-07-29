@@ -51,7 +51,7 @@ mark_fzf
 mark_go
 montage_clear
 montage_preview
-mplayer_kill
+player_kill
 pane_L
 pane_R
 pane_down
