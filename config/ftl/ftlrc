@@ -5,12 +5,13 @@ ftl_root=$ftl_cfg/var
 ftl_cmds=$ftl_root/cmds
 ghist=$ftl_root/history
 thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; 
+help_file="$ftl_cfg/help"
 
 # marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
 #options 
-shell_file=0
+shell_h=40%
 auto_tags=1
 pdhl=
 prev_all=1
@@ -43,7 +44,7 @@ iglyph=('' ᴵ ᴺ)
 lglyph=('' ᵈ ᶠ)
 tglyph=('' ¹ ² ³ D) 
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv';
-fzf_opt="-p 80% --cycle --reverse --info=inline --color=hl+:214,hl:214"
+fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
 
 #external commands
@@ -52,7 +53,8 @@ FTLI_W=10
 FTLI_H=19
 
 GPGID=CHANGE.ME
-MD_PAGER="moar --no-statusbar -no-linenumbers"
+PAGER_ANSI='/usr/bin/less -R'
+MD_PAGER='moar --no-statusbar -no-linenumbers'
 MD_RENDER1='lowdown -Tterm'
 MD_RENDER2='vmd'
 HEXEDIT=hexedit
@@ -134,7 +136,8 @@ declare -A C=(	[back]="h"
 		[hexedit]="${A[x]}"
 		[image_fzf]="${SA[i]}"
 		[image_mode]="M"
-		[link]="L"
+		[link]="${A[l]}"
+		[follow_link]="${SA[l]}"
 		[mark_fzf]="´" # alt-gr \' 
 		[mark_go]="'"
 		[mark_go_tab]="${SA["'"]}"
@@ -157,8 +160,8 @@ declare -A C=(	[back]="h"
 		[preview_hide_ext]="\%"
 		[preview_hide_clr]="\&"
 		[preview_image]="\""
-		[preview_lock]="${SA[l]}"
-		[preview_lock_clr]="${A[l]}"
+		[preview_lock]="⍰" 
+		[preview_lock_clr]="⍰"
 		[preview_m1]="${A[v]}"
 		[preview_m2]="${SA[v]}"
 		[preview_once]="V"
@@ -175,7 +178,8 @@ declare -A C=(	[back]="h"
 		[refresh]="r"
 		[rename]="R"
 		[shell]="s"
-		[shell_zoomed]="S"
+		[shell_files]="S"
+		[shell_zoomed]="⍰"
 		#[shell_pop]=""
 		[shell_file]="X"
 		[shell_synch]="${SA[0]}"

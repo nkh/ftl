@@ -1,27 +1,47 @@
+apt install :
 tmux
 vim
 ack
-ripgrep
-fdfind
-lscolors
-vmd: sudo pip3 install vmd
-lowdown
 zathura
 mcomix
-fzf script
+fzf
 perl
-treewhatever perl module
-brew install moar
-rip: cargo install rm-improved
-cp w3mimagedisplay from /usr/lib/w3m to PATH
-apt install libvips-tools
-apt install unrar
-apt install mupdf-tools
-apt-install mplayer
-apt install exittool
-apt install fzf
-apt install ffmpegthumbnailer
-nkh: piper, perl, ...
-apt install moreutils
-apt install rlwrap
+rustlang
+fdfind
+ripgrep
+rlwrap
+xdotool
+wmctrl
+libvips-tools
+unrar
+mupdf-tools
+mplayer
+exittool
+fzf
+ffmpegthumbnailer
+moreutils
+moreutils
+python-pip3
+
+pip3 install:
+vmd
+
+cargo install (https://www.rust-lang.org/tools/install):
+lscolors
+
+perl :
+treewhatever (https://github.com/nkh/treewhatever)
+piper (https://github.com/nkh/P5-App-Piper)
+
+non packet manager:
+fzf script
+
 image_bg must exist
+cp w3mimagedisplay from /usr/lib/w3m to PATH
+link files in ~/.config
+
+optional: 
+brew install moar
+cargo install rm-improved
+https://kristaps.bsd.lv/lowdown/
+

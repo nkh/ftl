@@ -110,7 +110,7 @@ shell_command()
 
 [[ "$1" =~ ^tree ]] && \
 	{
-	tmux popup -h 90% -w 90% -E -d "$PWD" "$@ -C | less -R"
+	tmux popup -h 90% -w 90% -E -d "$PWD" "$@ -C | $PAGER_ANSI"
 	return
 	}
 
