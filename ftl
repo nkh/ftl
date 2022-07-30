@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-. ~/.ftlrc || . ~/.config/ftl/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
+. $CFG/ftlrc || . $CFG/etc/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
@@ -17,7 +17,7 @@ while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}"
 bindings()
 {
 pdh "$REPLY\n"
-ext_bindings || case "${REPLY: -1}" in
+user_bindings || extra_bindings || case "${REPLY: -1}" in
 	${C[goto_entry]}) line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ;;
 	${C[hexedit]})		tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ;;
 	${C[help]})		<"$help_file" fzf-tmux $fzf_opt --tiebreak=begin --header="$(echo -e "\t\t")""⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader" ; list ;;
@@ -331,4 +331,6 @@ tselectp()  { [[ "$1" =~ ^% ]] && tmux selectp -t $1 || tmux selectp -t $pane_id
 winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh]}$R" ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
-def_sub etag_dir etag_tag 'ext_bindings:false' externals previewers ; . ~/.config/ftl/ftl.eb ; [[ $TMUX ]] && ftl "$@" || echo 'ftl: run in tmux'
+def_sub etag_dir etag_tag 'user_bindings:false' 'extra_bindings:false' externals previewers
+CFG="$HOME/.config/ftl" ; . $CFG/user_bindings || . $CFG/etc/extra_bindings ; [[ $TMUX ]] && ftl "$@" || echo 'ftl: run in tmux'
+

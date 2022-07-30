@@ -1,4 +1,4 @@
-ext_bindings()
+extra_bindings()
 {
 # handle leader + user defined shortcut
 ((leader_command)) && { leader_command ; return ; }
