@@ -6,6 +6,7 @@ ftl_cmds=$ftl_root/cmds
 ghist=$ftl_root/history
 thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; 
 help_file="$ftl_cfg/help"
+generators="$ftl_cfg/generators"
 
 # marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")

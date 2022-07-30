@@ -1,3 +1,7 @@
+. $FTL_CFG/etc/extra_commands/compress
+. $FTL_CFG/etc/extra_commands/optimize
+. $FTL_CFG/etc/extra_commands/shell
+
 extra_bindings()
 {
 # handle leader + user defined shortcut
@@ -43,95 +47,6 @@ case "$super_leader_command" in
 esac
 
 super_leader_command=
-}
-
-compress()
-{
-new_file=
-[[ $e =~ rar ]] && unrar e "$f" || \
-[[ $e =~ tar ]] && tar -xf "$f" || \
-[[ $e =~ zip ]] && unzip "$f" || \
-{ prompt 'tar.bz2 file: ' ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" && new_file="$REPLY" ; }
-
-tags=() ; cdir '' "$new_file" ; true
-}
-
-image_optimize()
-{
-[[ $e == jpg ]] && { cp "$f" "$b.original.$e" ; jpegoptim --size=50% "$f" ; cdir '' "$f" ; }
-[[ $e == png ]] && { mv "$f" "$b.original.$e" ; convert "$b.original.$e" -quality 90% "$b.jpg" ; cdir '' "$b.jpg" ; }
-true
-}
-
-pdf_optimize()
-{
-cp "$f" "$b.original.$e"
-ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$f "$b.original.$e"
-# -dFILTERIMAGE: produces an output where all raster images are removed.
-# -dFILTERTEXT: produces an output where all text elements are removed.
-# -dFILTERVECTOR: produces an output where all vector drawings are removed.
-# also: pdfimages, part of the poppler-utils package
-cdir '' "$f"
-}
-
-video_optimize()
-{
-mv "$f" "$b.original.$e"
-id=ftl$$$(date +%s%N)
-tmux new-session -d -s $id "ffmpeg -i '$b.original.$e' -vcodec libx265 -crf 24 '$f' ; tmux popup -h 5 echo Done re-encoding '$n'"
-cdir ''  "$b.original.$e"
-}
-
-shell_command()
-{
-[[ "$1" == 0 ]] && { return 1 ; }
-[[ "$1" =~ ^[1-9][0-9]*$ ]] && { file="${files[(($1 - 1))]}"  ; [[ -d "$file" ]] && cdir "$file" || list $(($1 - 1)) ; return 1 ; }
-
-[[ "$1" =~ ^etags ]] && \
-	{
-	p=~/.config/ftl/external_tags ; file="${1#etags }"
-
-	[[ -f "$p/$file" ]] && \
-		{ . $p/$file $fs ; etag=1 ; cdir ; } || \
-		{ file=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $file ]] && { . $p/$file $fs ; etag=1 ; cdir ; } ; }
-
-	return
-	}
-
-[[ "$1" == "load_tags" ]] && \
-	{
-	# eg: select all files in a directory: fd -a . > $ftl_root/load_tags 
-	[[ -s "$fs/load_tags" ]] \
-		&& { <"$fs/load_tags" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
-		|| tmux popup "echo -n ftl: no such file '$fs/load_tags'"
-
-	return
-	}
-
-[[ "$1" =~ ^tree ]] && \
-	{
-	tmux popup -h 90% -w 90% -E -d "$PWD" "$@ -C | $PAGER_ANSI"
-	return
-	}
-
-[[  ${C[$1]} ]] && R=${C[$1]} && return
-
-# shell command
-# todo: pass selection to session context
-# todo: keep window open
-
-[[ "$1" =~ ^-s ]] &&
-	{
-	[[ "$1" =~ ^-sl ]] && for n in "${selection[@]}" ; do tscommand "${1#-sl}" "-e n=${n@Q}" ; done || { tscommand "${1#-s}" "-e n=${n@Q}" ; }
-	cdir ; return
-	}
-
-tcpreview ; s="${selection[@]}" ; echo -en '\e[?1049l'
-
-[[ "$1" =~ ^-l ]] && for n in "${selection[@]}" ; do eval "echo -e '\e[2;33m[$(date -R)] $PWD > $1\e[m' ; ${1#-l} ; echo «$?»" ; done \
-	|| eval "echo -e '\e[2;33m[$(date -R)] $PWD > $1\e[m' ; $1 ; echo «$?»"
-
-read -sn 1 ; echo -en '\e[?1049h' ; cdir
 }
 
 # vim: set filetype=sh :

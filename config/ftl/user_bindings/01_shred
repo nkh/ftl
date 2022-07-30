@@ -1,0 +1,14 @@
+
+shred_command() { :  ; }
+
+# help shred  short explantion
+	#add line at end of help file
+
+# command shredd # register command
+# help_key shred, ? shred
+
+# setting shortcut
+# setting shortcut leader
+# setting shortcut super leader
+
+# vim: set filetype=sh :

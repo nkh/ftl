@@ -1,0 +1,9 @@
+. $FTL_CFG/etc/extra_bindings
+
+for b in $(fd  . "$FTL_CFG/user_bindings" --type f | grep -v "$FTL_CFG/user_bindings/bindings" | sort -u)
+	do
+		. $b
+	done
+
+# vim: set filetype=sh :
+

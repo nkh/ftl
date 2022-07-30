@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-. $CFG/ftlrc || . $CFG/etc/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
+. $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ; my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
@@ -16,9 +16,8 @@ while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}"
 
 bindings()
 {
-pdh "$REPLY\n"
-user_bindings || extra_bindings || case "${REPLY: -1}" in
-	${C[goto_entry]}) line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ;;
+case "${REPLY: -1}" in
+	${C[goto_entry]})	line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ;;
 	${C[hexedit]})		tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ;;
 	${C[help]})		<"$help_file" fzf-tmux $fzf_opt --tiebreak=begin --header="$(echo -e "\t\t")""⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader" ; list ;;
 	h|D)			[[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ;;
@@ -153,7 +152,7 @@ tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep=
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && . .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
-((gpreview)) || nice -15 $ftl_cfg/generators/generator $thumbs &
+((gpreview)) || nice -15 $generators/generator $thumbs &
 
 declare -A uniq_file ; pad=(* ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
@@ -265,7 +264,7 @@ ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]
 fzf_go()    { { IFS= read m ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { d="$(dirname "$p")" ; [[ -n $m ]] && tab_new "$d" ; cdir "$d" "$(basename "$p")" ; } || list ; }
 fzf_rg_go() { { IFS= read m ; IFS= read p ; } <<<"$1" ; [[ "$p" ]] && { g=${p%%:*} && d="$PWD/"$(dirname "$g") ; [[ -n $m ]] && tab_new "$d" ; cdir "$d" "$(basename "$g")" ; } || list ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
-gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $ftl_cfg/generators/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }
+gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $generators/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
@@ -332,5 +331,5 @@ winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLI
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
 def_sub etag_dir etag_tag 'user_bindings:false' 'extra_bindings:false' externals previewers
-CFG="$HOME/.config/ftl" ; . $CFG/user_bindings || . $CFG/etc/extra_bindings ; [[ $TMUX ]] && ftl "$@" || echo 'ftl: run in tmux'
+[[ $TMUX ]] && { FTL_CFG="$HOME/.config/ftl" ; . $FTL_CFG/user_bindings/bindings 2>&- || . $FTL_CFG/etc/extra_bindings ; ftl "$@" ; } || echo 'ftl: run in tmux'
 
