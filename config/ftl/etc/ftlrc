@@ -89,19 +89,20 @@ declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
 declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z [·]='.' [¥]=6)
 
-declare -A C=(	[back]="h"
-		[back_arrow]="D"
+declare -A C=(	
+		[move_left]="h"
+		[move_left_arrow]="D"
 		[move_down]="j"
 		[move_down_arrow]="B"
 		[move_up]="k"
 		[move_up_arrow]="A"
-		[forward]="l"
-		[forward_arrow]="C"
-		[page_up]=5
-		[page_down]=6
+		[move_right]="l"
+		[move_right_arrow]="C"
+		[move_page_up]=5
+		[move_page_down]=6
 
 		[help]="\?"
-		[cd]="G"
+		[change_dir]="G"
 		[chmod_x]="x"
 		[clear_filters]="${A[d]}"
 		[command_prompt]=":"
@@ -111,19 +112,19 @@ declare -A C=(	[back]="h"
 		[create_bulk]="${A[i]}"
 		[create_dir]="I"
 		[create_file]="i"
-		[delete]="d"
+		[delete_selection]="d"
 		[depth]="\*"
 		[editor_detach]="\$"
 		[external_mode1]="e"
 		[external_mode2]="E"
 		[external_mode3]="${A[e]}"
 		[external_mode4]="${SA[e]}"
-		[filter]="f"
+		[set_filter]="f"
 		[file_dir_mode]="\)"
-		[filter2]="F"
+		[set_filter2]="F"
 		[filter_ext]="${A[f]}"
 		[filter_reverse]="${SA[f]}"
-		[find]="/"
+		[find_entry]="/"
 		[find_fzf]="b"
 		[find_fzf_all]="${A[b]}"
 		[find_fzf_dirs]="${SA[b]}"
@@ -139,7 +140,7 @@ declare -A C=(	[back]="h"
 		[goto_alt1]="${A[g]}"
 		[goto_alt2]="${SA[g]}"
 		[goto_entry]="ö"
-		[history]="H"
+		[history_go]="H"
 		[hexedit]="${A[x]}"
 		[image_fzf]="${SA[i]}"
 		[image_mode]="M"
@@ -158,8 +159,8 @@ declare -A C=(	[back]="h"
 		[pane_right]="\>"
 		[pane_L]="\¦"
 		[pane_R]="\|"
-		[pane_next]="\-"
-		[pdh]="¿"
+		[pane_go_next]="\-"
+		[pdh_pane]="¿"
 		[preview_down]="J"
 		[preview_up]="K"
 		[preview_dir_only]="\="
@@ -176,13 +177,13 @@ declare -A C=(	[back]="h"
 		[preview_show]="w"
 		[preview_size]="+"
 		[preview_tail]="${A[z]}"
-		[preview]="v"
+		[preview_pane]="v"
 		[find_previous]="N"
 		[quit_all]="Q"
 		[quit_keep_shell]="${A[q]}"
 		[quit_keep_zoom]="${SA[q]}"
-		[quit]="q"
-		[refresh]="r"
+		[quit_ftl]="q"
+		[refresh_pane]="r"
 		[rename]="R"
 		[shell]="s"
 		[shell_files]="S"
@@ -195,8 +196,8 @@ declare -A C=(	[back]="h"
 		[show_hidden]="."
 		[show_size]="${A[s]}"
 		[show_stat]="\^"
-		[sort]="o"
-		[sort_reverse]="O"
+		[sort_entries]="o"
+		[sort_entries_reverse]="O"
 		[tab_new]="${SA[s]}"
 		[tab_next]=$'\t'
 		[tag_all]="${SA[y]}"
@@ -221,15 +222,18 @@ declare -A C=(	[back]="h"
 		[SIG_SYNCH_SHELL]=0
 		)
 
-declare -A shortcuts
+declare -A shortcuts shortcut_to_command
 for k in "${!C[@]}"
 	do
 		{ [[ -n "${LA[${C[$k]}]}" ]]  && shortcuts[$k]="⇑${LA[${C[$k]}]}/${C[$k]}" ; } ||
 		{ [[ -n "${LSA[${C[$k]}]}" ]] && shortcuts[$k]="⇈${LSA[${C[$k]}]}/${C[$k]}" ; } ||
 		                                 shortcuts[$k]="${C[$k]}"
+		
+		shortcut_to_command[${C[$k]}]="$k"
 	done
 
 shortcuts[tab_next]="TAB"
+shortcuts[enter]="ENTER"
 
 # vim: set filetype=sh :
 
