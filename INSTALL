@@ -1,27 +1,29 @@
 apt install :
-tmux
-vim
 ack
-zathura
-mcomix
-fzf
-perl
-rustlang
+exittool
 fdfind
+ffmpegthumbnailer
+fzf
+fzf
+libvips-tools
+mcomix
+moreutils
+moreutils
+mplayer
+mupdf-tools
+perl
+python-pip3
+qutebrowser
 ripgrep
 rlwrap
-xdotool
-wmctrl
-libvips-tools
+rustlang
+tmux
 unrar
-mupdf-tools
-mplayer
-exittool
-fzf
-ffmpegthumbnailer
-moreutils
-moreutils
-python-pip3
+vim
+vlc
+wmctrl
+xdotool
+zathura
 
 pip3 install:
 vmd
