@@ -24,6 +24,7 @@ vlc
 wmctrl
 xdotool
 zathura
+zathura-cb
 
 pip3 install:
 vmd

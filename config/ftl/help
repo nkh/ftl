@@ -1,32 +1,32 @@
 		j B       ) next entry                           	?         ) show help
 		k A       ) previous entry                       	5 6       ) page down/up
-		h D       ) parent directory                     	⇈s \t     ) new tab, nexttab
-		l C ''    ) cd or open file                      	> <       ) extra pane
-		g G       ) top/file/bottom, cd                  	_ | ¦     ) extra pane
-		a         ) kill sound preview                   	-         ) next pane or viewer
-		b ⇑b ⇈b   ) fzf find/all/dirs                    	/         ) find
-		c ⇑c      ) copy to, show command mapping        	⇈i        ) fzfi, using ueberzurg
-		d ⇑d ⇈d   ) delete, clear filters/history        	{         ) fzf to file with preview
-		e E       ) external viewer, detached            	}         ) rg to file
-		f F ⇑f ⇈f ) filter1/2, external, reverse         	:         ) go to entry
-		H ⇑h ¨ ⇈h ) fzf history, global, global, edit    	:         ) shell + commands: q, etags, load_tags
-		i I ⇑i    ) new file/directory, bulk             	' '       ) leader key
-		J K       ) scroll preview
-		⇑k        ) clear persistent marks               	, ;       ) persistent mark add/fzf
+		h D       ) parent directory                     	⇈s TAB    ) new tab, nexttab
+		l C ''    ) cd or open file
+		g G       ) top/file/bottom, cd                  	ö Ö ä     ) entry: next =type, next !type, goto
+		a         ) kill sound preview                   	> <       ) extra pane
+		b ⇑b ⇈b   ) fzf find/all/dirs                    	_ | ¦     ) extra pane
+		c ⇑c      ) copy to, show command mapping        	-         ) next pane or viewer
+		d ⇑d ⇈d   ) delete, clear filters/history        	/         ) find
+		e E       ) external viewer, detached            	⇈i        ) fzfi, using ueberzurg
+		f F ⇑f ⇈f ) filter1/2, external, reverse         	{         ) fzf to file with preview
+		H ⇑h ¨ ⇈h ) fzf history, global, global, edit    	}         ) rg to file
+		i I ⇑i    ) new file/directory, bulk
+		J K       ) scroll preview                              :         ) shell + commands: q, etags, load_tags
+		⇑k        ) clear persistent marks               	SPACE     ) leader key
 		⇈l ⇑l     ) create/follow symlink
-		m         ) mark directory and file              	' ⇑'      ) go, fzf to mark
-		M ⇑m ⇈m   ) view mode, montage/refresh           	)         ) file/dir view mode
-		n N       ) find next/previous                   	=         ) preview directory only
-		o O       ) sort type, reverse                   	*         ) maximum listing depth
-		⇑o ⇈O     ) merge tags, fzf
-		p P ⇈p    ) copy/move selection, move to
+		m         ) mark directory and file              	, ;       ) persistent mark add/fzf
+		M ⇑m ⇈m   ) view mode, montage/refresh
+		n N       ) find next/previous                   	' ⇑'      ) go, fzf to mark
+		o O       ) sort type, reverse                   	)         ) file/dir view mode
+		⇑o ⇈O     ) merge tags, fzf                             =         ) preview directory only
+		p P ⇈p    ) copy/move selection, move to                *         ) maximum listing depth
 		q Q ⇑q ⇈q ) quit, forced, keep shell/ zoom
 		r R       ) refresh, rename/bulk rename          	$         ) detach editor preview
-		s S       ) shell pane, with files               	
+		s S       ) shell pane, with files
 		⇑s        ) show/hide size                       	!         ) view shell
 		t T ⇑t    ) fzf tag, +subdir, to clipboard       	¿         ) pdh pane
 		⇈t        ) file preview at end                  	. ⇑. ⇈.   ) show/hide dot-files/etags, etags
-		U u ⇑u    ) untag all, fzf, goto                 	^         ) show/hide stat
+		U u ⇑g    ) untag all, fzf, goto                 	^         ) show/hide stat
 		v V       ) preview hide, once                   	#         ) show/hide extension preview
 		⇑v ⇈v     ) ext. preview mode (media, pdf, tar)  	"         ) show/hide image preview
 		w W       ) terminal player, extra viewers       	+         ) change preview size
