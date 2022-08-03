@@ -29,7 +29,7 @@ chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a
 clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gen_cl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; P=$(cmd_prompt) ; stty -echo ; tput civis ; [[ "$P" ]] && header '' "$head" && shell_command "$P" || list ; }
 gen_cl()		{ ((command_list_generated)) || { for k in "${!C[@]}" ; do echo "$k"  ; done >$fs/command_names ; command_list_generated=1 ; } ; }
-command_mapping()	{ for k in "${!shortcuts[@]}" ; do printf "%-17s %-5s\t\n" $k ${shortcuts[$k]} ; done | sort | column -c $CMD_COLS | fzf-tmux $fzf_opt --tiebreak=begin ; list ; }
+command_mapping()	{ for k in "${!shortcuts[@]}" ; do printf "%-17s %-5s\t\n" "$k" ${shortcuts[$k]} ; done | sort | column -c $CMDCOLS | fzf-tmux $fzf_opt --tiebreak=begin ; list ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
 create_bulk()		{ tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ; }
@@ -119,7 +119,7 @@ tag_all()		{ for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
 tag_moveto()		{ fzf_mv "${selection[@]}" && tags_clear ;  cdir '' "$f"; }
 tag_move()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
-tag_flip()		{ tag_flip "${files[file]}" ; move 1 ; list ; }
+tag_flip_down()		{ tag_flip "${files[file]}" ; move 1 ; list ; }
 tag_flip_up()		{ tag_flip "${files[file]}" ; move -1 ; list ; }
 tag_fzf()		{ fzf_tag T "$(fd -H --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 tag_fzf_all()		{ fzf_tag T "$(fd -H --color=always | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
