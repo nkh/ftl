@@ -48,3 +48,5 @@ brew install moar
 cargo install rm-improved
 https://kristaps.bsd.lv/lowdown/
 
+generate man pages:
+

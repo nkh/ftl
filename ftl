@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-. $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ; . $FTL_CFG/user_bindings/bindings 2>&- || { . $FTL_CFG/etc/bindings/search ; . $FTL_CFG/etc/bindings/leader_ftl ; }
+. $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
@@ -24,8 +24,10 @@ bindings()
 [[ "$REPLY" == $'\e' ]] && REPLY=ESCAPE_SEQ1
 [[ "$REPLY" == '['   ]] && REPLY=ESCAPE_SEQ2
 
+pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
+
    { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
-|| { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && ${iarray[$REPLY]} ; } \
+|| { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && { ((pdh_kfunc)) && pdhn "-> ${iarray[$REPLY]}" ; true ; } && ${iarray[$REPLY]} ; } \
 || key_map=standard_key_map
 }
 

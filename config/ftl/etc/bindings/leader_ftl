@@ -27,4 +27,15 @@ esac
 key_map=standard_key_map
 }
 
+shortcuts[compress]="leader_key+f+c"
+shortcuts[image_optimize]="leader_key+f+i"
+shortcuts[mutt]="leader_key+f+m"
+shortcuts[pdf_optimize]="leader_key+f+p"
+shortcuts[pdf2text]="leader_key+f+P"
+shortcuts[stat]="leader_key+f+s"
+shortcuts[shell_pop]="leader_key+f+t"
+shortcuts[video_optimize]="leader_key+f+v"
+shortcuts[gpg_decrypt]="leader_key+f+x"
+shortcuts[gpg_encrypt]="leader_key+f+z"
+
 # vim: set filetype=bash :

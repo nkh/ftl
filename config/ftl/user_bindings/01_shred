@@ -1,14 +1,15 @@
 
-shred_command() { :  ; }
+# shortcut: leader + s
+declare -Ag leader_key_map
+leader_key() { key_map=leader_key_map ; }
 
-# help shred  short explantion
-	#add line at end of help file
+leader_key_map[s]=shred_command
+shred_command() { prompt "shred ${#selection[@]} entries [yes|N]" ; [[ $REPLY == yes ]] && echo "shred -n 2 -z ${selection[@]}" ; cdir ; false ; }
 
-# command shredd # register command
-# help_key shred, ? shred
+#add line at end of help file
 
-# setting shortcut
-# setting shortcut leader
-# setting shortcut super leader
+#add to command list
+shortcuts[shred]="leader_key+s"
 
-# vim: set filetype=sh :
+# vim: set filetype=bash :
+

@@ -236,5 +236,9 @@ for k in "${!C[@]}"
 
 key_map=standard_key_map
 
+. $FTL_CFG/etc/bindings/search
+. $FTL_CFG/etc/bindings/leader
+. $FTL_CFG/etc/bindings/leader_ftl
+
 # vim: set filetype=sh :
 

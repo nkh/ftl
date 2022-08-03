@@ -4,17 +4,20 @@ leader_key() { key_map=leader_key_map ; }
 
 #----------------------------------------------------------------------
 
-leader_test() { tmux popup "echo -n ftl: leader_test" ; }
 leader_key_map[t]=leader_test
+leader_test() { tmux popup "echo -n ftl: leader_test" ; }
 
 #----------------------------------------------------------------------
+
+leader_key_map[SPACE_KEY]=leader_space
+leader_space() { key_map=super_leader_space ; }
 
 super_leader_space()
 {
 tmux popup "echo -n ftl: super_leader_space + \'$REPLY\'"
 key_map=standard_key_map
 }
-leader_space() { key_map=super_leader_space ; }
-leader_key_map[SPACE_KEY]=leader_space
+
+shortcuts[test]="leader_key+space+t"
 
 # vim: set filetype=bash :
