@@ -16,6 +16,19 @@ fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && try bindings ; kbdf ; winch=1 ; REPLY= ; done
 }
 
+bindings()
+{
+[[ "$REPLY" == ''    ]] && REPLY=ENTER_KEY
+[[ "$REPLY" == ' '   ]] && REPLY=SPACE_KEY
+[[ "$REPLY" == $'\t' ]] && REPLY=TAB_KEY
+[[ "$REPLY" == $'\e' ]] && REPLY=ESCAPE_SEQ1
+[[ "$REPLY" == '['   ]] && REPLY=ESCAPE_SEQ2
+
+   { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
+|| { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && ${iarray[$REPLY]} ; } \
+|| key_map=standard_key_map
+}
+
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
 get_dir() # dir, search
 {

@@ -1,3 +1,5 @@
+. $FTL_CFG/etc/extra_commands/shell
+
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
 ftl_help()		{ <"$help_file" fzf-tmux $fzf_opt --tiebreak=begin --header="$(echo -e "\t\t")""⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader" ; list ; }
@@ -26,7 +28,7 @@ change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || l
 chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
 clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gen_cl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; P=$(cmd_prompt) ; stty -echo ; tput civis ; [[ "$P" ]] && header '' "$head" && shell_command "$P" || list ; }
-gen_cl()		{ ((command_list_generated)) || { for k in "${!C[@]}" ; do echo $k  ; done >$fs/command_names ; command_list_generated=1 ; } ; }
+gen_cl()		{ ((command_list_generated)) || { for k in "${!C[@]}" ; do echo "$k"  ; done >$fs/command_names ; command_list_generated=1 ; } ; }
 command_mapping()	{ for k in "${!shortcuts[@]}" ; do printf "%-17s %-5s\t\n" $k ${shortcuts[$k]} ; done | sort | column -c $CMD_COLS | fzf-tmux $fzf_opt --tiebreak=begin ; list ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }

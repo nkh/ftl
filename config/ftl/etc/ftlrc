@@ -82,15 +82,16 @@ previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd p
 CMD_COLS=150 # columns when displaying command mapping in popup
 
 # Keyboard mappings
-# 0, 7-9 are used by ftl and corresponf to SIG_XXX entries below
+# 0, 7-9 are used by ftl and correspond to SIG_XXX entries below
 
-LEADER=' '
+LEADER_KEY=SPACE_KEY
+
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)
 declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i ['&']=k [Ł]=l [º]=m [Œ]=o [Þ]=p [Ω]=q [®]=r [§]=s [Þ]=t [↑]=u [‘]=v ['>']=x [¥]=y ['<']=z [×]="'" [˙]=. [°]=0 [÷]=/)
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=· [6]=¥)
 declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z [·]='.' [¥]=6)
 
-declare -A C=(	
+declare -A C=(	[leader_key]=$LEADER_KEY
 		[move_left]="h"
 		[move_left_arrow]="D"
 		[move_down]="j"
@@ -101,6 +102,7 @@ declare -A C=(
 		[move_right_arrow]="C"
 		[move_page_up]=5
 		[move_page_down]=6
+		[enter]="ENTER_KEY"
 		[ftl_help]="?"
 		[change_dir]="G"
 		[chmod_x]="x"
@@ -199,7 +201,7 @@ declare -A C=(
 		[sort_entries]="o"
 		[sort_entries_reverse]="O"
 		[tab_new]="${SA[s]}"
-		[tab_next]=$'\t'
+		[tab_next]="TAB_KEY"
 		[tag_all]="${SA[y]}"
 		[tag_all_files]="${A[y]}"
 		[tag_copy]="p"
@@ -222,18 +224,17 @@ declare -A C=(
 		[SIG_SYNCH_SHELL]=0
 		)
 
-declare -A shortcuts shortcut_to_command
+declare -A shortcuts standard_key_map
 for k in "${!C[@]}"
 	do
 		{ [[ -n "${LA[${C[$k]}]}" ]]  && shortcuts[$k]="⇑${LA[${C[$k]}]}/${C[$k]}" ; } ||
 		{ [[ -n "${LSA[${C[$k]}]}" ]] && shortcuts[$k]="⇈${LSA[${C[$k]}]}/${C[$k]}" ; } ||
 		                                 shortcuts[$k]="${C[$k]}"
 		
-		shortcut_to_command[${C[$k]}]="$k"
+		standard_key_map[${C[$k]}]="$k"
 	done
 
-shortcuts[tab_next]="TAB"
-shortcuts[enter]="ENTER"
+key_map=standard_key_map
 
 # vim: set filetype=sh :
 

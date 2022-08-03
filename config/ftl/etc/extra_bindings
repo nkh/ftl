@@ -1,52 +1,57 @@
+
+incremental_search()
+{
+case "$REPLY" in 
+	ENTER_KEY ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=standard_key_map ;;
+	*         ) to_search="$to_search$REPLY" ; find_next
+esac
+}
+find_entry() { key_map=incremental_search ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
+standard_key_map=[find_entry]="/"
+
+#----------------------------------------------------------------------
+
+declare -Ag leader_key_map
+leader_key() { key_map=leader_key_map ; }
+
+leader_test() { tmux popup "echo -n ftl: leader_test" ; }
+leader_key_map[t]=leader_test
+
+#----------------------------------------------------------------------
+
+super_leader_space()
+{
+tmux popup "echo -n ftl: super_leader_space + \'$REPLY\'"
+key_map=standard_key_map
+}
+leader_space() { key_map=super_leader_space ; }
+leader_key_map[SPACE_KEY]=leader_space
+
+#----------------------------------------------------------------------
 . $FTL_CFG/etc/extra_commands/compress
 . $FTL_CFG/etc/extra_commands/optimize
-. $FTL_CFG/etc/extra_commands/shell
 
-extra_bindings()
+leader_key_map[f]=leader_ftl
+leader_ftl() { key_map=super_leader_ftl ; }
+super_leader_ftl()
 {
-# handle leader + user defined shortcut
-((leader_command)) && { leader_command ; return ; }
-[[ "$super_leader_command" ]] && { super_leader_command ; return ; }
+case "$REPLY" in
+	c  ) compress ;;
+	i  ) image_optimize ;;
+	m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
+	p  ) [[ $e == pdf ]] && pdf_optimize ;;
+	P  ) [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ;;
+	s  ) tcpreview
+	     tsplit "{ stat '$n' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ;} | piper --global '\w+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn1" ;;
+	t  ) shell_pop  ;;
+	v  ) [[ $e == mp4 ]] && video_optimize ;;
+	x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
+	z  ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
 
-((incremental_search)) && case "${REPLY: -1}" in 
-	'') incremental_search=0 ; cursor_color="$cursor_color0" ; to_search= ; REPLY="${C[refresh]}" ;;
-	 *) to_search="$to_search$REPLY" ; REPLY="${C[find_next]}"
-esac && return 1
-
-case "${REPLY: -1}" in
-	"$LEADER"        ) leader_command=1 ;;
-	${C[find_entry]} ) to_search= ; incremental_search=1 ; cursor_color="$cursor_color_search" ; list ;;
-	*                ) false ;;
-esac
-}
-
-leader_command() { leader_command= ; [[ $REPLY =~ ^\ |f$ ]] && super_leader_command="$REPLY" ; }
-
-super_leader_command()
-{
-case "$super_leader_command" in
-	' ') case "$REPLY" in
-		' ') tmux popup "echo -n ftl: super leader command \'$super_leader_command\' \'$REPLY\'" ;;
-		esac ;;
-
-	f  ) case "$REPLY" in
-		c  ) compress ;;
-		i  ) image_optimize ;;
-		m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
-		p  ) [[ $e == pdf ]] && pdf_optimize ;;
-		P  ) [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ;;
-		s  ) tcpreview
-		     tsplit "{ stat '$n' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ;} | piper --global '\w+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn1" ;;
-		t  ) shell_pop  ;;
-		v  ) [[ $e == mp4 ]] && video_optimize ;;
-		x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
-		z  ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
-		esac ;;
-
-	*  ) tmux popup "echo -n ftl: unknown super leader command '$REPLY'" ;;
+	*  ) ftl_help ;;
 esac
 
-super_leader_command=
+key_map=standard_key_map
 }
 
-# vim: set filetype=sh :
+# vim: set filetype=bash :
