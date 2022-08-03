@@ -1,4 +1,4 @@
-bindings()  { [[ -z $REPLY ]] && enter || [[ $(type -t "${shortcut_to_command[$REPLY]}") == function ]] && ${shortcut_to_command[$REPLY]} ; }
+bindings()  { extra_bindings || { [[ -z $REPLY ]] && enter ; } || { [[ $(type -t "${shortcut_to_command[$REPLY]}") == function ]] && ${shortcut_to_command[$REPLY]} ; } ; }
 try()       { exec 9>&2 2>"$fs/error_log" ; "$@" ; exec 2>&9 ; [[ -s $fs/error_log ]] && { ((gpreview)) && eval "$(error_cmds)" || tmux popup -w 80% "$(error_cmds)" ; } ; }
 error_cmds(){ echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/error_log | tee -a $fs/errors_log && rm $fs/error_log ; echo '$(cmd_name $REPLY)'" ; }
 ewith()     { . ~/.config/ftl/open_with ; R="${C[refresh]}$R" ; true ; }
