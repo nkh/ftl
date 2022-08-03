@@ -1,0 +1,12 @@
+
+incremental_search()
+{
+case "$REPLY" in 
+	ENTER_KEY ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=standard_key_map ;;
+	*         ) to_search="$to_search$REPLY" ; find_next
+esac
+}
+find_entry() { key_map=incremental_search ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
+standard_key_map=[find_entry]="/"
+
+# vim: set filetype=bash :

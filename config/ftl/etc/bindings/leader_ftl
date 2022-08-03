@@ -1,33 +1,6 @@
-
-incremental_search()
-{
-case "$REPLY" in 
-	ENTER_KEY ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=standard_key_map ;;
-	*         ) to_search="$to_search$REPLY" ; find_next
-esac
-}
-find_entry() { key_map=incremental_search ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
-standard_key_map=[find_entry]="/"
-
-#----------------------------------------------------------------------
-
 declare -Ag leader_key_map
 leader_key() { key_map=leader_key_map ; }
 
-leader_test() { tmux popup "echo -n ftl: leader_test" ; }
-leader_key_map[t]=leader_test
-
-#----------------------------------------------------------------------
-
-super_leader_space()
-{
-tmux popup "echo -n ftl: super_leader_space + \'$REPLY\'"
-key_map=standard_key_map
-}
-leader_space() { key_map=super_leader_space ; }
-leader_key_map[SPACE_KEY]=leader_space
-
-#----------------------------------------------------------------------
 . $FTL_CFG/etc/extra_commands/compress
 . $FTL_CFG/etc/extra_commands/optimize
 

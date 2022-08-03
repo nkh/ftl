@@ -1,4 +1,6 @@
-. $FTL_CFG/etc/extra_bindings
+. $FTL_CFG/etc/bindings/search
+. $FTL_CFG/etc/bindings/leader
+. $FTL_CFG/etc/bindings/leader_ftl
 
 for b in $(fd  . "$FTL_CFG/user_bindings" --type f | grep -v "$FTL_CFG/user_bindings/bindings" | sort -u)
 	do
