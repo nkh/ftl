@@ -1,12 +1,25 @@
+[4;38;5;37msection		shortcut	[extra file filter find ftl history marks media move pane shell tags view][0m
+leader key	SPACE		˽
+extra		˽fP		pdf2txt
+extra		˽fc		compress/decompress
+extra		˽fi		reduce image size
+extra		˽fm		mail
+extra		˽fp		reduce pdf size
+extra		˽fs		stat file
+extra		˽ft		terminal popup
+extra		˽fv		reduce video size
+extra		˽fx		PGP encrypt/decrypt
+extra		˽fz		password encrypt/decrypt
 file		I		creat new directory
 file		P		move selection
 file		R		rename/bulk rename
-file		X		chmod a-x
-file		c		copy to
-file		d		delete
+file		X		chmod a-x selection
+file		c		copy selection to
+file		d		delete selection
 file		i		creat new file
 file		p		copy selection
-file		x		chmod a+x
+file		˽s		shred
+file		x		chmod a+x selection
 file		⇈l		symlink create
 file		⇈p		move to predefine location
 file		⇑i		creat in bulk
@@ -47,17 +60,6 @@ history		¨		fzf history all sessions
 history		⇈d		delete current session history
 history		⇈h		fzf edit all sessions history
 history		⇑h		fzf history all sessions
-leader		S		leader key
-leader		˽fP		pdf2txt
-leader		˽fc		compress/decompress
-leader		˽fi		reduce image size
-leader		˽fm		mail
-leader		˽fp		reduce pdf size
-leader		˽fs		stat file
-leader		˽ft		terminal popup
-leader		˽fv		reduce video size
-leader		˽fx		PGP encrypt/decrypt
-leader		˽fz		password encrypt/decrypt
 marks		'		go to mark
 marks		,		add persistent mark
 marks		;		fzf to persistent mark
@@ -69,31 +71,31 @@ media		W		fzf viewer
 media		a		kill sound preview
 media		e		external viewer
 media		w		terminal media player in background
-move		''		cd or open file
+move		''		enter; cd or open file
 move		-		next pane or viewer
 move		5		page down
 move		6		page up
-move		A		previous entry
-move		B		next entry
-move		C		cd or open file
-move		D		parent directory
+move		A		up to previous entry
+move		B		down to next entry
+move		C		right; cd into directory
+move		D		cd to parent directory
 move		J		scroll preview down
 move		K		scroll preview up
 move		g		go to top/file/bottom
-move		h		parent directory
-move		j		next entry
-move		k		previous entry
-move		l		cd or open file
-move		Ö		next entry of different extension
+move		h		cd to parent directory
+move		j		down to next entry
+move		k		up to previous entry
+move		l		right; cd into entry
 move		ä		goto entry by index
 move		ö		next entry of same extension
+move		Ö		next entry of different extension
 pane		<		extra pane right
 pane		>		extra pane left
 pane		_		extra pane below
 pane		|		extra pane: left
 pane		¦		extra pane: right
 shell		!		view shell
-shell		:		shell + commands: q, etags, load_tags
+shell		:		shell + commands: q, etags, load_tags, ...
 shell		S		shell pane with selected files
 shell		s		shell pane
 tabs		TAB		next tab

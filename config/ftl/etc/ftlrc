@@ -79,7 +79,7 @@ externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd pperl pshell ptext pcomp pcbr pcbz ptype ; }
 # p_your_viewer(){ vipreview ~/.bashrc ; }
 
-CMDCOLS=150 # columns when displaying command mapping in popup
+CMD_COLS=150 # columns when displaying command mapping in popup
 
 # Keyboard mappings
 # 0, 7-9 are used by ftl and correspond to SIG_XXX entries below

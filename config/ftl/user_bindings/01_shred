@@ -15,6 +15,7 @@ false # reset key_amp tp default
 }
 
 #add line at end of help file
+help[shred]="file		hide file contents and delete it"
 
 #add to command list
 shortcuts[shred]="leader_key+s"

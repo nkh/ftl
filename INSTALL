@@ -1,6 +1,7 @@
 apt install :
 ack
 exittool
+expect
 fdfind
 ffmpegthumbnailer
 fzf
@@ -37,7 +38,7 @@ treewhatever (https://github.com/nkh/treewhatever)
 piper (https://github.com/nkh/P5-App-Piper)
 
 non packet manager:
-fzf script
+https://github.com/nkh/fzf_scripts
 
 image_bg must exist
 cp w3mimagedisplay from /usr/lib/w3m to PATH

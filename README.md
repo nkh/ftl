@@ -12,7 +12,7 @@ c      ) copy selection                  h D     ) parent directory
 d      ) delete                          5 6     ) page down/up
 ... 
 
-for a complete list see resources/.config/ftl/help.md or press '?' in ftl
+for a complete list press '?' in ftl
 
 
 ```
@@ -71,14 +71,9 @@ The directory entries are colored with lscolors, if preview is on, a preview pan
 
 Only show images in the listing and directory preview; with multiple tabs, makes sorting images easy.
 
-# TODO
-
-- fzf scripts preview via vim not bat
-- vim file opener using ftl
- 
 # PATCHING ftl (with gratitude to Larry wall, and not just for patch)
 
-There's no documentation, the code is *dense* with long lines but there's hope as
+There's no documentation, yet, the code is *dense* with long lines but there's hope as
 the call stack is seldom more than 2 deep.
 
 The description of the main variables and functions should get you going, watch the
@@ -122,7 +117,7 @@ no installer
 
 Artistic License 2.0
 
-© Nadim Khemir
+© Nadim Khemir 2020-2022
 mailto:nadim.khemir@gmail.com
 CPAN/Github ID: NKH
 

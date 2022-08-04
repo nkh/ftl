@@ -1,3 +1,4 @@
+[38;5;37m		⇑: alt-gr, ⇈: shift+alt-gr, ˽: leader[0m
 		j B       ) next entry                           	?         ) show help
 		k A       ) previous entry                       	5 6       ) page down/up
 		h D       ) parent directory                     	⇈s TAB    ) new tab, nexttab
