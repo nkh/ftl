@@ -35,7 +35,7 @@ shortcuts[pdf2text]="leader_key+f+P"
 shortcuts[stat]="leader_key+f+s"
 shortcuts[shell_pop]="leader_key+f+t"
 shortcuts[video_optimize]="leader_key+f+v"
-shortcuts[gpg_decrypt]="leader_key+f+x"
-shortcuts[gpg_encrypt]="leader_key+f+z"
+shortcuts[gpg]="leader_key+f+x"
+shortcuts[password_encrypt]="leader_key+f+z"
 
 # vim: set filetype=bash :

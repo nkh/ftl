@@ -4,12 +4,20 @@ declare -Ag leader_key_map
 leader_key() { key_map=leader_key_map ; }
 
 leader_key_map[s]=shred_command
-shred_command() { prompt "shred ${#selection[@]} entries [yes|N]" ; [[ $REPLY == yes ]] && echo "shred -n 2 -z ${selection[@]}" ; cdir ; false ; }
+
+shred_command() 
+{
+((${#selection[@]} > 1)) && plural='ies' || plural='y'
+prompt "shred: ${#selection[@]} entr${plural} [yes|N]? "
+[[ $REPLY == yes ]] && { shred -n 2 -z -u "${selection[@]}" && tags_clear ; cdir ; } || list
+
+false # reset key_amp tp default
+}
 
 #add line at end of help file
 
 #add to command list
 shortcuts[shred]="leader_key+s"
 
-# vim: set filetype=bash :
+# vim: set filetype=sh :
 

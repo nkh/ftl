@@ -1,0 +1,129 @@
+file		I		creat new directory
+file		P		move selection
+file		R		rename/bulk rename
+file		X		chmod a-x
+file		c		copy to
+file		d		delete
+file		i		creat new file
+file		p		copy selection
+file		x		chmod a+x
+file		⇈l		symlink create
+file		⇈p		move to predefine location
+file		⇑i		creat in bulk
+file		⇑l		symlink follow
+filter		#		show/hide extension preview
+filter		%		hide extension
+filter		&		enable all extensions
+filter		.		show/hide dot-files
+filter		F		set filter 2
+filter		f		set filter 1
+filter		⇈.		select etags
+filter		⇈f		set reverse filter
+filter		⇑.		show/hide etags
+filter		⇑d		clear filters
+filter		⇑f		select filter
+find		/		find
+find		N		find previous
+find		b		fzf find current directory file
+find		n		find next
+find		{		fzf to file with preview
+find		}		rg to file
+find		⇈b		fzf find from current directory
+find		⇑b		fzf find current directory file or subdirs
+ftl		$		detach editor preview
+ftl		*		maximum listing depth
+ftl		?		show help
+ftl		G		cd
+ftl		Q		quit forced
+ftl		q		quit
+ftl		r		refresh
+ftl		¿		pdh pane
+ftl		⇈q		keep shell zoomed
+ftl		⇑c		show command mapping
+ftl		⇑q		quit keep shell
+ftl		⇑t		to clipboard
+history		H		fzf history current session
+history		¨		fzf history all sessions
+history		⇈d		delete current session history
+history		⇈h		fzf edit all sessions history
+history		⇑h		fzf history all sessions
+leader		S		leader key
+leader		˽fP		pdf2txt
+leader		˽fc		compress/decompress
+leader		˽fi		reduce image size
+leader		˽fm		mail
+leader		˽fp		reduce pdf size
+leader		˽fs		stat file
+leader		˽ft		terminal popup
+leader		˽fv		reduce video size
+leader		˽fx		PGP encrypt/decrypt
+leader		˽fz		password encrypt/decrypt
+marks		'		go to mark
+marks		,		add persistent mark
+marks		;		fzf to persistent mark
+marks		m		mark directory/file
+marks		⇑'		fzf to mark
+marks		⇑k		clear persistent marks
+media		E		external viewer detached
+media		W		fzf viewer
+media		a		kill sound preview
+media		e		external viewer
+media		w		terminal media player in background
+move		''		cd or open file
+move		-		next pane or viewer
+move		5		page down
+move		6		page up
+move		A		previous entry
+move		B		next entry
+move		C		cd or open file
+move		D		parent directory
+move		J		scroll preview down
+move		K		scroll preview up
+move		g		go to top/file/bottom
+move		h		parent directory
+move		j		next entry
+move		k		previous entry
+move		l		cd or open file
+move		Ö		next entry of different extension
+move		ä		goto entry by index
+move		ö		next entry of same extension
+pane		<		extra pane right
+pane		>		extra pane left
+pane		_		extra pane below
+pane		|		extra pane: left
+pane		¦		extra pane: right
+shell		!		view shell
+shell		:		shell + commands: q, etags, load_tags
+shell		S		shell pane with selected files
+shell		s		shell pane
+tabs		TAB		next tab
+tabs		⇈s		new tab
+tags		1-4		class tag
+tags		T		fzf tag files and subdirs
+tags		U		untag all
+tags		Y		tag up
+tags		t		fzf tag files
+tags		u		untag fzf
+tags		y		tag down
+tags		⇈O		fzf merge from panes
+tags		⇈y		tag all files and subdirs
+tags		⇑g		fzf goto
+tags		⇑o		merge from panes
+tags		⇑y		tag all files
+view		"		show/hide image preview
+view		)		file/dir view mode
+view		+		change preview size
+view		=		preview directory only
+view		M		view mode: file/directory/image
+view		O		sort reversed
+view		V		preview once
+view		^		show/hide stat
+view		o		sort type
+view		v		preview show/hide
+view		⇈i		fzfi, using ueberzurg
+view		⇈m		refresh montage
+view		⇈t		file preview at end
+view		⇈v		alternative preview for : dir, media, pdf, tar, ...
+view		⇑m		montage mode
+view		⇑s		show/hide size
+view		⇑v		alternative preview for : dir, media, pdf, tar, ...
