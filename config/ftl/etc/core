@@ -117,6 +117,7 @@ tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags
 tag_clear() { for t in "${!tags[@]}" ; do [[ "$1" == "${tags[$t]}" ]] && { unset -v tags["$t"] ; ((stagsi++)) ; } ; done ; }
 tag_flip()  { ((stagsi++)) ; [[ ${tags[$1]} ]] && unset -v "tags[$1]" || tags[$1]=${2:-▪} ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
+tag_read()  { [[ "$1" == '-t' ]] && { while read ; do REPLY="${REPLY/\.\//$PWD\/}" ; REPLY="${REPLY%/}" ; tags[$REPLY]='▪' ; done <"$2" ; REPLY= ; } ; }
 tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_tags && ostagsi != stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tscommand() { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }

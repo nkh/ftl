@@ -6,7 +6,7 @@ ftl - a bash file manager
 
 ftl
 
-ftl [directory[/file]]
+ftl [-t file] [directory[/file]]
 
 # DESCRIPTION
 

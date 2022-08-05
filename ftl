@@ -4,7 +4,7 @@ ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licenc
 {
 . $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
 
-my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 
+my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 ; tag_read "$@" && shift 2
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
@@ -23,7 +23,6 @@ bindings()
 [[ "$REPLY" == $'\t' ]] && REPLY=TAB_KEY
 [[ "$REPLY" == $'\e' ]] && REPLY=ESCAPE_SEQ1
 [[ "$REPLY" == '['   ]] && REPLY=ESCAPE_SEQ2
-
 #pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
 
    { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
