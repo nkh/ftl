@@ -67,7 +67,8 @@ MD_RENDER2='vmd'
 HEXEDIT=hexedit
 SHRED=shred
 MIMETYPE=mimemagic
-NCDU=ncdu
+NCDU=ncdu # ncdu ncdu2 gdu tdu
+
 RM="rm -rf"
 	# how you want your files deleted
 	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard

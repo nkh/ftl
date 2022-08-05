@@ -108,7 +108,7 @@ shell_synch()		{ shell_send 1 "cd '$p'" C-m ; }
 shell_zoomed()		{ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ; }
 show_etag()		{ ((etag^=1)) ; cdir ; }
 show_hidden()		{ ((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ; }
-show_size()		{ ((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((show_size == 3)) && dir_dusize ; cdir ; }
+show_size()		{ ((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((show_size == 3)) && { header '' "$msg_du" ; dir_dusize ; header '' "$head" ; } ; cdir ; }
 show_stat()		{ ((show_stat ^= 1)) ; refresh ; list ; }
 sort_entries()		{ ((sort_type[tab] = sort_type[tab] + 1 >= ${#sort_filters[@]} ? 0 : sort_type[tab] + 1)) ; cdir '' "$f" ; }
 sort_entries_reverse()	{ [[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; cdir '' "$f"; }
