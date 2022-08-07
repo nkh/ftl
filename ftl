@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-declare -Ag ftl_key_map C uhelp shortcuts ; key_map=ftl_key_map ; . $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
+declare -Ag ftl_key_map C uhelp ; key_map=ftl_key_map ; . $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 ; tag_read "$@" && shift 2
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
@@ -19,9 +19,10 @@ while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}"
 bind()
 {
 local map="$1" section="$2" key="$3" command="$4" help="$5"
-{ [[ -n "${LA[$key]}" ]]  && shortcut="⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && shortcut="⇈${LSA[$key]}/$key" ; } || shortcut="$key"
 
-C[$command]="$key" ; shortcuts[$command]="$shortcut" ; uhelp[$command]=$(printf "%s\t%s\t%s\t%s" "$section" "$shortcut" "$command" "$help")
+{ [[ -n "${LA[$key]}" ]] && shortcut="⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && shortcut="⇈${LSA[$key]}/$key" ; } || shortcut="$key"
+
+C[$command]="$key" ; uhelp[$command]="$section	$shortcut	$command	$help"
 eval "declare -Ag ${map}_key_map ; ${map}_key_map[$key]='$command'"
 }
 

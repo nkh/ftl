@@ -2,21 +2,6 @@
 
 ftl - terminal file manager, tmux based
 
-## Commands shortcuts (⇑: alt-gr, ⇈: shift+alt-gr)
-```
-q Q @  ) close, > &3, keep shell         ?       ) show help
-a      ) kill sound preview              j B     ) next entry
-b ⇑b   ) find/fzf entry in directory     k A     ) previous entry
-c      ) copy selection                  h D     ) parent directory
-⇑c     ) compress/decompress             l C ''  ) cd or open file
-d      ) delete                          5 6     ) page down/up
-... 
-
-for a complete list press '?' in ftl
-
-
-```
-
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
 
@@ -70,6 +55,10 @@ The directory entries are colored with lscolors, if preview is on, a preview pan
 ## Image mode
 
 Only show images in the listing and directory preview; with multiple tabs, makes sorting images easy.
+
+# commands
+
+For a complete list press 'alt-gr'+c
 
 # PATCHING ftl (with gratitude to Larry wall, and not just for patch)
 
