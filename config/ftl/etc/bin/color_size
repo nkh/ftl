@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#printf "123\n1K\n12K\n499K\n500K\n1M\n12M\n150M\n500M\n1G\n10G\n100G\n500G\n1T\n" | color_size
+
+piper --once $@ \
+'\d{4}(\.\d+)?K'	rgb010 \
+'[5-9]\d{2}(\.\d+)?K'	rgb055 \
+'[1-4]\d{2}(\.\d+)?K'	rgb035 \
+'\d{2}(\.\d+)?K'	rgb025 \
+'\d(\.\d+)?K'		rgb015 \
+\
+'\d{4}(\.\d+)?M'	rgb510 \
+'[5-9]\d{2}(\.\d+)?M'	rgb050 \
+'[1-4]\d{2}(\.\d+)?M'	rgb040 \
+'\d{2}(\.\d+)?M'	rgb030 \
+'\d(\.\d+)?M'		rgb020 \
+\
+'[5-9]\d{2}(\.\d+)?G'	rgb550 \
+'[1-4]\d{2}(\.\d+)?G'	rgb530 \
+'\d{2}(\.\d+)?G'	rgb520 \
+'\d(\.\d+)?G'		rgb510 \
+\
+'\d+(\.\d+)?[TP]'	'bright_yellow on_red' \
+\
+'\d+B'			rgb015 \
+'\d+'			rgb015
+

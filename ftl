@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-. $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
+declare -Ag ftl_key_map C uhelp shortcuts ; key_map=ftl_key_map ; . $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 ; tag_read "$@" && shift 2
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
@@ -13,21 +13,35 @@ echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; fli
 fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
-while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && try bindings ; kbdf ; winch=1 ; REPLY= ; done
+while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
-bindings()
+bind()
+{
+local map="$1" section="$2" key="$3" command="$4" help="$5"
+{ [[ -n "${LA[$key]}" ]]  && shortcut="⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && shortcut="⇈${LSA[$key]}/$key" ; } || shortcut="$key"
+
+C[$command]="$key" ; shortcuts[$command]="$shortcut" ; uhelp[$command]=$(printf "%s\t%s\t%s\t%s" "$section" "$shortcut" "$command" "$help")
+eval "declare -Ag ${map}_key_map ; ${map}_key_map[$key]='$command'"
+}
+
+key_command()
 {
 [[ "$REPLY" == ''    ]] && REPLY=ENTER_KEY
 [[ "$REPLY" == ' '   ]] && REPLY=SPACE_KEY
+[[ "$REPLY" == '*'   ]] && REPLY=STAR_KEY
+[[ "$REPLY" == '@'   ]] && REPLY=AT_KEY
+[[ "$REPLY" == "'"   ]] && REPLY=QUOTE_KEY
+[[ "$REPLY" == '"'   ]] && REPLY=DQUOTE_KEY
 [[ "$REPLY" == $'\t' ]] && REPLY=TAB_KEY
 [[ "$REPLY" == $'\e' ]] && REPLY=ESCAPE_SEQ1
 [[ "$REPLY" == '['   ]] && REPLY=ESCAPE_SEQ2
+[[ "$REPLY" == "${A[\']}" ]] && REPLY=ALT_QUOTE_KEY
 #pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
 
    { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
 || { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && { ((pdh_kfunc)) && pdhn "-> ${iarray[$REPLY]}" ; true ; } && ${iarray[$REPLY]} ; } \
-|| key_map=standard_key_map
+|| key_map=ftl_key_map
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
@@ -62,7 +76,7 @@ shopt -u nocasematch ; qd=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format '
 
 list() # select
 {
-[[ $1 ]] && dir_file[${tab}_$PWD]=$1 ; file=${dir_file[${tab}_$PWD]:-0}
+[[ "$1" ]] && dir_file[${tab}_$PWD]="$1" ; file=${dir_file[${tab}_$PWD]:-0}
 ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none ; ((gpreview)) || save_state $fs ; selection ; geo_winch
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center, bottom = top + lines - 1, bottom = bottom < 0 ? 0 : bottom)) ; l=0
 

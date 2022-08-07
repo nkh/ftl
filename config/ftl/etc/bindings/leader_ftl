@@ -24,18 +24,18 @@ case "$REPLY" in
 	*  ) ftl_help ;;
 esac
 
-key_map=standard_key_map
+key_map=ftl_key_map
 }
 
-shortcuts[compress]="leader_key+f+c"
-shortcuts[image_optimize]="leader_key+f+i"
-shortcuts[mutt]="leader_key+f+m"
-shortcuts[pdf_optimize]="leader_key+f+p"
-shortcuts[pdf2text]="leader_key+f+P"
-shortcuts[stat]="leader_key+f+s"
-shortcuts[shell_pop]="leader_key+f+t"
-shortcuts[video_optimize]="leader_key+f+v"
-shortcuts[gpg]="leader_key+f+x"
-shortcuts[password_encrypt]="leader_key+f+z"
+bind ftl extra	˽fP	pdf2txt			"convert current pdf to text file"
+bind ftl extra	˽fc	compress		"compress/decompress"
+bind ftl extra	˽fi	optimize_image		"reduce jpg image size, converts png to jpg"
+bind ftl extra	˽fm	mutt			"send selection in mail"
+bind ftl extra	˽fp	optimize_pdf		"reduce pdf size"
+bind ftl extra	˽fs	stat_file		"display stat information for file in preview pane"
+bind ftl extra	˽ft	shell_pop		"terminal popup"
+bind ftl extra	˽fv	optimize_video		"reduce video size"
+bind ftl extra	˽fx	gpg_encrypt		"GPG encrypt/decrypt"
+bind ftl extra	˽fz	password_encrypt	"password encrypt/decrypt"
 
 # vim: set filetype=bash :

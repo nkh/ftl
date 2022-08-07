@@ -31,7 +31,7 @@ shell_command()
 	}
 
 [[  ${C[$1]} ]] && R=${C[$1]} && return
-[[ "${standard_key_map[$1]}" ]] && R=${standard_key_map[$1]} && return ;
+[[ "${ftl_key_map[$1]}" ]] && R=${ftl_key_map[$1]} && return ;
 
 # shell command
 # todo: pass selection to session context

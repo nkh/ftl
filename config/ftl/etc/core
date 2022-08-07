@@ -69,7 +69,7 @@ inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | 
 inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete -e move "$PWD/" 2>&- | { read a b f ; [[ "$f" ]] && tmux send -t "$my_pane" ${C[refresh]} 2>&- ; } ; }
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 kbdf()      { [[ $REPLY != ESCAPE_SEQ1 && $REPLY != ESCAPE_SEQ2 ]] && while read -t 0.01 ; do : ; done ; }
-cdfl()      { true 2>&- >&3 && { [[ $REPLY == ${C[quit]} ]] && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
+k_bindings(){ printf '%s\n' "${uhelp[@]}" | sort | column -t --table-columns section,shortcut,command, -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
 mime_get()  { perl -le "-B qq~$n~ ? exit 0 : exit 1" && is_bin=1 || is_bin=0 ; [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$($MIMETYPE "$n")" ; } ; mtype="${mime[$n]}" ; false ; }
 mime_cache(){ while IFS=$': ' read fm mm ; do mime[$PWD/$fm]="$mm" ; done < <(mimemagic "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
@@ -77,7 +77,7 @@ move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf
 player_k()  { ((player)) && { kill $player &>/dev/null ; player= ; } ; }
 pane_extra(){ echo "${ofs:-$fs}" >$fsp/fs ; pane_ftl "'$n' $pfs" "$1" "$2" ; sleep 0.05 ; rdir ; tmux selectp -t $new_pane ; echo -e "\e[H\e[K" ; header '2' "$head" ; }
 pane_ftl()  { pane_read ; tcpreview ; tsplit "prev_all=0 ftl $1" 30% "$2" $3 ; panes+=($pane_id) ; new_pane=$pane_id ; pane_id= ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
-pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | sponge $pfs/panes ; tmux send -t ${panes[0]} ${C[quit]} 2>&- ; sleep 0.03 ; } ; }
+pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | sponge $pfs/panes ; tmux send -t ${panes[0]} ${C[quit_ftl]} 2>&- ; sleep 0.03 ; } ; }
 pane_next() { pane_read ; pf=0 ; tp=("${panes[@]}" $main_pane "${panes[@]}") ; for p in  "${tp[@]}" ; do [[ $p == $my_pane ]] && pf=1 || { ((pf)) && echo $p && break ; } ; done ; }
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 pane_send() { pane_read && for p in "${panes[@]}" ; do tmux send -t $p "$1" &>/dev/null ; done ; }
@@ -90,7 +90,8 @@ pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-he
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl" ; ftl_imode "${imode[tab]}" ; [[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/error_log" ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane ${C[SIG_PANE]} ; } ; rm -rf $fs ; exit 0 ; }
-quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; kill $w3iproc &>/dev/null ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
+quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
+cdfl()      { true 2>&- >&3 && { [[ $REPLY == ${C[quit_ftl]} ]] && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
 quit_shell(){ [[ $REPLY != ${A[q]} ]] && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=${2:-1} ; list ; qd=0 ; }
 refresh()   { echo -ne "\e[?25l$1" ; } 

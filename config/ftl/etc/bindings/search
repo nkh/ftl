@@ -1,15 +1,15 @@
 
-standard_key_map=[find_entry]="/"
+ftl_key_map=[find_entry]="/"
 find_entry() { key_map=incremental_search ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
 
 incremental_search()
 {
 case "$REPLY" in 
-	ENTER_KEY ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=standard_key_map ;;
+	ENTER_KEY ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=ftl_key_map ;;
 	*         ) to_search="$to_search$REPLY" ; find_next
 esac
 }
 
-shortcuts[incremental_search]="/"
+bind ftl find	"/"	incremental_search	"start incremental search, enter to end"
 
 # vim: set filetype=bash :
