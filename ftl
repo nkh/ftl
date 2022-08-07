@@ -20,10 +20,11 @@ bind()
 {
 local map="$1" section="$2" key="$3" command="$4" help="$5"
 
-{ [[ -n "${LA[$key]}" ]] && shortcut="⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && shortcut="⇈${LSA[$key]}/$key" ; } || shortcut="$key"
-
-C[$command]="$key" ; uhelp[$command]="$section	$shortcut	$command	$help"
 eval "declare -Ag ${map}_key_map ; ${map}_key_map[$key]='$command'"
+C[$command]="$key"
+
+{ [[ -n "${LA[$key]}" ]] && shortcut="⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && shortcut="⇈${LSA[$key]}/$key" ; } || shortcut="$key"
+uhelp[$command]="$section	$shortcut	$command	$help"
 }
 
 key_command()

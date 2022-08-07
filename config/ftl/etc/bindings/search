@@ -10,6 +10,6 @@ case "$REPLY" in
 esac
 }
 
-bind ftl find	"/"	incremental_search	"start incremental search, enter to end"
+bind override find	"/"	incremental_search	"start incremental search, press 'enter' to end"
 
 # vim: set filetype=bash :
