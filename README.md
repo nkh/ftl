@@ -118,4 +118,5 @@ clifm
 lfm
 nnn
 vifm
+gitfm
 ...

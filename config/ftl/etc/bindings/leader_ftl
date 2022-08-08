@@ -27,15 +27,15 @@ esac
 key_map=ftl_key_map
 }
 
-bind ftl extra	˽fP	pdf2txt			"convert current pdf to text file"
-bind ftl extra	˽fc	compress		"compress/decompress"
-bind ftl extra	˽fi	optimize_image		"reduce jpg image size, converts png to jpg"
-bind ftl extra	˽fm	mutt			"send selection in mail"
-bind ftl extra	˽fp	optimize_pdf		"reduce pdf size"
-bind ftl extra	˽fs	stat_file		"display stat information for file in preview pane"
-bind ftl extra	˽ft	shell_pop		"terminal popup"
-bind ftl extra	˽fv	optimize_video		"reduce video size"
-bind ftl extra	˽fx	gpg_encrypt		"GPG encrypt/decrypt"
-bind ftl extra	˽fz	password_encrypt	"password encrypt/decrypt"
+bind leader_ftl extra	˽fP	pdf2txt			"convert current pdf to text file"
+bind leader_ftl extra	˽fc	compress		"compress/decompress"
+bind leader_ftl extra	˽fi	optimize_image		"reduce jpg image size, converts png to jpg"
+bind leader_ftl extra	˽fm	mutt			"send selection in mail"
+bind leader_ftl extra	˽fp	optimize_pdf		"reduce pdf size"
+bind leader_ftl extra	˽fs	stat_file		"display stat information for file in preview pane"
+bind leader_ftl extra	˽ft	shell_pop		"terminal popup"
+bind leader_ftl extra	˽fv	optimize_video		"reduce video size"
+bind leader_ftl extra	˽fx	gpg_encrypt		"GPG encrypt/decrypt"
+bind leader_ftl extra	˽fz	password_encrypt	"password encrypt/decrypt"
 
 # vim: set filetype=bash :

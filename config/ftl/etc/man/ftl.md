@@ -12,6 +12,12 @@ ftl [-t file] [directory[/file]]
 
 ftl is Written in Bash, the language that packs a real punch (and sometimes punches you).
 
+## All bindings
+
+Try 'Alt-gt'+c for all the bindings and a short help
+
+
+
 ## Display
 
 The display consists of a header and a listing of the files in a directory, possibly filtered, and an optional preview
@@ -34,8 +40,111 @@ The directory entries are colored with lscolors, if preview is on, a preview pan
 
 all files and directories / files only / directories only
 
+## Panel modes
+
+## Sorting methods
+
+## Moving the cursor in the panel
+
+## Selecting files
+
+### Filters Selecting files matching patterns
+
+## Incremental searching files in a panel
+
+## Using the input line
+
+## File operations
+
+### Copying Files
+
+### Moving Files
+
+### Creating Files
+
+### Deleting Files
+
+### Linking Files
+
+### Renaming Files
+
+### Splitting files into smaller parts
+
+### Packing files into the minimum number of bins
+
+### Changing a file's mode, owner and group
+
+### Editing Files
+
+### Viewing Files
+
+### Compressing Files
+
+### Encoding Files
+
+### Encrypting Files
+
+### Comparing Files
+
+### Spell Checking Files
+
+### Printing Files
+
+### Wiping Files
+
+### Searching Files
+
+### Managing tar based archive files
+
+### File Types
+
+### MSDOS Files
+
+### A different action for each file type
+
+## Directory operations
+
+### Creating directories
+
+### Copying directories
+
+### Deleting directories
+
+### Moving directories
+
+### Renaming directories
+
+### Comparing Directories
+
+### Summarize directory usage
+
+### Changing directories
+
+### Directory History
+
+## Sending/receiving ascii/binary mail
+
+## Command line
+
+## Starting a sub-shell
+
+## Refreshing the screen contents
+
+## Mounting/unmounting file systems
+
+## Getting some useful file information
+
+## How to look at the environment variables
+
+## Synchronizing with the file systems
+
 
 # CONFIGURATION
+
+## RC files
+
+## Key bindings
+
 
 # ENVIRONMENT
 
@@ -61,7 +170,7 @@ chmod a-x selection [X]
 
 copy selection to [c]
 
-delete selection [d]
+🔴delete selection [d]
 
 creat new file [i]
 
@@ -351,4 +460,4 @@ Artistic licence 2.0
 
 # SEE ALSO
 
-ranger, fff, clifm, lfm, nnn, vifm, broot, ...
+ranger, fff, clifm, lfm, nnn, vifm, broot, gitfm, ...

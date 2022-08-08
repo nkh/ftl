@@ -11,10 +11,10 @@ shred_command()
 prompt "shred: ${#selection[@]} entr${plural} [yes|N]? "
 [[ $REPLY == yes ]] && { shred -n 2 -z -u "${selection[@]}" && tags_clear ; cdir ; } || list
 
-false # reset key_amp tp default
+false # reset key_map to default
 }
 
-bind ftl file	˽s	shred	"override selection multiple times and deletes it, bypasses config $RM, asks for confirmation"
+bind leader file	˽s	shred	"override selection multiple times and deletes it, bypasses config $RM, asks for confirmation"
 
 # vim: set filetype=sh :
 

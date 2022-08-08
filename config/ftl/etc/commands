@@ -2,7 +2,7 @@
 
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
-ftl_help()		{ <"$help_file" fzf-tmux $fzf_opt --ansi --tiebreak=begin --header-lines=1 ; list ; }
+ftl_help()		{ tmux popup -h90% -w90% -E "$MD_RENDER1 --term-width=140 \"$help_file\" | $PAGER" ; list ; }
 move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
 move_down()		{ ((nfiles)) && { move 1 && list ; } ; }
@@ -78,7 +78,7 @@ pane_left()		{ pane_extra "-h -b" '' ; }
 pane_right()		{ pane_ftl "'$n' $pfs" "-h -b" -R ; [[ "$n" ]] && rdir "$n" ; echo -e "\e[H\e[K" ; header '2' "$head" ; }
 pane_R()		{ pane_extra "" "" ; }
 pane_L()		{ pane_extra "-h -b" "-R" ; }
-pane_go_next()		{ p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh]} ; }
+pane_go_next()		{ p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh_pane]} ; }
 preview_pane()		{ ((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
 preview_once()		{ preview=1 ; tcpreview ; sleep 0.05 ; cdir ; geo_winch ; }
 preview_dir_only()	{ [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ; }
@@ -128,7 +128,7 @@ tags_merge_all()	{ source ~/.config/ftl/merge/all ; list ; }
 tag_untag_all()		{ tags_clear ; list ; }
 tag_untag_fzf()		{ tag_check && { fzf_tag U "$(printf "%s\n" "${!tags[@]}" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '⊟')" ; list ; } ; }
 tag_external()		{ p=~/.config/ftl/external_tags ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ; }
-SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh]} ; }
+SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
 SIG_REFRESH()		{ ((gpreview)) && kbdf && prev_synch ; }
 SIG_REMOTE()		{ ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }
 SIG_SYNCH_SHELL()	{ IFS=$'\n' read -r shell_dir <$pfs/synch_with_shell ; cdir "$shell_dir" ; }

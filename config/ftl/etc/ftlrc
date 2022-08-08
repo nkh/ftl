@@ -5,7 +5,7 @@ ftl_root=$ftl_cfg/var
 ftl_cmds=$ftl_root/cmds
 ghist=$ftl_root/history
 thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; 
-help_file="$ftl_cfg/etc/help"
+help_file="$ftl_cfg/etc/man/ftl.md"
 generators="$ftl_cfg/generators"
 
 # marks
