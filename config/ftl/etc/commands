@@ -2,7 +2,7 @@
 
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
-ftl_help()		{ tmux popup -h90% -w90% -E "$MD_RENDER1 --term-width=140 \"$help_file\" | $PAGER" ; list ; }
+ftl_help()		{ tmux popup -h90% -w90% -E "$help_command" ; }
 move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
 move_down()		{ ((nfiles)) && { move 1 && list ; } ; }

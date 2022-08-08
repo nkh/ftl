@@ -13,7 +13,7 @@ echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; fli
 fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
-while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -t 0.3 ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
+while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || read -sn 1 -r -t 0.3 ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
 bind()
@@ -30,6 +30,7 @@ bindings[$command]="$map	$section	$shortcut	$command	$help"
 key_command()
 {
 [[ "$REPLY" == ''    ]] && REPLY=ENTER_KEY
+[[ "$REPLY" == '\'   ]] && REPLY=BACKSPACE_KEY
 [[ "$REPLY" == ' '   ]] && REPLY=SPACE_KEY
 [[ "$REPLY" == '*'   ]] && REPLY=STAR_KEY
 [[ "$REPLY" == '@'   ]] && REPLY=AT_KEY
@@ -39,7 +40,7 @@ key_command()
 [[ "$REPLY" == $'\e' ]] && REPLY=ESCAPE_SEQ1
 [[ "$REPLY" == '['   ]] && REPLY=ESCAPE_SEQ2
 [[ "$REPLY" == "${A[\']}" ]] && REPLY=ALT_QUOTE_KEY
-#pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
+pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
 
    { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
 || { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && { ((pdh_kfunc)) && pdhn "-> ${iarray[$REPLY]}" ; true ; } && ${iarray[$REPLY]} ; } \
