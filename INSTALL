@@ -17,6 +17,7 @@ python-pip3
 qutebrowser
 ripgrep
 rlwrap
+rmlint
 rustlang
 tmux
 unrar

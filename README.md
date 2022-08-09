@@ -1,6 +1,6 @@
 # NAME
 
-ftl - terminal file manager, tmux based
+ftl - file manager using tmux panes and live previews
 
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)

@@ -11,6 +11,7 @@ super_leader_ftl()
 case "$REPLY" in
 	c  ) compress ;;
 	i  ) image_optimize ;;
+	l  ) rmlint "$PWD" ; cdir '' 'rmlint' ;;
 	m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
 	p  ) [[ $e == pdf ]] && pdf_optimize ;;
 	P  ) [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ;;
@@ -30,6 +31,7 @@ key_map=ftl_key_map
 bind leader_ftl extra	˽fP	pdf2txt			"convert current pdf to text file"
 bind leader_ftl extra	˽fc	compress		"compress/decompress"
 bind leader_ftl extra	˽fi	optimize_image		"reduce jpg image size, converts png to jpg"
+bind leader_ftl extra	˽fl	lint			"run rmlint in current_directory"
 bind leader_ftl extra	˽fm	mutt			"send selection in mail"
 bind leader_ftl extra	˽fp	optimize_pdf		"reduce pdf size"
 bind leader_ftl extra	˽fs	stat_file		"display stat information for file in preview pane"
