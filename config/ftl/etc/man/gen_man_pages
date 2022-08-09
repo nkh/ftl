@@ -1,2 +1,2 @@
 #!/bin/bash
-pandoc --standalone --to man ftl.md -o ftl.1
+pandoc --standalone -p --to man ftl.md -o ftl.1

@@ -225,13 +225,13 @@ bind ftl view		"${A[v]}"	preview_m1		"alternative preview for : dir, media, pdf,
 bind ftl view		"⍰"		preview_lock		"preview lock, using external script"
 bind ftl view		"⍰"		preview_lock		"preview lock clear"
 bind ftl SIG		7		SIG_PANE		"handle pane event"
-bind ftl SIG		7		SIG_REFRESH		"preview pane signal"
-bind ftl SIG		8		SIG_REMOTE		"handle pane preview"
-bind ftl SIG		9		SIG_SYNCH_SHELL		"cd to shell pane"
+bind ftl SIG		8		SIG_REFRESH		"preview pane signal"
+bind ftl SIG		9		SIG_REMOTE		"handle pane preview"
+bind ftl SIG		0		SIG_SYNCH_SHELL		"cd to shell pane"
 
 . $FTL_CFG/etc/bindings/search
 . $FTL_CFG/etc/bindings/leader
 . $FTL_CFG/etc/bindings/leader_ftl
 
-# vim: set filetype=sh :
+# vim: set filetype=bash :
 

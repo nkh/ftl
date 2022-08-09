@@ -44,6 +44,7 @@ https://github.com/nkh/fzf_scripts
 image_bg must exist
 cp w3mimagedisplay from /usr/lib/w3m to PATH
 link files in ~/.config
+au FileType man setlocal nospell >> vimrc
 
 optional: 
 brew install moar
