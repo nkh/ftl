@@ -15,28 +15,13 @@ I wanted a file manager that would use tmux and give me "live" preview and works
 
 This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs
 
-# DEPENDENCIES
+# MAN PAGE
 
-- tmux     - ftl is a tmux based file manager
-- terminal $EDITOR - $EDITOR is extensively used to provide live previews
-- lscolors <https://github.com/sharkdp/lscolors> - colors files according to LS_COLORS
-- rg       - to locate files containing a specific text
-- fzf      - to locate file and to present a picker
-- awk, sed, numfmt, sponge, ...
-- fzf-tmux, fim, zathura, qutebrowse, mutool, rw3m, w3mimgdisplay, cbconvert, pdftotext, ffmpegthumbnailer, mplayer, exiftool, mimemagic, rip, ...
-- xdotool, wmctrl, expect, inotifywait
-- divers fzf scripts (perl, bat) - fzf file location with preview, fzfi (uberzug), available here: ... soon
+*ftl* has a complete man page, this is just a very short overview. 
+![Manpage](https://github.com/nkh/ftl/blob/main/config/ftl/etc/man/ftl.md)
 
 ## Installation
-
-clone ftl, put it in the PATH, link resource/.config/ftl in ~/.config, install the dependencies *TODO: package dependencies*.
-
-Some optional files:
-
-ftl.eb: example of how to add extra binding. It contains, among other, an incremental search example.
-ftl.et: example of how to tag files with their git status
-
-see resources/ for your ftlrc setup and some filter examples
+see *INSTALL* file
 
 ## Display
 
@@ -57,46 +42,6 @@ The directory entries are colored with lscolors, if preview is on, a preview pan
 Only show images in the listing and directory preview; with multiple tabs, makes sorting images easy.
 
 # commands
-
-For a complete list press 'alt-gr'+c
-
-# PATCHING ftl (with gratitude to Larry wall, and not just for patch)
-
-There's no documentation, yet, the code is *dense* with long lines but there's hope as
-the call stack is seldom more than 2 deep.
-
-The description of the main variables and functions should get you going, watch the
-videos and if you need help send me a mail.
-
-## Variables
-
-- dir_file    selected file in a directory, ftl remembers where you were
-- filters     each tab has its filter
-- epanes      extra panes 
-- pane_id     id of preview pane
-- my_pane     own pane id
-- tfilter     used in image mode
-- marks       bookmarks, marks=([0]=dir [1]=dir ...), preset bookmarks
-- tags        list of tagged files
-- show_dirs   directory toggle
-- preview_all preview toggle
-- ifilter     extension of files considered images
-- zooms       preview pane sizes in percent
-- fs          directory where ftl saves the current selection and temporary files
-
-## Functions
-
-- ftl       variable setup and switch for the commands
-- cdir      get list of files in directory and colorize them
-- list      list directory files
-- ftl_pmode setup directory preview
-- ftl_imode setup image mode
-- c*        close previews
-- e*        external viewers
-- p*        "internal" viewers
-- t*        tmux function
-- vipreview text preview in $EDITOR
-...
 
 # BUGS AND LIMITATIONS
 

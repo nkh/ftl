@@ -1,0 +1,42 @@
+# NAME
+
+ftl - file manager using tmux panes and live previews
+
+# PATCHING ftl (with gratitude to Larry wall, and not just for patch)
+
+There's no documentation, yet, the code is *dense* with long lines but there's hope as
+the call stack is seldom more than 2 deep.
+
+The description of the main variables and functions should get you going, watch the
+videos and if you need help send me a mail.
+
+## Variables
+
+- dir_file    selected file in a directory, ftl remembers where you were
+- filters     each tab has its filter
+- epanes      extra panes 
+- pane_id     id of preview pane
+- my_pane     own pane id
+- tfilter     used in image mode
+- marks       bookmarks, marks=([0]=dir [1]=dir ...), preset bookmarks
+- tags        list of tagged files
+- show_dirs   directory toggle
+- preview_all preview toggle
+- ifilter     extension of files considered images
+- zooms       preview pane sizes in percent
+- fs          directory where ftl saves the current selection and temporary files
+
+## Functions
+
+- ftl       variable setup and switch for the commands
+- cdir      get list of files in directory and colorize them
+- list      list directory files
+- ftl_pmode setup directory preview
+- ftl_imode setup image mode
+- c*        close previews
+- e*        external viewers
+- p*        "internal" viewers
+- t*        tmux function
+- vipreview text preview in $EDITOR
+...
+

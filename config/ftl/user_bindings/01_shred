@@ -1,20 +1,23 @@
 
-# shortcut: leader + s
-declare -Ag leader_key_map
-leader_key() { key_map=leader_key_map ; }
-
-leader_key_map[s]=shred_command
-
 shred_command() 
 {
+# prompt user
 ((${#selection[@]} > 1)) && plural='ies' || plural='y'
 prompt "shred: ${#selection[@]} entr${plural} [yes|N]? "
-[[ $REPLY == yes ]] && { shred -n 2 -z -u "${selection[@]}" && tags_clear ; cdir ; } || list
+
+[[ $REPLY == yes ]] && # reply must be "yes"
+	{
+	shred -n 2 -z -u "${selection[@]}" && tags_clear # use shred utility and clear the selection tags
+	cdir # reload directory
+	} ||
+	# redisplay list to override prompt
+	list
 
 false # reset key_map to default
 }
 
-bind leader file	˽s	shred	"override selection multiple times and deletes it, bypasses config $RM, asks for confirmation"
+# bind shortcut «s» in the leader map
+bind leader file	s	shred_command	"override selection multiple times and deletes it, *** bypasses RM ***"
 
-# vim: set filetype=sh :
+# vim: set filetype=bash :
 
