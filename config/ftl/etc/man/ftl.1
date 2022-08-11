@@ -450,15 +450,22 @@ Change preview size \[Fo]+\[Fc]
 	chose a size in a predefined, see rc file, set of sizes
 
 Preview once \[Fo]V\[Fc]
-	Preview current entry (if preview pane is close), then close preview
+	Preview current entry (if preview pane is close), close the
+	preview at the next command.
 
-Alternative preview for dir, media, pdf, tar, ... \[Fo]\[uA]v/\[lq]\[Fc]
-Alternative preview for dir, media, pdf, tar, ... \[Fo]\[u21C8]v/\[oq]\[Fc]
-	When preview is on a preview for the current entry is shown, some
-	entries have more than one type of preview, IE: directories.
+Alternative preview #1 \[Fo]\[uA]v/\[lq]\[Fc]
+Alternative preview #2 \[Fo]\[u21C8]v/\[oq]\[Fc]
+	Some entry have multiple preview types, these bindings let you
+	to see the other type of preview.
+
+	entry types with multiple preview types:
+		- directories
+		- media
+		- pdf
+		- tar files 
 
 File preview at end \[Fo]\[u21C8]t/\[TP]\[Fc]
-	show the bottom of the entry
+	show the bottom of the entry (text files in vim)
 
 Hexadecimal preview \[Fo]\[uA]x/\[Fc]\[Fc]
 \f[R]
@@ -498,27 +505,48 @@ by_no_extension			# keep files not matching extensions
 by_only_tagged			# keep tagged files
 by_size				# keep files over minimum size
 
-Set reverse filter \[Fo]\[uA]a/\[Of]\[Fc]
+Set reverse-filter \[Fo]\[uA]a/\[Of]\[Fc]
+	Filters out what you don\[aq]t want to see. Applied after other
+	filters are applied. It can be set in your ftlrc file.
 
-Hide extension \[Fo]%\[Fc]
+	eg: keep all the files containing an \[aq]f\[aq] except those containing an \[aq]i\[aq]
+		\[Fo]f\[Fc]  -> f
+		\[Fo]\[uA]a\[Fc] -> i
+
+	eg: always hide vim swap files, set in rcfile
+		rfilter0=\[aq]\[rs].sw.$\[aq]
+
+Hide extension \[Fo]%\[Fc], globally
+	Hide all files having the same extention as the current file.
+	You can hide multiple extensions. You can successively reduce
+	the files displayed .
+
 Enable all extensions \[Fo]\[u21C8]k/&\[Fc]
+	enables the hidden extensions.
 \f[R]
 .fi
 .SS Searchings
 .IP
 .nf
 \f[C]
-Fzf find current directory file \[Fo]b\[Fc]
-Fzf find \[Fo]\[uA]b/\[rq]\[Fc]
-Fzf find directories \[Fo]\[u21C8]b/\[cq]\[Fc]
+Incremental search \[Fo]/\[Fc]
+	Press \[aq]enter\[aq] to end.
 
 Find next \[Fo]n\[Fc]
 Find previous \[Fo]N\[Fc]
 
-Find \[Fo]/\[Fc]
-Start incremental search, \[aq]enter\[aq] to end \[Fo]/\[Fc]
+Searching with _fzf_ and _rg_:
+	*ftl* runs fzf to let you pick one or multiple entries.
 
-Fzf to file with preview \[Fo]{\[Fc]
+	If you select only one entry, *ftl* positons you on the entry,
+	you can also open the entry in a new tab with \[aq]ctrl+t\[aq].
+
+	If you select multiple entries, end with \[aq]ctrl+t\[aq].
+
+Fzf find current directory file \[Fo]b\[Fc]
+Fzf find files and directories  \[Fo]\[uA]b/\[rq]\[Fc]
+Fzf find only directories       \[Fo]\[u21C8]b/\[cq]\[Fc]
+
 Rg to file \[Fo]}\[Fc]
 \f[R]
 .fi

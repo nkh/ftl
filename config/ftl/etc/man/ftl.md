@@ -373,15 +373,22 @@ sequences of keys to perform a command. The default is '\\'
 		chose a size in a predefined, see rc file, set of sizes
 
 	Preview once «V»
-		Preview current entry (if preview pane is close), then close preview
+		Preview current entry (if preview pane is close), close the
+		preview at the next command.
 
-	Alternative preview for dir, media, pdf, tar, ... «⇑v/“»
-	Alternative preview for dir, media, pdf, tar, ... «⇈v/‘»
-		When preview is on a preview for the current entry is shown, some
-		entries have more than one type of preview, IE: directories.
+	Alternative preview #1 «⇑v/“»
+	Alternative preview #2 «⇈v/‘»
+		Some entry have multiple preview types, these bindings let you
+		to see the other type of preview.
+
+		entry types with multiple preview types:
+			- directories
+			- media
+			- pdf
+			- tar files 
 
 	File preview at end «⇈t/Þ»
-		show the bottom of the entry
+		show the bottom of the entry (text files in vim)
 
 	Hexadecimal preview «⇑x/»»
 
@@ -414,23 +421,44 @@ sequences of keys to perform a command. The default is '\\'
 	by_only_tagged			# keep tagged files
 	by_size				# keep files over minimum size
 
-	Set reverse filter «⇑a/ª»
+	Set reverse-filter «⇑a/ª»
+		Filters out what you don't want to see. Applied after other
+		filters are applied. It can be set in your ftlrc file.
 
-	Hide extension «%»
+		eg: keep all the files containing an 'f' except those containing an 'i'
+			«f»  -> f
+			«⇑a» -> i
+
+		eg: always hide vim swap files, set in rcfile
+			rfilter0='\.sw.$'
+
+	Hide extension «%», globally
+		Hide all files having the same extention as the current file.
+		You can hide multiple extensions. You can successively reduce
+		the files displayed .
+
 	Enable all extensions «⇈k/&»
+		enables the hidden extensions.
 
 ## Searchings
-	Fzf find current directory file «b»
-	Fzf find «⇑b/”»
-	Fzf find directories «⇈b/’»
+	Incremental search «/»
+		Press 'enter' to end.
 
 	Find next «n»
 	Find previous «N»
 
-	Find «/»
-	Start incremental search, 'enter' to end «/»
+	Searching with _fzf_ and _rg_:
+		*ftl* runs fzf to let you pick one or multiple entries.
 
-	Fzf to file with preview «{»
+		If you select only one entry, *ftl* positons you on the entry,
+		you can also open the entry in a new tab with 'ctrl+t'.
+
+		If you select multiple entries, end with 'ctrl+t'.
+
+	Fzf find current directory file «b»
+	Fzf find files and directories  «⇑b/”»
+	Fzf find only directories       «⇈b/’»
+
 	Rg to file «}»
 
 ## Tags/Etags

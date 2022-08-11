@@ -47,7 +47,7 @@ lglyph=('' ᵈ ᶠ)
 tglyph=('' ¹ ² ³ D) 
 ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv';
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
-fzfp_opt="+m --cycle --expect=ctrl-t --reverse"
+fzfp_opt="--cycle --expect=ctrl-t --reverse"
 
 #external commands
 FTLI_CLEAN=0 # set to 1 if not using konsole
@@ -121,7 +121,6 @@ bind ftl find		"/"		find_entry		"find"
 bind ftl find		N		find_previous		"find previous"
 bind ftl find		b		find_fzf		"fzf find current directory file"
 bind ftl find		n		find_next		"find next"
-bind ftl find		"{"		go_fzf			"fzf to file with preview"
 bind ftl find		"}"		go_rg			"rg to file"
 bind ftl find		"${SA[b]}"	find_fzf_dirs		"fzf find directories"
 bind ftl find		"${A[b]}"	find_fzf_all		"fzf find"

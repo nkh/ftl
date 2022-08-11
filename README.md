@@ -41,8 +41,6 @@ The directory entries are colored with lscolors, if preview is on, a preview pan
 
 Only show images in the listing and directory preview; with multiple tabs, makes sorting images easy.
 
-# commands
-
 # BUGS AND LIMITATIONS
 
 no installer
