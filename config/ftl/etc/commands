@@ -105,7 +105,6 @@ shell_file()		{ for i in "${selection[@]}" ; do shell_send 1 "'$i'" " " ; done ;
 shell_view()		{ tcpreview ; echo -en '\e[?1049l' ; read -sn 1 ; echo -en '\e[?1049h' ; list ; }
 shell_synch()		{ shell_send 1 "cd '$p'" C-m ; }
 shell_zoomed()		{ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ; }
-show_etag()		{ ((etag^=1)) ; cdir ; }
 show_hidden()		{ ((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ; }
 show_size()		{ ((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((show_size == 3)) && { header '' "$msg_du" ; dir_dusize ; header '' "$head" ; } ; cdir ; }
 show_stat()		{ ((show_stat ^= 1)) ; refresh ; list ; }
@@ -127,7 +126,8 @@ tag_merge()		{ p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux --head
 tags_merge_all()	{ source ~/.config/ftl/merge/all ; list ; }
 tag_untag_all()		{ tags_clear ; list ; }
 tag_untag_fzf()		{ tag_check && { fzf_tag U "$(printf "%s\n" "${!tags[@]}" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '⊟')" ; list ; } ; }
-tag_external()		{ p=~/.config/ftl/external_tags ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ; }
+etag_show()		{ ((etag^=1)) ; cdir ; }
+etag_select()		{ p=~/.config/ftl/external_tags ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ; }
 SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
 SIG_REFRESH()		{ ((gpreview)) && kbdf && prev_synch ; }
 SIG_REMOTE()		{ ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }

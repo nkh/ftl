@@ -35,8 +35,8 @@ possible.
 You can chose to remove the preview as well as having multiple panes showing
 the same or different directories.
 
-Panes are independent instances of ftl that work in synch, each pane can
-have its own tabs. 
+Panes are independent instances of ftl that work in synch, each pane has its
+own tabs, filters, ... 
 
 ## Live Previews
 The preview pane is not, generally, a static view of the file but, thanks to
@@ -62,11 +62,12 @@ The directory entries are colored with lscolors. The header consists of:
 	<directory> [tilde(filter)] <current/total> <tab#> <selected_entries> [file_stat]
 
 ## Marks
-You can bookmak locations and jump back to them.
+You can bookmak locations and jump back to them. Marks can be set in the
+configuration file, added for the current session or made persistent.
 
 ## Tags/Etags
 You can tag (select) entries, tags are synched between panes when option
-_auto_tag_ is set (set by default. 
+_auto_tag_ is set (set by default). 
 
 Etags is extra information that adorns the entries, IE: git status
 
@@ -259,6 +260,7 @@ sequences of keys to perform a command. The default is '\\'
 		Entry stat is added to the header 
 
 	Show/hide etags «⇑./·»
+		tbd: more info about etags
 
 	File/dir view mode «)»
 		Set the file/dir to (circular):
