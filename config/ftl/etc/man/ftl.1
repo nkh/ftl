@@ -81,9 +81,19 @@ session or made persistent.
 .SS Tags/Etags
 .PP
 You can tag (select) entries, tags are synched between panes when option
-\f[I]auto_tag\f[R] is set (set by default.
+\f[I]auto_tag\f[R] is set (set by default).
 .PP
-Etags is extra information that adorns the entries, IE: git status
+Etags is extra information that is optionally prepended to the entries.
+.PP
+Available etags are: date or git status
+.IP
+.nf
+\f[C]
+/home/nadim/nadim/devel/repositories/ftl 2/14 \[u237A]
+ 1  08/11/2022-12:00 .git
+    \[u2BA4]  date etag   \[u2BA5]
+\f[R]
+.fi
 .SS Preview
 .PP
 If preview is on (on by default), a preview pane is displayed.
@@ -224,7 +234,8 @@ Show keyboard bindings \[Fo]\[uA]c/\[co]\[Fc]
 Show this man page \[Fo]?\[Fc]
 
 	The man page is generated and shows the default bindings. You
-	can configure *ftl* to show a different help if you prefer
+	can configure *ftl* to show a different help if you prefer to
+	cook your own.
 
 Quit \[Fo]q\[Fc]
 
@@ -237,12 +248,12 @@ Quit all \[Fo]Q\[Fc]
 
 Quit, keep shell \[Fo]\[at]\[Fc]
 
-	Quit *ftl* but doesn\[aq]t close the shell pane if one exists
+	Quit all but doesn\[aq]t close the shell pane if one exists
 
-Quit, keep shell zoomed \[Fo]\[u21C8]q/\[*W]\[Fc]
+Quit, keep preview zoomed \[Fo]\[u21C8]q/\[*W]\[Fc]
 
-	Quit *ftl* but doesn\[aq]t close the shell pane if one exists and
-	zooms its pane.
+	Quit *ftl* but doesn\[aq]t close the preview pane if one exists and
+	zooms it.
 
 Detach the preview \[Fo]$\[Fc]
 	
@@ -268,7 +279,7 @@ Copy selection to clipboard \[Fo]\[uA]t/\[Tp]\[Fc]
 
 Pdh, pane used for debugging \[Fo]\[r?]\[Fc]
 
-Bindings are used internaly by *ftl*
+Bindings used internaly by *ftl*
 
 	Refresh curent pane \[Fo]r\[Fc]
 	Handle pane event   \[Fo]7\[Fc]
@@ -318,6 +329,7 @@ Show/hide stat \[Fo]\[ha]\[Fc]
 	Entry stat is added to the header 
 
 Show/hide etags \[Fo]\[uA]./\[pc]\[Fc]
+	See \[dq]Select etag type\[dq] below.
 
 File/dir view mode \[Fo])\[Fc]
 	Set the file/dir to (circular):
@@ -351,8 +363,6 @@ Fzfi, using ueberzurg \[Fo]\[u21C8]i/\[.i]\[Fc]
 	Use fzf and ueberzurg to find and display images
 
 Preview lock \[Fo]\[u2370]\[Fc]
-	tbd
-	
 Preview lock clear \[Fo]\[u2370]\[Fc]
 	tbd
 \f[R]
@@ -361,11 +371,11 @@ Preview lock clear \[Fo]\[u2370]\[Fc]
 .IP
 .nf
 \f[C]
-New pane below \[Fo]_\[Fc]
-New pane left \[Fo]|\[Fc]
-New pane right \[Fo]\[bb]\[Fc]
-New pane left, keep focus \[Fo]\[u21C8]x/>\[Fc]
-New pane right, keep focus \[Fo]\[u21C8]z/<\[Fc]
+New ftl pane below \[Fo]_\[Fc]
+New ftl pane left \[Fo]|\[Fc]
+New ftl pane left, keep focus \[Fo]\[u21C8]x/>\[Fc]
+New ftl pane right \[Fo]\[bb]\[Fc]
+New ftl pane right, keep focus \[Fo]\[u21C8]z/<\[Fc]
 
 Next pane or viewer \[Fo]\[aq]-\[aq]\[Fc]
 	Set focus on the next pane
@@ -395,32 +405,39 @@ the directory before; afterward *ftl* will remembers which entry you
 were on.
 
 
-cd or edit file \[Fo]ENTER\[Fc]
+cd into directory or edit file \[Fo]ENTER\[Fc]
 	edit file if not binary, for binary files try hexedit command
 
 Cd to parent directory \[Fo]h\[Fc]
-Cd to parent directory \[Fo]D\[Fc]
+Down to next entry     \[Fo]j\[Fc]
+Up to previous entry   \[Fo]k\[Fc]
+cd into entry   \[Fo]l\[Fc]
 
-Down to next entry \[Fo]j\[Fc]
-Down to next entry \[Fo]B\[Fc]
+Using arrow:
 
-Up to previous entry \[Fo]k\[Fc]
-Up to previous entry \[Fo]A\[Fc]
+Cd to parent directory   \[Fo]arrow_left/D\[Fc]
+Down to next entry       \[Fo]arrow_down/B\[Fc]
+Up to previous entry     \[Fo]arrow_up/A\[Fc]
+cd into directory \[Fo]arrow_right/C\[Fc]
 
-Right; cd into entry \[Fo]l\[Fc]
-Right; cd into directory \[Fo]C\[Fc]
+Page down \[Fo]page_down/5\[Fc]
+Page up   \[Fo]page_up/6\[Fc]
 
-Page down \[Fo]5\[Fc]
-Page up \[Fo]6\[Fc]
+Move to \[Fo]g\[Fc]
+	goes to, depending of where in the listing you are:
 
-Go to top/file/bottom \[Fo]g\[Fc]
-
-Scroll preview up \[Fo]K\[Fc]
-Scroll preview down \[Fo]J\[Fc]
+	- top
+	- first file
+	- last file
 
 Next entry of same extension \[Fo]\[:o]\[Fc]
 Next entry of different extension \[Fo]\[:O]\[Fc]
 Goto entry by index \[Fo]\[:a]\[Fc]
+
+Preview window (when possible):
+
+Scroll preview up \[Fo]K\[Fc]
+Scroll preview down \[Fo]J\[Fc]
 \f[R]
 .fi
 .SS Preview
@@ -428,25 +445,37 @@ Goto entry by index \[Fo]\[:a]\[Fc]
 .nf
 \f[C]
 Preview show/hide \[Fo]v\[Fc]
+
 Change preview size \[Fo]+\[Fc]
+	chose a size in a predefined, see rc file, set of sizes
+
 Preview once \[Fo]V\[Fc]
+	Preview current entry (if preview pane is close), then close preview
 
 Alternative preview for dir, media, pdf, tar, ... \[Fo]\[uA]v/\[lq]\[Fc]
 Alternative preview for dir, media, pdf, tar, ... \[Fo]\[u21C8]v/\[oq]\[Fc]
+	When preview is on a preview for the current entry is shown, some
+	entries have more than one type of preview, IE: directories.
 
 File preview at end \[Fo]\[u21C8]t/\[TP]\[Fc]
+	show the bottom of the entry
 
-Hex preview + live editor \[Fo]\[uA]x/\[Fc]\[Fc]
+Hexadecimal preview \[Fo]\[uA]x/\[Fc]\[Fc]
 \f[R]
 .fi
 .SS Sorting
 .IP
 .nf
 \f[C]
-Set sort order \[Fo]o\[Fc]
+Select sort order \[Fo]o\[Fc] from:
+	- alphanumeric
+	- size
+	- date
+
 Reverse sort order \[Fo]O\[Fc]
 
 Select a sort order from a list of external sorts \[Fo]\[uA]f/\[u0111]\[Fc]
+	IE: by extension
 \f[R]
 .fi
 .SS Filtering
@@ -455,9 +484,19 @@ Select a sort order from a list of external sorts \[Fo]\[uA]f/\[u0111]\[Fc]
 \f[C]
 Set filter #1 \[Fo]f\[Fc]
 Set filter #2 \[Fo]F\[Fc]
-Clear filters \[Fo]\[uA]d/\[Sd]\[Fc]
 
-Select a filter from a list of external filters \[Fo]\[uA]f/\[u0111]\[Fc]
+Clear all filters \[Fo]\[uA]d/\[Sd]\[Fc]
+
+Select a filter from a list of external filters \[Fo]\[uA]f/\[u0111]\[Fc] ;
+
+by_extension			# keep files with matching extensions
+by_file				# keep only selected files, additive
+by_file_reset_dir		# keep only selected files, exclusive
+by_file_global			# keep only selected files, all tabs, additive
+by_file_global_reset_dir	# keep only selected files, all tabs, exclusive
+by_no_extension			# keep files not matching extensions
+by_only_tagged			# keep tagged files
+by_size				# keep files over minimum size
 
 Set reverse filter \[Fo]\[uA]a/\[Of]\[Fc]
 
@@ -483,7 +522,7 @@ Fzf to file with preview \[Fo]{\[Fc]
 Rg to file \[Fo]}\[Fc]
 \f[R]
 .fi
-.SS Tags/Selection
+.SS Tags/Etags
 .IP
 .nf
 \f[C]
@@ -543,6 +582,9 @@ Merge tags from all panes \[Fo]\[uA]o/\[oe]\[Fc]
 
 Fzf merge tags from panes \[Fo]\[u21C8]0/\[de]\[Fc]
 	if option auto_tags=0, chose the pane to merge tags from
+
+Select etag type from list \[Fo]\[u21C8]./\[a.]\[Fc]
+	See \[dq]Show/hide etags\[dq] above.
 \f[R]
 .fi
 .SS Marks
@@ -758,7 +800,7 @@ bind leader file s shred_command \[dq]override selection multiple times and dele
 .IP
 .nf
 \f[C]
-Add the following code to your vimrc:
+Add the following code to your bashrc:
 	source $path_to_ftl/cdf
 
 This adds a _cdf_ function which will open an *ftl* instance you can
@@ -809,7 +851,7 @@ map <silent> <leader>f :call Ftl(1)<cr>
 Please report bug to <https://https://github.com/nkh/ftl/issues>
 .PP
 Contributions are best done via pull requests on github.
-Keep code to a minimum, this \f[I]bash\f[R] !
+Keep code to a minimum.
 .SH AUTHOR
 .PP
 \[co] Nadim Khemir 2020-2022

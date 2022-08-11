@@ -40,7 +40,7 @@ key_command()
 [[ "$REPLY" == $'\e' ]] && REPLY=ESCAPE_SEQ1
 [[ "$REPLY" == '['   ]] && REPLY=ESCAPE_SEQ2
 [[ "$REPLY" == "${A[\']}" ]] && REPLY=ALT_QUOTE_KEY
-pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
+#pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
 
    { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
 || { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && { ((pdh_kfunc)) && pdhn "-> ${iarray[$REPLY]}" ; true ; } && ${iarray[$REPLY]} ; } \

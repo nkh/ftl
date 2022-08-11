@@ -1,6 +1,6 @@
 declare -g -A keep PWDS
 
-for f in "${!keep[@]}" do ; [[ "$f" =~ "$tab-$PWD/" ]] && unset keep[$f] ; done
+for f in "${!keep[@]}" ; do [[ "$f" =~ "$tab-$PWD/" ]] && unset keep[$f] ; done
 
 OIFS=$IFS ; IFS=$'\n'
 for file in $(\

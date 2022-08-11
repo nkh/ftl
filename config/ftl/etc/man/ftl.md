@@ -69,7 +69,13 @@ configuration file, added for the current session or made persistent.
 You can tag (select) entries, tags are synched between panes when option
 _auto_tag_ is set (set by default). 
 
-Etags is extra information that adorns the entries, IE: git status
+Etags is extra information that is optionally prepended to the entries.
+
+Available etags are: date or git status
+
+	/home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
+	 1  08/11/2022-12:00 .git
+	    ⮤  date etag   ⮥
 
 ## Preview
 If preview is on (on by default), a preview pane is displayed. It can
@@ -173,7 +179,8 @@ sequences of keys to perform a command. The default is '\\'
 	Show this man page «?»
 
 		The man page is generated and shows the default bindings. You
-		can configure *ftl* to show a different help if you prefer
+		can configure *ftl* to show a different help if you prefer to
+		cook your own.
 
 	Quit «q»
 
@@ -186,12 +193,12 @@ sequences of keys to perform a command. The default is '\\'
 
 	Quit, keep shell «@»
 
-		Quit *ftl* but doesn't close the shell pane if one exists
+		Quit all but doesn't close the shell pane if one exists
 
-	Quit, keep shell zoomed «⇈q/Ω»
+	Quit, keep preview zoomed «⇈q/Ω»
 
-		Quit *ftl* but doesn't close the shell pane if one exists and
-		zooms its pane.
+		Quit *ftl* but doesn't close the preview pane if one exists and
+		zooms it.
 
 	Detach the preview «$»
 		
@@ -217,7 +224,7 @@ sequences of keys to perform a command. The default is '\\'
 
 	Pdh, pane used for debugging «¿»
 
-	Bindings are used internaly by *ftl*
+	Bindings used internaly by *ftl*
 
 		Refresh curent pane «r»
 		Handle pane event   «7»
@@ -260,7 +267,7 @@ sequences of keys to perform a command. The default is '\\'
 		Entry stat is added to the header 
 
 	Show/hide etags «⇑./·»
-		tbd: more info about etags
+		See "Select etag type" below.
 
 	File/dir view mode «)»
 		Set the file/dir to (circular):
@@ -294,17 +301,15 @@ sequences of keys to perform a command. The default is '\\'
 		Use fzf and ueberzurg to find and display images
 
 	Preview lock «⍰»
-		tbd
-		
 	Preview lock clear «⍰»
 		tbd
 
 ## Panes
-	New pane below «_»
-	New pane left «|»
-	New pane right «¦»
-	New pane left, keep focus «⇈x/>»
-	New pane right, keep focus «⇈z/<»
+	New ftl pane below «_»
+	New ftl pane left «|»
+	New ftl pane left, keep focus «⇈x/>»
+	New ftl pane right «¦»
+	New ftl pane right, keep focus «⇈z/<»
 
 	Next pane or viewer «'-'»
 		Set focus on the next pane
@@ -326,59 +331,88 @@ sequences of keys to perform a command. The default is '\\'
 	were on.
 
 	
-	cd or edit file «ENTER»
+	cd into directory or edit file «ENTER»
 		edit file if not binary, for binary files try hexedit command
 
 	Cd to parent directory «h»
-	Cd to parent directory «D»
+	Down to next entry     «j»
+	Up to previous entry   «k»
+	cd into entry   «l»
 
-	Down to next entry «j»
-	Down to next entry «B»
+	Using arrow:
 
-	Up to previous entry «k»
-	Up to previous entry «A»
+	Cd to parent directory   «arrow_left/D»
+	Down to next entry       «arrow_down/B»
+	Up to previous entry     «arrow_up/A»
+	cd into directory «arrow_right/C»
 
-	Right; cd into entry «l»
-	Right; cd into directory «C»
+	Page down «page_down/5»
+	Page up   «page_up/6»
 
-	Page down «5»
-	Page up «6»
+	Move to «g»
+		goes to, depending of where in the listing you are:
 
-	Go to top/file/bottom «g»
-
-	Scroll preview up «K»
-	Scroll preview down «J»
+		- top
+		- first file
+		- last file
 
 	Next entry of same extension «ö»
 	Next entry of different extension «Ö»
 	Goto entry by index «ä»
 
+	Preview window (when possible):
+
+	Scroll preview up «K»
+	Scroll preview down «J»
+
 ## Preview
 
 	Preview show/hide «v»
+
 	Change preview size «+»
+		chose a size in a predefined, see rc file, set of sizes
+
 	Preview once «V»
+		Preview current entry (if preview pane is close), then close preview
 
 	Alternative preview for dir, media, pdf, tar, ... «⇑v/“»
 	Alternative preview for dir, media, pdf, tar, ... «⇈v/‘»
+		When preview is on a preview for the current entry is shown, some
+		entries have more than one type of preview, IE: directories.
 
 	File preview at end «⇈t/Þ»
+		show the bottom of the entry
 
-	Hex preview + live editor «⇑x/»»
+	Hexadecimal preview «⇑x/»»
 
 ## Sorting 
 
-	Set sort order «o»
+	Select sort order «o» from:
+		- alphanumeric
+		- size
+		- date
+
 	Reverse sort order «O»
 
 	Select a sort order from a list of external sorts «⇑f/đ»
+		IE: by extension
 
 ## Filtering
 	Set filter #1 «f»
 	Set filter #2 «F»
-	Clear filters «⇑d/ð»
 
-	Select a filter from a list of external filters «⇑f/đ»
+	Clear all filters «⇑d/ð»
+
+	Select a filter from a list of external filters «⇑f/đ» ;
+
+	by_extension			# keep files with matching extensions
+	by_file				# keep only selected files, additive
+	by_file_reset_dir		# keep only selected files, exclusive
+	by_file_global			# keep only selected files, all tabs, additive
+	by_file_global_reset_dir	# keep only selected files, all tabs, exclusive
+	by_no_extension			# keep files not matching extensions
+	by_only_tagged			# keep tagged files
+	by_size				# keep files over minimum size
 
 	Set reverse filter «⇑a/ª»
 
@@ -399,7 +433,7 @@ sequences of keys to perform a command. The default is '\\'
 	Fzf to file with preview «{»
 	Rg to file «}»
 
-## Tags/Selection
+## Tags/Etags
 	A tag is a selected file, *ftl* will display a glyph next to tagged
 	files. Option auto_tags controls if tags are automatically merged to
 	other panes.
@@ -457,6 +491,8 @@ sequences of keys to perform a command. The default is '\\'
 	Fzf merge tags from panes «⇈0/°»
 		if option auto_tags=0, chose the pane to merge tags from
 
+	Select etag type from list «⇈./˙»
+		See "Show/hide etags" above.
 ## Marks
 
 	Mark directory/file «m»
@@ -637,7 +673,7 @@ Also read the **INSTALL** file
 	# vim: set filetype=bash :
 
 ## Directory Picker
-	Add the following code to your vimrc:
+	Add the following code to your bashrc:
 		source $path_to_ftl/cdf
 
 	This adds a _cdf_ function which will open an *ftl* instance you can
@@ -682,7 +718,7 @@ Also read the **INSTALL** file
 
 Please report bug to <https://https://github.com/nkh/ftl/issues>
 
-Contributions are best done via pull requests on github. Keep code to a minimum, this _bash_ !
+Contributions are best done via pull requests on github. Keep code to a minimum.
 
 # AUTHOR
 

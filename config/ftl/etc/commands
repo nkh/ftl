@@ -94,9 +94,9 @@ preview_show_fzf()	{ p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-t
 preview_size()		{ ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tmux resizep -t $pane_id -x $x &>/dev/null ; rdir '' 0 ; }
 preview_tail()		{ [[ "${tail[$n]}" == "+$ " ]] && tail[$n]='+0 ' || tail[$n]='+$ ' ; list ; }
 quit_ftl()		{ tab_close || pane_close || quit ; }
-quit_keep_shell()	{ tab_close || pane_close || quit ; }
-quit_all()		{ ((main)) && { pane_send "${C[quit_ftl]}" ; sleep 0.05 ; R=${C[quit_ftl]} ; in_Q=1 ; } || tmux send -t $main_pane ${C[quit_all]}  ; }
-quit_keep_zoom()	{ quit2 ; [[ $pane_id ]] && { echo >$pfs/pane ; tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ; }
+quit_all()		{ ((main)) && { pane_send "${C[quit_ftl]}" ; sleep 0.05 ; in_Q=1 ; quit ; } || tmux send -t $main_pane ${C[quit_all]}  ; }
+quit_keep_shell()	{ keep_shell=1 ; quit_all ; }
+quit_keep_preview()	{ quit2 ; [[ $pane_id ]] && { echo >$pfs/pane ; tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ; }
 refresh_pane()		{ ((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ; } # directory content change signal
 rename()		{ tcpreview ; printf "%s\n" "${selection[@]}" | vidir - && tags_clear && cdir '' "$f" ; }
 shell()			{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; }
@@ -110,8 +110,8 @@ show_size()		{ ((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((sh
 show_stat()		{ ((show_stat ^= 1)) ; refresh ; list ; }
 sort_entries()		{ ((sort_type[tab] = sort_type[tab] + 1 >= ${#sort_filters[@]} ? 0 : sort_type[tab] + 1)) ; cdir '' "$f" ; }
 sort_entries_reverse()	{ [[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; cdir '' "$f"; }
-tab_new()		{ [[ -d "$f" ]] && tab_new "$n" || tab_new "$PWD" ; cdir ${tabs[tab]} ; }
-tab_next()		{ ctab=$tab ; tab_next ; ((tab != ctab)) && cdir ${tabs[tab]} '' "${dir_file[${tab}_${tabs[tab]}]}"; }
+tab_new()		{ [[ -d "$f" ]] && _tab_new "$n" || _tab_new "$PWD" ; cdir ${tabs[tab]} ; }
+tab_next()		{ ctab=$tab ; _tab_next ; ((tab != ctab)) && cdir ${tabs[tab]} '' "${dir_file[${tab}_${tabs[tab]}]}"; }
 tag_all_files()		{ for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ; }
 tag_all()		{ for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
