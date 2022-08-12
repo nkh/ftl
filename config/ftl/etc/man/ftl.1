@@ -53,6 +53,11 @@ killed and a new program is started.
 The idea is to use within \f[I]ftl\f[R] what you normally use on the
 command line.
 New previews are simple to add.
+.SS Extended And Detached Viewers
+.PP
+For some file types, often media types, \f[I]ftl\f[R] can show an
+extended view and even start a detached viewer.
+See \f[I]## MEDIA\f[R] below and `$CFG_CFG/etc/ftlrc'.
 .SS Vim
 .PP
 \f[I]ftl\f[R] uses the awesome \f[I]vim\f[R], if it\[cq]s not your
@@ -85,13 +90,18 @@ You can tag (select) entries, tags are synched between panes when option
 .PP
 Etags is extra information that is optionally prepended to the entries.
 .PP
-Available etags are: date or git status
+Available etags are:
 .IP
 .nf
 \f[C]
 /home/nadim/nadim/devel/repositories/ftl 2/14 \[u237A]
- 1  08/11/2022-12:00 .git
-    \[u2BA4]  date etag   \[u2BA5]
+ 1  08/11/2022-12:00 ftl
+    \[u2BA4]     date     \[u2BA5]
+
+/home/nadim/nadim/devel/repositories/ftl 2/14 \[u237A]
+ 1  M ftl
+ 1 ?? tags
+   \[u2BA4]\[u2BA5] git-status
 \f[R]
 .fi
 .SS Preview
@@ -766,8 +776,13 @@ External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
 Fzf chose viewer \[Fo]W\[Fc]
 
 Creating and using a viewer:
+	core viewers are in \[aq]$CFG_CFG/etc/viewers\[aq]
 
-\[aq]$CFG_CFG/viewers\[aq] ...
+	extra viewers are in\[aq]$CFG_CFG/viewers\[aq]
+
+	\[aq]$CFG_CFG/etc/ftlrc\[aq], the configuration file, contains an
+		example of user defined viewers
+	
 \f[R]
 .fi
 .SS Shell panes
@@ -786,7 +801,7 @@ background commands vs foreground commands
 bindings:
 Shell pane \[Fo]s\[Fc]
 Shell pane with selected files \[Fo]S\[Fc]
-Shell pane, zoomed out \[Fo]\[u2370]\[Fc]
+Shell pane, zoomed out \[Fo]\[u2370] - not asssigned\[Fc]
 
 Cd to shell pane \[Fo]\[u21C8]0/\[de]\[Fc]
 Send selection to shell pane \[Fo]X\[Fc]

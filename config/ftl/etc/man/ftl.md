@@ -47,6 +47,10 @@ program is killed and a new program is started.
 The idea is to use within *ftl* what you normally use on the command line. New
 previews are simple to add.
 
+## Extended And Detached Viewers
+For some file types, often media types, *ftl* can show an extended view and 
+even start a detached viewer. See *## MEDIA* below and '$CFG_CFG/etc/ftlrc'. 
+
 ## Vim
 *ftl* uses the awesome _vim_, if it's not your favorite editor you can install it
 just for previewing (and maybe find it awesome). Patches for other editors are
@@ -71,11 +75,16 @@ _auto_tag_ is set (set by default).
 
 Etags is extra information that is optionally prepended to the entries.
 
-Available etags are: date or git status
+Available etags are:
 
 	/home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
-	 1  08/11/2022-12:00 .git
-	    ⮤  date etag   ⮥
+	 1  08/11/2022-12:00 ftl
+	    ⮤     date     ⮥
+
+	/home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
+	 1  M ftl
+	 1 ?? tags
+	   ⮤⮥ git-status
 
 ## Preview
 If preview is on (on by default), a preview pane is displayed. It can
@@ -366,7 +375,6 @@ sequences of keys to perform a command. The default is '\\'
 	Scroll preview down «J»
 
 ## Preview
-
 	Preview show/hide «v»
 
 	Change preview size «+»
@@ -654,8 +662,13 @@ sequences of keys to perform a command. The default is '\\'
 	Fzf chose viewer «W»
 
 	Creating and using a viewer:
-	
-	'$CFG_CFG/viewers' ...
+		core viewers are in '$CFG_CFG/etc/viewers'
+
+		extra viewers are in'$CFG_CFG/viewers'
+
+		'$CFG_CFG/etc/ftlrc', the configuration file, contains an
+			example of user defined viewers
+		
 
 ## Shell panes
 	synch shell pane directory to ftl, and ftl directory to shell pane
@@ -670,7 +683,7 @@ sequences of keys to perform a command. The default is '\\'
 	bindings:
 	Shell pane «s»
 	Shell pane with selected files «S»
-	Shell pane, zoomed out «⍰»
+	Shell pane, zoomed out «⍰ - not asssigned»
 
 	Cd to shell pane «⇈0/°»
 	Send selection to shell pane «X»

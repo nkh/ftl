@@ -1,4 +1,5 @@
-# directories
+# CONFIG
+## Directories
 ftl_cfg="$HOME/.config/ftl"
 pgen="$ftl_cfg/generators"
 ftl_root=$ftl_cfg/var
@@ -9,10 +10,10 @@ help_file="$ftl_cfg/etc/man/ftl.1"
 help_command="man \"$help_file\""
 generators="$ftl_cfg/generators"
 
-# marks
+## Marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
-#options 
+## Options 
 shell_h=40%
 auto_tags=1
 pdhl=
@@ -35,17 +36,25 @@ show_tar=0
 tbcolor 67 67
 TBCOLORS='236 52'
 
-# external tags
+## External Tags
 etag=0
 #. $ftl_cfg/external_tags/git ; etag=1
 
+## Default sort
 sort_type0=0
 sort_reversed0=
+
+## Glyphs
 sglyph=( ⍺ 🡕 )
 iglyph=('' ᴵ ᴺ)
 lglyph=('' ᵈ ᶠ)
 tglyph=('' ¹ ² ³ D) 
-ifilter='webp|jpg|jpeg|JPG|png|gif'; mfilter='mp3|mp4|flv|mkv';
+
+## Media Filters
+ifilter='webp|jpg|jpeg|JPG|png|gif';
+mfilter='mp3|mp4|flv|mkv';
+
+## FZF Options
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="--cycle --expect=ctrl-t --reverse"
 
@@ -68,22 +77,23 @@ MD_RENDER2='vmd'
 HEXEDIT=hexedit
 SHRED=shred
 MIMETYPE=mimemagic
-NCDU=ncdu # ncdu ncdu2 gdu tdu
+NCDU=ncdu # ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 
+## Delete RM
 RM="rm -rf"
 	# how you want your files deleted
 	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
 	# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 	# RM=my_delete
 
-# external viewers and previewers
+## Extended And Detached Viewers
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd pperl pshell ptext pcomp pcbr pcbz ptype ; }
 # p_your_viewer(){ vipreview ~/.bashrc ; }
 
 CMD_COLS=150 # columns when displaying command mapping in popup
 
-# Keyboard mappings
+# BINDINGS 
 # 0, 7-9 are used by ftl and correspond to SIG_XXX entries below
 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
@@ -227,9 +237,10 @@ bind ftl SIG		8		SIG_REFRESH		"preview pane signal"
 bind ftl SIG		9		SIG_REMOTE		"handle pane preview"
 bind ftl SIG		0		SIG_SYNCH_SHELL		"cd to shell pane"
 
-. $FTL_CFG/etc/bindings/search
-. $FTL_CFG/etc/bindings/leader
-. $FTL_CFG/etc/bindings/leader_ftl
+# Extra Bindings
+source $FTL_CFG/etc/bindings/search
+source $FTL_CFG/etc/bindings/leader
+source $FTL_CFG/etc/bindings/leader_ftl
 
 # vim: set filetype=bash :
 

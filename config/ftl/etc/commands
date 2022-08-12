@@ -1,4 +1,4 @@
-. $FTL_CFG/etc/extra_commands/shell
+source $FTL_CFG/etc/extra_commands/shell
 
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }

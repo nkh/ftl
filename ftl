@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-declare -Ag ftl_key_map C bindings key_maps ; key_map=ftl_key_map ; . $FTL_CFG/ftlrc || . $FTL_CFG/etc/ftlrc ;
+declare -Ag ftl_key_map C bindings key_maps ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc || source $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6 ; tag_read "$@" && shift 2
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
@@ -53,7 +53,7 @@ cd "${1:-$PWD}" || return ; [[ "$PPWD" != "$PWD" ]] && { marks["'"]="$n" ; PPWD=
 tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
 
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
-[[ -f .ftlrc_dir ]] && . .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
+[[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
 ((gpreview)) || nice -15 $generators/generator $thumbs &
 
@@ -106,4 +106,4 @@ preview() # force_preview
 tcpreview
 }
 
-[[ $TMUX ]] && { FTL_CFG="$HOME/.config/ftl" ; . $FTL_CFG/etc/core ; . $FTL_CFG/etc/commands ; ftl "$@" ; } || echo 'ftl: run in tmux'
+[[ $TMUX ]] && { FTL_CFG="$HOME/.config/ftl" ; source $FTL_CFG/etc/core ; source $FTL_CFG/etc/commands ; ftl "$@" ; } || echo 'ftl: run in tmux'
