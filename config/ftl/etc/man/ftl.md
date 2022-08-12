@@ -440,6 +440,7 @@ sequences of keys to perform a command. The default is '\\'
 		eg: always hide vim swap files, set in rcfile
 			rfilter0='\.sw.$'
 
+	Hide extension «¤», per tab
 	Hide extension «%», globally
 		Hide all files having the same extention as the current file.
 		You can hide multiple extensions. You can successively reduce
