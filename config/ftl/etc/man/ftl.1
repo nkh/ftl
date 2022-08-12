@@ -36,7 +36,7 @@ starts with two panes, but can have more, one showing you a directory
 listing and the other a preview of the current entry.
 The outstanding \f[I]tmux\f[R] makes this possible.
 .PP
-You can chose to remove the preview as well as having multiple panes
+You can choose to remove the preview as well as having multiple panes
 showing the same or different directories.
 .PP
 Panes are independent instances of ftl that work in synch, each pane has
@@ -57,7 +57,8 @@ New previews are simple to add.
 .PP
 For some file types, often media types, \f[I]ftl\f[R] can show an
 extended view and even start a detached viewer.
-See \f[I]## MEDIA\f[R] below and `$CFG_CFG/etc/ftlrc'.
+See \[lq]## External Viewer\[rq] below and config in
+`$CFG_CFG/etc/ftlrc'.
 .SS Vim
 .PP
 \f[I]ftl\f[R] uses the awesome \f[I]vim\f[R], if it\[cq]s not your
@@ -116,7 +117,7 @@ accessed with a keyboard shortcut (Alt-gr+v by default)
 \f[I]ftl\f[R] can filter the files in the directory to present only
 those you want to see.
 .PP
-See \f[I]Filtering\f[R] commands.
+See \[lq]## Filtering\[rq] in commands.
 .SS Bash
 .PP
 \f[I]ftl\f[R] is written in Bash, the language that packs a real punch
@@ -152,7 +153,7 @@ ftl    file     c        copy          copy file to, prompts inline
 .PP
 You can override all the keys by creating your own rcfile and using the
 \f[I]bind\f[R] function.
-See <USER RCFILE, BINDINGS, COMMANDS, \&...> for some examples.
+See \[lq]## Examples\[rq].
 .IP
 .nf
 \f[C]
@@ -199,8 +200,6 @@ bind ftl bind BACKSPACE_KEY leader_key \[aq]leader key SPACE_KEY
 .IP \[bu] 2
 General Ftl Commands
 .IP \[bu] 2
-Command Mode
-.IP \[bu] 2
 Viewing modes
 .IP \[bu] 2
 Panes
@@ -227,7 +226,9 @@ File And Directory Operations
 .IP \[bu] 2
 External Commands
 .IP \[bu] 2
-Media
+External Viewer
+.IP \[bu] 2
+Shell Commands
 .IP \[bu] 2
 Shell Panes
 .SS General Ftl Commands
@@ -296,29 +297,6 @@ Bindings used internaly by *ftl*
 	Preview pane signal \[Fo]8\[Fc]
 	Handle pane preview \[Fo]9\[Fc]
 	Cd to shell pane    \[Fo]0\[Fc]
-\f[R]
-.fi
-.SS Command Mode
-.IP
-.nf
-\f[C]
-Run commands \[Fo]:\[Fc] # implemented in \[dq]$FTL_CFGl/etc/extra_commands/shell\[dq]
-
-	You are prompted, with edit, history, and completion, for a command:
-
-	\[Fo]empty answer\[Fc] 		Cancel
-	\[ha][1-9][0-9]*$ 		Goto entry
-	\[ha]etags			Chose tagging method
-	\[dq]load_tags\[dq]		Load tags from a file
-	\[ha]tree			display a tree in a popup pane
-	${C[$1]}		run the *ftl* command
-	\[dq]${ftl_key_map[$1]}\[dq]	run the *ftl* command matching the shortcut
-	\[ha]command		run command
-	\[ha]-l command		run command, once per selection entry
-	\[ha]-s command		run background command
-	\[ha]-sl command		run background command, once per selection entry
-
-View shell \[Fo]!\[Fc]
 \f[R]
 .fi
 .SS Viewing Mode
@@ -457,7 +435,7 @@ Scroll preview down \[Fo]J\[Fc]
 Preview show/hide \[Fo]v\[Fc]
 
 Change preview size \[Fo]+\[Fc]
-	chose a size in a predefined, see rc file, set of sizes
+	choose a size in a predefined, see rc file, set of sizes
 
 Preview once \[Fo]V\[Fc]
 	Preview current entry (if preview pane is close), close the
@@ -470,7 +448,8 @@ Alternative preview #2 \[Fo]\[u21C8]v/\[oq]\[Fc]
 
 	entry types with multiple preview types:
 		- directories
-		- media
+		- music
+			will show information and play the music
 		- pdf
 		- tar files 
 
@@ -607,10 +586,10 @@ Untag all \[Fo]u\[Fc]
 	directories.
 
 Untag fzf \[Fo]U\[Fc]
-	Opens fzf to let you chose which entries to untag
+	Opens fzf to let you choose which entries to untag
 
 Fzf goto \[Fo]\[uA]g/\[u014B]\[Fc]
-	Opens fzf to let you chose an entry among the tags, then
+	Opens fzf to let you choose an entry among the tags, then
 	change directory to where the tag is.
 
 	This is can be handy when tags are read from a file with option
@@ -620,7 +599,7 @@ Merge tags from all panes \[Fo]\[uA]o/\[oe]\[Fc]
 	if option auto_tags=0,  merge tags from all panes
 
 Fzf merge tags from panes \[Fo]\[u21C8]0/\[de]\[Fc]
-	if option auto_tags=0, chose the pane to merge tags from
+	if option auto_tags=0, choose the pane to merge tags from
 
 Select etag type from list \[Fo]\[u21C8]./\[a.]\[Fc]
 	See \[dq]Show/hide etags\[dq] above.
@@ -726,55 +705,34 @@ Send mail                      \[Fo]\[u02FD]fm\[Fc]
 Terminal popup                 \[Fo]\[u02FD]ft\[Fc]
 \f[R]
 .fi
-.SS Media
+.SS External Viewer
 .IP
 .nf
 \f[C]
-Images:
-	Preview:
+Sometime Previews in ftl are not enough, eg. you really want to see
+that pdf with the images in it not just a text rendering. The external
+key bindings set the _emode_ variable and external viewer decide how
+to display an entry, that may be in a text based application or not.
 
-External viewer, m1 \[Fo]e\[Fc]
-External viewer, m2, detached \[Fo]E\[Fc]
-External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
-External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
+*ftl* had a some viewers for images, videos, comics, directories
+containing media, mp3, ...
 
-Terminal media player \[Fo]w\[Fc]
-Fzf chose viewer \[Fo]W\[Fc]
+External viewer, mode #1 \[Fo]e\[Fc]
+External viewer, mode #2, detached \[Fo]E\[Fc]
+External viewer, mode #3 \[Fo]\[uA]e/\[Eu]\[Fc]
+External viewer, mode #4 \[Fo]\[u21C8]e/\[ct]\[Fc]
 
-Videos:
-	Preview:
+Music has a sound preview mode #1, it lets you play a file in the 
+background. you can stop it when you want or it stops when you
+leave *ftl*. Modes #2-#4 open _G_PLAYER_ which is _vlc_ by default.
 
-External viewer, m1 \[Fo]e\[Fc]
-External viewer, m2, detached \[Fo]E\[Fc]
-External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
-External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
-
-Terminal media player \[Fo]w\[Fc]
-Fzf chose viewer \[Fo]W\[Fc]
-
-Music:
-	Preview:
-	Live preview:
-
-Terminal media player \[Fo]w\[Fc]
 Kill sound preview \[Fo]a\[Fc]
 
-External viewer, m1 \[Fo]e\[Fc]
-External viewer, m2, detached \[Fo]E\[Fc]
-External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
-External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
+run viewer        \[Fo]w\[Fc]
+Fzf choose viewer \[Fo]W\[Fc]
 
-Fzf chose viewer \[Fo]W\[Fc]
-
-Comics:
-	Preview:
-
-External viewer, m1 \[Fo]e\[Fc]
-External viewer, m2, detached \[Fo]E\[Fc]
-External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
-External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
-
-Fzf chose viewer \[Fo]W\[Fc]
+The viewer for music queues the files in cmus. I recommend adding
+a binding for cmus in *tmux* to access the application easilly.
 
 Creating and using a viewer:
 	core viewers are in \[aq]$CFG_CFG/etc/viewers\[aq]
@@ -782,31 +740,98 @@ Creating and using a viewer:
 	extra viewers are in\[aq]$CFG_CFG/viewers\[aq]
 
 	\[aq]$CFG_CFG/etc/ftlrc\[aq], the configuration file, contains an
-		example of user defined viewers
+	example of a simple user defined viewer.
 	
 \f[R]
 .fi
-.SS Shell panes
+.SS Shell Commands
+.PP
+You can run shell commands in four different ways
+.IP \[bu] 2
+Within a shell pane
+.PP
+see \f[I]Shell Panes\f[R] below
+.IP \[bu] 2
+user defined ftl command
+.PP
+if you run the same command often you can create a command that you can
+call directly from \f[I]ftl\f[R].
+.PP
+Create a shortcut, maybe using \[Fo]leader + u + char\[Fc], and put your
+code in $FTL_CFG/user_bindings/, it will be loaded automatically by
+\f[I]ftl\f[R].
+See \[lq]# EXAMPLES\[rq] below.
+.PP
+You can also add commands without bindings, in $FTL_CFG/user_commands/,
+\f[I]ftl\f[R] will lets you choose a command to run with the invaluable
+\f[I]fzf\f[R] or at the command prompt.
 .IP
 .nf
 \f[C]
-synch shell pane directory to ftl, and ftl directory to shell pane
+Run user command \[Fo]\[u02FD]u\[Fc]
+command propmpt \[Fo]:\[Fc]
 
-moving from shell pane to ftl and from ftl to shell pane
+the scripts are either bash scripts that are sourced or executables
+written in any language.
 
-multiple shell panes
-
-background commands vs foreground commands
-	when commands fail
-
-bindings:
+	Look at $FTL_CONFIG/user_commands/01_example
+	Look at $FTL_CONFIG/user_commands/02_example (executable bash)
+\f[R]
+.fi
+.IP \[bu] 2
+run commands creating a background shell pane Run commands \[Fo]:\[Fc] #
+implemented in \[lq]$FTL_CFG/etc/extra_commands/shell\[rq]
+.RS 2
+.PP
+You are prompted, with edit, history, and completion, for a command:
+.PP
+- \[Fo]empty answer\[Fc] Cancel
+.PP
+- [1][0-9]*$ Goto entry
+.PP
+- \[ha]etags Chose tagging method
+.PP
+- \[lq]load_tags\[rq] Load tags from a file
+.PP
+- \[ha]tree display a tree in a popup pane
+.PP
+- shortcut run the \f[I]ftl\f[R] command
+.PP
+- bound function run the \f[I]ftl\f[R] command matching the shortcut
+.PP
+- user_command [args] run command
+.PP
+- \[ha]command [args] run command
+.PP
+- \[ha]-s command [args] run command, once per selection
+.PP
+- \[ha]-b command [args] run command, separate bash
+.PP
+- \[ha]-bs command [args] run command, separate bash, once per selection
+.PP
+switch to shell pane \[Fo]!\[Fc]
+.PP
+switch back from pane \[Fo]tmux-prefix+L\[Fc]
+.PP
+When a commands fails \f[I]ftl\f[R] adds a `!' in the header.
+Switch to the tmux ftl session to see the error.
+.PP
+Command that takes time to complete tbd
+.RE
+.SS Shell Panes
+.IP
+.nf
+\f[C]
 Shell pane \[Fo]s\[Fc]
+	moving from shell pane to ftl and from ftl to shell pane
+
 Shell pane with selected files \[Fo]S\[Fc]
-Shell pane, zoomed out \[Fo]\[u2370] - not asssigned\[Fc]
+Shell pane, zoomed out \[Fo]not asssigned\[Fc]
 
 Cd to shell pane \[Fo]\[u21C8]0/\[de]\[Fc]
+	synch shell pane directory to ftl
+
 Send selection to shell pane \[Fo]X\[Fc]
-	Comparing Files
 \f[R]
 .fi
 .SH FILES AND DIRECTORIES
@@ -823,7 +848,7 @@ $FTL_CFG (set by default to $HOME/.config/ftl) is the directory that
 contains \f[I]ftl\f[R] code and data.
 .SH CONFIGURATION
 .PP
-See \f[I]config/ftl/etc/ftlrc\f[R], ftl\[cq]s default config file, for a
+See \[lq]$FTL_CFG/etc/ftlrc\[rq], ftl\[cq]s default config file, for a
 complete documentation
 .SH INSTALL
 .PP
@@ -874,12 +899,12 @@ declare -A marks=(
 # vim: set filetype=bash :
 \f[R]
 .fi
-.SS New Command
+.SS User Command With Binding
+.PP
+This example can be found in $FTL_CONFIG/user_bindings/01_shred
 .IP
 .nf
 \f[C]
-This example can be found in $FTL_CONFIG/user_bindings/01_shred
-
 shred_command() 
 {
 # prompt user
@@ -972,3 +997,7 @@ Artistic licence 2.0 or GNU General Public License 3, at your option.
 .SH SEE ALSO
 .PP
 ranger, fff, clifm, lfm, nnn, vifm, broot, gitfm, \&...
+.SH NOTES
+.SS [1]
+.PP
+1-9

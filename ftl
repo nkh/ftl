@@ -55,7 +55,7 @@ tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep=
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
-((gpreview)) || nice -15 $generators/generator $thumbs &
+((gpreview)) || nice -15 $pgen/generator $thumbs &
 
 declare -A uniq_file ; pad=(* ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size

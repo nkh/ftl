@@ -32,7 +32,7 @@ go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; m= ; while read 
 fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$p")" ; }
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
-gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $generators/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }
+gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $pgen/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }

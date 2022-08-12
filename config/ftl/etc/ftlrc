@@ -1,48 +1,50 @@
 # CONFIG
 ## Directories
 ftl_cfg="$HOME/.config/ftl"
-pgen="$ftl_cfg/generators"
-ftl_root=$ftl_cfg/var
-ftl_cmds=$ftl_root/cmds
-ghist=$ftl_root/history
-thumbs=$ftl_root/thumbs ; mkdir -p $thumbs ; 
-help_file="$ftl_cfg/etc/man/ftl.1"
-help_command="man \"$help_file\""
-generators="$ftl_cfg/generators"
+pgen="$ftl_cfg/generators" #location of preview generators
+ftl_root=$ftl_cfg/var # runtime directory, every session gets a directory here
+ftl_cmds=$ftl_root/cmds # history of shell commands
+ghist=$ftl_root/history # global history file
+
+thumbs=$ftl_root/thumbs #where preview generators cache the previews
+mkdir -p $thumbs # make sure the directory exists
+
+help_file="$ftl_cfg/etc/man/ftl.1" # the help file to be shown by the help command, you can have your own help
+help_command="man \"$help_file\"" # command to run to show help, try setting MANPAGER to vim
 
 ## Marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
 ## Options 
-shell_h=40%
-auto_tags=1
-pdhl=
-prev_all=1
-zoom=0 ; zooms=(70 50 30)
-msg_m='Creating montage ...'
-msg_du='Computing dir sizes ...'
-find_auto=README
-line_color0="\e[2;40;90m"
-line_color="$line_color0"
-line_color_hi="\e[38;5;240m"
-cursor_color0='\e[7;34m'
-cursor_color="$cursor_color0"
-cursor_color_search='\e[7;35m'
-quick_display=512
-show_line=1
+shell_h=40% # shell pane height
+auto_tags=1 # automatically synch tags between panes
+pdhl= # log pdh message in file too
+prev_all=1 # open preview window
+zooms=(70 50 30) # sizes of preview pane in percent
+zoom=0 # start zoon level
+msg_m='Creating montage ...' # message displayed when creating image montage for directories
+msg_du='Computing dir sizes ...' # message displayed when computing directory sizes
+find_auto=README # file to select by default
+line_color0="\e[2;40;90m" # default line color
+line_color="$line_color0" #line color
+line_color_hi="\e[38;5;240m" # line color highlightes
+cursor_color0='\e[7;34m' # default cursor color
+cursor_color="$cursor_color0" # cursor color
+cursor_color_search='\e[7;35m' # cursor color in interactive search
+quick_display=512 # display entries during scanning if over this number
+show_line=1 # show line (entry index)
 show_size=0 # 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
-show_date=1
-show_tar=0
-tbcolor 67 67
+show_date=1 # show date in header if sort mode is by date
+show_tar=0 # show extra information about tar file, takes time
+tbcolor 67 67 # tmux separation line color
 TBCOLORS='236 52'
 
 ## External Tags
-etag=0
-#. $ftl_cfg/external_tags/git ; etag=1
+etag=0 # show wtag
+#. $ftl_cfg/external_tags/git ; etag=1 # if you want to show git tags by default
 
-## Default sort
-sort_type0=0
-sort_reversed0=
+sort_type0=0 # default sort. 0: alphanumeric, 1: size, 2: date.
+sort_reversed0= #default reverse sort order
 
 ## Glyphs
 sglyph=( ⍺ 🡕 )
@@ -60,36 +62,43 @@ fzfp_opt="--cycle --expect=ctrl-t --reverse"
 
 #external commands
 FTLI_CLEAN=0 # set to 1 if not using konsole
-FTLI_W=10
-FTLI_H=19
+FTLI_W=10 # hint FTLI about Character width
+FTLI_H=19 # hint FTLI about Character height
 
 GPGID=CHANGE.ME
 
-G_PLAYER=vlc
-T_PLAYER="mplayer -vo null"
-T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null'
+G_PLAYER=vlc # gui media player
+T_PLAYER="mplayer -vo null" # terminal media player
+T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
 PREVIEW_SHOW="$ftl_cfg/viewers/cmus"
 
 PAGER_ANSI='/usr/bin/less -R'
-MD_PAGER='moar --no-statusbar -no-linenumbers'
-MD_RENDER1='lowdown -Tterm'
-MD_RENDER2='vmd'
-HEXEDIT=hexedit
-SHRED=shred
-MIMETYPE=mimemagic
+MD_PAGER='moar --no-statusbar -no-linenumbers' # pager when showing markdown preview
+MD_RENDER1='lowdown -Tterm' # markdown renderer #1
+MD_RENDER2='vmd' # markdown renderer #2
+HEXEDIT=hexedit # hex viewer/editor
+MIMETYPE=mimemagic # mimetype generator
 NCDU=ncdu # ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 
-## Delete RM
+## Delete application
 RM="rm -rf"
 	# how you want your files deleted
 	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
 	# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 	# RM=my_delete
 
-## Extended And Detached Viewers
+## Extended And Detached Viewers order
 externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
+
+## Previewers order
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd pperl pshell ptext pcomp pcbr pcbz ptype ; }
-# p_your_viewer(){ vipreview ~/.bashrc ; }
+
+
+# my_pviewer()
+# {
+# vipreview ~/.bashrc ; true 
+# } 
+#previewers(){ echo plock pdir my_pviewer ; } # set previewers order
 
 CMD_COLS=150 # columns when displaying command mapping in popup
 
@@ -159,13 +168,13 @@ bind ftl marks		","		gmark			"add persistent mark"
 bind ftl marks		";"		gmark_fzf		"fzf to persistent mark"
 bind ftl marks		m		mark			"mark directory/file"
 bind ftl marks		"${A[k]}"	gmarks_clear		"clear persistent marks"
-bind ftl media		E		external_mode2		"external viewer m2, detached"
-bind ftl media		W		preview_show_fzf	"fzf viewer"
 bind ftl media		a		player_kill		"kill sound preview"
 bind ftl media		e		external_mode1		"external viewer, m1"
+bind ftl media		E		external_mode2		"external viewer m2, detached"
 bind ftl media		"${A[e]}"	external_mode3		"external viewer, m3"
 bind ftl media		"${SA[e]}"	external_mode4		"external viewer, m4"
 bind ftl media		w		preview_show		"terminal media player in background"
+bind ftl media		W		preview_show_fzf	"fzf a viewer"
 bind ftl move		ENTER_KEY	enter			"enter; cd or open file"
 bind ftl move		5		move_page_up		"page down"
 bind ftl move		6		move_page-down		"page up"
@@ -242,6 +251,7 @@ bind ftl SIG		0		SIG_SYNCH_SHELL		"cd to shell pane"
 source $FTL_CFG/etc/bindings/search
 source $FTL_CFG/etc/bindings/leader
 source $FTL_CFG/etc/bindings/leader_ftl
+source $FTL_CFG/etc/bindings/user_command
 
 # vim: set filetype=bash :
 

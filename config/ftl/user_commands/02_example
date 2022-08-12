@@ -1,0 +1,17 @@
+fs=/tmp/$USER
+mkdir -p $fs
+
+source $ftl_info_file # executable get serialized information from * ftl *
+
+{ 
+echo ftl_info_file: $ftl_info_file
+echo FTL_PWD: $FTL_PWD
+echo current entry: $n
+echo Selection: ;        printf "\t%s\n" "${selection[@]}"
+echo Arguments: ;        printf "\t%s\n" "$@"
+} >$fs/02_example_info
+
+tmux popup cat $fs/02_example_info
+
+# vim: set filetype=bash :
+

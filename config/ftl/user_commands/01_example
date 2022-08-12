@@ -1,0 +1,15 @@
+
+# sourced bash scripts are running in the same shell and have access to * ftl *
+# data, the arguments are those you give on the command line.
+
+{ 
+echo CWD: $PWD
+echo current entry: $n
+echo Selection: ; printf "\t%s\n" "${selection[@]}"
+echo Arguments: ; printf "\t%s\n" "$@"
+} >$fs/01_example_info
+
+tmux popup cat $fs/01_example_info
+
+# vim: set filetype=bash :
+
