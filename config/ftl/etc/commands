@@ -102,7 +102,7 @@ rename()		{ tcpreview ; printf "%s\n" "${selection[@]}" | vidir - && tags_clear 
 shell()			{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_files()		{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } && R=${C[shell_file]} || shell_pane 1 ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_file()		{ for i in "${selection[@]}" ; do shell_send 1 "'$i'" " " ; done ; }
-shell_view()		{ tcpreview ; echo -en '\e[?1049l' ; read -sn 1 ; echo -en '\e[?1049h' ; list ; }
+shell_view()		{ tmux switch -t ftl$$:ftl$$_bash ; }
 shell_synch()		{ shell_send 1 "cd '$p'" C-m ; }
 shell_zoomed()		{ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ; }
 show_hidden()		{ ((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ; }
