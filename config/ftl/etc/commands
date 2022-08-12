@@ -35,7 +35,7 @@ create_bulk()		{ tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }
 delete_selection()	{ tag_check && { delete_tag ; true ; } || delete '' "${selection[@]}" ; }
-depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && max_depth[tab]=$REPLY && cdir '' "$f" ; }
+depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && { max_depth[tab]=$REPLY && cdir '' "$f" ; } || list ; }
 editor_detach()		{ ((in_vipreview)) && in_vipreview= && pane_id= && cdir ; }
 external_mode1()	{ emode=1 ; preview ; }
 external_mode2()	{ emode=2 ; preview ; }
@@ -53,22 +53,22 @@ find_fzf_all()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -HI -E'.git/*' | sed
 find_fzf_dirs()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -td -I -L | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 find_fzf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 gmark()			{ { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ; }
-gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop fzf "$(cat $ftl_root/marks | lscolors | fzf-tmux $fzf_opt --cycle --expect=ctrl-t --ansi)" ; }
+gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$(cat $ftl_root/marks | lscolors | fzf-tmux $fzf_opt --cycle -m --expect=ctrl-t --ansi)" ; }
 gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ; }
 go_rg()			{ exec 2>&9 ; tcpreview ; go_loop rg "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/log" ; }
-history_go()		{ h=$fs/history ; dedup $h && go_loop fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
-ghistory()		{ h=$ghist ; dedup $h && go_loop fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
-ghistory2()		{ h=$ghist ; dedup $h && go_loop fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
+history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
+ghistory()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
+ghistory2()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory_clear()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
 ghistory_edit()		{ dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ; }
-image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
+image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
 image_mode()		{ ((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ftl_imode ; cdir '' "$f"; }
 link()			{ tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags_clear && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ; }
 follow_link()		{ [[ -L "$n" ]] && cdir "$(dirname $(realpath "$n"))"  "$(basename $(realpath "$n"))" ; }
-mark_fzf()		{ go_loop fzf "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --expect=ctrl-t --ansi)" ; }
-mark_go()		{ read -n 1 ; [[ -n ${marks[$REPLY]} ]] && { dir="$(dirname "${marks[$REPLY]}")" ; cdir "$dir" '' "${dir_file[${tab}_$dir]}" ; } || list ; }
-mark_go_tab()		{ read -n 1 ; [[ -n ${marks[$REPLY]} ]] && { dir="$(dirname "${marks[$REPLY]}")" ; _tab_new "$dir" ; cdir "$dir" '' "${dir_file[${tab}_$dir]}" ; } || list ; }
 mark()			{ read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]="${files[file]}" ; }
+mark_fzf()		{ go_loop f fzf "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)" ; }
+mark_go()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" '' "${dir_file[${tab}_$d]}" ; } || list ; }
+mark_go_tab()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" '' "${dir_file[${tab}_$d]}" ; } || list ; }
 montage_clear()		{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&- ; pw3image FTL_RESTART_W3M ; list ; } ; }
 montage_preview()	{ [[ "$montage" ]] && montage= || montage="⠶" ; list ; }
 player_kill()		{ player_k ; }
@@ -120,7 +120,7 @@ tag_flip_down()		{ tag_flip "${files[file]}" ; move 1 ; list ; }
 tag_flip_up()		{ tag_flip "${files[file]}" ; move -1 ; list ; }
 tag_fzf()		{ fzf_tag T "$(fd -H --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 tag_fzf_all()		{ fzf_tag T "$(fd -H --color=always | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
-tag_goto()		{ tag_check && go_loop fzf "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
+tag_goto()		{ tag_check && go_loop f fzf "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 tag_merge()		{ p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' $fzf_opt) ; [[ $file ]] && . $p/$file ; cdir ; }
 tags_merge_all()	{ source ~/.config/ftl/merge/all ; list ; }
 tag_untag_all()		{ tags_clear ; list ; }

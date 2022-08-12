@@ -55,7 +55,7 @@ filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
 filter_rst(){ eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
-go_loop()   { P="$PWD" m= ; while read p ; do [[ "$p" == ctrl-t ]] && { m=1 ; continue ; } ; ${1}_go "$m" "$P" "$p" ; done<<<"$2" ; }
+go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; m= ; while read p ; do [[ "$p" == ctrl-t ]] && { m=1 ; continue ; } ; ${1}_go "$m" "$P" "$p" ; done<<<"$2" ; }
 fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$p")" ; }
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do [[ "$1" == U ]] && unset -v "tags[$f]" || tags[$PWD/$f]='▪' ; done <<<$2 ; }
@@ -99,7 +99,6 @@ run_maxed() { run_maxed=1 ; ((run_maxed)) && { aw=$(xdotool getwindowfocus -f) ;
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_pane(){ tcpreview ; P=$pane_id; tsplit bash $shell_h -v -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
 shell_send(){ { (( $1 )) && [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "${@:2}" ; }
-shell_pop() { tmux popup -E -d "$PWD" -w 80%  ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }
 save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs

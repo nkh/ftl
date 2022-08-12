@@ -215,7 +215,7 @@ History
 .IP \[bu] 2
 File And Directory Operations
 .IP \[bu] 2
-Extra Operations
+External Commands
 .IP \[bu] 2
 Media
 .IP \[bu] 2
@@ -619,14 +619,18 @@ Select etag type from list \[Fo]\[u21C8]./\[a.]\[Fc]
 .IP
 .nf
 \f[C]
-Mark directory/file \[Fo]m\[Fc]
-Fzf to mark \[Fo]QUOTE\[Fc]
+Mark directory/file \[Fo]m\[Fc] + character
+
+Go to mark \[Fo]QUOTE\[Fc] + character
 	QUOTE+QUOTE will take you to the last directory
 
-Go to mark, optionally in new tab \[Fo]\[u21C8]\[aq]/\[tmu]\[Fc]
+Fzf go to mark \[Fo]\[u21C8]\[aq]/\[tmu]\[Fc]
+	You can open multiple marks in tabs with \[Fo]ctrl-t\[Fc]
 
 Add persistent mark \[Fo],\[Fc]
 Fzf to persistent mark \[Fo];\[Fc]
+	You can open multiple marks in tabs with \[Fo]ctrl-t\[Fc]
+
 Clear persistent marks \[Fo]\[uA]k/\[u0138]\[Fc]
 \f[R]
 .fi
@@ -634,80 +638,136 @@ Clear persistent marks \[Fo]\[uA]k/\[u0138]\[Fc]
 .IP
 .nf
 \f[C]
-Fzf history all sessions \[Fo]\[uA]h/\[u0127]\[Fc]
-Fzf history all sessions \[Fo]\[ad]\[Fc]
-Fzf history current session \[Fo]H\[Fc]
+*ftl* keeps two location histories, one in the currentsession and one
+global (sum of all sessions)
 
-Fzf edit all sessions history \[Fo]\[u21C8]h/\[u0126]\[Fc]
-Delete current session history \[Fo]\[u21C8]d/\[-D]\[Fc]
+Fzf history all sessions \[Fo]\[ad]\[Fc]
+Fzf history all sessions \[Fo]\[uA]h/\[u0127]\[Fc]
+	You can open multiple marks in tabs with \[Fo]ctrl-t\[Fc]
+
+Fzf history current session \[Fo]H\[Fc]
+	You can open multiple marks in tabs with \[Fo]ctrl-t\[Fc]
+
+Fzf delete from all sessions history \[Fo]\[u21C8]h/\[u0126]\[Fc]
+	Uses fzf to mark entries that will be removed from the history
+
+Delete all session history \[Fo]\[u21C8]d/\[-D]\[Fc]
 \f[R]
 .fi
 .SS File and directory operations
 .IP
 .nf
 \f[C]
-Creat new file, prompts inline \[Fo]i\[Fc]
-Creat new directory, prompts inline \[Fo]I\[Fc]
-Creat in files and directories in bulk, uses vim, lines ending with / will create directories \[Fo]\[uA]i/\[->]\[Fc]
+Create new file        \[Fo]i\[Fc]
+Create new directory   \[Fo]I\[Fc]
+Create entries in bulk \[Fo]\[uA]i/\[->]\[Fc]
+	Opens _vim_, lines ending with / will create directories
 
-Copy file to, prompts inline \[Fo]c\[Fc]
+Delete selection \[Fo]d\[Fc]
+	uses configuration *RM*, see ftlrc.
 
-Delete selection using config $RM \[Fo]d\[Fc]
+Copy entry \[Fo]c\[Fc]
+Copy selection \[Fo]p\[Fc]
 
-Symlink selection in current directory \[Fo]\[uA]l/\[/l]\[Fc]
-Symlink follow \[Fo]\[u21C8]l/\[/L]\[Fc]
+Move selection \[Fo]P\[Fc]
+Move selection \[Fo]\[u21C8]p/\[Tp]\[Fc]
+	Uses _fzf_mv_.
 
-Copy selection to current directory \[Fo]p\[Fc]
-Move selection to current directory \[Fo]P\[Fc]
-Move to selection to predefine location using fzf_mv \[Fo]\[u21C8]p/\[Tp]\[Fc]
+Rename \[Fo]R\[Fc]
+	Uses _vidir_.
 
-Rename/bulk rename selection using vidir \[Fo]R\[Fc]
+Symlink selection \[Fo]\[uA]l/\[/l]\[Fc]
+Symlink follow    \[Fo]\[u21C8]l/\[/L]\[Fc]
 
 Flip selection executable bit \[Fo]x\[Fc]
 \f[R]
 .fi
-.SS Extra commands
+.SS External Commands
 .IP
 .nf
 \f[C]
-Compress/decompress \[Fo]\[u02FD]fc\[Fc]
+Example of command integration, see \[aq]etc/bindings/leader_ftl\[aq].
 
-Reduce jpg image size, converts png to jpg \[Fo]\[u02FD]fi\[Fc]
+Compress/decompress            \[Fo]\[u02FD]fc\[Fc]
 
-Run rmlint in current directory \[Fo]\[u02FD]fl\[Fc]
+Convert pdf to text file       \[Fo]\[u02FD]fP\[Fc]
 
-Send selection in mail \[Fo]\[u02FD]fm\[Fc]
+Display stat in preview pane   \[Fo]\[u02FD]fs\[Fc]
 
-Reduce pdf size \[Fo]\[u02FD]fp\[Fc]
+Encrypt/decrypt using password \[Fo]\[u02FD]fz\[Fc]
 
-Convert current pdf to text file \[Fo]\[u02FD]fP\[Fc]
+Encrypt/decrypt using _gpg_    \[Fo]\[u02FD]fx\[Fc]
 
-Display stat information for file in preview pane \[Fo]\[u02FD]fs\[Fc]
+Shred selection using _shred_  \[Fo]\[u02FD]s\[Fc]
 
-Override selection multiple times and deletes it, bypasses config rm -rf, asks for confirmation \[Fo]\[u02FD]s\[Fc]
+Reduce jpg image size          \[Fo]\[u02FD]fi\[Fc]
 
-Terminal popup \[Fo]\[u02FD]ft\[Fc]
+Reduce png to jpg              \[Fo]\[u02FD]fi\[Fc]
 
-Reduce video size \[Fo]\[u02FD]fv\[Fc]
+Reduce pdf size                \[Fo]\[u02FD]fp\[Fc]
 
-GPG encrypt/decrypt \[Fo]\[u02FD]fx\[Fc]
+Reduce video size              \[Fo]\[u02FD]fv\[Fc]
 
-Password encrypt/decrypt \[Fo]\[u02FD]fz\[Fc]
+Lint current directory         \[Fo]\[u02FD]fl\[Fc]
+
+Send mail                      \[Fo]\[u02FD]fm\[Fc]
+
+Terminal popup                 \[Fo]\[u02FD]ft\[Fc]
 \f[R]
 .fi
 .SS Media
 .IP
 .nf
 \f[C]
+Images:
+	Preview:
+
 External viewer, m1 \[Fo]e\[Fc]
 External viewer, m2, detached \[Fo]E\[Fc]
 External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
 External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
 
-Terminal media player in background \[Fo]w\[Fc]
-Fzf viewer \[Fo]W\[Fc]
+Terminal media player \[Fo]w\[Fc]
+Fzf chose viewer \[Fo]W\[Fc]
 
+Videos:
+	Preview:
+
+External viewer, m1 \[Fo]e\[Fc]
+External viewer, m2, detached \[Fo]E\[Fc]
+External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
+External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
+
+Terminal media player \[Fo]w\[Fc]
+Fzf chose viewer \[Fo]W\[Fc]
+
+Music:
+	Preview:
+	Live preview:
+
+Terminal media player \[Fo]w\[Fc]
 Kill sound preview \[Fo]a\[Fc]
+
+External viewer, m1 \[Fo]e\[Fc]
+External viewer, m2, detached \[Fo]E\[Fc]
+External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
+External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
+
+Fzf chose viewer \[Fo]W\[Fc]
+
+Comics:
+	Preview:
+
+External viewer, m1 \[Fo]e\[Fc]
+External viewer, m2, detached \[Fo]E\[Fc]
+External viewer, m3 \[Fo]\[uA]e/\[Eu]\[Fc]
+External viewer, m4 \[Fo]\[u21C8]e/\[ct]\[Fc]
+
+Fzf chose viewer \[Fo]W\[Fc]
+
+Creating and using a viewer:
+
+\[aq]$CFG_CFG/viewers\[aq] ...
 \f[R]
 .fi
 .SS Shell panes
@@ -719,6 +779,9 @@ synch shell pane directory to ftl, and ftl directory to shell pane
 moving from shell pane to ftl and from ftl to shell pane
 
 multiple shell panes
+
+background commands vs foreground commands
+	when commands fail
 
 bindings:
 Shell pane \[Fo]s\[Fc]

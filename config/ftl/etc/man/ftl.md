@@ -164,7 +164,7 @@ sequences of keys to perform a command. The default is '\\'
 - Marks
 - History
 - File And Directory Operations
-- Extra Operations
+- External Commands
 - Media
 - Shell Panes
 
@@ -521,81 +521,141 @@ sequences of keys to perform a command. The default is '\\'
 
 	Select etag type from list «⇈./˙»
 		See "Show/hide etags" above.
-## Marks
 
-	Mark directory/file «m»
-	Fzf to mark «QUOTE»
+## Marks
+	Mark directory/file «m» + character
+
+	Go to mark «QUOTE» + character
 		QUOTE+QUOTE will take you to the last directory
 
-	Go to mark, optionally in new tab «⇈'/×»
+	Fzf go to mark «⇈'/×»
+		You can open multiple marks in tabs with «ctrl-t»
 
 	Add persistent mark «,»
 	Fzf to persistent mark «;»
+		You can open multiple marks in tabs with «ctrl-t»
+
 	Clear persistent marks «⇑k/ĸ»
 
 ## History
-	Fzf history all sessions «⇑h/ħ»
-	Fzf history all sessions «¨»
-	Fzf history current session «H»
+	*ftl* keeps two location histories, one in the currentsession and one
+	global (sum of all sessions)
 
-	Fzf edit all sessions history «⇈h/Ħ»
-	Delete current session history «⇈d/Ð»
+	Fzf history all sessions «¨»
+	Fzf history all sessions «⇑h/ħ»
+		You can open multiple marks in tabs with «ctrl-t»
+
+	Fzf history current session «H»
+		You can open multiple marks in tabs with «ctrl-t»
+
+	Fzf delete from all sessions history «⇈h/Ħ»
+		Uses fzf to mark entries that will be removed from the history
+
+	Delete all session history «⇈d/Ð»
 
 ## File and directory operations
-	Creat new file, prompts inline «i»
-	Creat new directory, prompts inline «I»
-	Creat in files and directories in bulk, uses vim, lines ending with / will create directories «⇑i/→»
+	Create new file        «i»
+	Create new directory   «I»
+	Create entries in bulk «⇑i/→»
+		Opens _vim_, lines ending with / will create directories
 
-	Copy file to, prompts inline «c»
+	Delete selection «d»
+		uses configuration *RM*, see ftlrc.
 
-	Delete selection using config $RM «d»
+	Copy entry «c»
+	Copy selection «p»
 
-	Symlink selection in current directory «⇑l/ł»
-	Symlink follow «⇈l/Ł»
+	Move selection «P»
+	Move selection «⇈p/þ»
+		Uses _fzf_mv_.
 
-	Copy selection to current directory «p»
-	Move selection to current directory «P»
-	Move to selection to predefine location using fzf_mv «⇈p/þ»
+	Rename «R»
+		Uses _vidir_.
 
-	Rename/bulk rename selection using vidir «R»
+	Symlink selection «⇑l/ł»
+	Symlink follow    «⇈l/Ł»
 
 	Flip selection executable bit «x»
 
-## Extra commands 
-	Compress/decompress «˽fc»
+## External Commands
+	Example of command integration, see 'etc/bindings/leader_ftl'.
 
-	Reduce jpg image size, converts png to jpg «˽fi»
+	Compress/decompress            «˽fc»
 
-	Run rmlint in current directory «˽fl»
+	Convert pdf to text file       «˽fP»
 
-	Send selection in mail «˽fm»
+	Display stat in preview pane   «˽fs»
 
-	Reduce pdf size «˽fp»
+	Encrypt/decrypt using password «˽fz»
 
-	Convert current pdf to text file «˽fP»
+	Encrypt/decrypt using _gpg_    «˽fx»
 
-	Display stat information for file in preview pane «˽fs»
+	Shred selection using _shred_  «˽s»
 
-	Override selection multiple times and deletes it, bypasses config rm -rf, asks for confirmation «˽s»
+	Reduce jpg image size          «˽fi»
 
-	Terminal popup «˽ft»
+	Reduce png to jpg              «˽fi»
 
-	Reduce video size «˽fv»
+	Reduce pdf size                «˽fp»
 
-	GPG encrypt/decrypt «˽fx»
+	Reduce video size              «˽fv»
 
-	Password encrypt/decrypt «˽fz»
+	Lint current directory         «˽fl»
+
+	Send mail                      «˽fm»
+
+	Terminal popup                 «˽ft»
 
 ## Media
+	Images:
+		Preview:
+
 	External viewer, m1 «e»
 	External viewer, m2, detached «E»
 	External viewer, m3 «⇑e/€»
 	External viewer, m4 «⇈e/¢»
 
-	Terminal media player in background «w»
-	Fzf viewer «W»
+	Terminal media player «w»
+	Fzf chose viewer «W»
 
+	Videos:
+		Preview:
+
+	External viewer, m1 «e»
+	External viewer, m2, detached «E»
+	External viewer, m3 «⇑e/€»
+	External viewer, m4 «⇈e/¢»
+
+	Terminal media player «w»
+	Fzf chose viewer «W»
+
+	Music:
+		Preview:
+		Live preview:
+
+	Terminal media player «w»
 	Kill sound preview «a»
+
+	External viewer, m1 «e»
+	External viewer, m2, detached «E»
+	External viewer, m3 «⇑e/€»
+	External viewer, m4 «⇈e/¢»
+
+	Fzf chose viewer «W»
+
+	Comics:
+		Preview:
+
+	External viewer, m1 «e»
+	External viewer, m2, detached «E»
+	External viewer, m3 «⇑e/€»
+	External viewer, m4 «⇈e/¢»
+
+	Fzf chose viewer «W»
+
+	Creating and using a viewer:
+	
+	'$CFG_CFG/viewers' ...
 
 ## Shell panes
 	synch shell pane directory to ftl, and ftl directory to shell pane
@@ -603,6 +663,9 @@ sequences of keys to perform a command. The default is '\\'
 	moving from shell pane to ftl and from ftl to shell pane
 
 	multiple shell panes
+
+	background commands vs foreground commands
+		when commands fail
 
 	bindings:
 	Shell pane «s»

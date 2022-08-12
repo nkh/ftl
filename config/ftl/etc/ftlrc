@@ -86,10 +86,10 @@ CMD_COLS=150 # columns when displaying command mapping in popup
 # Keyboard mappings
 # 0, 7-9 are used by ftl and correspond to SIG_XXX entries below
 
+declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
+declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z ["´"]="'" [·]='.')
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)
 declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i ['&']=k [Ł]=l [º]=m [Œ]=o [Þ]=p [Ω]=q [®]=r [§]=s [Þ]=t [↑]=u [‘]=v ['>']=x [¥]=y ['<']=z [×]="'" [˙]=. [°]=0 [÷]=/)
-declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« [.]=·)
-declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z [·]='.')
 
 bind ftl bind	 	BACKSPACE_KEY	leader_key		'leader key "\"'
 
@@ -142,11 +142,11 @@ bind ftl history	"${SA[d]}"	ghistory_clear		"delete current session history"
 bind ftl history	"${SA[h]}"	ghistory_edit		"fzf edit all sessions history"
 bind ftl history	"${A[h]}"	ghistory		"fzf history all sessions"
 bind ftl marks		QUOTE_KEY	mark_go			"go to mark"
-bind ftl marks		"${SA["'"]}"	mark_go			"go to mark, new tab"
+bind ftl marks		"${SA["'"]}"	mark_go_tab		"go to mark, new tab"
+bind ftl marks		"${A["'"]}"	mark_fzf		"fzf to mark"
 bind ftl marks		","		gmark			"add persistent mark"
 bind ftl marks		";"		gmark_fzf		"fzf to persistent mark"
 bind ftl marks		m		mark			"mark directory/file"
-bind ftl marks		ALT_QUOTE_KEY	mark_fzf		"fzf to mark"
 bind ftl marks		"${A[k]}"	gmarks_clear		"clear persistent marks"
 bind ftl media		E		external_mode2		"external viewer m2, detached"
 bind ftl media		W		preview_show_fzf	"fzf viewer"
@@ -183,7 +183,6 @@ bind ftl shell		":"		command_prompt		"run commands: q, etags, load_tags, ..."
 bind ftl shell		S		shell_files		"shell pane with selected files"
 bind ftl shell		s		shell			"shell pane"
 bind ftl shell		"⍰"		shell_zoomed		"shell pane, zoomed out"
-bind ftl shell		"⍰"		shell_pop		"shell pane, in popup"
 bind ftl shell		X		shell_file		"send selection to shell pane"
 bind ftl shell		"${SA[0]}"	shell_synch		"cd to shell pane"
 bind ftl tabs		TAB_KEY		tab_next		"next tab"
