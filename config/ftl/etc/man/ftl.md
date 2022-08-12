@@ -672,14 +672,29 @@ sequences of keys to perform a command. The default is '\\'
 		
 
 ## Shell panes
+	shell background commands
+		-b
+		-l
+
+		when commands fail
+
+		switch to shell pane !
+		switch back prefix+L
+
+	shell foreground commands
+		-l
+
+		when commands fail
+
+		switch to shell pane !
+		switch back prefix+L
+
+	
 	synch shell pane directory to ftl, and ftl directory to shell pane
 
 	moving from shell pane to ftl and from ftl to shell pane
 
 	multiple shell panes
-
-	background commands vs foreground commands
-		when commands fail
 
 	bindings:
 	Shell pane «s»
