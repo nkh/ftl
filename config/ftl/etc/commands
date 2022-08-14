@@ -28,7 +28,7 @@ change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || l
 chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
 clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gcl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" || list ; }
-gcl()			{ ((command_list_generated)) || { for k in "${!C[@]}" ; do echo "$k"  ; done >$fs/command_names ; command_list_generated=1 ; } ; }
+gcl()			{ ((gcl)) || { { (cd "$ftl_cfg/user_commands" ; fd -t f | sed 's/^.\///') ; printf "%s\n" "${!C[@]}" ; } >$fs/command_names ; gcl=1 ; } ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
 create_bulk()		{ tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ; }
