@@ -1,4 +1,4 @@
-. $FTL_CFG/etc/bindings/search
+. $FTL_CFG/etc/bindings/incremental_search
 . $FTL_CFG/etc/bindings/leader
 . $FTL_CFG/etc/bindings/leader_ftl
 

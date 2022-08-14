@@ -1,7 +1,7 @@
 fs=/tmp/$USER
 mkdir -p $fs
 
-source $ftl_info_file # executable get serialized information from * ftl *
+source $ftl_info_file # to get serialized information from * ftl *
 
 { 
 echo ftl_info_file: $ftl_info_file

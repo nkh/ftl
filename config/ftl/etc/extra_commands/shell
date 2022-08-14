@@ -3,16 +3,7 @@ shell_command()
 [[ "$1" == 0 ]] && { return 1 ; }
 [[ "$1" =~ ^[1-9][0-9]*$ ]] && { file="${files[(($1 - 1))]}"  ; [[ -d "$file" ]] && cdir "$file" || list $(($1 - 1)) ; return 1 ; }
 
-[[ "$1" =~ ^etags ]] && \
-	{
-	p=~/.config/ftl/external_tags ; file="${1#etags }"
-
-	[[ -f "$p/$file" ]] && \
-		{ . $p/$file $fs ; etag=1 ; cdir ; } || \
-		{ file=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $file ]] && { . $p/$file $fs ; etag=1 ; cdir ; } ; }
-
-	return
-	}
+# commands can be implemented here or in files found in "user_commands"
 
 [[ "$1" == "load_tags" ]] && \
 	{
@@ -24,72 +15,37 @@ shell_command()
 	return
 	}
 
-[[ "$1" =~ ^tree ]] && \
-	{
-	tmux popup -h 90% -w 90% -E -d "$PWD" "$@ -C | $PAGER_ANSI"
-	return
-	}
-
+# shortcut or command bound to shortcut
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 [[ "${ftl_key_map[$1]}" ]] && R=${ftl_key_map[$1]} && return ;
 
-# user command
+# split command and serialize ftl information
 
-eval "cmd_parts=($1)" #split like a blunt axe!
+eval "cmd_parts=($1)" # split like a blunt axe! <https://www.reddit.com/r/bash/comments/wn83rz/splitting_a_string_that_contains_single_and>
 cmd="$cmd_parts"
+
+export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
+{ FTL_PWD=${PWD@Q} ; declare -p FTL_PWD n selection ; } >$ftl_info_file
+
+# user command
 
 user_cmd="$ftl_cfg/user_commands/$cmd"
 [[ -f  "$user_cmd" ]] && 
 	{
-	[[ ! -x "$user_cmd" ]] && source "$user_cmd" "${cmd_parts[@]:1}" || { serialize_ftl_info ; "$user_cmd" "${cmd_parts[@]:1}" ; } 
+	[[ ! -x "$user_cmd" ]] && source "$user_cmd" "${cmd_parts[@]:1}" || { "$user_cmd" "${cmd_parts[@]:1}" ; } 
 	return
 	}
 
 # shell command
 
-serialize_ftl_info
-
-[[ "$cmd" =~ ^-b ]] &&
-	{
-	[[ "$cmd" =~ ^-bs ]] && for n in "${selection[@]}" ; do tscommand "${cmd_parts[@]:1}" "-e n=${n@Q}" ; done || { tscommand "${cmd_parts[@]:1}""${ucmd#-b}" "-e n=${n@Q}" ; }
-	cdir ; return
-	}
-
-((has_bash_window)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; has_bash_window=1 ; }
-
-[[ "$cmd" =~ ^-s ]] && 
-	{
-	for n in "${selection[@]}"
-		do
-			{
-			echo "cd '$PWD' ; n=${n@Q}"
-			echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
-			echo "${cmd_parts[@]:1}"
-			echo "echo -e '\n\e[2;33mExit code: $?\e[m'"
-			} >$fs/bash_command
-			tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
-		done
-
-	} ||
-	{
-	{
-	echo "cd '$PWD'"
-	echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
-	echo "${cmd_parts[@]}"
-	echo "echo -e '\n\e[2;33mExit code: $?\e[m'"
-	} >$fs/bash_command
-	tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
-	}
-}
-
-serialize_ftl_info()
-{
-export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
+((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
 {
-FTL_PWD=${PWD@Q}
-declare -p FTL_PWD n selection
-} >$ftl_info_file
+echo "cd '$PWD'"
+echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
+echo "${cmd_parts[@]}"
+echo "echo -e '\n\e[2;33mExit code: $?\e[m'"
+} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
 
 }
 

@@ -1,0 +1,8 @@
+p="$ftl_cfg/external_tags" ; file="${1#etags }"
+
+[[ -f "$p/$file" ]] &&
+	{ . "$p/$file" $fs ; etag=1 ; cdir ; } || 
+	{ file="$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline)" ; [[ "$file" ]] && { . "$p/$file" $fs ; etag=1 ; cdir ; } ; }
+
+# vim: set filetype=bash :
+

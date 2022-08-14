@@ -12,10 +12,12 @@ ftl
 ftl [-t file] [directory[/file]]
 
 # OPTIONS
+
 -t file		file contains paths to files to tag
 	eg: ftl -t <(find -name 'ftl*') 
 
 # DESCRIPTION
+
 ftl is hyperothodox file manager with live previews that leverages tmux and
 many other programs.
 
@@ -27,6 +29,7 @@ file picker in _vim_
 # CONCEPTS
 
 ## Hyperorthodoxy
+
 ftl is hyperothodox, or not at all depending on your preferences, it starts
 with two panes, but can have more, one showing you a directory listing and
 the other a preview of the current entry. The outstanding _tmux_ makes this
@@ -39,6 +42,7 @@ Panes are independent instances of ftl that work in synch, each pane has its
 own tabs, filters, ... 
 
 ## Live Previews
+
 The preview pane is not, generally, a static view of the file but, thanks to
 _tmux_, a running program. If you are positioned on a text file, _vim_ will be
 run to display it. If you change the position in the listing pane, the preview
@@ -48,29 +52,35 @@ The idea is to use within *ftl* what you normally use on the command line. New
 previews are simple to add.
 
 ## Extended And Detached Viewers
+
 For some file types, often media types, *ftl* can show an extended view and 
 even start a detached viewer. See "## External Viewer" below and config in 
 '$CFG_CFG/etc/ftlrc'. 
 
 ## Vim
+
 *ftl* uses the awesome _vim_, if it's not your favorite editor you can install it
 just for previewing (and maybe find it awesome). Patches for other editors are
 welcome.
 
 ## Tabs
+
 Tabs are views, to same or different directories, in the same pane. Filters
 are per tab so you can have two tabs with different filters.
 
 ## File Listing
+
 The directory entries are colored with lscolors. The header consists of:
 
 	<directory> [tilde(filter)] <current/total> <tab#> <selected_entries> [file_stat]
 
 ## Marks
+
 You can bookmak locations and jump back to them. Marks can be set in the
 configuration file, added for the current session or made persistent.
 
 ## Tags/Etags
+
 You can tag (select) entries, tags are synched between panes when option
 _auto_tag_ is set (set by default). 
 
@@ -88,18 +98,21 @@ Available etags are:
 	   ⮤⮥ git-status
 
 ## Preview
+
 If preview is on (on by default), a preview pane is displayed. It can
 be switched on and off during the session; it's size can be changed. Some
 entry types have multiple previews (IE: directories) that can be accessed
 with a keyboard shortcut (Alt-gr+v by default)
 
 ## Filtering 
+
 *ftl* can filter the files in the directory to present only those you want
 to see.
 
 See "## Filtering" in commands.
 
 ## Bash
+
 *ftl* is written in Bash, the language that packs a real punch ... and
 sometimes punches you. It also strives to follow the spirit of unix by
 reusing what's available.
@@ -160,7 +173,7 @@ sequences of keys to perform a command. The default is '\\'
 
 # COMMANDS TOC
 
-- General Ftl Commands
+- General *ftl* Commands
 - Viewing modes
 - Panes
 - Tabs
@@ -175,10 +188,11 @@ sequences of keys to perform a command. The default is '\\'
 - File And Directory Operations
 - External Commands
 - External Viewer
-- Shell Commands
-- Shell Panes
+- Shell Pane
+- Command Mode
 
-## General Ftl Commands
+## General *ftl* Commands
+
 	Show keyboard bindings «⇑c/©» 
 
 		The bindings listing is generateed at runtime, if you add
@@ -296,6 +310,7 @@ sequences of keys to perform a command. The default is '\\'
 		tbd
 
 ## Panes
+
 	New ftl pane below «_»
 	New ftl pane left «|»
 	New ftl pane left, keep focus «⇈x/>»
@@ -306,6 +321,7 @@ sequences of keys to perform a command. The default is '\\'
 		Set focus on the next pane
 
 ## Tabs
+
 	Each tab has its own index, indexes are not reused; each pane has
 	its own tabs. Tabs are close with «q», when the last tab is closed
 	the pane is closed.
@@ -314,6 +330,7 @@ sequences of keys to perform a command. The default is '\\'
 	Next tab «TAB»
 
 ## Moving around
+
 	Also see "cd" in *General Commands* above and *Marks* and
 	*History* below
 
@@ -357,6 +374,7 @@ sequences of keys to perform a command. The default is '\\'
 	Scroll preview down «J»
 
 ## Preview
+
 	Preview show/hide «v»
 
 	Change preview size «+»
@@ -396,6 +414,7 @@ sequences of keys to perform a command. The default is '\\'
 		IE: by extension
 
 ## Filtering
+
 	Set filter #1 «f»
 	Set filter #2 «F»
 
@@ -403,11 +422,11 @@ sequences of keys to perform a command. The default is '\\'
 
 	Select a filter from a list of external filters «⇑f/đ» ;
 
-	by_extension			# keep files with matching extensions
-	by_file				# keep only selected files, additive
-	by_file_reset_dir		# keep only selected files, exclusive
-	by_file_global			# keep only selected files, all tabs, additive
-	by_file_global_reset_dir	# keep only selected files, all tabs, exclusive
+	by_extension			# keep files matching extensions
+	by_file				# keep selected files, additive
+	by_file_reset_dir		# keep selected files, exclusive
+	by_file_global			# keep selected files, all tabs, additive
+	by_file_global_reset_dir	# keep selected files, all tabs, exclusive
 	by_no_extension			# keep files not matching extensions
 	by_only_tagged			# keep tagged files
 	by_size				# keep files over minimum size
@@ -416,7 +435,7 @@ sequences of keys to perform a command. The default is '\\'
 		Filters out what you don't want to see. Applied after other
 		filters are applied. It can be set in your ftlrc file.
 
-		eg: keep all the files containing an 'f' except those containing an 'i'
+		eg: keep files containing 'f' and not containing 'i'
 			«f»  -> f
 			«⇑a» -> i
 
@@ -425,14 +444,13 @@ sequences of keys to perform a command. The default is '\\'
 
 	Hide extension «¤», per tab
 	Hide extension «%», globally
-		Hide all files having the same extention as the current file.
-		You can hide multiple extensions. You can successively reduce
-		the files displayed .
+		Hide files having the same extention as the current file.
+		You can hide multiple extensions.
 
-	Enable all extensions «⇈k/&»
-		enables the hidden extensions.
+	Show hidden extensions «⇈k/&»
 
 ## Searchings
+
 	Incremental search «/»
 		Press 'enter' to end.
 
@@ -451,9 +469,10 @@ sequences of keys to perform a command. The default is '\\'
 	Fzf find files and directories  «⇑b/”»
 	Fzf find only directories       «⇈b/’»
 
-	Rg to file «}»
+	Rg to file with preview «}»
 
 ## Tags/Etags
+
 	A tag is a selected file, *ftl* will display a glyph next to tagged
 	files. Option auto_tags controls if tags are automatically merged to
 	other panes.
@@ -470,8 +489,8 @@ sequences of keys to perform a command. The default is '\\'
 		Tag current entry in "normal" tag class and move one entry up
 
 	Class tag «1» «2» «3»
-		Tag current entry in given class and move one entry down. The entry
-		is addorned with the class name
+		Tag current entry in given class and move one entry down. The
+		entry is addorned with the class name
 
 	Class tag D «4»
 		Tag current entry in D class and move one entry down. The entry
@@ -515,6 +534,7 @@ sequences of keys to perform a command. The default is '\\'
 		See "Show/hide etags" above.
 
 ## Marks
+
 	Mark directory/file «m» + character
 
 	Go to mark «QUOTE» + character
@@ -530,6 +550,7 @@ sequences of keys to perform a command. The default is '\\'
 	Clear persistent marks «⇑k/ĸ»
 
 ## History
+
 	*ftl* keeps two location histories, one in the currentsession and one
 	global (sum of all sessions)
 
@@ -546,6 +567,7 @@ sequences of keys to perform a command. The default is '\\'
 	Delete all session history «⇈d/Ð»
 
 ## File and directory operations
+
 	Create new file        «i»
 	Create new directory   «I»
 	Create entries in bulk «⇑i/→»
@@ -570,6 +592,7 @@ sequences of keys to perform a command. The default is '\\'
 	Flip selection executable bit «x»
 
 ## External Commands
+
 	Example of command integration, see 'etc/bindings/leader_ftl'.
 
 	Compress/decompress            «˽fc»
@@ -599,6 +622,7 @@ sequences of keys to perform a command. The default is '\\'
 	Terminal popup                 «˽ft»
 
 ## External Viewer
+
 	Sometime Previews in ftl are not enough, eg. you really want to see
 	that pdf with the images in it not just a text rendering. The external
 	key bindings set the _emode_ variable and external viewer decide how
@@ -632,12 +656,24 @@ sequences of keys to perform a command. The default is '\\'
 		'$CFG_CFG/etc/ftlrc', the configuration file, contains an
 		example of a simple user defined viewer.
 		
-## Shell Commands
-You can run shell commands in four different ways
+## Shell Pane
+	Shell pane «s»
 
-- Within a shell pane
+		moving from shell pane to ftl and from ftl to shell pane
 
-see *Shell Panes* below
+	Shell pane with selected files «S»
+	Shell pane, zoomed out «not asssigned»
+
+	Cd to shell pane «⇈0/°»
+		synch shell pane directory to ftl
+
+	Send selection to shell pane «X»
+
+# Command Mode
+
+You can run commands in different ways
+
+- Within a shell pane, see *Shell Panes* above
 
 - user defined ftl command
 
@@ -655,62 +691,59 @@ command prompt.
 	Run user command «˽u»
 	command propmpt «:»
 
-	the scripts are either bash scripts that are sourced or executables
-	written in any language.
+	the scripts are either
+		- bash scripts that are sourced (can change *ftl* state)
+		- executables written in any language
 
-		Look at $FTL_CONFIG/user_commands/01_example
-		Look at $FTL_CONFIG/user_commands/02_example (executable bash)
+	Look in $FTL_CONFIG/user_commands for documentation and examples.
 
-- run commands creating a background shell pane
+- from the command prompt
+
 	Run commands «:» # implemented in "$FTL_CFG/etc/extra_commands/shell"
 
-		You are prompted, with edit, history, and completion, for a command:
+	You are prompted, with edit/history/completion, for a command:
 
-			- «empty answer» 	Cancel
+		- «empty answer» 	Cancel
 
-			- ^[1-9][0-9]*$ 	Goto entry
+		- ^[1-9][0-9]*$ 	Goto entry
 
-			- ^etags		Chose tagging method
+		- ^etags		Chose tagging method
 
-			- "load_tags"		Load tags from a file
+		- "load_tags"		Load tags from a file
 
-			- ^tree			display a tree in a popup pane
+		- ^tree			display a tree in a popup pane
 
-			- shortcut		run the *ftl* command
+		- shortcut		run the *ftl* command
 
-			- bound function	run the *ftl* command matching the shortcut
+		- bound function	run the *ftl* command
 
-			- user_command [args]   run command
+		- user_command [args]   run the user command
 
-			- ^command [args]	run command
+		- external command	See 'External command' below
 
-			- ^-s command [args]	run command, once per selection
+## External Commands
 
-			- ^-b command [args]	run command, separate bash
+*ftl* has one _session-shell_, a pane running bash, where your external commands
+are run by default.
 
-			- ^-bs command [args]	run command, separate bash, once per selection
+*ftl* can also run you external commands in a separate shell in the *ftl*
+session with *ftl_shell*, this is useful when running commands that take
+time to complete.
 
-	switch to shell pane «!»
+You can also run a command on each selected entry with *ftl_xargs*.
 
-	switch back from pane «tmux-prefix+L»
+When a command fails *ftl* will add a '!' in the header.
 
-	When a commands fails *ftl* adds a '!' in the header. Switch to
-	the tmux ftl session to see the error.
+	Run command  «:»
+		command [args]
 
-	Command that takes time to complete
-		tbd
+		*ftl_session* command [command args]
 
-## Shell Panes
-	Shell pane «s»
-		moving from shell pane to ftl and from ftl to shell pane
+		*ftl_xargs* command [command args]
 
-	Shell pane with selected files «S»
-	Shell pane, zoomed out «not asssigned»
+	Switch to session-shell pane «!»
 
-	Cd to shell pane «⇈0/°»
-		synch shell pane directory to ftl
-
-	Send selection to shell pane «X»
+	Switch back from tmux pane «tmux-prefix+L»
 
 # FILES AND DIRECTORIES
 
@@ -727,9 +760,11 @@ $FTL_CFG (set by default to $HOME/.config/ftl) is the directory that contains
 *ftl* code and data.
 
 # CONFIGURATION
-See "$FTL_CFG/etc/ftlrc", ftl's default config file, for a complete documentation 
+
+See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details. 
 
 # INSTALL
+
 Install ftl in $FTL_CFG and symlink _ftl_ somewhere in your $PATH
 
 Also read the **INSTALL** file
@@ -737,6 +772,7 @@ Also read the **INSTALL** file
 # EXAMPLES
 
 ## RCfile
+
 	# source ftl default config
 	. $FTL_CFG/etc/ftlrc
 
@@ -775,6 +811,7 @@ Also read the **INSTALL** file
 	# vim: set filetype=bash :
 
 ## User Command With Binding
+
 This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
 	shred_command() 
@@ -785,7 +822,9 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
 	[[ $REPLY == yes ]] && # reply must be "yes"
 		{
-		shred -n 2 -z -u "${selection[@]}" && tags_clear # use shred utility and clear the selection tags
+		# use shred utility and clear the selection tags
+		shred -n 2 -z -u "${selection[@]}" && tags_clear
+
 		cdir # reload directory
 		} ||
 		# redisplay list to override prompt
@@ -795,11 +834,12 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 	}
 
 	# bind shortcut «s» in the leader map
-	bind leader file s shred_command "override selection multiple times and deletes it, *** bypasses RM ***"
+	bind leader file s shred_command "*** bypasses RM *** ..."
 
 	# vim: set filetype=bash :
 
 ## Directory Picker
+
 	Add the following code to your bashrc:
 		source $path_to_ftl/cdf
 
@@ -810,6 +850,7 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 	Press «Q» to cancel.
 
 ## Vim File Picker
+
 	Add the following code to your vimrc:
 
 	function! Ftl(preview)

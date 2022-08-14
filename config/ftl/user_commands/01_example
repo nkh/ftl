@@ -11,5 +11,12 @@ echo Arguments: ; printf "\t%s\n" "$@"
 
 tmux popup cat $fs/01_example_info
 
+# to run a command in the session-shell
+# tmux send -t ftl$$:ftl$$_bash "command" Enter
+
+# to run command in extra shell in ftl session
+# tscommand (found in etc/core) runs commands in extra shell this way:
+# tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }"
+
 # vim: set filetype=bash :
 

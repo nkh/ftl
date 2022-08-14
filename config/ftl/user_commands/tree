@@ -1,0 +1,6 @@
+tmux popup -h 90% -w 90% -E -d "$PWD" "tree -C $@ | less -R"
+
+# vim: set filetype=bash :
+
+
+

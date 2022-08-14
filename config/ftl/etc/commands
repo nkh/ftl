@@ -102,7 +102,7 @@ rename()		{ tcpreview ; printf "%s\n" "${selection[@]}" | vidir - && tags_clear 
 shell()			{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_files()		{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } && R=${C[shell_file]} || shell_pane 1 ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_file()		{ for i in "${selection[@]}" ; do shell_send 1 "'$i'" " " ; done ; }
-shell_view()		{ ((has_bash_window)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; has_bash_window=1 ; } ; tmux switch -t ftl$$:ftl$$_bash ; }
+shell_view()		{ ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; } ; tmux switch -t ftl$$:ftl$$_bash ; }
 shell_synch()		{ shell_send 1 "cd '$p'" C-m ; }
 shell_zoomed()		{ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ; }
 show_hidden()		{ ((show_hidden[tab])) && show_hidden[tab]= || show_hidden[tab]=1 ; cdir '' "$f" ; }

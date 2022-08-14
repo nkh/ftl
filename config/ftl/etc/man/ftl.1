@@ -198,7 +198,7 @@ bind ftl bind BACKSPACE_KEY leader_key \[aq]leader key SPACE_KEY
 .fi
 .SH COMMANDS TOC
 .IP \[bu] 2
-General Ftl Commands
+General \f[I]ftl\f[R] Commands
 .IP \[bu] 2
 Viewing modes
 .IP \[bu] 2
@@ -228,10 +228,10 @@ External Commands
 .IP \[bu] 2
 External Viewer
 .IP \[bu] 2
-Shell Commands
+Shell Pane
 .IP \[bu] 2
-Shell Panes
-.SS General Ftl Commands
+Command Mode
+.SS General \f[I]ftl\f[R] Commands
 .IP
 .nf
 \f[C]
@@ -485,11 +485,11 @@ Clear all filters \[Fo]\[uA]d/\[Sd]\[Fc]
 
 Select a filter from a list of external filters \[Fo]\[uA]f/\[u0111]\[Fc] ;
 
-by_extension			# keep files with matching extensions
-by_file				# keep only selected files, additive
-by_file_reset_dir		# keep only selected files, exclusive
-by_file_global			# keep only selected files, all tabs, additive
-by_file_global_reset_dir	# keep only selected files, all tabs, exclusive
+by_extension			# keep files matching extensions
+by_file				# keep selected files, additive
+by_file_reset_dir		# keep selected files, exclusive
+by_file_global			# keep selected files, all tabs, additive
+by_file_global_reset_dir	# keep selected files, all tabs, exclusive
 by_no_extension			# keep files not matching extensions
 by_only_tagged			# keep tagged files
 by_size				# keep files over minimum size
@@ -498,7 +498,7 @@ Set reverse-filter \[Fo]\[uA]a/\[Of]\[Fc]
 	Filters out what you don\[aq]t want to see. Applied after other
 	filters are applied. It can be set in your ftlrc file.
 
-	eg: keep all the files containing an \[aq]f\[aq] except those containing an \[aq]i\[aq]
+	eg: keep files containing \[aq]f\[aq] and not containing \[aq]i\[aq]
 		\[Fo]f\[Fc]  -> f
 		\[Fo]\[uA]a\[Fc] -> i
 
@@ -507,12 +507,10 @@ Set reverse-filter \[Fo]\[uA]a/\[Of]\[Fc]
 
 Hide extension \[Fo]\[Cs]\[Fc], per tab
 Hide extension \[Fo]%\[Fc], globally
-	Hide all files having the same extention as the current file.
-	You can hide multiple extensions. You can successively reduce
-	the files displayed .
+	Hide files having the same extention as the current file.
+	You can hide multiple extensions.
 
-Enable all extensions \[Fo]\[u21C8]k/&\[Fc]
-	enables the hidden extensions.
+Show hidden extensions \[Fo]\[u21C8]k/&\[Fc]
 \f[R]
 .fi
 .SS Searchings
@@ -537,7 +535,7 @@ Fzf find current directory file \[Fo]b\[Fc]
 Fzf find files and directories  \[Fo]\[uA]b/\[rq]\[Fc]
 Fzf find only directories       \[Fo]\[u21C8]b/\[cq]\[Fc]
 
-Rg to file \[Fo]}\[Fc]
+Rg to file with preview \[Fo]}\[Fc]
 \f[R]
 .fi
 .SS Tags/Etags
@@ -560,8 +558,8 @@ Tag up \[Fo]Y\[Fc]
 	Tag current entry in \[dq]normal\[dq] tag class and move one entry up
 
 Class tag \[Fo]1\[Fc] \[Fo]2\[Fc] \[Fo]3\[Fc]
-	Tag current entry in given class and move one entry down. The entry
-	is addorned with the class name
+	Tag current entry in given class and move one entry down. The
+	entry is addorned with the class name
 
 Class tag D \[Fo]4\[Fc]
 	Tag current entry in D class and move one entry down. The entry
@@ -744,13 +742,28 @@ Creating and using a viewer:
 	
 \f[R]
 .fi
-.SS Shell Commands
+.SS Shell Pane
+.IP
+.nf
+\f[C]
+Shell pane \[Fo]s\[Fc]
+
+	moving from shell pane to ftl and from ftl to shell pane
+
+Shell pane with selected files \[Fo]S\[Fc]
+Shell pane, zoomed out \[Fo]not asssigned\[Fc]
+
+Cd to shell pane \[Fo]\[u21C8]0/\[de]\[Fc]
+	synch shell pane directory to ftl
+
+Send selection to shell pane \[Fo]X\[Fc]
+\f[R]
+.fi
+.SH Command Mode
 .PP
-You can run shell commands in four different ways
+You can run commands in different ways
 .IP \[bu] 2
-Within a shell pane
-.PP
-see \f[I]Shell Panes\f[R] below
+Within a shell pane, see \f[I]Shell Panes\f[R] above
 .IP \[bu] 2
 user defined ftl command
 .PP
@@ -771,19 +784,21 @@ You can also add commands without bindings, in $FTL_CFG/user_commands/,
 Run user command \[Fo]\[u02FD]u\[Fc]
 command propmpt \[Fo]:\[Fc]
 
-the scripts are either bash scripts that are sourced or executables
-written in any language.
+the scripts are either
+	- bash scripts that are sourced (can change *ftl* state)
+	- executables written in any language
 
-	Look at $FTL_CONFIG/user_commands/01_example
-	Look at $FTL_CONFIG/user_commands/02_example (executable bash)
+Look in $FTL_CONFIG/user_commands for documentation and examples.
 \f[R]
 .fi
 .IP \[bu] 2
-run commands creating a background shell pane Run commands \[Fo]:\[Fc] #
-implemented in \[lq]$FTL_CFG/etc/extra_commands/shell\[rq]
+from the command prompt
 .RS 2
 .PP
-You are prompted, with edit, history, and completion, for a command:
+Run commands \[Fo]:\[Fc] # implemented in
+\[lq]$FTL_CFG/etc/extra_commands/shell\[rq]
+.PP
+You are prompted, with edit/history/completion, for a command:
 .PP
 - \[Fo]empty answer\[Fc] Cancel
 .PP
@@ -797,41 +812,38 @@ You are prompted, with edit, history, and completion, for a command:
 .PP
 - shortcut run the \f[I]ftl\f[R] command
 .PP
-- bound function run the \f[I]ftl\f[R] command matching the shortcut
+- bound function run the \f[I]ftl\f[R] command
 .PP
-- user_command [args] run command
+- user_command [args] run the user command
 .PP
-- \[ha]command [args] run command
-.PP
-- \[ha]-s command [args] run command, once per selection
-.PP
-- \[ha]-b command [args] run command, separate bash
-.PP
-- \[ha]-bs command [args] run command, separate bash, once per selection
-.PP
-switch to shell pane \[Fo]!\[Fc]
-.PP
-switch back from pane \[Fo]tmux-prefix+L\[Fc]
-.PP
-When a commands fails \f[I]ftl\f[R] adds a `!' in the header.
-Switch to the tmux ftl session to see the error.
-.PP
-Command that takes time to complete tbd
+- external command See `External command' below
 .RE
-.SS Shell Panes
+.SS External Commands
+.PP
+\f[I]ftl\f[R] has one \f[I]session-shell\f[R], a pane running bash,
+where your external commands are run by default.
+.PP
+\f[I]ftl\f[R] can also run you external commands in a separate shell in
+the \f[I]ftl\f[R] session with \f[I]ftl_shell\f[R], this is useful when
+running commands that take time to complete.
+.PP
+You can also run a command on each selected entry with
+\f[I]ftl_xargs\f[R].
+.PP
+When a command fails \f[I]ftl\f[R] will add a `!' in the header.
 .IP
 .nf
 \f[C]
-Shell pane \[Fo]s\[Fc]
-	moving from shell pane to ftl and from ftl to shell pane
+Run command  \[Fo]:\[Fc]
+	command [args]
 
-Shell pane with selected files \[Fo]S\[Fc]
-Shell pane, zoomed out \[Fo]not asssigned\[Fc]
+	*ftl_session* command [command args]
 
-Cd to shell pane \[Fo]\[u21C8]0/\[de]\[Fc]
-	synch shell pane directory to ftl
+	*ftl_xargs* command [command args]
 
-Send selection to shell pane \[Fo]X\[Fc]
+Switch to session-shell pane \[Fo]!\[Fc]
+
+Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 \f[R]
 .fi
 .SH FILES AND DIRECTORIES
@@ -848,8 +860,8 @@ $FTL_CFG (set by default to $HOME/.config/ftl) is the directory that
 contains \f[I]ftl\f[R] code and data.
 .SH CONFIGURATION
 .PP
-See \[lq]$FTL_CFG/etc/ftlrc\[rq], ftl\[cq]s default config file, for a
-complete documentation
+See \[lq]$FTL_CFG/etc/ftlrc\[rq], ftl\[cq]s default config file, for
+details.
 .SH INSTALL
 .PP
 Install ftl in $FTL_CFG and symlink \f[I]ftl\f[R] somewhere in your
@@ -913,7 +925,9 @@ prompt \[dq]shred: ${#selection[\[at]]} entr${plural} [yes|N]? \[dq]
 
 [[ $REPLY == yes ]] && # reply must be \[dq]yes\[dq]
 	{
-	shred -n 2 -z -u \[dq]${selection[\[at]]}\[dq] && tags_clear # use shred utility and clear the selection tags
+	# use shred utility and clear the selection tags
+	shred -n 2 -z -u \[dq]${selection[\[at]]}\[dq] && tags_clear
+
 	cdir # reload directory
 	} ||
 	# redisplay list to override prompt
@@ -923,7 +937,7 @@ false # reset key_map to default
 }
 
 # bind shortcut \[Fo]s\[Fc] in the leader map
-bind leader file s shred_command \[dq]override selection multiple times and deletes it, *** bypasses RM ***\[dq]
+bind leader file s shred_command \[dq]*** bypasses RM *** ...\[dq]
 
 # vim: set filetype=bash :
 \f[R]
