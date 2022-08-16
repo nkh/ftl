@@ -1,4 +1,4 @@
-source $FTL_CFG/etc/extra_commands/shell
+source "$FTL_CFG/etc/core/lib/shell"
 
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
@@ -28,7 +28,7 @@ change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || l
 chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
 clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gcl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
-gcl()			{ ((gcl)) || { { (cd "$ftl_cfg/user_commands" ; fd -t f | sed 's/^.\///') ; printf "%s\n" "${!C[@]}" ; } >$fs/command_names ; gcl=1 ; } ; }
+gcl()			{ ((gcl)) || { { (cd "$ftl_cfg/commands" ; fd -t f | sed 's/^.\///') ; printf "%s\n" "${!C[@]}" ; } >$fs/command_names ; gcl=1 ; } ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
 create_bulk()		{ tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ; }
@@ -44,7 +44,7 @@ external_mode4()	{ emode=4 ; preview ; }
 file_dir_mode()		{ ((lmode[tab]--)) ; ((lmode[tab] < 0)) && lmode[tab]=2 ; cdir '' "$f" ; }
 set_filter()		{ prompt "filter: " -i "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
 set_filter2()		{ prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
-filter_ext()		{ p=~/.config/ftl/external_filters ; file=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle) ; [[ $file ]] && . "$p/$file" $fs ; cdir '' "$f"; }
+filter_ext()		{ p="$ftl_cfg/filters" ; file=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle) ; [[ $file ]] && . "$p/$file" $fs ; cdir '' "$f"; }
 filter_reverse()	{ prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
 find_entry()		{ prompt "find: " -i to_search ; R="${C[find_next]}" ; }
 find_next()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
@@ -86,11 +86,11 @@ preview_hide_ext_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
 preview_hide_ext()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
 preview_hide_clr()	{ lignore=() ; cdir ; }
 preview_lock_clr()	{ rm "$fs/lock_preview/$n" 2>&- ; list ; }
-preview_lock()		{ p=~/.config/ftl/lock_preview ; file=$(cd $p ; fd | fzf-tmux $fzf_opt) ; [[ $file ]] && . $p/$file ; list ; }
+preview_lock()		{ p="$ftl_cfg/etc/core/lib/lock_preview" ; file=$(cd $p ; fd | fzf-tmux $fzf_opt) ; [[ $file ]] && . $p/$file ; list ; }
 preview_m1()		{ extmode=1 ; list ; }
 preview_m2()		{ extmode=2 ; list ; }
 preview_show()		{ [[ $e =~ $mfilter ]] && { ($PREVIEW_SHOW "${selection[@]}" & ) ; tags_clear ; list ; } ; }
-preview_show_fzf()	{ p=~/.config/ftl/viewers ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ; }
+preview_show_fzf()	{ p="$ftl_cfg/viewers" ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && . $p/$viewer ; list ; }
 preview_size()		{ ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tmux resizep -t $pane_id -x $x &>/dev/null ; rdir '' 0 ; }
 preview_tail()		{ [[ "${tail[$n]}" == "+$ " ]] && tail[$n]='+0 ' || tail[$n]='+$ ' ; list ; }
 quit_ftl()		{ tab_close || pane_close || quit ; }
@@ -122,15 +122,16 @@ tag_flip_up()		{ tag_flip "${files[file]}" ; move -1 ; list ; }
 tag_fzf()		{ fzf_tag T "$(fd -H --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 tag_fzf_all()		{ fzf_tag T "$(fd -H --color=always | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 tag_goto()		{ tag_check && go_loop f fzf "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
-tag_merge()		{ p=~/.config/ftl/merge ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' $fzf_opt) ; [[ $file ]] && . $p/$file ; cdir ; }
-tags_merge_all()	{ source ~/.config/ftl/merge/all ; list ; }
+tag_merge()		{ p="$FTL_CFG/etc/core/lib/merge" ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' $fzf_opt) ; [[ $file ]] && . $p/$file ; cdir ; }
+tags_merge_all()	{ source "$FTL_CFG/etc/core/lib/merge/all" ; list ; }
 tag_untag_all()		{ tags_clear ; list ; }
 tag_untag_fzf()		{ tag_check && { fzf_tag U "$(printf "%s\n" "${!tags[@]}" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '⊟')" ; list ; } ; }
 etag_show()		{ ((etag^=1)) ; cdir ; }
-etag_select()		{ p=~/.config/ftl/external_tags ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ; }
+etag_select()		{ p="$ftl_cfg/etags" ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ; }
 SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
 SIG_REFRESH()		{ ((gpreview)) && kbdf && prev_synch ; }
 SIG_REMOTE()		{ ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }
 SIG_SYNCH_SHELL()	{ IFS=$'\n' read -r shell_dir <$pfs/synch_with_shell ; cdir "$shell_dir" ; }
+
 
 # vim: set filetype=bash :

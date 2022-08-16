@@ -1,9 +1,9 @@
-
-source "$FTL_CFG/etc/viewers/core"
+source "$FTL_CFG/etc/core/viewers"
+source "$FTL_CFG/etc/core/commands"
 
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && eval "$(error_cmds)" || tmux popup -w 80% "$(error_cmds)" ; } ; }
 error_cmds(){ echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors_log && rm $fs/log" ; }
-ewith()     { . ~/.config/ftl/open_with ; R="${C[refresh_pane]}$R" ; true ; }
+ewith()     { source "$ftl_cfg/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
 pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; sleep 0.05 ; tmux selectp -t $my_pane ; } ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &> /dev/null ; in_pdir= ; pane_id= ; in_vipreview= ; in_ftli= ; sleep 0.01 ; } ; }
 vipreview() { ((in_vipreview)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E 's/\$/\\$/g' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_vipreview=1 ; }
@@ -58,7 +58,7 @@ path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/"
 path_none() { n= ; p= ; f= ; b= ; e= ; }
 pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
 pdhn()      { pdh "$*\n" ; }
-pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(cat $pfs/pdh) &>/dev/null ; rm $pfs/pdh ; } || { tcpreview ; tsplit "$ftl_cfg/fpdh $pfs" 30% -v $my_pane ; pane_id= ; } ; cdir ; }
+pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(cat $pfs/pdh) &>/dev/null ; rm $pfs/pdh ; } || { tcpreview ; tsplit "$ftl_cfg/bin/fpdh $pfs" 30% -v $my_pane ; pane_id= ; } ; cdir ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl" ; ftl_imode "${imode[tab]}" ; [[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }

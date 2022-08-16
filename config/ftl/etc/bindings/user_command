@@ -4,10 +4,10 @@ leader_key() { key_map=leader_key_map ; }
 leader_key_map[u]=leader_user
 leader_user() 
 {
-p=$ftl_cfg/user_commands ; cmd=$(cd $p 2>&- && fd | sed 's/^.\///' | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $cmd ]] && . $p/$cmd ; list
+p=$ftl_cfg/commands ; cmd=$(cd $p 2>&- && fd | sed 's/^.\///' | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $cmd ]] && . $p/$cmd ; list
 key_map=ftl_key_map
 }
 
-bind leader_user shell ˽u run_user_command "chose a user command to run"
+bind leader_user shell ˽u run_user_command "choose a user command to run"
 
 # vim: set filetype=bash :

@@ -8,7 +8,7 @@
 # echo 0 >"$1/generator_time"
 # { echo -n "s: " ; date +%c ; } >>"$1/generator_time_all"
 
-for g in $(fd . ~/.config/ftl/generators/ -t f -d 1 -E generator)
+for g in $(fd . $FTL_CFG/etc/generators/ -t f -d 1 -E generator)
 	do 
 		ext=$(basename $g)
 		mkdir -p "$1/$ext"

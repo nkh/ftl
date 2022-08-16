@@ -15,9 +15,9 @@ shell_command()
 	return
 	}
 
-# shortcut or command bound to shortcut
-[[  ${C[$1]} ]] && R=${C[$1]} && return
+# command or shortcut bound to command
 [[ "${ftl_key_map[$1]}" ]] && R=${ftl_key_map[$1]} && return ;
+[[  ${C[$1]} ]] && R=${C[$1]} && return
 
 # split command and serialize ftl information
 
@@ -29,7 +29,7 @@ export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
 
 # user command
 
-user_cmd="$ftl_cfg/user_commands/$cmd"
+user_cmd="$ftl_cfg/commands/$cmd"
 [[ -f  "$user_cmd" ]] && 
 	{
 	[[ ! -x "$user_cmd" ]] && source "$user_cmd" "${cmd_parts[@]:1}" || { "$user_cmd" "${cmd_parts[@]:1}" ; } 

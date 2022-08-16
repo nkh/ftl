@@ -1,8 +1,8 @@
 declare -Ag leader_key_map
 leader_key() { key_map=leader_key_map ; }
 
-. $FTL_CFG/etc/extra_commands/compress
-. $FTL_CFG/etc/extra_commands/optimize
+. $FTL_CFG/etc/bindings/lib/compress
+. $FTL_CFG/etc/bindings/lib/optimize
 
 leader_key_map[f]=leader_ftl
 leader_ftl() { key_map=super_leader_ftl ; }

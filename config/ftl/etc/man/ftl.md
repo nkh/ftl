@@ -55,7 +55,7 @@ previews are simple to add.
 
 For some file types, often media types, *ftl* can show an extended view and 
 even start a detached viewer. See "## External Viewer" below and config in 
-'$CFG_CFG/etc/ftlrc'. 
+'$FTL_CFG/etc/ftlrc'. 
 
 ## Vim
 
@@ -649,11 +649,11 @@ sequences of keys to perform a command. The default is '\\'
 	a binding for cmus in *tmux* to access the application easilly.
 
 	Creating and using a viewer:
-		core viewers are in '$CFG_CFG/etc/viewers'
+		core viewers are in '$FTL_CFG/etc/core/viewers/ftl'
 
-		extra viewers are in'$CFG_CFG/viewers'
+		extra viewers are in'$FTL_CFG/viewers'
 
-		'$CFG_CFG/etc/ftlrc', the configuration file, contains an
+		'$FTL_CFG/etc/ftlrc', the configuration file, contains an
 		example of a simple user defined viewer.
 		
 ## Shell Pane
@@ -681,10 +681,10 @@ if you run the same command often you can create a command that you can call
 directly from *ftl*.
 
 Create a shortcut, maybe using «leader + u + char», and put your code
-in $FTL_CFG/user_bindings/, it will be loaded automatically by *ftl*. See 
+in $FTL_CFG/bindings/, it will be loaded automatically by *ftl*. See 
 "# EXAMPLES" below.
 
-You can also add commands without bindings, in $FTL_CFG/user_commands/, *ftl*
+You can also add commands without bindings, in $FTL_CFG/commands/, *ftl*
 will lets you choose a command to run with the invaluable _fzf_ or at the
 command prompt.
 
@@ -695,11 +695,11 @@ command prompt.
 		- bash scripts that are sourced (can change *ftl* state)
 		- executables written in any language
 
-	Look in $FTL_CONFIG/user_commands for documentation and examples.
+	Look in $FTL_CFG/etc/commands/XX_example for documentation.
 
 - from the command prompt
 
-	Run commands «:» # implemented in "$FTL_CFG/etc/extra_commands/shell"
+	Run commands «:»
 
 	You are prompted, with edit/history/completion, for a command:
 
@@ -775,9 +775,6 @@ Also read the **INSTALL** file
 
 	# source ftl default config
 	. $FTL_CFG/etc/ftlrc
-
-	# source some extra commands ad bindings
-	. $FTL_CFG/user_bindings/bindings
 
 	# change leader-key to SPACE_KEY
 	bind ftl bind SPACE_KEY leader_key 'leader key "˽"'

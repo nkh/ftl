@@ -106,4 +106,5 @@ preview() # force_preview
 tcpreview
 }
 
-[[ $TMUX ]] && { FTL_CFG="$HOME/.config/ftl" ; source $FTL_CFG/etc/core ; source $FTL_CFG/etc/commands ; ftl "$@" ; } || echo 'ftl: run in tmux'
+[[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run in tmux'
+

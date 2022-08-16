@@ -51,5 +51,14 @@ brew install moar
 cargo install rm-improved
 https://kristaps.bsd.lv/lowdown/
 
+create and possibly link to etc:
+config/ftl/viewers
+config/ftl/commands
+config/ftl/etags
+config/ftl/generators
+config/ftl/ftlrc
+config/ftl/filters 
+
 generate man pages:
+run command in man directory
 
