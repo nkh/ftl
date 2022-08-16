@@ -25,7 +25,7 @@ eval "cmd_parts=($1)" # split like a blunt axe! <https://www.reddit.com/r/bash/c
 cmd="$cmd_parts"
 
 export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
-{ FTL_PWD=${PWD@Q} ; declare -p FTL_PWD n selection ; } >$ftl_info_file
+{ FTL_PID=$$ ; FTL_FS=$fs ; FTL_PWD=${PWD@Q} ; declare -p FTL_PID FTL_FS FTL_PWD n selection ; } >$ftl_info_file
 
 # user command
 
@@ -41,10 +41,11 @@ user_cmd="$ftl_cfg/user_commands/$cmd"
 ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
 {
+echo "export ftl_info_file=$ftl_info_file"
 echo "cd '$PWD'"
 echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
 echo "${cmd_parts[@]}"
-echo "echo -e '\n\e[2;33mExit code: $?\e[m'"
+echo "echo -e \"\n\e[2;33mExit code: \$?\e[m\""
 } >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
 
 }

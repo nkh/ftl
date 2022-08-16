@@ -1,4 +1,4 @@
-[[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & }
+[[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { player_kill ; mplayer -vo null "$n" </dev/null &>/dev/null & }
 
 # vim: set filetype=sh :
 

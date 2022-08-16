@@ -1,0 +1,13 @@
+#!/bin/bash
+
+fzf_mv_rc=$HOME/.fzf_mv_rc
+fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214 --tac -m --ansi"
+
+[[ -e "$fzf_mv_rc" ]] || { echo "fzf_mv: error: can't find '$fzf_mv_rc'" ; exit 1 ; }
+
+tac "$fzf_mv_rc" | awk '!seen[$0]++' | tac | sponge "$fzf_mv_rc"
+
+<"$fzf_mv_rc" lscolors | fzf-tmux $fzf_opt > /tmp/$$_fzf_mv && rg -v -x -F -f /tmp/$$_fzf_mv "$fzf_mv_rc" | sponge "$fzf_mv_rc"
+rm -f /tmp/$$_fzf_mv
+
+# vim: set filetype=bash :

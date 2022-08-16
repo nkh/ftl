@@ -27,7 +27,7 @@ pdh_pane()		{ pdh_show ; }
 change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ; }
 chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
 clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
-command_prompt()	{ gcl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" || list ; }
+command_prompt()	{ gcl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
 gcl()			{ ((gcl)) || { { (cd "$ftl_cfg/user_commands" ; fd -t f | sed 's/^.\///') ; printf "%s\n" "${!C[@]}" ; } >$fs/command_names ; gcl=1 ; } ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
@@ -115,7 +115,7 @@ tab_next()		{ ctab=$tab ; _tab_next ; ((tab != ctab)) && cdir ${tabs[tab]} '' "$
 tag_all_files()		{ for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ; }
 tag_all()		{ for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
-tag_moveto()		{ fzf_mv "${selection[@]}" && tags_clear ;  cdir '' "$f"; }
+tag_moveto()		{ fzf_mv "${selection[@]}" && tags_clear ; cdir '' "$f"; }
 tag_move()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
 tag_flip_down()		{ tag_flip "${files[file]}" ; move 1 ; list ; }
 tag_flip_up()		{ tag_flip "${files[file]}" ; move -1 ; list ; }

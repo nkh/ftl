@@ -1,3 +1,3 @@
-[[ $e =~ $mfilter ]] && { mplayer_k ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$!
+[[ $e =~ $mfilter ]] && { player_kill ; mplayer -vo null "$n" </dev/null &>/dev/null & } && mplayer=$!
 # vim: set filetype=sh :
 

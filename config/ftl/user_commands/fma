@@ -1,0 +1,4 @@
+fzf_mv_add $@
+ 
+# vim: set filetype=bash :
+

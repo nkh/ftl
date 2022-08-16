@@ -1,0 +1,8 @@
+#!/bin/bash
+
+fzf_mv_rc=$HOME/.fzf_mv_rc
+[[ -e "$fzf_mv_rc" ]] || { echo "fzf_mv: error: can't find '$fzf_mv_rc'" >&2 ; exit 1 ; }
+
+{ [[ "$1" ]] &&  printf "%s\n" "$@" || echo "$PWD" ; cat "$fzf_mv_rc" 2>&- ; } | awk '!seen[$0]++' | sponge "$fzf_mv_rc"
+
+# vim: set filetype=bash :

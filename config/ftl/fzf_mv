@@ -1,38 +1,18 @@
 #!/bin/bash
 
-read -r -d '' destinations << EOM
-$HOME/downloads/video
-$HOME/downloads/projects/house
-$HOME/downloads/projects
-$HOME/downloads/pictures
-$HOME/downloads/pdf
-$HOME/downloads/nadim
-$HOME/downloads/music
-$HOME/downloads/memes
-$HOME/downloads/images/tools
-$HOME/downloads/images
-$HOME/downloads/dev_programs
-$HOME/downloads/dev2
-$HOME/downloads/books/rust
-$HOME/downloads/books/electronic
-$HOME/downloads/books/div
-$HOME/downloads/books/dev
-$HOME/downloads/books/computer
-$HOME/downloads/books/bash
-$HOME/downloads/books
-$HOME/downloads/bikes
-$HOME/downloads/bdz
-$HOME/downloads
-$HOME
-EOM
+fzf_mv_rc=$HOME/.fzf_mv_rc
 
-to=$( { cat $ftl_root/fzf_mv_hist 2>&- ; echo -e "$destinations" ; true ; } | awk '!seen[$0]++' | lscolors | fzf-tmux -0 -1 -p 70% --ansi --cycle --info=inline)
+[[  "$1" ]] || { echo "fzf_mv: error: no files to move" >&2 ; exit 1 ; }
+[[ -e "$fzf_mv_rc" ]] || { echo "fzf_mv: error: can't find '$fzf_mv_rc'" >&2 ; exit 1 ; }
+
+fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214 --tac -m --ansi"
+to=$( cat "$fzf_mv_rc" 2>&- | awk '!seen[$0]++' | lscolors | fzf-tmux -0 -1 $fzf_opt)
 
 [[ "$to" ]] && 
 	{
-	{ echo "$to" ; cat $ftl_root/fzf_mv_hist 2>&- ; true ; } | awk '!seen[$0]++' | sponge $ftl_root/fzf_mv_hist
-	mv "$@" "$to" 2>fzf_mv_log && rm fzf_mv_log || { tmux popup "echo ${RED}Error:$RESET ; cat '$PWD/fzf_mv_log'" ; false ; }
+	{ echo "$to" ; cat "$fzf_mv_rc" 2>&- ; } | awk '!seen[$0]++' | sponge "$fzf_mv_rc"
+	mv "$@" "$to" 2>fzf_mv_log && rm fzf_mv_log || { echo "fzf_mv: error:" ; cat '$PWD/fzf_mv_log' >&2 ; false ; }
 	} 
 
-# vim: set filetype=sh :
+# vim: set filetype=bash :
 
