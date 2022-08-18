@@ -37,6 +37,7 @@ lscolors
 perl :
 treewhatever (https://github.com/nkh/treewhatever)
 piper (https://github.com/nkh/P5-App-Piper)
+cpanm File::MimeInfo
 
 non packet manager:
 https://github.com/nkh/fzf_scripts

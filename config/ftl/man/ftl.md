@@ -9,12 +9,15 @@ ftl - terminal file manager, hyperorthodox and with live previews
 # SYNOPSIS
 ftl
 
-ftl [-t file] [directory[/file]]
+ftl [-t|-T file] [directory[/file]]
 
 # OPTIONS
 
 -t file		file contains paths to files to tag
-	eg: ftl -t <(find -name 'ftl*') 
+		eg: ftl -t <(find -name 'ftl*') 
+
+-T file		file contains paths to files to show in own tab
+		eg: ftl -t <(find -name 'ftl*') 
 
 # DESCRIPTION
 
@@ -747,6 +750,51 @@ When a command fails *ftl* will add a '!' in the header.
 	Switch back from tmux pane «tmux-prefix+L»
 
 # FILES AND DIRECTORIES
+
+	<ftl repo>
+	├── INSTALL
+	├── README.md 
+	└── config
+	    └── ftl
+		├── ftlrc
+		├── bindings
+		├── commands -> etc/commands
+		├── etags -> etc/etags
+		├── etc
+		│   ├── bin
+		│   │   ├── cdf
+		│   │   ├── color_size
+		│   │   ├── fpdh
+		│   │   ├── ftl
+		│   │   ├── ftli
+		│   │   ├── ftl_session
+		│   │   ├── ftl_shell_back
+		│   │   ├── ftl_synch_with_shell
+		│   │   ├── ftlvim
+		│   │   ├── ftl_xargs
+		│   │   ├── fzf_mv
+		│   │   ├── fzf_mv_add
+		│   │   └── fzf_mv_rm
+		│   ├── bindings
+		│   │   └── lib
+		│   ├── commands
+		│   ├── core
+		│   │   └── lib
+		│   │       ├── lock_preview
+		│   │       └── merge
+		│   ├── etags
+		│   ├── filters
+		│   ├── generators
+		│   └── viewers
+		├── filters -> etc/filters
+		├── generators -> etc/generators
+		├── man
+		├── var
+		│   └── thumbs
+		│       ├── flv
+		│       ├── mp4
+		│       └── ...
+		└── viewers -> etc/viewers
 
 ## ftlrc
 

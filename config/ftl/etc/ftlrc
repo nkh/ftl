@@ -10,7 +10,7 @@ ghist=$ftl_root/history # global history file
 thumbs=$ftl_root/thumbs #where preview generators cache the previews
 mkdir -p $thumbs # make sure the directory exists
 
-help_command="man \"$ftl_cfg/etc/man/ftl.1\"" # command to run to show help, try setting MANPAGER to vim
+help_command="man \"$ftl_cfg/man/ftl.1\"" # command to run to show help, try setting MANPAGER to vim
 
 ## Marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")

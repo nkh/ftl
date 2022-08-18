@@ -15,7 +15,7 @@ EOF
 	[[ "$p" ]] && { [[ $m ]] && { ($p "$n" &) ; tcpreview ; sleep 0.4 ; true ; } || { run_maxed $p "$n" ; true ; } ; }
 	} ||
 	{
-	tmux split-window -l 50% mimeopen "$n"
+	tmux split-window -l 50% "mimeopen - '$n'"
 	}
 
 # vim: set filetype=sh :

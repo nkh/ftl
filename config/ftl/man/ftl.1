@@ -58,7 +58,7 @@ New previews are simple to add.
 For some file types, often media types, \f[I]ftl\f[R] can show an
 extended view and even start a detached viewer.
 See \[lq]## External Viewer\[rq] below and config in
-`$CFG_CFG/etc/ftlrc'.
+`$FTL_CFG/etc/ftlrc'.
 .SS Vim
 .PP
 \f[I]ftl\f[R] uses the awesome \f[I]vim\f[R], if it\[cq]s not your
@@ -124,6 +124,8 @@ See \[lq]## Filtering\[rq] in commands.
 \&... and sometimes punches you.
 It also strives to follow the spirit of unix by reusing what\[cq]s
 available.
+IT will probably not work in other shells but may be a cool exercise in
+making things portable.
 .PP
 Most of the code is one liners, albeit long, and it\[cq]s structured to
 be \f[I]easy\f[R] to expand.
@@ -733,11 +735,11 @@ The viewer for music queues the files in cmus. I recommend adding
 a binding for cmus in *tmux* to access the application easilly.
 
 Creating and using a viewer:
-	core viewers are in \[aq]$CFG_CFG/etc/viewers\[aq]
+	core viewers are in \[aq]$FTL_CFG/etc/core/viewers/ftl\[aq]
 
-	extra viewers are in\[aq]$CFG_CFG/viewers\[aq]
+	extra viewers are in\[aq]$FTL_CFG/viewers\[aq]
 
-	\[aq]$CFG_CFG/etc/ftlrc\[aq], the configuration file, contains an
+	\[aq]$FTL_CFG/etc/ftlrc\[aq], the configuration file, contains an
 	example of a simple user defined viewer.
 	
 \f[R]
@@ -771,11 +773,11 @@ if you run the same command often you can create a command that you can
 call directly from \f[I]ftl\f[R].
 .PP
 Create a shortcut, maybe using \[Fo]leader + u + char\[Fc], and put your
-code in $FTL_CFG/user_bindings/, it will be loaded automatically by
+code in $FTL_CFG/bindings/, it will be loaded automatically by
 \f[I]ftl\f[R].
 See \[lq]# EXAMPLES\[rq] below.
 .PP
-You can also add commands without bindings, in $FTL_CFG/user_commands/,
+You can also add commands without bindings, in $FTL_CFG/commands/,
 \f[I]ftl\f[R] will lets you choose a command to run with the invaluable
 \f[I]fzf\f[R] or at the command prompt.
 .IP
@@ -788,15 +790,14 @@ the scripts are either
 	- bash scripts that are sourced (can change *ftl* state)
 	- executables written in any language
 
-Look in $FTL_CONFIG/user_commands for documentation and examples.
+Look in $FTL_CFG/etc/commands/XX_example for documentation.
 \f[R]
 .fi
 .IP \[bu] 2
 from the command prompt
 .RS 2
 .PP
-Run commands \[Fo]:\[Fc] # implemented in
-\[lq]$FTL_CFG/etc/extra_commands/shell\[rq]
+Run commands \[Fo]:\[Fc]
 .PP
 You are prompted, with edit/history/completion, for a command:
 .PP
@@ -847,6 +848,55 @@ Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 \f[R]
 .fi
 .SH FILES AND DIRECTORIES
+.IP
+.nf
+\f[C]
+<ftl repo>
+\[u251C]\[u2500]\[u2500] INSTALL
+\[u251C]\[u2500]\[u2500] README.md 
+\[u2514]\[u2500]\[u2500] config
+\  \  \[u2514]\[u2500]\[u2500] ftl
+	\[u251C]\[u2500]\[u2500] ftlrc
+	\[u251C]\[u2500]\[u2500] bindings
+	\[u251C]\[u2500]\[u2500] commands -> etc/commands
+	\[u251C]\[u2500]\[u2500] etags -> etc/etags
+	\[u251C]\[u2500]\[u2500] etc
+	\[br]\ \  \[u251C]\[u2500]\[u2500] bin
+	\[br]\ \  \[br]\ \  \[u251C]\[u2500]\[u2500] cdf
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] color_size
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] fpdh
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftli
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_session
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_shell_back
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_synch_with_shell
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftlvim
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_xargs
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] fzf_mv
+	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] fzf_mv_add
+	\[br]   \[br]\ \  \[u2514]\[u2500]\[u2500] fzf_mv_rm
+	\[br]\ \  \[u251C]\[u2500]\[u2500] bindings
+	\[br]\ \  \[br]\ \  \[u2514]\[u2500]\[u2500] lib
+	\[br]\ \  \[u251C]\[u2500]\[u2500] commands
+	\[br]\ \  \[u251C]\[u2500]\[u2500] core
+	\[br]\ \  \[br]\ \  \[u2514]\[u2500]\[u2500] lib
+	\[br]\ \  \[br]\ \      \[u251C]\[u2500]\[u2500] lock_preview
+	\[br]\ \  \[br]\ \      \[u2514]\[u2500]\[u2500] merge
+	\[br]\ \  \[u251C]\[u2500]\[u2500] etags
+	\[br]\ \  \[u251C]\[u2500]\[u2500] filters
+	\[br]\ \  \[u251C]\[u2500]\[u2500] generators
+	\[br]\ \  \[u2514]\[u2500]\[u2500] viewers
+	\[u251C]\[u2500]\[u2500] filters -> etc/filters
+	\[u251C]\[u2500]\[u2500] generators -> etc/generators
+	\[u251C]\[u2500]\[u2500] man
+	\[u251C]\[u2500]\[u2500] var
+	\[br]\ \  \[u2514]\[u2500]\[u2500] thumbs
+	\[br]\ \      \[u251C]\[u2500]\[u2500] flv
+	\[br]\ \      \[u251C]\[u2500]\[u2500] mp4
+	\[br]\ \      \[u2514]\[u2500]\[u2500] ...
+	\[u2514]\[u2500]\[u2500] viewers -> etc/viewers
+\f[R]
+.fi
 .SS ftlrc
 .PP
 \f[I]ftl\f[R] reads it\[cq]s configuration from
@@ -875,9 +925,6 @@ Also read the \f[B]INSTALL\f[R] file
 \f[C]
 # source ftl default config
 \&. $FTL_CFG/etc/ftlrc
-
-# source some extra commands ad bindings
-\&. $FTL_CFG/user_bindings/bindings
 
 # change leader-key to SPACE_KEY
 bind ftl bind SPACE_KEY leader_key \[aq]leader key \[dq]\[u02FD]\[dq]\[aq]

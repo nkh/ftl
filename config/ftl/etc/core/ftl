@@ -84,6 +84,8 @@ save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
 _tab_new()  { dir="$1" ; [[ "$dir" == '.' ]] && dir= ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; rfilters[tab]=$rfilter0 ; }
 _tab_next() { ((tab++)) ; for i in "${tabs[@]:$tab}" TAB_RESET "${tabs[@]}" ; do [[ "$i" == TAB_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; true ; }
+tab_read()  { [[ "$1" == '-T' ]] && { tabs=() ; ntabs=0 ; while read P ; do [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; } ; }
+_tab_read() { _tab_new "$1" ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && dir_file[${tab}_$1]=$index ; ((index++)) ; done ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$tag]" ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }
 tags_clear(){ ((stagsi++)) ; tags=() ; true ; }
