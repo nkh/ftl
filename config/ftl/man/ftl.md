@@ -115,7 +115,8 @@ See "## Filtering" in commands.
 
 *ftl* is written in Bash, the language that packs a real punch ... and
 sometimes punches you. It also strives to follow the spirit of unix by
-reusing what's available.
+reusing what's available. IT will probably not work in other shells but
+may be a cool exercise in making things portable.
 
 Most of the code is one liners, albeit long, and it's structured to be
 _easy_ to expand.

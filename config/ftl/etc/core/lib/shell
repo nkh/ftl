@@ -32,7 +32,7 @@ export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
 user_cmd="$ftl_cfg/commands/$cmd"
 [[ -f  "$user_cmd" ]] && 
 	{
-	[[ ! -x "$user_cmd" ]] && source "$user_cmd" "${cmd_parts[@]:1}" || { "$user_cmd" "${cmd_parts[@]:1}" ; } 
+	[[ ! -x "$user_cmd" ]] && { source "$user_cmd" "${cmd_parts[@]:1}" ; true ; } || { "$user_cmd" "${cmd_parts[@]:1}" ; } 
 	return
 	}
 

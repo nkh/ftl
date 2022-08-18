@@ -1,4 +1,4 @@
-p="$ftl_cfg/external_tags" ; file="${1#etags }"
+p="$ftl_cfg/etags" ; file="${1#etags }"
 
 [[ -f "$p/$file" ]] &&
 	{ . "$p/$file" $fs ; etag=1 ; cdir ; } || 

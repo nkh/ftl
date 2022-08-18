@@ -93,17 +93,12 @@ externals() { echo emedia edir eimage epdf ehtml etext ewith ; }
 ## Previewers order
 previewers(){ echo plock pdir pignore pmp4 pimage pmp3 ppdf phtml mime_get pmd pperl pshell ptext pcomp pcbr pcbz ptype ; }
 
-
-# my_pviewer()
-# {
-# vipreview ~/.bashrc ; true 
-# } 
-#previewers(){ echo plock pdir my_pviewer ; } # set previewers order
+# my_pviewer() { vipreview ~/.bashrc ; true ; } 
+# previewers(){ echo plock pdir my_pviewer ; } # set previewers order
 
 CMD_COLS=150 # columns when displaying command mapping in popup
 
-# BINDINGS 
-# 0, 7-9 are used by ftl and correspond to SIG_XXX entries below
+# BINDINGS # 0, 7-9 are used by ftl and correspond to SIG_XXX entries below
 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
 declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z ["´"]="'" [·]='.')
