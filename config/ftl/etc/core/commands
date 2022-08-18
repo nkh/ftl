@@ -34,7 +34,7 @@ copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
 create_bulk()		{ tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ; }
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }
-delete_selection()	{ tag_check && { delete_tag ; true ; } || delete '' "${selection[@]}" ; }
+delete_selection()	{ tag_check && { delete_tag ; true ; } || delete 'delete ?' 'true' "${selection[@]}" ; }
 depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && { max_depth[tab]=$REPLY && cdir '' "$f" ; } || list ; }
 editor_detach()		{ ((in_vipreview)) && in_vipreview= && pane_id= && cdir ; }
 external_mode1()	{ emode=1 ; preview ; }

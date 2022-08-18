@@ -9,14 +9,17 @@ ftl - terminal file manager, hyperorthodox and with live previews
 # SYNOPSIS
 ftl
 
-ftl [-t|-T file] [directory[/file]]
+ftl [ [-t file] [-T file] ][directory[/file]]
 
 # OPTIONS
 
 -t file		file contains paths to files to tag
+
 		eg: ftl -t <(find -name 'ftl*') 
 
--T file		file contains paths to files to show in own tab
+-T file		file contains paths to files to show in own tab, must come
+		after option _-t_ if it's used
+
 		eg: ftl -t <(find -name 'ftl*') 
 
 # DESCRIPTION
@@ -852,7 +855,7 @@ Also read the **INSTALL** file
 		)
 
 	# load git support 
-	. ~/.config/ftl/external_tags/git
+	. ~/.config/ftl/etags/git
 
 	# vim: set filetype=bash :
 

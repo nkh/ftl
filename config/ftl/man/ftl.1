@@ -13,11 +13,25 @@ ftl - terminal file manager, hyperorthodox and with live previews
 .PP
 ftl
 .PP
-ftl [-t file] [directory[/file]]
+ftl [ [-t file] [-T file] ][directory[/file]]
 .SH OPTIONS
 .PP
--t file file contains paths to files to tag eg: ftl -t <(find -name
-\[cq]ftl*\[cq])
+-t file file contains paths to files to tag
+.IP
+.nf
+\f[C]
+	eg: ftl -t <(find -name \[aq]ftl*\[aq]) 
+\f[R]
+.fi
+.PP
+-T file file contains paths to files to show in own tab, must come after
+option \f[I]-t\f[R] if it\[cq]s used
+.IP
+.nf
+\f[C]
+	eg: ftl -t <(find -name \[aq]ftl*\[aq]) 
+\f[R]
+.fi
 .SH DESCRIPTION
 .PP
 ftl is hyperothodox file manager with live previews that leverages tmux
@@ -953,7 +967,7 @@ declare -A marks=(
 	)
 
 # load git support 
-\&. \[ti]/.config/ftl/external_tags/git
+\&. \[ti]/.config/ftl/etags/git
 
 # vim: set filetype=bash :
 \f[R]
