@@ -54,8 +54,7 @@ _tmux_, a running program. If you are positioned on a text file, _vim_ will be
 run to display it. If you change the position in the listing pane, the preview
 program is killed and a new program is started.
 
-The idea is to use within *ftl* what you normally use on the command line. New
-previews are simple to add.
+The idea is to use within *ftl* what you normally use on the command line.
 
 ## Extended And Detached Viewers
 
@@ -659,9 +658,6 @@ sequences of keys to perform a command. The default is '\\'
 		core viewers are in '$FTL_CFG/etc/core/viewers/ftl'
 
 		extra viewers are in'$FTL_CFG/viewers'
-
-		'$FTL_CFG/etc/ftlrc', the configuration file, contains an
-		example of a simple user defined viewer.
 		
 ## Shell Pane
 	Shell pane «s»

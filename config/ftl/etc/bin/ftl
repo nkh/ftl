@@ -1,11 +1,12 @@
 #!/bin/env bash
 
+
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
 declare -Ag ftl_key_map C bindings ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc || source $FTL_CFG/etc/ftlrc ;
 
-my_pane=$(pid_2_pane $$) ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
-tags_size=0 ; [[ "$1" == '-t' ]] && { tag_read "$@" && shift 2 ; }
+my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
+[[ "$1" == '-t' ]] && { tag_read "$@" && shift 2 ; }
 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
 [[ "$1" == '-T' ]] && { tab_read "$@" && shift 2 ; }
@@ -101,13 +102,12 @@ for((i=$top ; i <= bottom ; i++))
 ((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { geo_winch ; preview ; }
 }
 
+pindex=0
 preview() # force_preview
 {
 ((main || prev_all)) || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
 
-((emode)) && { for external in $(externals) ; do $external && { sleep 0.1 ; emode=0 ; return ; } ; done ; } ; emode=0 ;
-((${1:-${preview:-$prev_all}})) && { preview= ; for v in $(previewers) ; do $v && { extmode=0 ; return ; } ; done ; extmode=0 ; }
-tcpreview
+((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; }
 }
 
 [[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run in tmux'
