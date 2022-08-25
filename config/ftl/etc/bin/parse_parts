@@ -1,0 +1,12 @@
+#!/bin/env perl
+
+use Text::ParseWords ;
+
+$i = 0 ;
+
+for ( quotewords '\s+', 0, $ARGV[0] ) 
+{
+    print qq{cmd_parts[$i]="$_"\n} ;
+    $i++ ;
+}
+

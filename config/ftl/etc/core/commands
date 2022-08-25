@@ -9,7 +9,7 @@ move_down()		{ ((nfiles)) && { move 1 && list ; } ; }
 move_down_arrow()	{ move_down ; }
 move_up()		{ ((nfiles)) && { move -1 && list ; } ; }
 move_up_arrow()		{ move_up ; }
-move_right()		{ ((nfiles)) && [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; }
+move_right()		{ ((nfiles)) && { [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; [[ -e $HOME/.avfs/$n# ]] && cdir "$HOME/.avfs/$n#" ; } ; }
 move_right_arrow()	{ move_right ; }
 enter()			{ ((nfiles)) && { { [[ -f "${files[file]}" ]] && edit ; } || { [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; } ; } ; }
 move_page_up()		{ move -$LINES ; list ; }

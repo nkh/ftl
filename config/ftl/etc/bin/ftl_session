@@ -1,11 +1,10 @@
 #!/bin/bash
-# ftl_session command [command args]
 
 source $ftl_info_file # to get FTL_PID
 
-tmux has-session -t ftl${FTL_PID} 2>&- || tmux new -A -d -s ftl${FTL_PID}
-tmux neww -P -F "ftl_session: running command in pane '#{pane_id}'" \
-		-a -t ftl${FTL_PID} \
-		"echo -e \"\e[33m$(date)\nftl_session> $@\e[m\" ; { $@ ; } || { echo -e \"\e[7;31mftl_session: error:  \$!\e[m\\n\" ; exec bash ; }"
+tmux neww -P -a -t ftl${FTL_PID} \
+	"export ftl_info_file='$ftl_info_file' ; \
+	echo -e \"\e[33m$(date)\nftl_session> $@\e[m\" ;  \
+	{ $@ ; } || { echo -e \"\e[33mftl_session: error code: \$?\e[m\\n\" ; bash ; }"
 
 # vim: set filetype=bash :

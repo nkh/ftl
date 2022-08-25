@@ -11,7 +11,7 @@ There are many promising file managers for the terminal, from fff to nnn, clifm,
 
 ftl is Written in Bash, the language that packs a real punch (and sometimes punches you).
 
-I wanted a file manager that would use tmux and give me "live" preview and works well with my tiling manager,
+I wanted a file manager that would use tmux and give me "live" preview and works well with my tiling window manager,
 
 This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs
 

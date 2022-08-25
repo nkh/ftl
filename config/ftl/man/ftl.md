@@ -730,19 +730,18 @@ command prompt.
 are run by default.
 
 *ftl* can also run you external commands in a separate shell in the *ftl*
-session with *ftl_shell*, this is useful when running commands that take
+session with *ftl_sesion*, this is useful when running commands that take
 time to complete.
-
-You can also run a command on each selected entry with *ftl_xargs*.
-
-When a command fails *ftl* will add a '!' in the header.
 
 	Run command  «:»
 		command [args]
 
-		*ftl_session* command [command args]
+		*ftlsel* command [command args]
+			echo ftl selection, null ended
+				«:» ftlsel | xargs -0 ls --color=always
+				«:» ftlsel | xargs -0 -n 1 ls --color=always
 
-		*ftl_xargs* command [command args]
+		*ftl_session* command [command args]
 
 	Switch to session-shell pane «!»
 

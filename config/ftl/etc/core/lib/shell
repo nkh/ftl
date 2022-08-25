@@ -20,8 +20,7 @@ shell_command()
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 
 # split command and serialize ftl information
-
-eval "cmd_parts=($1)" # split like a blunt axe! <https://www.reddit.com/r/bash/comments/wn83rz/splitting_a_string_that_contains_single_and>
+eval "$($FTL_CFG/etc/bin/parse_parts "$1")" 
 cmd="$cmd_parts"
 
 export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
@@ -40,14 +39,17 @@ user_cmd="$ftl_cfg/commands/$cmd"
 
 ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
-{
-echo "export ftl_info_file=$ftl_info_file"
-echo "cd '$PWD'"
-echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
-echo "${cmd_parts[@]}"
-echo "echo -e \"\n\e[2;33mExit code: \$?\e[m\""
-} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
-
+[[ "$cmd_parts" == ftl_session ]] &&
+	{ ftl_session "$(printf "%s " "${cmd_parts[@]:1}")" ; true ; } ||
+	{
+		{
+		echo "export ftl_info_file=$ftl_info_file"
+		echo "cd '$PWD'"
+		echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
+		echo "${cmd_parts[@]}"
+		echo "echo -e \"\n\e[2;33mExit code: \$?\e[m\""
+		} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
+	}
 }
 
 # vim: set filetype=bash :

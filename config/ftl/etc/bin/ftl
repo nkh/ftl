@@ -1,6 +1,5 @@
 #!/bin/env bash
 
-
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
 declare -Ag ftl_key_map C bindings ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc || source $FTL_CFG/etc/ftlrc ;
@@ -91,7 +90,8 @@ head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage}" ; h
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
 ((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header '' "$head" ; tcpreview ; clear_list 0 ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
-((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date= ; head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd$flip" ; header '' "$head"
+((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date=
+head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd$flip" ; header '' "$head"
 
 for((i=$top ; i <= bottom ; i++))
 	do
@@ -102,12 +102,10 @@ for((i=$top ; i <= bottom ; i++))
 ((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { geo_winch ; preview ; }
 }
 
-pindex=0
 preview() # force_preview
 {
-((main || prev_all)) || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
-
-((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; }
+((main))     || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
+((prev_all)) && { ((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; }
 }
 
 [[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run in tmux'
