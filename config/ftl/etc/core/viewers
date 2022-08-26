@@ -28,9 +28,9 @@ pviewers()
 [[ $e =~ mkv|mp4|flv ]]           && { pmp4      ; return ; }
 [[ $e =~ ^md|MD$ ]]               && { pmd       ; return ; }
 [[ $e == pdf ]]                   && { ppdf      ; return ; }
-[[ $e == zip ]]                   && { pcomp     ; return ; }
-[[ $e == rar ]]                   && { pcomp     ; return ; }
-[[ $f =~ \.tar ]]                 && { pcomp     ; return ; }
+[[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
+[[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
+[[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
 [[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
