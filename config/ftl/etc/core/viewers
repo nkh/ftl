@@ -51,7 +51,7 @@ epdf()      { ((emode == 1)) && epdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/de
 epdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 
-pignore()   { mime_get ; in_pdir= ; in_vipreview= ; ptype ; }
+pignore()   { mime_get ; in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { ctsplit "echo ${f@Q} ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 

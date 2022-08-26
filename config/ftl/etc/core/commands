@@ -3,7 +3,7 @@ source "$FTL_CFG/etc/core/lib/shell"
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
 ftl_help()		{ tmux popup -h90% -w90% -E "$help_command" ; }
-move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
+move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; [[ "$PWD" =~ '#' && ! "$nd" =~ '#' ]] && nd=${nd#$HOME/.avfs} ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
 move_down()		{ ((nfiles)) && { move 1 && list ; } ; }
 move_down_arrow()	{ move_down ; }
@@ -17,8 +17,8 @@ move_page_down()	{ move $LINES ; list ; }
 top_file_bottom()	{ twd="${tab}_$PWD" ; [[ -f "$n" ]] && { (($file == $nfiles - 1)) && dir_file[$twd]=0 || dir_file[$twd]=$nfiles ; } || dir_file[$twd]=$first_file ; list ; }
 goto_alt1()		{ to_search=".$e" ; R="${C[find_next]}" ; }
 goto_alt2()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ ! "${files[i]##*/}" =~ ".$e" ]] && { list $i ; return ; } ; done ; list ; }
-preview_down()		{ ((in_vipreview)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ; }
-preview_up()		{ ((in_vipreview)) && tmux send -t $pane_id C-U || [[ $pane_id ]] && tmux send -t $pane_id k ; }
+preview_down()		{ ((in_viprev)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ; }
+preview_up()		{ ((in_viprev)) && tmux send -t $pane_id C-U || [[ $pane_id ]] && tmux send -t $pane_id k ; }
 tag_1()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
 tag_2()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
 tag_3()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
@@ -36,7 +36,7 @@ create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && 
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }
 delete_selection()	{ tag_check && { delete_tag ; true ; } || delete 'delete ?' 'true' "${selection[@]}" ; }
 depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && { max_depth[tab]=$REPLY && cdir '' "$f" ; } || list ; }
-editor_detach()		{ ((in_vipreview)) && in_vipreview= && pane_id= && cdir ; }
+editor_detach()		{ ((in_viprev)) && in_viprev= && pane_id= && cdir ; }
 external_mode1()	{ emode=1 ; preview ; }
 external_mode2()	{ emode=2 ; preview ; }
 external_mode3()	{ emode=3 ; preview ; }
