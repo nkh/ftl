@@ -1,0 +1,14 @@
+etag_dir()
+{
+declare -g -A ext_sizes=()
+while read ext_file ; do ext_sizes[$ext_file]="          " ; done < <(find "$PWD/" -mindepth 1 -maxdepth 1 2>&-)
+
+while read ext_file ext_size ; do
+	ext_sizes[$ext_file]="$ext_size" 
+done < <(find "$PWD/" -mindepth 1 -maxdepth 1 2>&- | rg "${ifilter@Q}$" | xargs file | perl -ne 'm/(^.*?):.*?(\d{2,}) ?x ?(\d{2,})/ && printf "%s\t\e[2;40;35m%4sx%4s \e[m\n", $1, $2, $3')
+}
+
+etag_tag() { local -n r2=$2 r3=$3 ; r2="${ext_sizes[$PWD/$1]}" ; r3=10 ; }
+
+# vim: set filetype=bash :
+
