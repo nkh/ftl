@@ -4,6 +4,7 @@ exittool
 expect
 fdfind
 ffmpegthumbnailer
+fim
 fzf
 fzf
 libvips-tools
@@ -30,6 +31,7 @@ zathura-cb
 
 pip3 install:
 vmd
+ueberzug
 
 cargo install (https://www.rust-lang.org/tools/install):
 lscolors

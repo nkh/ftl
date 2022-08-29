@@ -66,7 +66,7 @@ pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] ||
 pdir_only() { tcpreview ; }
 
 phtml()     { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; }
-pimage()    { pw3image "$n" ; }
+pimage()    { ((extmode)) && { ctsplit "identify -format 'type: %m\nsize: %wx%h\nbits: %q\ndisk: %b\n' ${n@Q} ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
 pmp3()      { pmlive || { ctsplit "$PAGER_ANSI <$(gen_exift) ; read -sn1" ; } ; }
 pmp4()      { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; pw3image "$t" ; } ; }
 pmlive()    { ((extmode)) && { player_k ; ctsplit "cat $(gen_exift) ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
