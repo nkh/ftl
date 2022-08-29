@@ -1,0 +1,23 @@
+# called by ftl when left/right/enter is pressed
+# you can override the default behavior here
+
+# do_move_left()  { false ; }
+# do_move_right() { do_enter ; }
+
+do_enter()
+{
+((nfiles)) && [[ -f "${files[file]}" ]] &&
+	{
+	mime_get
+
+	((! is_bin)) && \
+	[[ -s "$n" ]] && \
+	[[ $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && \
+		edit
+
+	true
+	}
+}
+
+# vim: set filetype=bash :
+

@@ -684,7 +684,7 @@ if you run the same command often you can create a command that you can call
 directly from *ftl*.
 
 Create a shortcut, maybe using «leader + u + char», and put your code
-in $FTL_CFG/bindings/, it will be loaded automatically by *ftl*. See 
+in $FTL_CFG/bindings/, it will be loaded automatically in *ftlrc*. See 
 "# EXAMPLES" below.
 
 You can also add commands without bindings, in $FTL_CFG/commands/, *ftl*

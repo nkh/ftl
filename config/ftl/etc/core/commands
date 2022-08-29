@@ -1,17 +1,21 @@
 source "$FTL_CFG/etc/core/lib/shell"
 
+do_move_left()		{ false ; }
+do_move_right()		{ false ; }
+do_enter()		{ false ; }
+
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
 ftl_help()		{ tmux popup -h90% -w90% -E "$help_command" ; }
-move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; [[ "$PWD" =~ '#' && ! "$nd" =~ '#' ]] && nd=${nd#$HOME/.avfs} ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
+move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; do_move_left || cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
 move_down()		{ ((nfiles)) && { move 1 && list ; } ; }
 move_down_arrow()	{ move_down ; }
 move_up()		{ ((nfiles)) && { move -1 && list ; } ; }
 move_up_arrow()		{ move_up ; }
-move_right()		{ ((nfiles)) && { [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; [[ -e $HOME/.avfs/$n# ]] && cdir "$HOME/.avfs/$n#" ; } ; }
+move_right()		{ ((nfiles)) && { [[ -d "${files[file]}" ]] && cdir "${files[file]}" || do_move_right ; } ; }
 move_right_arrow()	{ move_right ; }
-enter()			{ ((nfiles)) && { { [[ -f "${files[file]}" ]] && edit ; } || { [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; } ; } ; }
+enter()			{ do_enter || { ((nfiles)) && { { [[ -f "${files[file]}" ]] && edit ; } || { [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; } ; } ; } ; }
 move_page_up()		{ move -$LINES ; list ; }
 move_page_down()	{ move $LINES ; list ; }
 top_file_bottom()	{ twd="${tab}_$PWD" ; [[ -f "$n" ]] && { (($file == $nfiles - 1)) && dir_file[$twd]=0 || dir_file[$twd]=$nfiles ; } || dir_file[$twd]=$first_file ; list ; }
