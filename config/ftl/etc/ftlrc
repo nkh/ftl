@@ -53,7 +53,7 @@ lglyph=('' ᵈ ᶠ)
 tglyph=('' ¹ ² ³ D) 
 
 ## Media Filters
-ifilter='webp|jpg|jpeg|JPG|png|gif';
+ifilter='svg|webp|jpg|jpeg|JPG|png|gif';
 mfilter='mp3|mp4|flv|mkv';
 
 ## FZF Options

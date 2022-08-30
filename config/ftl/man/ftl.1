@@ -4,7 +4,7 @@
 .hy
 .SH NAME
 .PP
-ftl - terminal file manager, hyperorthodox and with live previews
+ftl - terminal file manager, hyperorthodox, with live previews
 .PP
 [IMAGE: Screenshot (https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)]
 .PP
@@ -25,11 +25,11 @@ ftl [ [-t file] [-T file] ][directory[/file]]
 .fi
 .PP
 -T file file contains paths to files to show in own tab, must come after
-option \f[I]-t\f[R] if it\[cq]s used
+optionial \f[I]-t\f[R]
 .IP
 .nf
 \f[C]
-	eg: ftl -t <(find -name \[aq]ftl*\[aq]) 
+	eg: ftl -T <(find -name \[aq]ftl*\[aq]) 
 \f[R]
 .fi
 .SH DESCRIPTION
@@ -109,13 +109,18 @@ Available etags are:
 .nf
 \f[C]
 /home/nadim/nadim/devel/repositories/ftl 2/14 \[u237A]
- 1  08/11/2022-12:00 ftl
-    \[u2BA4]     date     \[u2BA5]
+1  08/11/2022-12:00 ftl
+   \[u2BA4]     etag     \[u2BA5] date 
 
 /home/nadim/nadim/devel/repositories/ftl 2/14 \[u237A]
- 1  M ftl
- 1 ?? tags
-   \[u2BA4]\[u2BA5] git-status
+1  M ftl
+1 ?? tags
+  \[u2BA4]\[u2BA5] git-status
+
+/home/nadim/nadim/devel/repositories/ftl 2/14 \[u237A]
+11\[u2003]1598x2100 image.jpg
+12\[u2003] 720x 507 image.png
+   \[u2BA4] etag  \[u2BA5] image-size
 \f[R]
 .fi
 .SS Preview
@@ -252,7 +257,7 @@ Command Mode
 \f[C]
 Show keyboard bindings \[Fo]\[uA]c/\[co]\[Fc] 
 
-	The bindings listing is generateed at runtime, if you add
+	The bindings listing is generated at runtime, if you add
 	or modify bindings it will show in the listing. The listing
 	is displayed in fzf which allows you to search by name but
 	also by binding.
@@ -783,8 +788,8 @@ if you run the same command often you can create a command that you can
 call directly from \f[I]ftl\f[R].
 .PP
 Create a shortcut, maybe using \[Fo]leader + u + char\[Fc], and put your
-code in $FTL_CFG/bindings/, it will be loaded automatically by
-\f[I]ftl\f[R].
+code in $FTL_CFG/bindings/, it will be loaded automatically in
+\f[I]ftlrc\f[R].
 See \[lq]# EXAMPLES\[rq] below.
 .PP
 You can also add commands without bindings, in $FTL_CFG/commands/,
@@ -835,22 +840,20 @@ You are prompted, with edit/history/completion, for a command:
 where your external commands are run by default.
 .PP
 \f[I]ftl\f[R] can also run you external commands in a separate shell in
-the \f[I]ftl\f[R] session with \f[I]ftl_shell\f[R], this is useful when
+the \f[I]ftl\f[R] session with \f[I]ftl_sesion\f[R], this is useful when
 running commands that take time to complete.
-.PP
-You can also run a command on each selected entry with
-\f[I]ftl_xargs\f[R].
-.PP
-When a command fails \f[I]ftl\f[R] will add a `!' in the header.
 .IP
 .nf
 \f[C]
 Run command  \[Fo]:\[Fc]
 	command [args]
 
-	*ftl_session* command [command args]
+	*ftlsel* command [command args]
+		echo ftl selection, null ended
+			\[Fo]:\[Fc] ftlsel | xargs -0 ls --color=always
+			\[Fo]:\[Fc] ftlsel | xargs -0 -n 1 ls --color=always
 
-	*ftl_xargs* command [command args]
+	*ftl_session* command [command args]
 
 Switch to session-shell pane \[Fo]!\[Fc]
 

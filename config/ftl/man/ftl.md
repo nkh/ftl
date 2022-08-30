@@ -1,6 +1,6 @@
 % FTL(1) | General Commands Manual
 # NAME
-ftl - terminal file manager, hyperorthodox and with live previews
+ftl - terminal file manager, hyperorthodox, with live previews
 
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 
@@ -18,9 +18,9 @@ ftl [ [-t file] [-T file] ][directory[/file]]
 		eg: ftl -t <(find -name 'ftl*') 
 
 -T file		file contains paths to files to show in own tab, must come
-		after option _-t_ if it's used
+		after optionial _-t_ 
 
-		eg: ftl -t <(find -name 'ftl*') 
+		eg: ftl -T <(find -name 'ftl*') 
 
 # DESCRIPTION
 
@@ -94,13 +94,18 @@ Etags is extra information that is optionally prepended to the entries.
 Available etags are:
 
 	/home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
-	 1  08/11/2022-12:00 ftl
-	    ⮤     date     ⮥
+	1  08/11/2022-12:00 ftl
+	   ⮤     etag     ⮥ date 
 
 	/home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
-	 1  M ftl
-	 1 ?? tags
-	   ⮤⮥ git-status
+	1  M ftl
+	1 ?? tags
+	  ⮤⮥ git-status
+
+	/home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
+	11 1598x2100 image.jpg
+	12  720x 507 image.png
+	   ⮤ etag  ⮥ image-size
 
 ## Preview
 
@@ -201,7 +206,7 @@ sequences of keys to perform a command. The default is '\\'
 
 	Show keyboard bindings «⇑c/©» 
 
-		The bindings listing is generateed at runtime, if you add
+		The bindings listing is generated at runtime, if you add
 		or modify bindings it will show in the listing. The listing
 		is displayed in fzf which allows you to search by name but
 		also by binding.
