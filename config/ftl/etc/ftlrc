@@ -36,6 +36,7 @@ show_line=1 # show line (entry index)
 show_size=0 # 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
 show_date=1 # show date in header if sort mode is by date
 show_tar=0 # show extra information about tar file, takes time
+use_fuse_archive=1 #mount compressed files
 tbcolor 67 67 # tmux separation line color
 TBCOLORS='236 52'
 
