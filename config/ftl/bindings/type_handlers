@@ -1,0 +1,46 @@
+
+move_left()
+{
+# get out of mounted directories back to where the archive is
+{ [[ "$PWD" =~ _mnt_root$ ]] && nd="${PWD#$fs/mnt}" && nd=${nd%_mnt_root} && cdir "$(dirname "$nd")" ; } || \
+{ [[ "$PWD" != / ]] && nd="${PWD%/*}" && cdir "${nd:-/}" "$(basename "$p")" ; }
+}
+
+# default move right doesn't open files but only changed directory, uncomment to call _enter_
+# move_right() { ((nfiles)) && { [[ -d "${files[file]}" ]] && cdir "${files[file]}" || enter ; } ; }
+
+enter()
+{
+[[ -d "${files[file]}" ]] && cdir "${files[file]}" && return
+
+((nfiles)) && [[ -f "${files[file]}" ]] &&
+	{
+	# mount archives
+	((use_fuse_archive)) && [[ $e =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && \
+		{
+		# password.zip not supported
+		
+		mount_point="$fs/mnt/${n}_mnt_root"
+		mount_archive "$n" "$mount_point" && ftl_mount_points+=("$mount_point") && cdir "$mount_point" ; return 
+		}
+	
+	# edit text files with vi
+	mime_get
+	
+	((! is_bin)) && \
+	[[ -s "$n" ]] && \
+	[[ $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && \
+		edit
+
+	# add other type handlers below
+	}
+
+}
+
+# unmount archives
+ftl_event_quit() { for m in "${ftl_mount_points[@]}" ; do fusermount -u "$m" ; done ; }
+
+mount_archive() { [[ -e "$2" ]] || { mkdir -p "$2" && fuse-archive -o allow_other "$1" "$2" ; } ; }
+
+# vim: set filetype=bash :
+

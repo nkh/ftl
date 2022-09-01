@@ -130,6 +130,14 @@ It can be switched on and off during the session; it\[cq]s size can be
 changed.
 Some entry types have multiple previews (IE: directories) that can be
 accessed with a keyboard shortcut (Alt-gr+v by default)
+.SS Type handlers
+.PP
+Text files are opened in \f[I]vim\f[R].
+.PP
+\f[I]7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip\f[R] archives are
+automounted.
+.PP
+You can add handlers in \f[I]`$FTL_CFG/bindings/type_handlers'\f[R]
 .SS Filtering
 .PP
 \f[I]ftl\f[R] can filter the files in the directory to present only
@@ -189,6 +197,10 @@ bind function arguments, all mendatory:
 eg: bind ftl file k copy \[dq]copy file to, prompts inline\[dq]
 \f[R]
 .fi
+.PP
+You can also override \f[I]ftl_event_quit\f[R] which is called when
+\f[I]ftl\f[R] is closing, you can see it in use in
+\f[I]`$FTL_CFG/bindings/type_handlers'\f[R]
 .PP
 In the default \f[I]ftlrc\f[R] file, associative arrays A for alt-gr and
 SA for shift+Alt-gr are defined, they allow you to define bindings this

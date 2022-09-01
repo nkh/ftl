@@ -114,6 +114,14 @@ be switched on and off during the session; it's size can be changed. Some
 entry types have multiple previews (IE: directories) that can be accessed
 with a keyboard shortcut (Alt-gr+v by default)
 
+## Type handlers
+
+Text files are opened in _vim_.
+
+_7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip_ archives are automounted.
+
+You can add handlers in _'$FTL_CFG/bindings/type_handlers'_
+
 ## Filtering 
 
 *ftl* can filter the files in the directory to present only those you want
@@ -164,6 +172,9 @@ function. See "## Examples".
               
 
 	eg: bind ftl file k copy "copy file to, prompts inline"
+
+You can also override _ftl_event_quit_ which is called when *ftl* is closing,
+you can see it in use in _'$FTL_CFG/bindings/type_handlers'_
 
 In the default _ftlrc_ file, associative arrays A for alt-gr and SA for
 shift+Alt-gr are defined, they allow you to define bindings this way: 
