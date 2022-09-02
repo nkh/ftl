@@ -82,19 +82,19 @@ save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$
 			imode[tab]=${imode[tab]}; xxx=0						; sort_type[tab]=${sort_type[tab]}
 			ftag=$ftag		; filters[tab]=\"${filters[tab]}\"		; filters2[tab]=\"${filters2[tab]}\" 
 			etag=$etag		; show_size=$show_size" ; }
-tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir ${tabs[tab]} ; } ; }
+tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
 _tab_new()  { dir="$1" ; [[ "$dir" == '.' ]] && dir= ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; rfilters[tab]=$rfilter0 ; }
 _tab_next() { ((tab++)) ; for i in "${tabs[@]:$tab}" TAB_RESET "${tabs[@]}" ; do [[ "$i" == TAB_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; true ; }
 tab_read()  { tabs=() ; ntabs=0 ; while read P ; do P="$(path_full "$P")" ; [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; }
 _tab_read() { _tab_new "$1" ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && dir_file[${tab}_$1]=$index ; ((index++)) ; done ; }
-tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v "tags[$tag]" ; done ; ((${#tags[@]} != 0)) ; }
+tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }
 tags_clear(){ ((stagsi++)) ; tags=() ; tags_size=0 ; true ; }
 tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; }
-tags_unset(){ for t in "${!tags[@]}" ; do [[ "$1" == "${tags[$t]}" ]] && { unset -v tags["$t"] ; tags_size - "$t" ; ((stagsi++)) ; } ; done ; }
-tag_flip()  { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v "tags[$1]" ; tags_size - "$1" ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
+tags_unset(){ [[ "$1" ]] && { unset -v 'tags[$t]' ; tags_size - "$t" ; ((stagsi++)) ; } ; }
+tag_flip()  { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_set()   { ((stagsi++)) ; [[ ! ${tags[$1]} ]] && { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
-tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v "tags[$1]" ; tags_size - "$1" ; } ; }
+tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 tag_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
 tags_size() { [[ $1 == + ]] && ((tags_size+=$(stat --printf="%s" "$2"))) || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
