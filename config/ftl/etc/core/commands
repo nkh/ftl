@@ -19,16 +19,16 @@ goto_alt1()		{ to_search=".$e" ; R="${C[find_next]}" ; }
 goto_alt2()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ ! "${files[i]##*/}" =~ ".$e" ]] && { list $i ; return ; } ; done ; list ; }
 preview_down()		{ ((in_viprev)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ; }
 preview_up()		{ ((in_viprev)) && tmux send -t $pane_id C-U || [[ $pane_id ]] && tmux send -t $pane_id k ; }
-tag_1()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
-tag_2()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
-tag_3()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
-tag_4()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v "tags[$n]" || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
+tag_1()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
+tag_2()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
+tag_3()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
+tag_4()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[$REPLY]} ; ((stagsi++)) ; move 1 ; list ; }
 pdh_pane()		{ pdh_show ; }
 change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ; }
 chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
 clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
-command_prompt()	{ gcl ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
-gcl()			{ ((gcl)) || { { (cd "$ftl_cfg/commands" ; fd -t f | sed 's/^.\///') ; printf "%s\n" "${!C[@]}" ; } >$fs/command_names ; gcl=1 ; } ; }
+command_prompt()	{ gcn ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
+gcn()			{ { find "$ftl_cfg/commands" -type f -printf "%f\n" ; printf "%s\n" "${!C[@]}" ftl_session ftl_selection ; } >$fs/command_names ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
 create_bulk()		{ tcpreview ; : >$fs/bc ; $EDITOR $fs/bc && perl -i -ne 'if(m-^.$i-){ if(m-/$-){ print "mkdir $_" }else{ print "touch $_" }}' $fs/bc && bash $fs/bc ; cdir ; }

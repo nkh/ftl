@@ -3,6 +3,7 @@ image_optimize()
 {
 [[ $e == jpg ]] && { cp "$f" "$b.original.$e" ; jpegoptim --size=50% "$f" ; cdir '' "$f" ; }
 [[ $e == png ]] && { mv "$f" "$b.original.$e" ; convert "$b.original.$e" -quality 90% "$b.jpg" ; cdir '' "$b.jpg" ; }
+pw3image FTL_RESTART_W3M 
 true
 }
 

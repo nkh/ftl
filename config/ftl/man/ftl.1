@@ -46,8 +46,10 @@ and as a file picker in \f[I]vim\f[R]
 .SS Hyperorthodoxy
 .PP
 ftl is hyperothodox, or not at all depending on your preferences, it
-starts with two panes, but can have more, one showing you a directory
-listing and the other a preview of the current entry.
+starts with two panes but can start with just one pane or have more than
+two panes.
+The default is two panes, one showing you a directory listing and the
+other a preview of the current entry.
 The outstanding \f[I]tmux\f[R] makes this possible.
 .PP
 You can choose to remove the preview as well as having multiple panes
@@ -55,7 +57,13 @@ showing the same or different directories.
 .PP
 Panes are independent instances of ftl that work in synch, each pane has
 its own tabs, filters, \&...
-.SS Live Previews
+.SS Preview Pane And Live Previews
+.PP
+If preview is on (on by default), a preview pane is displayed.
+It can be switched on and off during the session; it\[cq]s size can be
+changed.
+Some entry types have multiple previews (IE: directories) that can be
+accessed with a keyboard shortcut (Alt-gr+v by default)
 .PP
 The preview pane is not, generally, a static view of the file but,
 thanks to \f[I]tmux\f[R], a running program.
@@ -84,12 +92,47 @@ Tabs are views, to same or different directories, in the same pane.
 Filters are per tab so you can have two tabs with different filters.
 .SS File Listing
 .PP
-The directory entries are colored with lscolors.
-The header consists of:
+The listing consists of a header and directory listing.
+.PP
+The header consists of multiple elements, some depending on the current
+state:
 .IP
 .nf
 \f[C]
-<directory> [tilde(filter)] <current/total> <tab#> <selected_entries> [file_stat]
+- current directory, possibly truncated
+- listing mode, directory/file
+- image mode, all files/non image/image
+- preview dir only (D)
+- montage mode (\[u2836])
+- filtered (\[ti])
+- entry index/number of entries
+- size of directory, if sizes are displayed
+- file stat, optional
+- tab id
+- sort glyph, \[u237A]: alphanumeric, \[u1F855]: size, entry date
+- reverse sort order (r)
+- background shell sessions
+\f[R]
+.fi
+.PP
+The directory listing consists of:
+.IP
+.nf
+\f[C]
+- entry index
+- optional etag
+- entries colored by _lscolors_
+\f[R]
+.fi
+.PP
+Example:
+.IP
+.nf
+\f[C]
+\&../ftl/config/ftl/man 3/3 -rw-rw-r-- nadim  28K 09/03/22-09:54 \[u1D57]2\[u2003]
+ 1\[u2003]   gen_man_pages
+ 2\[u2003] M ftl.md
+ 3\[u2003]   ftl.1
 \f[R]
 .fi
 .SS Marks
@@ -123,13 +166,6 @@ Available etags are:
    \[u2BA4] etag  \[u2BA5] image-size
 \f[R]
 .fi
-.SS Preview
-.PP
-If preview is on (on by default), a preview pane is displayed.
-It can be switched on and off during the session; it\[cq]s size can be
-changed.
-Some entry types have multiple previews (IE: directories) that can be
-accessed with a keyboard shortcut (Alt-gr+v by default)
 .SS Type handlers
 .PP
 Text files are opened in \f[I]vim\f[R].
@@ -165,16 +201,15 @@ The control key is not used but the Alt-gr key, in combination with the
 shift key, is used extensively
 .SS Default bindings
 .PP
-`Alt-gr'+c will open a window with all the current binding
-.PP
-A list of all bindings, in \f[I]fzf\f[R], wich allows you to search per
-key or name.
+`Alt-gr'+c will open a window listing all the current binding, in
+\f[I]fzf\f[R], wich allows you to search per key or name.
 .IP
 .nf
 \f[C]
 map    section  key      command                
 -------------------------------------------------------------------
 ftl    file     c        copy          copy file to, prompts inline
+\&...
 \f[R]
 .fi
 .SS User defined bindings
@@ -454,9 +489,7 @@ Next entry of same extension \[Fo]\[:o]\[Fc]
 Next entry of different extension \[Fo]\[:O]\[Fc]
 Goto entry by index \[Fo]\[:a]\[Fc]
 
-Preview window (when possible):
-
-Scroll preview up \[Fo]K\[Fc]
+Scroll preview up   \[Fo]K\[Fc]
 Scroll preview down \[Fo]J\[Fc]
 \f[R]
 .fi
@@ -850,29 +883,31 @@ You are prompted, with edit/history/completion, for a command:
 .PP
 \f[I]ftl\f[R] has one \f[I]session-shell\f[R], a pane running bash,
 where your external commands are run by default.
-.PP
-\f[I]ftl\f[R] can also run you external commands in a separate shell in
-the \f[I]ftl\f[R] session with \f[I]ftl_sesion\f[R], this is useful when
-running commands that take time to complete.
 .IP
 .nf
 \f[C]
 Run command  \[Fo]:\[Fc]
 	command [args]
 
-	*ftlsel* command [command args]
-		echo ftl selection, null ended
-			\[Fo]:\[Fc] ftlsel | xargs -0 ls --color=always
-			\[Fo]:\[Fc] ftlsel | xargs -0 -n 1 ls --color=always
+	*ftlsel* list ftl selection, null separated
+		
+		\[Fo]:\[Fc] ftlsel | xargs -0 ls --color=always
+		\[Fo]:\[Fc] ftlsel | xargs -0 -n 1 ls --color=always
 
 	*ftl_session* command [command args]
+
+		run you commands in a separate shell pane in the *ftl*
+		session, eg: when commands that take time to complete.
+		
+		the shell pane is closed if the command exit code is 0. 
 
 Switch to session-shell pane \[Fo]!\[Fc]
 
 Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 \f[R]
 .fi
-.SH FILES AND DIRECTORIES
+.SH FILES
+.SS Directory structure
 .IP
 .nf
 \f[C]
@@ -887,19 +922,9 @@ Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 	\[u251C]\[u2500]\[u2500] etags -> etc/etags
 	\[u251C]\[u2500]\[u2500] etc
 	\[br]\ \  \[u251C]\[u2500]\[u2500] bin
-	\[br]\ \  \[br]\ \  \[u251C]\[u2500]\[u2500] cdf
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] color_size
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] fpdh
 	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl
 	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftli
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_session
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_shell_back
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_synch_with_shell
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftlvim
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] ftl_xargs
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] fzf_mv
-	\[br]   \[br]\ \  \[u251C]\[u2500]\[u2500] fzf_mv_add
-	\[br]   \[br]\ \  \[u2514]\[u2500]\[u2500] fzf_mv_rm
+	\[br]   \[br]\ \  \[u2514]\[u2500]\[u2500] ...
 	\[br]\ \  \[u251C]\[u2500]\[u2500] bindings
 	\[br]\ \  \[br]\ \  \[u2514]\[u2500]\[u2500] lib
 	\[br]\ \  \[u251C]\[u2500]\[u2500] commands
@@ -917,7 +942,6 @@ Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 	\[u251C]\[u2500]\[u2500] var
 	\[br]\ \  \[u2514]\[u2500]\[u2500] thumbs
 	\[br]\ \      \[u251C]\[u2500]\[u2500] flv
-	\[br]\ \      \[u251C]\[u2500]\[u2500] mp4
 	\[br]\ \      \[u2514]\[u2500]\[u2500] ...
 	\[u2514]\[u2500]\[u2500] viewers -> etc/viewers
 \f[R]
@@ -944,12 +968,23 @@ $PATH
 .PP
 Also read the \f[B]INSTALL\f[R] file
 .SH EXAMPLES
+.SS helpful bindings
+.IP
+.nf
+\f[C]
+# start ftl in a new window
+tmux bind C-F run-shell \[aq]tmux new-window -n ftl ftl \[dq]#{pane_current_path}\[dq]\[aq]
+
+# start ftl on a specific directory in a new window
+tmux bind C-D new-window -n download \[dq]ftl $HOME/downloads\[dq]
+\f[R]
+.fi
 .SS RCfile
 .IP
 .nf
 \f[C]
-# source ftl default config
-\&. $FTL_CFG/etc/ftlrc
+# source default config
+source $FTL_CFG/etc/ftlrc
 
 # change leader-key to SPACE_KEY
 bind ftl bind SPACE_KEY leader_key \[aq]leader key \[dq]\[u02FD]\[dq]\[aq]

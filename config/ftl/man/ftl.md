@@ -37,9 +37,9 @@ file picker in _vim_
 ## Hyperorthodoxy
 
 ftl is hyperothodox, or not at all depending on your preferences, it starts
-with two panes, but can have more, one showing you a directory listing and
-the other a preview of the current entry. The outstanding _tmux_ makes this
-possible.
+with two panes but can start with just one pane or have more than two panes.
+The default is two panes, one showing you a directory listing and the other
+a preview of the current entry. The outstanding _tmux_ makes this possible.
 
 You can choose to remove the preview as well as having multiple panes showing
 the same or different directories.
@@ -47,7 +47,12 @@ the same or different directories.
 Panes are independent instances of ftl that work in synch, each pane has its
 own tabs, filters, ... 
 
-## Live Previews
+## Preview Pane And Live Previews
+
+If preview is on (on by default), a preview pane is displayed. It can
+be switched on and off during the session; it's size can be changed. Some
+entry types have multiple previews (IE: directories) that can be accessed
+with a keyboard shortcut (Alt-gr+v by default)
 
 The preview pane is not, generally, a static view of the file but, thanks to
 _tmux_, a running program. If you are positioned on a text file, _vim_ will be
@@ -75,9 +80,36 @@ are per tab so you can have two tabs with different filters.
 
 ## File Listing
 
-The directory entries are colored with lscolors. The header consists of:
+The listing consists of a header and directory listing.
 
-	<directory> [tilde(filter)] <current/total> <tab#> <selected_entries> [file_stat]
+The header consists of multiple elements, some depending on the current state:
+
+	- current directory, possibly truncated
+	- listing mode, directory/file
+	- image mode, all files/non image/image
+	- preview dir only (D)
+	- montage mode (⠶)
+	- filtered (~)
+	- entry index/number of entries
+	- size of directory, if sizes are displayed
+	- file stat, optional
+	- tab id
+	- sort glyph, ⍺: alphanumeric, 🡕: size, entry date
+	- reverse sort order (r)
+	- background shell sessions
+
+The directory listing consists of:
+
+	- entry index
+	- optional etag
+	- entries colored by _lscolors_
+
+Example:
+
+	../ftl/config/ftl/man 3/3 -rw-rw-r-- nadim  28K 09/03/22-09:54 ᵗ2 
+	 1    gen_man_pages
+	 2  M ftl.md
+	 3    ftl.1
 
 ## Marks
 
@@ -106,13 +138,6 @@ Available etags are:
 	11 1598x2100 image.jpg
 	12  720x 507 image.png
 	   ⮤ etag  ⮥ image-size
-
-## Preview
-
-If preview is on (on by default), a preview pane is displayed. It can
-be switched on and off during the session; it's size can be changed. Some
-entry types have multiple previews (IE: directories) that can be accessed
-with a keyboard shortcut (Alt-gr+v by default)
 
 ## Type handlers
 
@@ -149,13 +174,13 @@ but the Alt-gr key, in combination with the shift key, is used extensively
 
 ## Default bindings
 
-'Alt-gr'+c will open a window with all the current binding
-
-A list of all bindings, in _fzf_, wich allows you to search per key or name.
+'Alt-gr'+c will open a window listing all the current binding, in _fzf_,
+wich allows you to search per key or name.
 
 	map    section  key      command                
 	-------------------------------------------------------------------
 	ftl    file     c        copy          copy file to, prompts inline
+	...
 
 ## User defined bindings
 
@@ -390,9 +415,7 @@ sequences of keys to perform a command. The default is '\\'
 	Next entry of different extension «Ö»
 	Goto entry by index «ä»
 
-	Preview window (when possible):
-
-	Scroll preview up «K»
+	Scroll preview up   «K»
 	Scroll preview down «J»
 
 ## Preview
@@ -745,25 +768,28 @@ command prompt.
 *ftl* has one _session-shell_, a pane running bash, where your external commands
 are run by default.
 
-*ftl* can also run you external commands in a separate shell in the *ftl*
-session with *ftl_sesion*, this is useful when running commands that take
-time to complete.
-
 	Run command  «:»
 		command [args]
 
-		*ftlsel* command [command args]
-			echo ftl selection, null ended
-				«:» ftlsel | xargs -0 ls --color=always
-				«:» ftlsel | xargs -0 -n 1 ls --color=always
+		*ftlsel* list ftl selection, null separated
+			
+			«:» ftlsel | xargs -0 ls --color=always
+			«:» ftlsel | xargs -0 -n 1 ls --color=always
 
 		*ftl_session* command [command args]
+
+			run you commands in a separate shell pane in the *ftl*
+			session, eg: when commands that take time to complete.
+			
+			the shell pane is closed if the command exit code is 0. 
 
 	Switch to session-shell pane «!»
 
 	Switch back from tmux pane «tmux-prefix+L»
 
-# FILES AND DIRECTORIES
+# FILES
+
+## Directory structure
 
 	<ftl repo>
 	├── INSTALL
@@ -776,19 +802,9 @@ time to complete.
 		├── etags -> etc/etags
 		├── etc
 		│   ├── bin
-		│   │   ├── cdf
-		│   │   ├── color_size
-		│   │   ├── fpdh
 		│   │   ├── ftl
 		│   │   ├── ftli
-		│   │   ├── ftl_session
-		│   │   ├── ftl_shell_back
-		│   │   ├── ftl_synch_with_shell
-		│   │   ├── ftlvim
-		│   │   ├── ftl_xargs
-		│   │   ├── fzf_mv
-		│   │   ├── fzf_mv_add
-		│   │   └── fzf_mv_rm
+		│   │   └── ...
 		│   ├── bindings
 		│   │   └── lib
 		│   ├── commands
@@ -806,7 +822,6 @@ time to complete.
 		├── var
 		│   └── thumbs
 		│       ├── flv
-		│       ├── mp4
 		│       └── ...
 		└── viewers -> etc/viewers
 
@@ -834,10 +849,18 @@ Also read the **INSTALL** file
 
 # EXAMPLES
 
+## Helpful Bindings
+
+	# start ftl in a new window
+	tmux bind C-F run-shell 'tmux new-window -n ftl ftl "#{pane_current_path}"'
+
+	# start ftl on a specific directory in a new window
+	tmux bind C-D new-window -n download "ftl $HOME/downloads"
+
 ## RCfile
 
-	# source ftl default config
-	. $FTL_CFG/etc/ftlrc
+	# source default config
+	source $FTL_CFG/etc/ftlrc
 
 	# change leader-key to SPACE_KEY
 	bind ftl bind SPACE_KEY leader_key 'leader key "˽"'
