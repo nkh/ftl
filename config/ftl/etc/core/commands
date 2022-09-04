@@ -82,9 +82,9 @@ preview_pane()		{ ((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
 preview_once()		{ preview=1 ; tcpreview ; sleep 0.05 ; cdir ; geo_winch ; }
 preview_dir_only()	{ [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ; }
 preview_ext_ign()	{ [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ; }
-preview_hide_ext_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
-preview_hide_ext()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
-preview_hide_clr()	{ lignore=() ; cdir ; }
+extension_hide_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
+extension_hide()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
+extension_clear()	{ lignore=() ; cdir ; }
 preview_lock_clr()	{ rm "$fs/lock_preview/$n" 2>&- ; list ; }
 preview_lock()		{ p="$ftl_cfg/etc/core/lib/lock_preview" ; file=$(cd $p ; fd | fzf-tmux $fzf_opt) ; [[ $file ]] && . $p/$file ; list ; }
 preview_m1()		{ extmode=1 ; list ; }

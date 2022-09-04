@@ -19,7 +19,7 @@ declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_M
 shell_h=40% # shell pane height
 auto_tags=1 # automatically synch tags between panes
 pdhl= # log pdh message in file too
-prev_all=1 # open preview window
+: ${prev_all:=1} # open preview window
 zooms=(70 50 30) # sizes of preview pane in percent
 zoom=0 # start zoon level
 msg_m='Creating montage ...' # message displayed when creating image montage for directories
@@ -111,9 +111,9 @@ bind ftl file		"${A[i]}"	create_bulk		"creat in files and directories in bulk, u
 bind ftl file		"${A[l]}"	link			"symlink selection in current directory"
 bind ftl file		"${SA[l]}"	follow_link		"symlink follow"
 bind ftl filter		"#"		preview_ext_ign		"show/hide extension preview"
-bind ftl filter		"¤"		preview_hide_ext_tab	"hide extension from listing, per tab"
-bind ftl filter		"%"		preview_hide_ext	"hide extension from listing"
-bind ftl filter		"&"		preview_hide_clr	"enable all extensions"
+bind ftl filter		"¤"		extension_hide_tab	"hide extension from listing, per tab"
+bind ftl filter		"%"		extension_hide		"hide extension from listing"
+bind ftl filter		"&"		extension_clear		"enable all extensions"
 bind ftl filter		"."		show_hidden		"show/hide dot-files"
 bind ftl filter		F		set_filter2		"set filter 2"
 bind ftl filter		f		set_filter		"set filter 1"

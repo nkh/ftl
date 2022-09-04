@@ -360,9 +360,9 @@ sequences of keys to perform a command. The default is '\\'
 
 	New ftl pane below «_»
 	New ftl pane left «|»
-	New ftl pane left, keep focus «⇈x/>»
+	New ftl pane left, keep focus «>»
 	New ftl pane right «¦»
-	New ftl pane right, keep focus «⇈z/<»
+	New ftl pane right, keep focus «<»
 
 	Next pane or viewer «'-'»
 		Set focus on the next pane

@@ -56,25 +56,31 @@ get_dir() # dir, search
 cd "${1:-$PWD}" || return ; [[ "$PPWD" != "$PWD" ]] && { marks["'"]="$n" ; PPWD="$PWD" ; ((gpreview)) || echo "$n" | tee -a $fs/history >> $ghist ; }
 tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
 
+((gpreview)) || nice -15 $pgen/generator $thumbs &
+
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
-
-((gpreview)) || nice -15 $pgen/generator $thumbs &
 
 declare -A uniq_file ; pad=(* ? ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; dir &
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	[[ $pnc == $dir_done ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1
-	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; qd=1 ; list $found ; }
-	[[ ! -r "$pnc" ]] && pc="\e[7m$pnc\e[m" ; [[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
 	[[ "$pnc" =~ '.' ]] && { e=${pnc##*.} ; ((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue ; } ; pl=${#pnc}
+	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; qd=1 ; list $found ; }
+
+	[[ ! -r "$pnc" ]] && pc="\e[7m$pnc\e[m" ; [[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
+
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
 	((show_size)) && { ((sum += size, pl += 5)) ; [[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="     $pc" ; true ; } \
 			 || { for u in '' K M G T ; do ((size < 1024)) && printf -v pc "\e[94m%4s\e[m $pc" $size$u && break ; ((size/=1024)) ; done  ; } ; }
 	((show_line)) && { ((line++)) ; printf -v pc "$line_color%-${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += 4)) ; }
+
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((pl > (COLS - 1))) && { [[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }
+
+	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc"
+
 	[[ -f "$pnc" ]] && [[ -z $first_file ]] && first_file=$nfiles
-	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc" ; [[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" =~ $search ]] && found=$nfiles ; ((nfiles++))
+	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" =~ $search ]] && found=$nfiles ; ((nfiles++))
 done
 
 shopt -u nocasematch ; qd=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
@@ -91,7 +97,7 @@ head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage}" ; h
 ((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅ $head$ftag$tabsd" ; header '' "$head" ; tcpreview ; clear_list 0 ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
 ((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date=
-head="$head$ftag$((file+1))/${nfiles}$hsum$stat$date$tabsd$flip" ; header '' "$head"
+head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$flip" ; header '' "$head"
 
 for((i=$top ; i <= bottom ; i++))
 	do
