@@ -30,7 +30,7 @@ ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" 
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; while read p ; do in_tab=$(fzf_in_tab "$p") && ${1}_go $in_tab "$P" "$p" ; done<<<"$2" ; }
 fzf_in_tab(){ [[ -z "$1" ]] && return 1 ; [[ "$1" == ctrl-t ]] && echo 1 || echo 0 ; }
-fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$p")" ; }
+fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; cdir "$2/$d" "^$(basename "$p")$" ; }
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
 gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $pgen/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }

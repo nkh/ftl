@@ -74,7 +74,7 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((pl > (COLS - 1))) && { [[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }
 	[[ -f "$pnc" ]] && [[ -z $first_file ]] && first_file=$nfiles
-	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc" ; [[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" == "$search" ]] && found=$nfiles ; ((nfiles++))
+	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc" ; [[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" =~ $search ]] && found=$nfiles ; ((nfiles++))
 done
 
 shopt -u nocasematch ; qd=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
@@ -99,7 +99,7 @@ for((i=$top ; i <= bottom ; i++))
 		echo -ne "\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo ; ((l++))
 	done
 
-((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { geo_winch ; preview ; }
+((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { preview ; geo_winch ; }
 }
 
 preview() # force_preview
