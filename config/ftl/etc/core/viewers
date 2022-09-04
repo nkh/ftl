@@ -35,7 +35,7 @@ pviewers()
 [[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
-mime_get
+mime_get ; is_bin "$n"
 
 ((! is_bin)) && [[ -s "$n" ]] && \
 	[[ $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && \
@@ -52,7 +52,7 @@ epdf()      { ((emode == 1)) && epdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/de
 epdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
 etext()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 
-pignore()   { mime_get ; in_pdir= ; in_viprev= ; ptype ; }
+pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { ctsplit "echo ${f@Q} ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 

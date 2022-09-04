@@ -44,7 +44,8 @@ inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 kbdf()      { [[ $REPLY != ESCAPE_SEQ1 && $REPLY != ESCAPE_SEQ2 ]] && while read -t 0.01 ; do : ; done ; }
 k_bindings(){ printf '%s\n' "${bindings[@]}" | sort | column -t --table-columns map,section,key,command, -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
-mime_get()  { perl -le "-B qq~$n~ ? exit 0 : exit 1" && is_bin=1 || is_bin=0 ; [[ "${mime[$n]}" ]] || { mime_cache ; mime[$n]="$($MIMETYPE "$n")" ; } ; mtype="${mime[$n]}" ; false ; }
+mime_get()  { [[ "${mime[$n]}" ]] || mime_cache ; mtype="${mime[$n]}" ; }
+is_bin()    { perl -le "-B qq~$1~ ? exit 0 : exit 1" && is_bin=1 || is_bin=0  ; }
 mime_cache(){ while IFS=$': ' read fm mm ; do mime[$PWD/$fm]="$mm" ; done < <(mimemagic "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }

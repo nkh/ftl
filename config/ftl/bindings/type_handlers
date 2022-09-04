@@ -13,7 +13,8 @@ enter()
 	[[ $e =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && { mount_archive "$n" ; return ; }
 	
 	# edit text files with vi
-	((! is_bin)) && [[ -s "$n" ]] && mime_get && [[ $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && edit
+	mime_get ; is_bin "$n"
+	[[ $is_bin == 0 && $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && edit
 
 	# add other type handlers below
 	}
