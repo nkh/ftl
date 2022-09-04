@@ -22,6 +22,7 @@ pdhl= # log pdh message in file too
 : ${prev_all:=1} # open preview window
 zooms=(70 50 30) # sizes of preview pane in percent
 zoom=0 # start zoon level
+move_step=4 # fast movement size
 msg_m='Creating montage ...' # message displayed when creating image montage for directories
 msg_du='Computing dir sizes ...' # message displayed when computing directory sizes
 find_auto=README # file to select by default
@@ -167,6 +168,8 @@ bind ftl move		A		move_up_arrow		"up to previous entry"
 bind ftl move		B		move_down_arrow		"down to next entry"
 bind ftl move		C		move_right_arrow	"right; cd into directory"
 bind ftl move		D		move_left_arrow		"cd to parent directory"
+# bind ftl move		J		move_down_step		"move down multiple lines"
+# bind ftl move		K		move_up_step		"move up multiple lines"
 bind ftl move		J		preview_down		"scroll preview down"
 bind ftl move		K		preview_up		"scroll preview up"
 bind ftl move		g		top_file_bottom		"go to top/file/bottom"

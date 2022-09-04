@@ -418,6 +418,10 @@ sequences of keys to perform a command. The default is '\\'
 	Scroll preview up   «K»
 	Scroll preview down «J»
 
+	or this alternative, see rc file
+		Move up multiple lines   «K»
+		Move down multiple lines «J»
+
 ## Preview
 
 	Preview show/hide «v»

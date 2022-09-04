@@ -11,6 +11,8 @@ move_up()		{ ((nfiles)) && { move -1 && list ; } ; }
 move_up_arrow()		{ move_up ; }
 move_right()		{ ((nfiles)) && [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; }
 move_right_arrow()	{ move_right ; }
+move_down_step()	{ ((nfiles)) && { move $move_step && list ; } ; }
+move_up_step()		{ ((nfiles)) && { move -$move_step && list ; } ; }
 enter()			{ ((nfiles)) && { { [[ -f "${files[file]}" ]] && edit ; } || { [[ -d "${files[file]}" ]] && cdir "${files[file]}" ; } ; } ; }
 move_page_up()		{ move -$LINES ; list ; }
 move_page_down()	{ move $LINES ; list ; }
