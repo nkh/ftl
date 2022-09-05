@@ -7,6 +7,7 @@ ftl - terminal file manager, hyperorthodox, with live previews
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
 
 # SYNOPSIS
+
 ftl
 
 ftl [ [-t file] [-T file] ][directory[/file]]
@@ -106,11 +107,23 @@ The directory listing consists of:
 
 Example:
 
-	../ftl/config/ftl/man 3/3 -rw-rw-r-- nadim  28K 09/03/22-09:54 ᵗ2 
-	 1    gen_man_pages
-	 2  M ftl.md
-	 3    ftl.1
+	[ path ]  [      information       ]  [                   preview                    ] 
 
+	ries/ftl  7/8 09/03/22-09:54 ᵗ2      │
+	 1     .git                          │NAME                                            
+	 2     config                        │                                                
+	 3     screenshots                   │    ftl - file manager using tmux panes and live
+	 4     test                          │                                                
+	 5     .gitignore                    │    Screenshot [Image: https://raw.github.com/nk
+	 6  A  INSTALL                       │    Screenshot [Image: https://raw.github.com/nk
+	 7  M  README.md                     │                                                
+	 8     Todo.txt                      │DOCUMENTATION                                   
+	 ^  ^  [entries]                     │                                                
+	 |  |                                │    There are many promising file managers for t
+	 |  `- [etags]                       │    nnn, clifm, ranger, vimfm, broot, etc …     
+	 |                                   │
+	 `- [index]                          │...
+                                              
 ## Marks
 
 You can bookmak locations and jump back to them. Marks can be set in the

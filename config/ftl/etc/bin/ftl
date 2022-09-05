@@ -108,10 +108,11 @@ for((i=$top ; i <= bottom ; i++))
 ((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { preview ; geo_winch ; }
 }
 
-preview() # force_preview
+preview()
 {
-((main))     || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
-((prev_all)) && { ((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; }
+((main || prev_all)) \
+	&& { ((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
+        || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
 }
 
 [[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run in tmux'
