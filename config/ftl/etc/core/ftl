@@ -63,7 +63,7 @@ pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] &
 pdhn()      { pdh "$*\n" ; }
 pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm $pfs/pdh ; } || { tcpreview; tsplit "$ftl_cfg/etc/bin/fpdh $pfs" 30% -v $my_pane ; pane_id= ; } ; cdir ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
-prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl" ; ftl_imode "${imode[tab]}" ; [[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
+
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
 quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane ${C[SIG_PANE]} ; } ; rm -rf $fs ; exit 0 ; }
 quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
@@ -80,9 +80,13 @@ sort_glyph(){ echo ${sglyph[s_type]} ; }
 save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
 		((!nfiles)) && : >${1:-$fs}/ftl || >${1:-$fs}/ftl echo "\
 			sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
-			imode[tab]=${imode[tab]}; xxx=0						; sort_type[tab]=${sort_type[tab]}
+			imode[tab]=${imode[tab]}						; sort_type[tab]=${sort_type[tab]}
 			ftag=$ftag		; filters[tab]=\"${filters[tab]}\"		; filters2[tab]=\"${filters2[tab]}\" 
 			etag=$etag		; show_size=$show_size" ; }
+prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl"
+		ftl_imode "${imode[tab]}"
+		[[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; }
+		ofs= ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
 _tab_new()  { dir="$1" ; [[ "$dir" == '.' ]] && dir= ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; rfilters[tab]=$rfilter0 ; }
 _tab_next() { ((tab++)) ; for i in "${tabs[@]:$tab}" TAB_RESET "${tabs[@]}" ; do [[ "$i" == TAB_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; true ; }

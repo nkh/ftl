@@ -16,24 +16,24 @@ ewith
 
 pviewers()
 {
-[[ $e ]] && ((pignore["${e@Q}"])) && { pignore   ; return ; }
-[[ -e "$fs/lock_preview/$n" ]]    && { plock     ; return ; }
+[[ $e ]] && ((pignore["${e@Q}"])) && { pignore    ; return ; }
+[[ -e "$fs/lock_preview/$n" ]]    && { plock      ; return ; }
+[[ "${pdir_only[tab]}" ]]         && { pdir_only || return ; }
 
-[[ $e == cbr ]]                   && { pcbr      ; return ; }
-[[ $e == cbz ]]                   && { pcbz      ; return ; }
-[[ "${pdir_only[tab]}" ]]         && { pdir_only ; return ; }
-[[ $e == html ]]                  && { phtml     ; return ; }
-[[ $e == svg ]]                   && { psvg      ; return ; }
-[[ $e =~ $ifilter ]]              && { pimage    ; return ; }
-[[ $e == mp3 ]]                   && { pmp3      ; return ; }
-[[ $e =~ mkv|mp4|flv ]]           && { pmp4      ; return ; }
-[[ $e =~ ^md|MD$ ]]               && { pmd       ; return ; }
-[[ $e == pdf ]]                   && { ppdf      ; return ; }
-[[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
-[[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
-[[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
-[[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
-[[ -d "$n" ]]                     && { pdir      ; return ; }
+[[ $e == cbr ]]                   && { pcbr       ; return ; }
+[[ $e == cbz ]]                   && { pcbz       ; return ; }
+[[ $e == html ]]                  && { phtml      ; return ; }
+[[ $e == svg ]]                   && { psvg       ; return ; }
+[[ $e =~ $ifilter ]]              && { pimage     ; return ; }
+[[ $e == mp3 ]]                   && { pmp3       ; return ; }
+[[ $e =~ mkv|mp4|flv ]]           && { pmp4       ; return ; }
+[[ $e =~ ^md|MD$ ]]               && { pmd        ; return ; }
+[[ $e == pdf ]]                   && { ppdf       ; return ; }
+[[ $e == zip ]]   && ((extmode))  && { pcomp      ; return ; }
+[[ $e == rar ]]   && ((extmode))  && { pcomp      ; return ; }
+[[ $f =~ \.tar ]] && ((extmode))  && { pcomp      ; return ; }
+[[ $e =~ ^json|yml$ ]]            && { ptext      ; return ; }
+[[ -d "$n" ]]                     && { pdir       ; return ; }
 
 mime_get ; is_bin "$n"
 
@@ -64,7 +64,7 @@ pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REF
 pdir_du()   { ctsplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
 
-pdir_only() { tcpreview ; }
+pdir_only() { [[ -d "$n" ]] || { tcpreview ; false ; } ; }
 
 phtml()     { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; }
 pimage()    { ((extmode)) && { ctsplit "identify -format 'type: %m\nsize: %wx%h\nbits: %q\ndisk: %b\n' ${n@Q} ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
