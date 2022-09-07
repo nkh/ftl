@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source $ftl_info_file # to get FTL_PID
+cmd="$(printf "%s " "$@")"
+
+tmux neww -P -a -t ftl${FTL_PID} "export ftl_info_file='$ftl_info_file' ;\
+echo -e \"\e[2;33m[\$(date -R)] \$PWD\n\e[0;33mfsh> $cmd\e[m\" ;\
+echo -e \"\t\e[93m\$\$ - [\$(date -R)] \$PWD\n\t\e[93m\$\$ - fsh> $cmd\e[m\" >>$FTL_FS/cmd_log ;\
+{ $cmd ; } ; \
+exit_code=\$? ; \
+{ \
+echo -e \"\t\e[93m\$\$ - exit code: \$exit_code\e[m\n\" >>$FTL_FS/cmd_log ; \
+echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\" ; \
+bash ; \
+}"
+
+# vim: set filetype=bash :

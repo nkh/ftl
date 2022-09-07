@@ -39,15 +39,18 @@ user_cmd="$ftl_cfg/commands/$cmd"
 
 ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
-[[ "$cmd_parts" == ftl_session ]] &&
-	{ ftl_session "$(printf "%s " "${cmd_parts[@]:1}")" ; true ; } ||
+[[ "$cmd_parts" == fsh ]] &&
+	{ fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; true ; } ||
 	{
 		{
 		echo "export ftl_info_file=$ftl_info_file"
 		echo "cd '$PWD'"
 		echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
+		echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$fs/cmd_log"
 		echo "${cmd_parts[@]}"
-		echo "echo -e \"\n\e[2;33mExit code: \$?\e[m\""
+		echo "exit_code=\$?"
+		echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$fs/cmd_log"
+		echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
 		} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
 	}
 }

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-source $ftl_info_file 
-printf "%s\0" "${selection[@]}" 
-
-# vim: set filetype=bash :
-

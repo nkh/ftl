@@ -906,21 +906,37 @@ where your external commands are run by default.
 Run command  \[Fo]:\[Fc]
 	command [args]
 
-	*ftlsel* list ftl selection, null separated
-		
-		\[Fo]:\[Fc] ftlsel | xargs -0 ls --color=always
-		\[Fo]:\[Fc] ftlsel | xargs -0 -n 1 ls --color=always
+Switch to session-shell pane \[Fo]!\[Fc]
 
-	*ftl_session* command [command args]
-
-		run you commands in a separate shell pane in the *ftl*
-		session, eg: when commands that take time to complete.
-		
-		the shell pane is closed if the command exit code is 0. 
+Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 
 Switch to session-shell pane \[Fo]!\[Fc]
 
 Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
+
+Selection an shells:
+
+*fsel* list ftl selection, null separated
+	
+	\[Fo]:\[Fc] fsel | xargs -0 ls --color=always
+	\[Fo]:\[Fc] fsel | xargs -0 -n 1 ls --color=always
+
+*fsh* command [command args]
+
+	Run you commands in a separate shell pane in the *ftl*
+	session, eg: when commands that take time to complete.
+	
+	The shell pane is closed if the command exit code is 0. 
+
+                                           run command in:
+
+\[Fo]:\[Fc] command                                default shell
+\[Fo]:\[Fc] fsh command                            own shell
+\[Fo]:\[Fc] fsel | xargs -0 command                default shell, one command for all selection
+\[Fo]:\[Fc] fsel | xargs -0 -n1 command            default shell, one command per selection
+\[Fo]:\[Fc] fsh fsel | xargs -0 command            own shell, one command for all selection
+\[Fo]:\[Fc] fsh fsel | xargs -0 -n1 command        own shell, one command per selection
+\[Fo]:\[Fc] fsel | xargs -0 -n1 fsh command        one shell per selection
 \f[R]
 .fi
 .SH FILES

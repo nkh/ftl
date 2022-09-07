@@ -788,21 +788,37 @@ are run by default.
 	Run command  «:»
 		command [args]
 
-		*ftlsel* list ftl selection, null separated
-			
-			«:» ftlsel | xargs -0 ls --color=always
-			«:» ftlsel | xargs -0 -n 1 ls --color=always
+	Switch to session-shell pane «!»
 
-		*ftl_session* command [command args]
-
-			run you commands in a separate shell pane in the *ftl*
-			session, eg: when commands that take time to complete.
-			
-			the shell pane is closed if the command exit code is 0. 
+	Switch back from tmux pane «tmux-prefix+L»
 
 	Switch to session-shell pane «!»
 
 	Switch back from tmux pane «tmux-prefix+L»
+
+	Selection an shells:
+	
+	*fsel* list ftl selection, null separated
+		
+		«:» fsel | xargs -0 ls --color=always
+		«:» fsel | xargs -0 -n 1 ls --color=always
+	
+	*fsh* command [command args]
+	
+		Run you commands in a separate shell pane in the *ftl*
+		session, eg: when commands that take time to complete.
+		
+		The shell pane is closed if the command exit code is 0. 
+	
+	                                           run command in:
+	
+	«:» command                                default shell
+	«:» fsh command                            own shell
+	«:» fsel | xargs -0 command                default shell, one command for all selection
+	«:» fsel | xargs -0 -n1 command            default shell, one command per selection
+	«:» fsh fsel | xargs -0 command            own shell, one command for all selection
+	«:» fsh fsel | xargs -0 -n1 command        own shell, one command per selection
+	«:» fsel | xargs -0 -n1 fsh command        one shell per selection
 
 # FILES
 
