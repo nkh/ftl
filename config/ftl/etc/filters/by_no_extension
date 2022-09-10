@@ -1,19 +1,27 @@
 declare -g -A fnexts=()
 shopt -s dotglob
 
-for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
-		sort -u | lscolors | fzf-tmux -p 30% -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
-	do 
-		fnexts[$ext]=1
-		filter_tag="~"
-	done
+[[ "$1" == load ]] && [[ -e "$pfs/by_no_extension" ]] && source "$pfs/by_no_extension" || \
+	{
+	remove_no_ext=0
+
+	for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
+			sort -u | { echo "-without_extension-" ; cat ; } | lscolors | \
+			fzf-tmux -p 30% -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
+		do 
+			[[ $ext == "-without_extension-" ]] && remove_no_ext=1 || fnexts[$ext]=1
+			filter_tag="~"
+		done
+
+	declare -p remove_no_ext fnexts >"$pfs/by_no_extension"
+	}
 
 ftl_filter()
 {
 while read -r file_data
 	do
 		fn="${file_data#$'*\t'*$'\t'}" ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
-		{ [[ -d "$fn" ]] || [[ -z "$ext" ]] || [[ -z "${fnexts[$ext]}" ]] ; } && echo "$file_data"
+		{ [[ -d "$fn" ]] || [[ -z "$ext" && $remove_no_ext == 0 ]] || [[ -n "$ext" && -z ${fnexts[$ext]} ]] ; } && echo "$file_data"
 	done
 }
 

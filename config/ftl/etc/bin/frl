@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+frl_max_depth="${2:-1000}"
+find -maxdepth $frl_max_depth | rg --no-heading --smart-case "$1" --color=always --colors 'match:fg:51' | sed -e 's/^\.\///' -e '/^\.$/d' | lscolors
+

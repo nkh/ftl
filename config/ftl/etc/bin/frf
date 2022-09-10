@@ -1,0 +1,25 @@
+#!/bin/bash
+frf_max_depth="${1:-1000}"
+
+FZF_DEFAULT_COMMAND="frl '' $frf_max_depth" fzf-tmux -p 80% \
+	-e \
+	-m \
+	--disabled \
+	--no-sort \
+ 	--ansi \
+	--layout=reverse-list \
+	--color="hl:51,header:238,bg+:236" \
+	--info=inline \
+	--header '^rg ^fzf ᵃj-down ᵃk-up ?-preview ^select ^deselect ^toggle' \
+	--prompt '1. rg> ' \
+	--preview '\
+		file={} ;
+		[[ -d {} ]] && ls -AgGh --group-directories-first --color=always {} || \
+		{ perl -e "exit -B \$ARGV[0]" -- {} && vimkat {} 100 -1 || { file {} | piper "[^,]+" "grey20" ",.*" "grey10" ; } ; } ' \
+	--bind "change:reload:sleep 0.1; frl {q} $frf_max_depth || true" \
+	--bind 'ctrl-f:unbind(change,ctrl-f)+change-prompt(2. fzf> )+enable-search+clear-query+rebind(ctrl-r)' \
+	--bind "ctrl-r:unbind(ctrl-r)+change-prompt(1. rg> )+disable-search+reload(frl {q} $frf_max_depth || true)+rebind(change,ctrl-f)" \
+	--bind 'alt-k:preview-up,alt-j:preview-down' \
+	--bind '?:toggle-preview' \
+	--bind 'ctrl-a:select-all,ctrl-d:deselect-all,ctrl-t:toggle-all'
+

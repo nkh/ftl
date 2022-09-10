@@ -5,8 +5,7 @@ expect
 fdfind
 ffmpegthumbnailer
 fim
-fzf
-fzf
+fzf > 0.30
 jpegoptim
 libvips-tools
 librsvg2-bin

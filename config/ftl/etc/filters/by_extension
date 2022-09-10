@@ -1,22 +1,27 @@
 declare -g -A fexts=()
-shopt -s dotglob
 
-for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
-		sort -u | lscolors | fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
-	do 
-		fexts[$ext]=1
-		filter_tag="~"
-	done
+[[ "$1" == load ]] && [[ -e "$2/by_extension" ]] && source "$2/by_extension" || \
+	{
+	shopt -s dotglob
+
+	for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ \. ]] && echo ".${i##*.}" ; done | \
+			sort -u | { echo "-no_extension-" ; cat ; } | lscolors | \
+			fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
+		do 
+			fexts[$ext]=1 ; filter_tag="~"
+		done
+	
+	declare -p fexts >"$fs/by_extension"
+	}
 
 ftl_filter()
 {
 while read -r file_data
 	do
-		# the slowwwww way, left here as an example of when to optimize
-		#fn=$(cut -f 3- <<<"$file_data") ;"
-		
-		fn="${file_data#$'*\t'*$'\t'}" ; ext= ; [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
-		{ [[ -d "$fn" ]] || { [[ "$ext" ]] && [[ ${fexts[$ext]} == 1 ]] ; } ; } && echo "$file_data"
+		#fn=$(cut -f 3- <<<"$file_data") # the slowwwwwwww way, left here as an example of when to optimize
+		fn="${file_data#$'*\t'*$'\t'}" ; ext= ; [[ "$fn" =~ \. ]] && ext=".${fn##*.}" ; 
+
+		[[ -d "$fn" ]] || [[ "$ext" && ${fexts[$ext]} == 1 || -z "$ext" && ${fexts[-no_extension-]} == 1 ]] && echo "$file_data"
 	done
 }
 

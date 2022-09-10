@@ -11,7 +11,7 @@ while IFS=$'\t' read -a file_data
 		((entry++))
 	done
 
-for i in $(printf "%s\n" "${sort_data[@]}" | sort -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done
+for i in $(printf "%s\n" "${sort_data[@]}" | sort -s -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done
 }
 
 # vim: set filetype=sh :

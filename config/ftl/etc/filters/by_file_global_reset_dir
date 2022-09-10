@@ -1,18 +1,23 @@
 declare -g -A keep PWDS
 
-for f in "${!keep[@]}" do ; [[ "$f" =~ "$tab-$PWD/" ]] && unset 'keep[$f]' ; done
+[[ "$1" == load ]] && [[ -e "$pfs/by_file_global_reset_dir" ]] && source "$pfs/by_file_global_reset_dir" || \
+	{
+	for f in "${!keep[@]}" ; do [[ "$f" =~ "$tab-$PWD/" ]] && unset 'keep[$f]' ; done
 
-OIFS=$IFS ; IFS=$'\n'
-for file in $(\
-		{ find -maxdepth 1 -type d -printf "%f\n" | grep -v '^\.$' | sort -u ; find -maxdepth 1 -type f -printf "%f\n" | sort -u ; } | \
-		lscolors | fzf-tmux -p 80% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all \
-		)
-	do 
-		keep["$PWD/$file"]=1
-		PWDS[$PWD]=1
-		filter_tag="~"
-	done
-IFS=$OIFS
+	OIFS=$IFS ; IFS=$'\n'
+	for file in $(\
+			{ find -maxdepth 1 -type d -printf "%f\n" | grep -v '^\.$' | sort -u ; find -maxdepth 1 -type f -printf "%f\n" | sort -u ; } | \
+			lscolors | fzf-tmux -p 80% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all \
+			)
+		do 
+			keep["$PWD/$file"]=1
+			PWDS[$PWD]=1
+			filter_tag="~"
+		done
+	IFS=$OIFS
+
+	declare -p keep PWDS >"$pfs/by_file_global_reset_dir"
+	}
 
 ftl_filter()
 {

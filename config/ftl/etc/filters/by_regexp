@@ -1,0 +1,29 @@
+declare -g -A keep PWDS
+
+[[ "$1" == load ]] && [[ -e "$pfs/by_regexp" ]] && source "$pfs/by_regexp" || \
+	{
+	OIFS=$IFS ; IFS=$'\n'
+	for file in $(frf 1)
+		do 
+			keep["$tab-$PWD/$file"]=1
+			PWDS[$tab-$PWD]=1
+			filter_tag="~"
+		done
+	IFS=$OIFS
+
+	declare -p keep PWDS >"$pfs/by_regexp"
+	}
+
+ftl_filter()
+{
+[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
+	{
+	while read -r file_data
+		do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat 
+}
+
+# vim: set filetype=sh :

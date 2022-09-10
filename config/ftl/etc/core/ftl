@@ -25,7 +25,7 @@ edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-$
 files()     { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1  -printf '%s\t%T@\t%P\n' 2>&- | ftl_filter | $2 ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg "${filters[tab]}" | rg "${filters2[tab]}" | { [[ "${rfilters[tab]}" ]] && rg -v "${rfilters[tab]}" || cat ; } | filter2 ; }
 filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
-filter_rst(){ eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
+filter_rst(){ filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; while read p ; do in_tab=$(fzf_in_tab "$p") && ${1}_go $in_tab "$P" "$p" ; done<<<"$2" ; }
@@ -78,15 +78,22 @@ shell_send(){ { (( $1 )) && [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }
 save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
-		((!nfiles)) && : >${1:-$fs}/ftl || >${1:-$fs}/ftl echo "\
-			sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
-			imode[tab]=${imode[tab]}						; sort_type[tab]=${sort_type[tab]}
-			ftag=$ftag		; filters[tab]=\"${filters[tab]}\"		; filters2[tab]=\"${filters2[tab]}\" 
-			etag=$etag		; show_size=$show_size" ; }
-prev_synch(){ tag_synch ; read ofs <$fsp/fs ; . "$ofs/ftl"
+		((!nfiles)) && : >${1:-$fs}/ftl \
+			    || >${1:-$fs}/ftl echo "sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
+							ftag=$ftag		; etag=$etag					; show_size=$show_size 
+							filter_ext=\"$filter_ext\"
+							imode[tab]=\"${imode[tab]}\"
+							sort_type[tab]=${sort_type[tab]}
+							filters[tab]=\"${filters[tab]}\"
+							filters2[tab]=\"${filters2[tab]}\" 
+							lmode[tab]=\"${lmode[tab]}\"
+							show_hidden[tab]=\"${show_hidden[tab]}\"
+							rfilters[tab]=\"${rfilters[tab]}\"
+							ntfilter[tab]=\"${ntfilter[tab]}\" "; }
+prev_synch(){ tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
+		((gpreview)) && { [[ "$filter_ext" ]] && source "$ftl_cfg/filters/$filter_ext" load $ofs || filter_rst ; }
 		ftl_imode "${imode[tab]}"
-		[[ $1 ]] && { path "$n" ; preview ; } || { cdir "$sdir" '' "$sindex" ; }
-		ofs= ; }
+		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
 _tab_new()  { dir="$1" ; [[ "$dir" == '.' ]] && dir= ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; rfilters[tab]=$rfilter0 ; }
 _tab_next() { ((tab++)) ; for i in "${tabs[@]:$tab}" TAB_RESET "${tabs[@]}" ; do [[ "$i" == TAB_RESET ]] && tab=0 && continue ; [[ -n "$i" ]] && break ; ((tab++)) ; done ; true ; }

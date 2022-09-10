@@ -1,7 +1,12 @@
-clear ; stty echo ; tput cnorm ; read -p 'ftl filter, file min size: ' ftl_min_size ; tput civis ; stty -echo
+[[ "$1" == load ]] && [[ -e "$pfs/by_size" ]] && source "$pfs/by_size" || \
+	{
+	prompt 'ftl filter file min size: ' ; ftl_min_size="${REPLY:-0}" ; [[ "$ftl_min_size" =~ [0-9]+ ]] || ftl_min_size=0
 
+	declare -p ftl_min_size >"$pfs/by_size"
+	}
 
 filter_tag="~"
+
 ftl_filter() 
 {
 while IFS=$'\t' read -a file_data
