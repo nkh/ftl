@@ -51,9 +51,10 @@ filter_reverse()	{ prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$RE
 find_entry()		{ prompt "find: " -i to_search ; R="${C[find_next]}" ; }
 find_next()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
 find_previous()		{ for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
+find_fzf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 find_fzf_all()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -HI -E'.git/*' | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 find_fzf_dirs()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -td -I -L | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
-find_fzf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
+find_frf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(frf)" ; exec 2>"$fs/log" ; }
 gmark()			{ { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ; }
 gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$(cat $ftl_root/marks | lscolors | fzf-tmux $fzf_opt --cycle -m --expect=ctrl-t --ansi)" ; }
 gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ; }
