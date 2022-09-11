@@ -2,14 +2,18 @@ declare -g -A keep PWDS
 
 [[ "$1" == load ]] && [[ -e "$pfs/by_regexp" ]] && source "$pfs/by_regexp" || \
 	{
+	exec 2>&9
 	OIFS=$IFS ; IFS=$'\n'
-	for file in $(frf 1)
+
+	for file in $(frf 1 "-tmux -p 80%")
 		do 
 			keep["$tab-$PWD/$file"]=1
 			PWDS[$tab-$PWD]=1
 			filter_tag="~"
 		done
+
 	IFS=$OIFS
+	exec 2>"$fs/log"
 
 	declare -p keep PWDS >"$pfs/by_regexp"
 	}

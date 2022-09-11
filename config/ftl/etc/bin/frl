@@ -1,4 +1,10 @@
 #!/usr/bin/bash
 frl_max_depth="${2:-1000}"
-find -maxdepth $frl_max_depth | rg --no-heading --smart-case "$1" --color=always --colors 'match:fg:51' | sed -e 's/^\.\///' -e '/^\.$/d' | lscolors
+
+{ 
+# find -maxdepth $frl_max_depth -type d,l -xtype d | sort
+# find -maxdepth $frl_max_depth -xtype p,l | sort
+# find -maxdepth $frl_max_depth -type f,l -xtype f | sort
+find -maxdepth $frl_max_depth -type p,d,f,l -xtype p,d,f,l | sort
+} | rg --no-heading --smart-case "$1" --color=always --colors 'match:fg:51' | sed -e 's/^\.\///' -e '/^\.$/d' | lscolors
 

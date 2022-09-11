@@ -33,6 +33,7 @@ pviewers()
 [[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
+[[ -p "$n" ]]                     && { ppipe     ; return ; }
 [[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
@@ -64,6 +65,7 @@ pdir()      { ((extmode)) && pdir_du || { [[ "$montage" ]] && pdir_image || { ec
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 pdir_du()   { ctsplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
+ppipe()     { ctsplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 
 phtml()     { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; }
 pimage()    { ((extmode)) && { ctsplit "identify -format 'type: %m\nsize: %wx%h\nbits: %q\ndisk: %b\n' ${n@Q} ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
