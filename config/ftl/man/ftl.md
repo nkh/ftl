@@ -65,8 +65,9 @@ The idea is to use within *ftl* what you normally use on the command line.
 ## Extended And Detached Viewers
 
 For some file types, often media types, *ftl* can show an extended view and 
-even start a detached viewer. See "## External Viewer" below and config in 
-'$FTL_CFG/etc/ftlrc'. 
+even start a detached viewer. 
+
+See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
 
 ## Vim
 
@@ -87,7 +88,7 @@ The header consists of multiple elements, some depending on the current state:
 
 	- current directory, possibly truncated
 	- listing mode, directory/file
-	- image mode, all files/non image/image
+	- image mode, all files/non images/images
 	- preview dir only (D)
 	- montage mode (⠶)
 	- filtered (~)
@@ -171,8 +172,8 @@ See "## Filtering" in commands.
 
 *ftl* is written in Bash, the language that packs a real punch ... and
 sometimes punches you. It also strives to follow the spirit of unix by
-reusing what's available. *ftl* is designed to be used with other Unix
-tools and applications, not a monolitic compiled application.
+reusing what's available. *ftl* is designed to integrate other Unix
+tools and applications.
 
 *ftl*  will probably not work in other shells but it may be a cool exercise
 making things portable.
@@ -182,8 +183,7 @@ to expand.
 
 # KEY BINDINGS
 
-*ftl* uses vim-like key bindings by default, the bindings are defined in the
-default ftlrc file.
+*ftl* uses vim-like key bindings, the bindings can be changed in the default ftlrc file.
 
 *ftl* has many commands and thus many bindings. The control key is not used
 but the Alt-gr key, in combination with the shift key, is used extensively
@@ -272,7 +272,7 @@ sequences of keys to perform a command. The default is '\\'
 	Quit «q»
 
 		Closes the current tab, it there are tabs, then closes the
-		last created pane.
+		last created pane, closes *ftl*.
 
 	Quit all «Q»
 		
@@ -289,8 +289,7 @@ sequences of keys to perform a command. The default is '\\'
 
 	Detach the preview «$»
 		
-		Open a new preview pane, the old preview pane is not under *ftl*
-		control any more.
+		Open a new preview pane, detach the old preview pane from *ftl*.
 
 	Cd «G»
 		
@@ -494,6 +493,7 @@ sequences of keys to perform a command. The default is '\\'
 	by_file_global_reset_dir	# keep selected files, all tabs, exclusive
 	by_no_extension			# keep files not matching extensions
 	by_only_tagged			# keep tagged files
+	by_regexp			# keep files, filter with regexp or fyzzy
 	by_size				# keep files over minimum size
 
 	Set reverse-filter «⇑a/ª»
@@ -504,7 +504,7 @@ sequences of keys to perform a command. The default is '\\'
 			«f»  -> f
 			«⇑a» -> i
 
-		eg: always hide vim swap files, set in rcfile
+		eg: always hide vim swap files, set by default in _ftlrc_
 			rfilter0='\.sw.$'
 
 	Hide extension «¤», per tab
@@ -514,27 +514,24 @@ sequences of keys to perform a command. The default is '\\'
 
 	Show hidden extensions «⇈k/&»
 
-## Searchings
+## Searching
 
-	Incremental search «/»
+	Fzf find in current directory  «b»
+	Fzf find                       «⇑b/”»
+	Fzf find regexp/fuzzy          «⇈b/’»
+	Fzf find only directories      «⇈'/’/÷»
+
+	Ripgreg with preview           «}»
+
+	Opening search results in tabs:
+		If you use one of the above you can pick multiple entries.
+		Entries can be opened in a new tab with 'ctrl+t'.
+
+	Incremental search             «/»
 		Press 'enter' to end.
 
-	Find next «n»
-	Find previous «N»
-
-	Searching with _fzf_ and _rg_:
-		*ftl* runs fzf to let you pick one or multiple entries.
-
-		If you select only one entry, *ftl* positons you on the entry,
-		you can also open the entry in a new tab with 'ctrl+t'.
-
-		If you select multiple entries, end with 'ctrl+t'.
-
-	Fzf find current directory file «b»
-	Fzf find files and directories  «⇑b/”»
-	Fzf find only directories       «⇈b/’»
-
-	Rg to file with preview «}»
+	Find next                      «n»
+	Find previous                  «N»
 
 ## Tags/Etags
 
@@ -543,9 +540,7 @@ sequences of keys to perform a command. The default is '\\'
 	other panes.
 
 	When using tags and multiple class tags are present, *ftl* will ask
-	which class to use.
-
-	The number of tagged entries is displayed in the header
+	which class to use. The number of entries is displayed in the header.
 
 	Tag down «y»
 		Tag current entry in "normal" tag class and move one entry down
@@ -584,7 +579,7 @@ sequences of keys to perform a command. The default is '\\'
 
 	Fzf goto «⇑g/ŋ»
 		Opens fzf to let you choose an entry among the tags, then
-		change directory to where the tag is.
+		changes directory to where the tag is.
 
 		This is can be handy when tags are read from a file with option
 		-t on the command line or via the 'load_tags' shell command
@@ -616,8 +611,8 @@ sequences of keys to perform a command. The default is '\\'
 
 ## History
 
-	*ftl* keeps two location histories, one in the currentsession and one
-	global (sum of all sessions)
+	*ftl* keeps two location histories, one for the current session and one
+	global (sum of all sessions).
 
 	Fzf history all sessions «¨»
 	Fzf history all sessions «⇑h/ħ»
@@ -639,13 +634,13 @@ sequences of keys to perform a command. The default is '\\'
 		Opens _vim_, lines ending with / will create directories
 
 	Delete selection «d»
-		uses configuration *RM*, see ftlrc.
+		uses configuration *RM* variable, see ftlrc.
 
-	Copy entry «c»
-	Copy selection «p»
+	Copy entry        «c»
+	Copy selection    «p»
 
-	Move selection «P»
-	Move selection «⇈p/þ»
+	Move selection    «P»
+	Move selection to «⇈p/þ»
 		Uses _fzf_mv_.
 
 	Rename «R»
@@ -690,7 +685,7 @@ sequences of keys to perform a command. The default is '\\'
 
 	Sometime Previews in ftl are not enough, eg. you really want to see
 	that pdf with the images in it not just a text rendering. The external
-	key bindings set the _emode_ variable and external viewer decide how
+	key bindings set the _emode_ variable and an external viewer decide how
 	to display an entry, that may be in a text based application or not.
 
 	*ftl* had a some viewers for images, videos, comics, directories
@@ -720,9 +715,6 @@ sequences of keys to perform a command. The default is '\\'
 		
 ## Shell Pane
 	Shell pane «s»
-
-		moving from shell pane to ftl and from ftl to shell pane
-
 	Shell pane with selected files «S»
 	Shell pane, zoomed out «not asssigned»
 
@@ -751,7 +743,7 @@ will lets you choose a command to run with the invaluable _fzf_ or at the
 command prompt.
 
 	Run user command «˽u»
-	command propmpt «:»
+	command propmpt  «:»
 
 	the scripts are either
 		- bash scripts that are sourced (can change *ftl* state)
@@ -775,9 +767,9 @@ command prompt.
 
 		- ^tree			display a tree in a popup pane
 
-		- shortcut		run the *ftl* command
+		- ftl shortcut		run the *ftl* command
 
-		- bound function	run the *ftl* command
+		- ftl functioni		run the *ftl* command
 
 		- user_command [args]   run the user command
 
@@ -790,10 +782,6 @@ are run by default.
 
 	Run command  «:»
 		command [args]
-
-	Switch to session-shell pane «!»
-
-	Switch back from tmux pane «tmux-prefix+L»
 
 	Switch to session-shell pane «!»
 
@@ -1005,7 +993,7 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
 Please report bug to <https://https://github.com/nkh/ftl/issues>
 
-Contributions are best done via pull requests on github. Keep code to a minimum.
+Contributions are best done via pull requests on github. Keep code to a bare minimum.
 
 # AUTHOR
 

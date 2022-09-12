@@ -28,9 +28,9 @@ filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
 filter_rst(){ filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
-go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; while read p ; do in_tab=$(fzf_in_tab "$p") && ${1}_go $in_tab "$P" "$p" ; done<<<"$2" ; }
-fzf_in_tab(){ [[ -z "$1" ]] && return 1 ; [[ "$1" == ctrl-t ]] && echo 1 || echo 0 ; }
-fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; cdir "$2/$d" "^$(basename "$p")$" ; }
+go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read p ; do fzf_in_tab "$p" && continue ; ${1}_go $in_tab "$P" "$p" ; done<<<"$2" ; }
+fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }
+fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d" || nd="$d" ; cdir "$nd" "^$(basename "$3")$" ; }
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
 gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $pgen/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }

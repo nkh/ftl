@@ -13,13 +13,13 @@ ftl is Written in Bash, the language that packs a real punch (and sometimes punc
 
 I wanted a file manager that would use tmux and give me "live" preview and works well with my tiling window manager.
 
-This is definitely not production quality, it's for the fun of it, but it's good enough so I stopped using other programs.
+*ftl* is quite complete but still in development. It's good enough so I stopped using other programs a while ago.
 
 # MAN PAGE
 
-*ftl* has a complete man page accessible at the url below or in *ftl* by pressing '?' .
+*ftl* has a complete man page accessible by pressing '?' in *ftl* or the link below.
 
-![Manpage](https://github.com/nkh/ftl/blob/main/config/ftl/etc/man/ftl.md)
+[Man page](../main/config/ftl/man/ftl.md)
 
 ## Installation
 See *INSTALL* file.

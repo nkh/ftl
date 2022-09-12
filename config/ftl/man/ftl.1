@@ -78,6 +78,7 @@ command line.
 .PP
 For some file types, often media types, \f[I]ftl\f[R] can show an
 extended view and even start a detached viewer.
+.PP
 See \[lq]## External Viewer\[rq] below and config in
 `$FTL_CFG/etc/ftlrc'.
 .SS Vim
@@ -101,7 +102,7 @@ state:
 \f[C]
 - current directory, possibly truncated
 - listing mode, directory/file
-- image mode, all files/non image/image
+- image mode, all files/non images/images
 - preview dir only (D)
 - montage mode (\[u2836])
 - filtered (\[ti])
@@ -199,15 +200,18 @@ See \[lq]## Filtering\[rq] in commands.
 \&... and sometimes punches you.
 It also strives to follow the spirit of unix by reusing what\[cq]s
 available.
-IT will probably not work in other shells but may be a cool exercise in
-making things portable.
+\f[I]ftl\f[R] is designed to integrate other Unix tools and
+applications.
+.PP
+\f[I]ftl\f[R] will probably not work in other shells but it may be a
+cool exercise making things portable.
 .PP
 Most of the code is one liners, albeit long, and it\[cq]s structured to
-be \f[I]easy\f[R] to expand.
+be \[lq]easy\[rq] to expand.
 .SH KEY BINDINGS
 .PP
-\f[I]ftl\f[R] uses vim-like key bindings by default, the bindings are
-defined in the default ftlrc file.
+\f[I]ftl\f[R] uses vim-like key bindings, the bindings can be changed in
+the default ftlrc file.
 .PP
 \f[I]ftl\f[R] has many commands and thus many bindings.
 The control key is not used but the Alt-gr key, in combination with the
@@ -331,7 +335,7 @@ Show this man page \[Fo]?\[Fc]
 Quit \[Fo]q\[Fc]
 
 	Closes the current tab, it there are tabs, then closes the
-	last created pane.
+	last created pane, closes *ftl*.
 
 Quit all \[Fo]Q\[Fc]
 	
@@ -348,8 +352,7 @@ Quit, keep preview zoomed \[Fo]\[u21C8]q/\[*W]\[Fc]
 
 Detach the preview \[Fo]$\[Fc]
 	
-	Open a new preview pane, the old preview pane is not under *ftl*
-	control any more.
+	Open a new preview pane, detach the old preview pane from *ftl*.
 
 Cd \[Fo]G\[Fc]
 	
@@ -574,6 +577,7 @@ by_file_global			# keep selected files, all tabs, additive
 by_file_global_reset_dir	# keep selected files, all tabs, exclusive
 by_no_extension			# keep files not matching extensions
 by_only_tagged			# keep tagged files
+by_regexp			# keep files, filter with regexp or fyzzy
 by_size				# keep files over minimum size
 
 Set reverse-filter \[Fo]\[uA]a/\[Of]\[Fc]
@@ -584,7 +588,7 @@ Set reverse-filter \[Fo]\[uA]a/\[Of]\[Fc]
 		\[Fo]f\[Fc]  -> f
 		\[Fo]\[uA]a\[Fc] -> i
 
-	eg: always hide vim swap files, set in rcfile
+	eg: always hide vim swap files, set by default in _ftlrc_
 		rfilter0=\[aq]\[rs].sw.$\[aq]
 
 Hide extension \[Fo]\[Cs]\[Fc], per tab
@@ -595,29 +599,26 @@ Hide extension \[Fo]%\[Fc], globally
 Show hidden extensions \[Fo]\[u21C8]k/&\[Fc]
 \f[R]
 .fi
-.SS Searchings
+.SS Searching
 .IP
 .nf
 \f[C]
-Incremental search \[Fo]/\[Fc]
+Fzf find in current directory  \[Fo]b\[Fc]
+Fzf find                       \[Fo]\[uA]b/\[rq]\[Fc]
+Fzf find regexp/fuzzy          \[Fo]\[u21C8]b/\[cq]\[Fc]
+Fzf find only directories      \[Fo]\[u21C8]\[aq]/\[cq]/\[tdi]\[Fc]
+
+Ripgreg with preview           \[Fo]}\[Fc]
+
+Opening search results in tabs:
+	If you use one of the above you can pick multiple entries.
+	Entries can be opened in a new tab with \[aq]ctrl+t\[aq].
+
+Incremental search             \[Fo]/\[Fc]
 	Press \[aq]enter\[aq] to end.
 
-Find next \[Fo]n\[Fc]
-Find previous \[Fo]N\[Fc]
-
-Searching with _fzf_ and _rg_:
-	*ftl* runs fzf to let you pick one or multiple entries.
-
-	If you select only one entry, *ftl* positons you on the entry,
-	you can also open the entry in a new tab with \[aq]ctrl+t\[aq].
-
-	If you select multiple entries, end with \[aq]ctrl+t\[aq].
-
-Fzf find current directory file \[Fo]b\[Fc]
-Fzf find files and directories  \[Fo]\[uA]b/\[rq]\[Fc]
-Fzf find only directories       \[Fo]\[u21C8]b/\[cq]\[Fc]
-
-Rg to file with preview \[Fo]}\[Fc]
+Find next                      \[Fo]n\[Fc]
+Find previous                  \[Fo]N\[Fc]
 \f[R]
 .fi
 .SS Tags/Etags
@@ -629,9 +630,7 @@ files. Option auto_tags controls if tags are automatically merged to
 other panes.
 
 When using tags and multiple class tags are present, *ftl* will ask
-which class to use.
-
-The number of tagged entries is displayed in the header
+which class to use. The number of entries is displayed in the header.
 
 Tag down \[Fo]y\[Fc]
 	Tag current entry in \[dq]normal\[dq] tag class and move one entry down
@@ -670,7 +669,7 @@ Untag fzf \[Fo]U\[Fc]
 
 Fzf goto \[Fo]\[uA]g/\[u014B]\[Fc]
 	Opens fzf to let you choose an entry among the tags, then
-	change directory to where the tag is.
+	changes directory to where the tag is.
 
 	This is can be handy when tags are read from a file with option
 	-t on the command line or via the \[aq]load_tags\[aq] shell command
@@ -708,8 +707,8 @@ Clear persistent marks \[Fo]\[uA]k/\[u0138]\[Fc]
 .IP
 .nf
 \f[C]
-*ftl* keeps two location histories, one in the currentsession and one
-global (sum of all sessions)
+*ftl* keeps two location histories, one for the current session and one
+global (sum of all sessions).
 
 Fzf history all sessions \[Fo]\[ad]\[Fc]
 Fzf history all sessions \[Fo]\[uA]h/\[u0127]\[Fc]
@@ -734,13 +733,13 @@ Create entries in bulk \[Fo]\[uA]i/\[->]\[Fc]
 	Opens _vim_, lines ending with / will create directories
 
 Delete selection \[Fo]d\[Fc]
-	uses configuration *RM*, see ftlrc.
+	uses configuration *RM* variable, see ftlrc.
 
-Copy entry \[Fo]c\[Fc]
-Copy selection \[Fo]p\[Fc]
+Copy entry        \[Fo]c\[Fc]
+Copy selection    \[Fo]p\[Fc]
 
-Move selection \[Fo]P\[Fc]
-Move selection \[Fo]\[u21C8]p/\[Tp]\[Fc]
+Move selection    \[Fo]P\[Fc]
+Move selection to \[Fo]\[u21C8]p/\[Tp]\[Fc]
 	Uses _fzf_mv_.
 
 Rename \[Fo]R\[Fc]
@@ -791,7 +790,7 @@ Terminal popup                 \[Fo]\[u02FD]ft\[Fc]
 \f[C]
 Sometime Previews in ftl are not enough, eg. you really want to see
 that pdf with the images in it not just a text rendering. The external
-key bindings set the _emode_ variable and external viewer decide how
+key bindings set the _emode_ variable and an external viewer decide how
 to display an entry, that may be in a text based application or not.
 
 *ftl* had a some viewers for images, videos, comics, directories
@@ -826,9 +825,6 @@ Creating and using a viewer:
 .nf
 \f[C]
 Shell pane \[Fo]s\[Fc]
-
-	moving from shell pane to ftl and from ftl to shell pane
-
 Shell pane with selected files \[Fo]S\[Fc]
 Shell pane, zoomed out \[Fo]not asssigned\[Fc]
 
@@ -861,7 +857,7 @@ You can also add commands without bindings, in $FTL_CFG/commands/,
 .nf
 \f[C]
 Run user command \[Fo]\[u02FD]u\[Fc]
-command propmpt \[Fo]:\[Fc]
+command propmpt  \[Fo]:\[Fc]
 
 the scripts are either
 	- bash scripts that are sourced (can change *ftl* state)
@@ -888,9 +884,9 @@ You are prompted, with edit/history/completion, for a command:
 .PP
 - \[ha]tree display a tree in a popup pane
 .PP
-- shortcut run the \f[I]ftl\f[R] command
+- ftl shortcut run the \f[I]ftl\f[R] command
 .PP
-- bound function run the \f[I]ftl\f[R] command
+- ftl functioni run the \f[I]ftl\f[R] command
 .PP
 - user_command [args] run the user command
 .PP
@@ -905,10 +901,6 @@ where your external commands are run by default.
 \f[C]
 Run command  \[Fo]:\[Fc]
 	command [args]
-
-Switch to session-shell pane \[Fo]!\[Fc]
-
-Switch back from tmux pane \[Fo]tmux-prefix+L\[Fc]
 
 Switch to session-shell pane \[Fo]!\[Fc]
 
@@ -1137,7 +1129,7 @@ map <silent> <leader>f :call Ftl(1)<cr>
 Please report bug to <https://https://github.com/nkh/ftl/issues>
 .PP
 Contributions are best done via pull requests on github.
-Keep code to a minimum.
+Keep code to a bare minimum.
 .SH AUTHOR
 .PP
 \[co] Nadim Khemir 2020-2022

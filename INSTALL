@@ -1,3 +1,6 @@
+Clone, link, or copy the repository to $HOME/.config/ftl
+Set FTL_CFG to $HOME/.config/ftl
+
 apt install :
 ack
 exittool

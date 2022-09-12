@@ -1,0 +1,34 @@
+issue: key grabbed by other pane
+	when dir preview is opened
+
+issue: inotify, focuses main! resize missed when pane is closed
+
+issue: space in names when passing env var to shell
+
+install: package the script needed for installer
+		add local binaries and perl scripts
+		plc, atw, tlc, ...
+
+# later
+
+arch: multi column attributes
+	have a column for entry number, size, etags, access attribute, time, file name, ...
+	
+	user can add and remove, except file
+	user can sort per one or more of the columns 
+
+	columns can be added by background process
+		eg: many files need processing and that thats a long time
+			list every time a batch is processed
+
+arch: put all options in one array
+
+arch: filter list instead for specialized filters 
+
+arch: filter per directory, inherit from parent
+
+arch: let hidden pane do preview so main pane data isn't overridden by extra pane's
+	this may also make it possible to use fz, rg, etc... as filters and ftl as preview
+
+feature: add command to bash history when failure in tscommand
+
