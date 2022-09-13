@@ -1,3 +1,5 @@
+# Current
+
 issue: key grabbed by other pane
 	when dir preview is opened
 
@@ -5,11 +7,17 @@ issue: inotify, focuses main! resize missed when pane is closed
 
 issue: space in names when passing env var to shell
 
-install: package the script needed for installer
-		add local binaries and perl scripts
-		plc, atw, tlc, ...
+feature: installer
+	put all small dependencies in etc/bin
 
-# later
+	plc
+	atw
+	tlc
+	git clone -depth=1 https://github.com/nkh/fzf_scripts
+	git clone -depth=1 https://github.com/nkh/treewhatever
+	git clone -depth=1 https://github.com/nkh/P5-App-Piper
+
+# Later
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...

@@ -865,12 +865,6 @@ $FTL_CFG (set by default to $HOME/.config/ftl) is the directory that contains
 
 See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details. 
 
-# INSTALL
-
-Install ftl in $FTL_CFG and symlink _ftl_ somewhere in your $PATH
-
-Also read the **INSTALL** file
-
 # EXAMPLES
 
 ## Helpful Bindings

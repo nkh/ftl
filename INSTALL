@@ -1,71 +1,99 @@
-Clone, link, or copy the repository to $HOME/.config/ftl
-Set FTL_CFG to $HOME/.config/ftl
+# set ftl location
+# if you have a space in the path you'll need to quote everywhere
+# in the script below
+FTL_ROOT="$HOME/.config"
 
-apt install :
-ack
-exittool
-expect
-fdfind
-ffmpegthumbnailer
-fim
-fzf > 0.30
-jpegoptim
-libvips-tools
-librsvg2-bin
-mcomix
-moreutils
-moreutils
-mplayer
-mupdf-tools
-perl
-python-pip3
-qutebrowser
-ripgrep
-rlwrap
-rmlint
-rustlang
-tmux
-unrar
-vim
-vlc
-wmctrl
-xdotool
-zathura
-zathura-cb
+# shallow clone ftl
+mkdir -p $FTL_ROOT ; cd $FTL_ROOT
+git clone -depth=1 https://github.com/nkh/ftl.git
 
-pip3 install:
-vmd
-ueberzug
+# generate man pages:
+( cd $FTL_ROOT/ftl/config/ftl/man/ ; ./gen_man_pages )
 
-cargo install (https://www.rust-lang.org/tools/install):
-lscolors
+# set environment variables
+FTL_CFG="$FTL_ROOT/ftl"
+#echo 'export FTL_CFG="$FTL_CFG' >>~/.bashrc 
 
-perl :
-treewhatever (https://github.com/nkh/treewhatever)
-piper (https://github.com/nkh/P5-App-Piper)
+PATH="$PATH:$FTL_CFG/etc/bin"
+#echo PATH="$PATH:$FTL_CFG/etc/bin" >>~/.bashrc
+
+# install packages
+sudo apt install ack
+sudo apt install exittool
+sudo apt install expect
+sudo apt install fdfind
+sudo apt install ffmpegthumbnailer
+sudo apt install fim
+sudo apt install fzf > 0.30
+
+sudo apt install imagemagick
+# ftl needs an image of your terminal background color to 
+# draw around image preview
+HEX_RED=00
+HEX_GREEN=00
+HEX_BLUE=00
+convert -size 2000x2000 xc:#$RED$GREEN$BLUE "$FTL_CFG/image_bg.png"
+
+# you also need to hint ftl about your terminal character size
+# see FTLI_W and FTLI_H in ftlrc
+
+sudo apt install jpegoptim
+sudo apt install libvips-tools
+sudo apt install librsvg2-bin
+sudo apt install mcomix
+sudo apt install moreutils
+sudo apt install mplayer
+sudo apt install mupdf-tools
+sudo apt install perl
+sudo apt install python-pip3
+sudo apt install qutebrowser
+sudo apt install ripgrep
+sudo apt install rlwrap
+sudo apt install rmlint
+sudo apt install rustlang
+sudo apt install tmux
+sudo apt install unrar
+sudo apt install vim
+sudo apt install vlc
+
+sudo apt install w3m
+cp /usr/lib/w3m/w3mimagedisplay $FTL_CFG/etc/bin/
+
+sudo apt install wmctrl
+sudo apt install xdotool
+sudo apt install zathura
+sudo apt install zathura-cb
+
+pip3 install vmd
+pip3 install ueberzug
+
+# ftl uses moar as a pages for markdown files
+# that can be changed in the rc file
+brew install moar
+
+# (https://www.rust-lang.org/tools/install):
+cargo install lscolors
+
+# optionally install a better "rm" (https://github.com/nivekuil/rip)
+# it needs to be configured in the rc file
+#cargo install rm-improved
+
 cpanm File::MimeInfo
 
-non packet manager:
-https://github.com/nkh/fzf_scripts
+# optional, lowdown for markdown preview, see rc file 
+#https://kristaps.bsd.lv/lowdown/
 
-image_bg must exist
-cp w3mimagedisplay from /usr/lib/w3m to PATH
-link files in ~/.config
-au FileType man setlocal nospell >> vimrc
+# non packet manager:
+TBD!
 
-optional: 
-brew install moar
-cargo install rm-improved
-https://kristaps.bsd.lv/lowdown/
+# ftl uses vim to display man pages, see rc file
+#MANPAGER="vim -c 'set nospell' +MANPAGER -"
 
-create and possibly link to etc:
-config/ftl/viewers
-config/ftl/commands
-config/ftl/etags
-config/ftl/generators
-config/ftl/ftlrc
-config/ftl/filters 
+# I also needed to add this to my vimrc
+#au FileType man setlocal nospell >> vimrc
 
-generate man pages:
-run command in man directory
+# run ftl
+cd $HOME
+ftl
 
+# vim: set filetype=bash : 

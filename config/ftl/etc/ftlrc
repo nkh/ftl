@@ -1,16 +1,15 @@
 # CONFIG
 
 ## Directories
-ftl_cfg="$HOME/.config/ftl"
-pgen="$ftl_cfg/etc/generators" #location of preview generators
-ftl_root=$ftl_cfg/var # runtime directory, every session gets a directory here
+pgen="$FTL_CFG/etc/generators" #location of preview generators
+ftl_root=$FTL_CFG/var # runtime directory, every session gets a directory here
 ftl_cmds=$ftl_root/cmds # history of shell commands
 ghist=$ftl_root/history # global history file
 
 thumbs=$ftl_root/thumbs #where preview generators cache the previews
 mkdir -p $thumbs # make sure the directory exists
 
-help_command="man \"$ftl_cfg/man/ftl.1\"" # command to run to show help, try setting MANPAGER to vim
+help_command="man \"$FTL_CFG/man/ftl.1\"" # command to run to show help, try setting MANPAGER to vim
 
 ## Marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
@@ -42,7 +41,7 @@ TBCOLORS='236 52'
 
 ## External Tags
 etag=0 # show wtag
-#. $ftl_cfg/etc/etags/git ; etag=1 # if you want to show git tags by default
+#. $FTL_CFG/etc/etags/git ; etag=1 # if you want to show git tags by default
 
 sort_type0=0 # default sort. 0: alphanumeric, 1: size, 2: date.
 sort_reversed0= #default reverse sort order
@@ -71,7 +70,7 @@ GPGID=CHANGE.ME
 G_PLAYER=vlc # gui media player
 T_PLAYER="mplayer -vo null" # terminal media player
 T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
-PREVIEW_SHOW="$ftl_cfg/etc/viewers/cmus"
+PREVIEW_SHOW="$FTL_CFG/etc/viewers/cmus"
 
 PAGER_ANSI='/usr/bin/less -R'
 MD_PAGER='moar --no-statusbar -no-linenumbers' # pager when showing markdown preview

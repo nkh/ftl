@@ -1,2 +1,6 @@
-test
 .*
+test
+config/ftl/ftlrc
+config/ftl/var
+config/ftl/man/ftl.1
+
