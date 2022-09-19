@@ -10,7 +10,7 @@ enter()
 [[ -d "${files[file]}" ]] && cdir "${files[file]}" ||
 	{
 	# mount archives
-	[[ $e =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && { mount_archive "$n" ; return ; }
+	[[ $mount_archive && $e =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && { mount_archive "$n" ; return ; }
 	
 	# edit text files with vi
 	mime_get ; is_bin "$n"

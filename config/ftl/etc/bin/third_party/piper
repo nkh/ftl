@@ -1,0 +1,188 @@
+#!/usr/bin/env perl
+
+use strict ; 
+use warnings ; 
+use Term::ANSIColor qw(color colorvalid) ;
+
+# todo:
+# local $Term::ANSIColor::AUTOLOCAL = 1;
+# push /pop
+# Xterm position
+
+print <> and exit(0) unless @ARGV ;
+
+my $global_match = (grep {/^--global$/} @ARGV);
+my $once = (grep {/^--once$/} @ARGV);
+my $debug = (grep {/^--debug$/} @ARGV);
+my $debug_definitions = (grep {/^--debug_definitions$/} @ARGV);
+
+@ARGV = (grep {!/^--debug.*$/} @ARGV);
+@ARGV = (grep {!/^--global*$/} @ARGV);
+@ARGV = (grep {!/^--once*$/} @ARGV);
+
+print <<'EOH' and exit 0 if (grep {/^--help$/} @ARGV) || @ARGV % 2 ;
+Usage:	$> command | piper perl_regex replacement|color|block ...
+		replace and/or color text 
+
+	regex
+		A perl5 regex, or a simple string to match
+		line matchin regex '(?#|start_line,end_line)regex'
+
+	replacement
+		A text to replace the match with, if the replacement is a color,
+		the text is not replace but colorized. See color and block.
+	
+	color
+		An ANSI color by name. If your terminal supports 256 colors
+		give color as rgb500. The color is automatically reset after
+		the match is displayed
+
+	block	
+		Description of a {start color}replacement{end color} tuple.
+
+		The start color is used before the replacement is done, the 
+		end color after the replacement. The color is not automatically
+		reset.
+
+		If an invalid color is given, the declaration will be part of the
+		replacement. Empty color declaration is allowed (see examples).
+
+Options:
+	--help               displays this message
+	--global|g           do global matching rather than linear
+	--once               match_once per line
+	--debug              displays how the color, or block, is parsed
+	--debug_definitions  displays regex and defintions before matching
+
+Example:
+	# color trailing spaces, replace tabs with a space, colors 'MI' and 'MINI'
+	piper   '\s+$' 'on_red'           '\t' ' '              'MI(NI)*' green
+
+	#     reset line color  number in blue  color 'start' green the rest red
+	piper   '^' reset        '\d+' blue          start {green}{red} 
+	
+	#     color 'start' green the rest red   color 'end' green and rest
+	piper      start {green}{red}              end {green}{reset}
+
+	#     color 'start' green, continues in green  remove 'end' green and rest
+	piper      start {green}                            end {}{reset}
+ 
+	#     color 'start' green, replace 'end' with green 'the end'
+	piper      start {green}       end {green}the end{reset}
+ 
+	
+	# say you want  to colorize the output of du -h (also check du's -t option)
+		kilobytes in green:             '^.+K' green 
+		less than 5MB on blue:          '^[1-4](,[0-9])*M' on_blue
+		anything else in MB on red:     '^[0-9,]*M' on_red	
+
+	declare a function
+		du_col(){ piper '^.+K' green '^[1-4](,[0-9])*M' ...  ; }
+
+	$ du -h | du_col
+EOH
+
+my $KEEP_MATCH ;
+
+#debug variables
+my @definitions ;
+my $regex_index = 0 ;
+
+my (@rx, @rp) ; 
+
+while(@ARGV)
+	{
+	my $rx = shift @ARGV ;
+	push @rx, $rx ;
+
+	$_ = shift @ARGV ;
+
+	s/^(?'cd1'\{(?'c1'[^\{\}]*)\})// ;
+	my ($v1, $c1, $cd1) = (0, $+{c1} // '', $+{cd1} // '') ;
+	($v1, $c1) = (1, color($c1)) if $c1 !~ /^\s*$/ && colorvalid($c1) ; 
+
+	$_ = reverse ; # search from end
+
+	s/^(?'cd2'\}(?'c2'[^\{\}]*)\{)// ;
+	my $v2 = 0 ; my $c2 = reverse($+{c2} // '') ; my $cd2 = reverse($+{cd2} // '') ;
+	($v2, $c2) = (1, color($c2)) if $c2 !~ /^\s*$/ && colorvalid($c2) ; 
+
+	my $t = reverse $_ ;
+	($c1, $t) = ('', $cd1 . $t) if !$v1 && $cd1 ne '{}' ;
+	($c2, $t) = ('', $t . $cd2) if !$v2 && $cd2 ne '{}' ;
+
+	($c1, $cd1, $t, $c2, $cd2) = (color($t), ">$t<", $KEEP_MATCH, color('reset'), ">reset<") 
+		if !$v1 && $cd1 ne '{}' && !$v2 && $cd1 ne '{}' && $t !~ /^\s*$/ && colorvalid($t) ;
+
+	$t = $KEEP_MATCH if defined $t && $t eq '' && ($v1) ;
+
+	push @definitions,
+		sprintf 
+			color('grey6') . "[$regex_index]" . color('reset') 
+			. sprintf(" %-25s", $rx)
+			. " ${c1}$cd1 - @{[$t // '*keep match*']} - ${c2}$cd2 ..."
+			. color('reset')
+
+		if $debug || $debug_definitions ;
+
+	push @rp,[$c1, $t, $c2] ;
+	$regex_index++ ;
+	} 
+
+my $r = join '|', map {"(?'r$_'" . $rx[$_] . ')' } 0 .. @rx -1 ;
+
+if ($debug_definitions)
+	{
+	warn "$r\n\n" ;
+	warn join("\n", @definitions), "\n" ;
+	}
+
+sub r
+{
+my $i = $global_match ? chop $_[0] : $_[0] ;
+
+warn sprintf "%-40s $definitions[$i]\n", '<'.$_[1].'>' if $debug ;
+
+$rp[$i][0] . ($rp[$i][1] // $_[1]) . $rp[$i][2] 
+}
+
+$_='' ;
+
+if ($global_match)
+	{
+	do { s/($r)/r(%+)/gen ; print } while(<>) ;
+	}
+else
+	{
+	my $line = 0 ;	
+
+	while(<>)
+		{
+		$line++;
+		my $colored = '' ;
+
+		for (my $i = 0 ; $i < @rx ; $i++)
+			{
+			# handle line selection, cache this test
+			if ($rx[$i] =~ /\(  \?  \#  \|  (?<start>\d+)? \,?  (?<end>\d+)? \)/x)
+				{
+				print "line: $line, regex:$rx[$i], start: " . ($+{start} || '') . ", end: " . ($+{end} || '') . "\n" if $debug ;
+
+				if (defined $+{start} || defined $+{end})
+					{
+					next if (defined $+{start} && $line < $+{start}) ;
+					next if (defined $+{end} && $line > $+{end}) ;
+					}
+				}
+
+			while(m/\G(.*?)($rx[$i])/gc) {$colored .= $1 . r($i, $2) ; last} 
+			$once && $colored ne '' && last ;
+			}
+
+		if(m/\G(.+)/) {$colored .= $1} 
+
+		print if $debug ;
+		print $colored . "\n" ;
+		}
+	}
+

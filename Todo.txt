@@ -8,14 +8,6 @@ issue: inotify, focuses main! resize missed when pane is closed
 issue: space in names when passing env var to shell
 
 feature: installer
-	put all small dependencies in etc/bin
-
-	plc
-	atw
-	tlc
-	git clone -depth=1 https://github.com/nkh/fzf_scripts
-	git clone -depth=1 https://github.com/nkh/treewhatever
-	git clone -depth=1 https://github.com/nkh/P5-App-Piper
 
 # Later
 

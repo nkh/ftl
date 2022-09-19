@@ -22,11 +22,22 @@ I wanted a file manager that would use tmux and give me "live" preview and works
 [Man page](../main/config/ftl/man/ftl.md)
 
 ## Installation
-See *INSTALL* file.
 
-# BUGS AND LIMITATIONS
+There a very simple installer that mirrors my environment. I run
+Ubuntu (KUbuntu) and install a few dependencies from source.
 
-No installer
+Since some dependencies gets build during the install multiple development
+environment are also installed.
+
+*ftl* uses full apllications which need to be installed so the disk usage
+may be high depending on what options you chose to install. On the other hand
+the applications are great and worth having installed even when not using *ftl*.
+
+To install *ftl* you need download the bash INSTALL file
+
+wget https://raw.githubusercontent.com/nkh/ftl/main/INSTALL
+
+Follow the instructions.
 
 # LICENSE AND COPYRIGHT
 

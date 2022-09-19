@@ -1,99 +1,121 @@
+# download this file from the repository
+# READ IT and modify it to install optional packages
+# source it
+
+# fzf version must be > 0.30
+# check your package manager, you may  need to be installed manually
+# see https://github.com/junegunn/fzf
+
+# for optional packages, you'll need to write your own ftlrc, or
+# modify the default, see man page for an example
+
 # set ftl location
-# if you have a space in the path you'll need to quote everywhere
-# in the script below
-FTL_ROOT="$HOME/.config"
+FTL_CFG="$HOME/.config/ftl" 
+mkdir -p $FTL_CFG
+mkdir -p $FTL_CFG/etc/bin/third_party
+cd $FTL_CFG
+
+sudo apt install -y 	ack \
+			python3-pip \
+			libimage-exiftool-perl \
+			cpanminus \
+			curl \
+			exiftool \
+			expect \
+			fd-find \
+			ffmpegthumbnailer \
+			fim \
+			fzf \
+			git \
+			imagemagick \
+			jpegoptim \
+			libvips-tools \
+			librsvg2-bin \
+			libx11-dev \
+			libxext-dev \
+			mcomix \
+			moreutils \
+			mplayer \
+			mupdf-tools \
+			perl \
+			pandoc \
+			qutebrowser \
+			ripgrep \
+			rlwrap \
+			rmlint \
+			tmux \
+			tree \
+			unrar \
+			vim \
+			vlc \
+			w3m \
+			w3m-img \
+			wmctrl \
+			xdotool \
+			zathura \
+			zathura-cb \
+
+pip3 install		vmd \
+			ueberzug
+
+# install cargo (and rust!) see https://www.rust-lang.org/tools/install
+# yes I highly dislike "curl ... | sh"
+curl https://sh.rustup.rs -sSf | sh
+source ~/.bashrc
+
+cargo install 		lscolors
+
+sudo cpanm			File::MimeInfo \
+				Term::ANSIColor \
+				File::Spec \
+				Term::ANSIColor \
+				Getopt::Long \
+				FileHandle \
+				IPC::Open2 \
+
+sudo ln -s /usr/bin/fdfind /usr/bin/fd # old fdfind name is used
+cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party
+
+# you'll need a compiler toolchain for some of the dependencies
+# sudo apt install -y automake pkg-config libarchive-dev libarchive-tools make gcc g++
+
+# optional install fuse-archive; set mount_archive in rc file
+# sudo apt install -y libfuse-dev 
+#(git clone https://github.com/google/fuse-archive.git && cd fuse-archive && make ; cp out/fuse-archive $FTL_CFG/etc/bin/third_party)
+
+# optional "a better rm" (https://github.com/nivekuil/rip)
+#cargo install rm-improved
+
+# optional pager, you need brew installed and change MD_PAGER in rc file
+# see https://docs.brew.sh/Homebrew-on-Linux
+# brew install moar
+
+# optional markdown previewer
+#https://kristaps.bsd.lv/lowdown/
 
 # shallow clone ftl
-mkdir -p $FTL_ROOT ; cd $FTL_ROOT
-git clone -depth=1 https://github.com/nkh/ftl.git
+git clone --depth=1 https://github.com/nkh/ftl.git ftl_repo
+cp -r $FTL_CFG/ftl_repo/config/ftl/* .
+cp $FTL_CFG/ftl_repo/config/ftl/etc/bin/third_party/.vimkatrc ~
 
-# generate man pages:
-( cd $FTL_ROOT/ftl/config/ftl/man/ ; ./gen_man_pages )
+# generate man pages
+( cd $FTL_CFG/man ; ./gen_man_pages )
 
-# set environment variables
-FTL_CFG="$FTL_ROOT/ftl"
-#echo 'export FTL_CFG="$FTL_CFG' >>~/.bashrc 
-
-PATH="$PATH:$FTL_CFG/etc/bin"
-#echo PATH="$PATH:$FTL_CFG/etc/bin" >>~/.bashrc
-
-# install packages
-sudo apt install ack
-sudo apt install exittool
-sudo apt install expect
-sudo apt install fdfind
-sudo apt install ffmpegthumbnailer
-sudo apt install fim
-sudo apt install fzf > 0.30
-
-sudo apt install imagemagick
-# ftl needs an image of your terminal background color to 
-# draw around image preview
+# ftl needs an image of your terminal background color to draw around
+# image preview. You also need to hint ftl about your terminal character
+# size see FTLI_W and FTLI_H in ftlrc for default
 HEX_RED=00
 HEX_GREEN=00
 HEX_BLUE=00
-convert -size 2000x2000 xc:#$RED$GREEN$BLUE "$FTL_CFG/image_bg.png"
+convert -size 2000x2000 xc:#$HEX_RED$HEX_GREEN$HEX_BLUE "$FTL_CFG/image_bg.png"
 
-# you also need to hint ftl about your terminal character size
-# see FTLI_W and FTLI_H in ftlrc
-
-sudo apt install jpegoptim
-sudo apt install libvips-tools
-sudo apt install librsvg2-bin
-sudo apt install mcomix
-sudo apt install moreutils
-sudo apt install mplayer
-sudo apt install mupdf-tools
-sudo apt install perl
-sudo apt install python-pip3
-sudo apt install qutebrowser
-sudo apt install ripgrep
-sudo apt install rlwrap
-sudo apt install rmlint
-sudo apt install rustlang
-sudo apt install tmux
-sudo apt install unrar
-sudo apt install vim
-sudo apt install vlc
-
-sudo apt install w3m
-cp /usr/lib/w3m/w3mimagedisplay $FTL_CFG/etc/bin/
-
-sudo apt install wmctrl
-sudo apt install xdotool
-sudo apt install zathura
-sudo apt install zathura-cb
-
-pip3 install vmd
-pip3 install ueberzug
-
-# ftl uses moar as a pages for markdown files
-# that can be changed in the rc file
-brew install moar
-
-# (https://www.rust-lang.org/tools/install):
-cargo install lscolors
-
-# optionally install a better "rm" (https://github.com/nivekuil/rip)
-# it needs to be configured in the rc file
-#cargo install rm-improved
-
-cpanm File::MimeInfo
-
-# optional, lowdown for markdown preview, see rc file 
-#https://kristaps.bsd.lv/lowdown/
-
-# non packet manager:
-TBD!
-
-# ftl uses vim to display man pages, see rc file
-#MANPAGER="vim -c 'set nospell' +MANPAGER -"
-
-# I also needed to add this to my vimrc
-#au FileType man setlocal nospell >> vimrc
+# set environment variables
+echo export FTL_CFG="'$FTL_CFG'" >>~/.bashrc 
+echo PATH="$PATH:$FTL_CFG/etc/bin:$FTL_CFG/etc/bin/third_party" >>~/.bashrc
 
 # run ftl
 cd $HOME
+source .bashrc
 ftl
 
 # vim: set filetype=bash : 

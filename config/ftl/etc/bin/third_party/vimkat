@@ -1,0 +1,47 @@
+#!/bin/bash
+
+help() {
+echo "
+NAME
+	vimkat - render a file via Vim
+
+SYNOPSIS
+	vimkat input_file [max_lines] [vimrc] [vim_command]
+	... | vimkat [max_lines] [vimrc] [vim_command]   
+
+DESCRIPTION
+	Renders a file via Vim ... quite fast
+
+	input_file	the file you want rendered
+	max_lines	the maximum number of lines to render, -1 for all lines
+	vimrc		a vimrc file to use instead for your default vimrc, -1 for vimkat's vimrc
+	vim_command	extra argument to vim, eg: "-c 'ft=sh'"
+
+AUTHOR/LICENSE
+	© Nadim Ibn Hamouda El Khemir, 2022. Artistic License 2.0 or Vim's license
+	mailto: nadim.khemir@gmail.com
+
+SEE ALSO
+	vimpage, vimcat
+" >&2
+}
+
+[[ -t 0 || -f "$1" ]] \
+	&& {	[[ -z "$1" || "$1" =~ ^--? ]] && { help ; exit ; }
+		input="$1" ; [[ -e "$input" ]] || { echo "vimkat: no such file ${input@Q}" >&2 && exit 1 ; }
+		tmp_input= ; max="$2" ; vimrc="$3" ; extra_commands="${@:4}"
+		} \
+	|| { tmp_input=1 ; input="/tmp/vimkat_pipe_input_$$" ; cat >"$input" ; max="$1" ; vimrc="$2" ; extra_commands="${@:3}" ; }
+
+
+typescript_file="/tmp/vimkat_typescript_${input##*/}_$$"
+vimkat_max="/tmp/vimkat_max_${input##*/}_$$"
+[[ -n $max && $max != -1 ]] && head -n "$max" "$input" >"$vimkat_max" && input="$vimkat_max"
+
+[[ -n "$vimrc" ]] && { [[ "$vimrc" == -1 ]] && vimrc="$HOME/.vimkatrc" ; [[ -e "$vimrc" ]] && vimrc="-u ${vimrc@Q}" ; }
+
+(( lines = $(wc -l <"$input") + 10))
+COLUMNS="$COLUMNS" script -o 1000000 -qc "vim $vimrc -R -c'set lines=$lines' $extra_commands +redraw +q ${input@Q}" "$typescript_file" | sed -e '1s/.*1;1H//' -e "s/~          .*//" 
+
+rm -f "$typescript_file" "$vimkat_max" ; ((tmp_imput)) && rm "$input" 
+true

@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-declare -Ag ftl_key_map C bindings ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc || source $FTL_CFG/etc/ftlrc ;
+declare -Ag ftl_key_map C bindings ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
 [[ "$1" == '-t' ]] && { tag_read "$@" && shift 2 ; }
@@ -115,5 +115,5 @@ preview()
         || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
 }
 
-[[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run in tmux'
+[[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; export FTL_CFG ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run in tmux'
 

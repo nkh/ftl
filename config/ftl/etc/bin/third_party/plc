@@ -1,0 +1,68 @@
+#!/usr/bin/env perl 
+		
+use strict ;
+use warnings ;
+
+use File::Spec ;
+use Term::ANSIColor ;
+#use File::LsColor qw(ls_color_custom) ;
+
+use Getopt::Long ;
+$|++ ;
+
+my $values = 0 ;
+
+die 'Error parsing options!'unless
+        GetOptions
+                (
+                'v|values' => \$values,
+                'h|help' => \&display_help,
+                ) ;
+
+sub display_help
+{
+print <<'EOH' ;
+Name:
+	plc: path ls color
+
+	extract a path from a line folowing pattern: path/file:rest
+	and colors the path and file according to LS_COLORS
+
+	uses 'lscolors' or File::LS_colors
+ 
+Options:
+	'v|values'	Expect values after path
+
+examples:
+
+EOH
+exit ;
+}
+
+my $ansi = qr/\e\[(?:[0-9;]*)[mK]/ ;
+	
+use FileHandle;
+use IPC::Open2;
+my $pid = open2(*COLORED, *LSCOLORS, "lscolors");
+
+while (<>)
+	{
+	chomp ;
+
+	#separate path from rest of line
+	my ($path, $rest, @rest) = split( /(?<!:) : (?!:)/x ) ; 
+	$path //='' ;
+
+	$rest = $values && defined $rest 
+			? ':' . $rest . (@rest ? ':' . join(':', @rest) : '')
+			:  '' ;
+
+	$path =~ s/$ansi//g ;
+
+	#print ls_color_custom($ENV{LS_COLORS}, $path) . color('reset') . "$rest\n" ;
+	print LSCOLORS "$path\n" ;
+	$path = <COLORED> ;
+	chomp $path ;
+
+	print $path . "$rest\n" ;
+	}

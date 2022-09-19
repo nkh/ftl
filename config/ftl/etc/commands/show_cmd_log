@@ -1,2 +1,2 @@
-tmux popup -w 80% -h 80% $MD_PAGER $fs/cmd_log
+[[ -f $fs/cmd_log ]] && tmux popup -w 80% -h 80% $MD_PAGER $fs/cmd_log
 

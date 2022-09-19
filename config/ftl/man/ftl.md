@@ -886,6 +886,9 @@ See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details.
 	# don't show swap files
 	rfilter0='\.sw.$'
 
+	# set to auto mount archives, fuse-archive must be installed
+	mount_archive=1
+
 	# display options for fzf
 	fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 
@@ -982,6 +985,15 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 	endfunction
 
 	map <silent> <leader>f :call Ftl(1)<cr>
+
+## Vim As Man Pager
+	To use vim as a man page viewer add this to your bashrc:
+
+		MANPAGER="vim -c 'set nospell' +MANPAGER -"
+
+	I also added this to my vimrc:
+
+		au FileType man setlocal nospell
 
 # BUGS AND CONTRIBUTIONS
 

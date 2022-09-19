@@ -1,0 +1,46 @@
+set nornu nonumber
+
+syntax on
+filetype plugin on
+
+"RGB color support
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+set background=dark
+
+" show tab
+set list
+hi SpecialKey ctermfg=237  
+set listchars=tab:◐◌
+
+hi StatusLine ctermbg=22 ctermfg=black
+hi StatusLineNC ctermbg=20 ctermfg=black
+
+hi VertSplit ctermbg=22 ctermfg=black
+hi TabLineFill ctermbg=240 ctermfg=17
+hi TabLine ctermbg=17 ctermfg=245
+hi TabLineSel ctermbg=17 ctermfg=253
+hi FoldColumn ctermbg=black ctermfg=40
+hi Folded ctermbg=black ctermfg=190
+hi Comment ctermbg=black ctermfg=33
+hi Todo ctermbg=136 ctermfg=black
+
+hi TagListFileName ctermbg=black ctermfg=40
+hi PodFormat ctermbg=black ctermfg=75
+hi shCommandSub ctermbg=black ctermfg=red
+hi shCmSubRegion ctermbg=black ctermfg=142
+hi shDerefSimple ctermbg=black ctermfg=38
+hi shDerefVar ctermbg=black ctermfg=38
+
+hi SpellBad ctermbg=black ctermfg=red
+hi SpellCap ctermbg=black ctermfg=blue
+hi Search cterm=NONE ctermfg=black ctermbg=92
+
+hi DiffDelete cterm=NONE ctermfg=124 ctermbg=235          
+hi DiffAdd   cterm=NONE  ctermfg=34 ctermbg=235           
+hi DiffChange cterm=NONE ctermfg=34 ctermbg=235  
+hi DiffText  cterm=NONE ctermfg=79  ctermbg=22 
+
+hi Folded ctermfg=Blue
+hi FoldColumn ctermfg=Blue
+
