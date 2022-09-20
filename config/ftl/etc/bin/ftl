@@ -17,7 +17,7 @@ echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; fli
 fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
-while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key 0.3 ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
+while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key $KEY_TIMEOUT ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
 bind()

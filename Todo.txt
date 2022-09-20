@@ -7,8 +7,6 @@ issue: inotify, focuses main! resize missed when pane is closed
 
 issue: space in names when passing env var to shell
 
-feature: installer
-
 # Later
 
 arch: multi column attributes

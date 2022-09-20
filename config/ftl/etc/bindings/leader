@@ -10,7 +10,7 @@ bind leader test	˽˽t	leader_test	"test leader key"
 
 leader_key_map[SPACE]=leader_space
 leader_space() { key_map=leader_space_test ; }
-leader_space_test() { tmux popup "echo -n ftl: leader + space + \'$REPLY\'" ; key_map=ftl_key_map ; }
+leader_space_test() { [[ $REPLY != ERROR_142 ]] && tmux popup "echo -n ftl: leader + space + \'$REPLY\'" ; key_map=ftl_key_map ; }
 bind leader_space test	˽˽?	leader_space_test	"test leader + space + key"
 
 # vim: set filetype=bash :

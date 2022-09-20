@@ -20,7 +20,6 @@ pviewers()
 [[ -e "$fs/lock_preview/$n" ]]    && { plock     ; return ; }
 [[ "${pdir_only[tab]}" ]]         && { [[ -d "$n" ]] || { tcpreview ; return ; } ; }
 
-
 [[ $e == cbr ]]                   && { pcbr      ; return ; }
 [[ $e == cbz ]]                   && { pcbz      ; return ; }
 [[ $e == html ]]                  && { phtml     ; return ; }
@@ -61,10 +60,12 @@ ptype()     { ctsplit "echo ${f@Q} ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s
 pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$f" "$thumbs/cbr" ; pw3image "$t" ; }
 pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$f" "$thumbs/cbz" ; pw3image "$t" ; }
 
-pdir()      { ((extmode)) && pdir_du || { [[ "$montage" ]] && pdir_image || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; } ; } || { in_pdir= ; pdir_only ; }
+pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 pdir_du()   { ctsplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
+pdir_ls()   { ctsplit "ls -lsh --group-directories-first --color=always \"$n\" ; read -sn 1000" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
+
 ppipe()     { ctsplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 
 phtml()     { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; }

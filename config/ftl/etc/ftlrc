@@ -1,4 +1,4 @@
-## Directories
+# Directories
 pgen="$FTL_CFG/etc/generators" #location of preview generators
 ftl_root=$FTL_CFG/var # runtime directory, every session gets a directory here
 mkdir -p $ftl_root
@@ -12,57 +12,58 @@ mkdir -p $thumbs # make sure the directory exists
 
 help_command="man \"$FTL_CFG/man/ftl.1\"" # command to run to show help, see # Vim in man page
 
-## Marks
+# Marks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
-## Options 
-shell_h=40% # shell pane height
-auto_tags=1 # automatically synch tags between panes
-pdhl= # log pdh message in file too
-: ${prev_all:=1} # open preview window
-zooms=(70 50 30) # sizes of preview pane in percent
-zoom=0 # start zoon level
-move_step=4 # fast movement size
-msg_m='Creating montage ...' # message displayed when creating image montage for directories
-msg_du='Computing dir sizes ...' # message displayed when computing directory sizes
-find_auto=README # file to select by default
-line_color0="\e[2;40;90m" # default line color
-line_color="$line_color0" #line color
-line_color_hi="\e[38;5;240m" # line color highlight
-mount_archive=0 # set if fuse-archive is installed
-cursor_color0='\e[7;34m' # default cursor color
-cursor_color="$cursor_color0" # cursor color
-cursor_color_search='\e[7;35m' # cursor color in interactive search
-quick_display=512 # display entries during scanning if over this number
-show_line=1 # show line (entry index)
-show_size=0 # 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
-show_date=1 # show date in header if sort mode is by date
-show_tar=0 # show extra information about tar file, takes time
-tbcolor 67 67 # set tmux separation line color
+# Options 
+KEY_TIMEOUT=0.4				# timeout between key presses
+shell_h=40%				# shell pane height
+auto_tags=1				# automatically synch tags between panes
+pdhl=					# log pdh message in file too
+: ${prev_all:=1}			# open preview window
+zooms=(70 50 30)			# sizes of preview pane in percent
+zoom=0					# start zoon level
+move_step=4				# fast movement size
+msg_m='Creating montage ...'		# message displayed when creating image montage for directories
+msg_du='Computing dir sizes ...'	# message displayed when computing directory sizes
+find_auto=README			# file to select by default
+line_color0="\e[2;40;90m"		# default line color
+line_color="$line_color0"		# line color
+line_color_hi="\e[38;5;240m"		# line color highlight
+mount_archive=0				# set if fuse-archive is installed
+cursor_color0='\e[7;34m'		# default cursor color
+cursor_color="$cursor_color0"		# cursor color
+cursor_color_search='\e[7;35m'		# cursor color in interactive search
+quick_display=512			# display entries during scanning if over this number
+show_line=1				# show line (entry index)
+show_size=0				# 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
+show_date=1				# show date in header if sort mode is by date
+show_tar=0				# show extra information about tar file, takes time
+tbcolor 67 67				# set tmux separation line color
 TBCOLORS='236 52'
 
-## External Tags
-etag=0 # show wtag
+# External Tags
+etag=0 					# show wtag
 #. $FTL_CFG/etc/etags/git ; etag=1 # if you want to show git tags by default
 
 sort_type0=0 # default sort. 0: alphanumeric, 1: size, 2: date.
 sort_reversed0= #default reverse sort order
 
-## Glyphs
+# Glyphs
 sglyph=( ⍺ 🡕 )
 iglyph=('' ᴵ ᴺ)
 lglyph=('' ᵈ ᶠ)
 tglyph=('' ¹ ² ³ D) 
 
-## Media Filters
+# Media Filters
 ifilter='svg|webp|jpg|jpeg|JPG|png|gif';
 mfilter='mp3|mp4|flv|mkv';
 
-## FZF Options
+# FZF Options
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="--cycle --expect=ctrl-t --reverse"
 
-#external commands
+# External Commands
 EDITOR=vim
 
 FTLI_CLEAN=0 # set to 1 if not using konsole
@@ -71,22 +72,21 @@ FTLI_H=19 # hint FTLI about Character height
 
 GPGID=CHANGE.ME
 
-G_PLAYER=vlc # gui media player
-T_PLAYER="mplayer -vo null" # terminal media player
+G_PLAYER=vlc 			# gui media player
+T_PLAYER="mplayer -vo null" 	# terminal media player
 T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
 PREVIEW_SHOW="$FTL_CFG/etc/viewers/cmus"
 
 PAGER_ANSI='/usr/bin/less -R'
+MD_PAGER='/usr/bin/less -R'	# pager when showing markdown preview, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
+MD_RENDER1='vmd'		# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
+MD_RENDER2='vmd'		# markdown renderer #2
 
-MD_PAGER='/usr/bin/less -R' # pager when showing markdown preview, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
-MD_RENDER1='vmd' # markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
-MD_RENDER2='vmd' # markdown renderer #2
+HEXEDIT=hexedit			# hex viewer/editor
+MIMETYPE=mimemagic		# mimetype generator
+NCDU=ncdu 			# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 
-HEXEDIT=hexedit # hex viewer/editor
-MIMETYPE=mimemagic # mimetype generator
-NCDU=ncdu # ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
-
-## Delete application
+# Deletion
 RM="rm -rf"
 	# how you want your files deleted
 	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
@@ -95,7 +95,7 @@ RM="rm -rf"
 
 CMD_COLS=150 # columns when displaying command mapping in popup
 
-# BINDINGS # 0, 7-9 are used by ftl and correspond to SIG_XXX entries below
+# Bindings, [07-9] are used by ftl and correspond to SIG_XXX entries below
 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
 declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z ["´"]="'" [·]='.')
@@ -226,12 +226,12 @@ bind ftl view		o		sort_entries		"sort type"
 bind ftl view		v		preview_pane		"preview show/hide"
 bind ftl view		"${A[x]}"	hexedit			"hexedit"
 bind ftl view		"${SA[i]}"	image_fzf		"fzfi, using ueberzurg"
-bind ftl view		"${SA[m]}"	montage_clear		"refresh montage"
+bind ftl view		"${SA[m]}"	montage_refresh		"refresh montage"
 bind ftl view		"${A[e]}"	preview_tail		"file preview at end"
-bind ftl view		"${SA[v]}"	preview_m2		"alternative preview for : dir, media, pdf, tar, ..."
 bind ftl view		"${A[m]}"	montage_preview		"montage mode"
 bind ftl view		"${A[s]}"	show_size		"show/hide size"
 bind ftl view		"${A[v]}"	preview_m1		"alternative preview for : dir, media, pdf, tar, ..."
+bind ftl view		"${SA[v]}"	preview_m2		"alternative preview for : dir, media, pdf, tar, ..."
 bind ftl view		"not_assigned"	preview_lock		"preview lock, using external script"
 bind ftl view		"not_assigned"	preview_lock_clr	"preview lock clear"
 bind ftl SIG		7		SIG_PANE		"handle pane event"
@@ -239,6 +239,7 @@ bind ftl SIG		8		SIG_REFRESH		"preview pane signal"
 bind ftl SIG		9		SIG_REMOTE		"handle pane preview"
 bind ftl SIG		0		SIG_SYNCH_SHELL		"cd to shell pane"
 
+# Extra Bindings
 for b in $(fd  . "$FTL_CFG/etc/bindings" --type f | sort -u) ; do source "$b" ; done
 for b in $(fd  . "$FTL_CFG/bindings" --type f | sort -u) ; do source "$b" ; done
 

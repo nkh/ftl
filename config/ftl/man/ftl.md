@@ -53,7 +53,7 @@ own tabs, filters, ...
 If preview is on (on by default), a preview pane is displayed. It can
 be switched on and off during the session; it's size can be changed. Some
 entry types have multiple previews (IE: directories) that can be accessed
-with a keyboard shortcut (Alt-gr+v by default)
+with a keyboard shortcut (Alt-gr+v and Alt-gr+V by default)
 
 The preview pane is not, generally, a static view of the file but, thanks to
 _tmux_, a running program. If you are positioned on a text file, _vim_ will be
