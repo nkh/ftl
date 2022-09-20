@@ -183,10 +183,8 @@ to expand.
 
 # KEY BINDINGS
 
-*ftl* uses vim-like key bindings, the bindings can be changed in the default ftlrc file.
-
-*ftl* has many commands and thus many bindings. The control key is not used
-but the Alt-gr key, in combination with the shift key, is used extensively
+*ftl* uses vim-like key bindings, the bindings can be changed in the default
+ftlrc file but it better to create your own rcfile.
 
 ## Default bindings
 
@@ -200,16 +198,13 @@ wich allows you to search per key or name.
 
 ## User defined bindings
 
-You can override all the keys by creating your own rcfile and using the *bind*
-function. See "## Examples".
-
 	bind function arguments, all mendatory:
 
-		map		map where the binding is saves 
-		section		logical group the binding belongs to (hint)
-		key		the keyboard key
-		command		name of the internal command that is called
-		short_ help	help displayed 
+		map			map where the binding is saved
+		section			logical group the binding belongs to (hint)
+		key			the keyboard key
+		command			name of the internal command that is called
+		short_ help		help displayed in command listing
               
 
 	eg: bind ftl file k copy "copy file to, prompts inline"
@@ -226,13 +221,27 @@ When bindings are shown _alt-gr_ is replaced by _⇑_ and "_shift+alt-gr_
 is replaced by  _⇈_; as well as the key the combination would generate
 that makes it easier to search by name or by binding. 
 
+Available symbolic key name (depending on your OS bindings and terminal) :
+
+	AT, BACKSPACE, DEL, ENTER, ESCAPE, INS
+
+	BACKSLASH, QUOTE and DQUOTE, SPACE, STAR, TAB
+
+	UP, DOWN, RIGHT, LEFT, PGUP, PGDN, HOME, END 
+
+	F1 to F12
+
+	CTL-A to CTL-Z
+
+See example in "# EXAMPLES" below.
+
 ## Leader key
 
 The “Leader key” is a prefix key used to extend *ftl* shortcuts by using
 sequences of keys to perform a command. The default is '\\'
 
 	# set leader to "space"
-	bind ftl bind BACKSPACE_KEY leader_key 'leader key SPACE_KEY
+	bind ftl bind BACKSPACE leader_key 'leader key SPACE'
 
 # COMMANDS TOC
 
@@ -734,8 +743,8 @@ You can run commands in different ways
 if you run the same command often you can create a command that you can call
 directly from *ftl*.
 
-Create a shortcut, maybe using «leader + u + char», and put your code
-in $FTL_CFG/bindings/, it will be loaded automatically in *ftlrc*. See 
+Create a shortcut, maybe using a function keys, and put your code
+in $FTL_CFG/bindings/, it will be loaded automatically by *ftlrc*. See 
 "# EXAMPLES" below.
 
 You can also add commands without bindings, in $FTL_CFG/commands/, *ftl*
@@ -743,7 +752,7 @@ will lets you choose a command to run with the invaluable _fzf_ or at the
 command prompt.
 
 	Run user command «˽u»
-	command propmpt  «:»
+	Command prompt   «:»
 
 	the scripts are either
 		- bash scripts that are sourced (can change *ftl* state)
@@ -753,7 +762,7 @@ command prompt.
 
 - from the command prompt
 
-	Run commands «:»
+	Command prompt «:»
 
 	You are prompted, with edit/history/completion, for a command:
 
@@ -780,7 +789,7 @@ command prompt.
 *ftl* has one _session-shell_, a pane running bash, where your external commands
 are run by default.
 
-	Run command  «:»
+	Command  prompt «:»
 		command [args]
 
 	Switch to session-shell pane «!»
@@ -867,7 +876,7 @@ See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details.
 
 # EXAMPLES
 
-## Helpful Bindings
+## Helpful Tmux Bindings
 
 	# start ftl in a new window
 	tmux bind C-F run-shell 'tmux new-window -n ftl ftl "#{pane_current_path}"'
@@ -880,8 +889,8 @@ See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details.
 	# source default config
 	source $FTL_CFG/etc/ftlrc
 
-	# change leader-key to SPACE_KEY
-	bind ftl bind SPACE_KEY leader_key 'leader key "˽"'
+	# change leader-key to SPACE key
+	bind ftl bind SPACE leader_key 'leader key "˽"'
 
 	# don't show swap files
 	rfilter0='\.sw.$'

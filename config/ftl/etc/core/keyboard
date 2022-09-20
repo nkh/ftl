@@ -1,0 +1,79 @@
+
+get_key()
+{
+OIFS="$IFS" ; IFS=
+
+[[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; }
+read -rsn 4 -t 0.004 E1 E2 E3 E4
+
+case "$REPLY$E1$E2$E3$E4" in 
+	$'\e'                           ) REPLY=ESCAPE ;;
+	$'\177'                         ) REPLY=BACKSPACE ;;
+	$'\\'                           ) REPLY=BACKSLASH ;;
+	$' '                            ) REPLY=SPACE ;;
+	$'*'                            ) REPLY=STAR ;;
+	$'@'                            ) REPLY=AT ;;
+	$"'"                            ) REPLY=QUOTE ;;
+	$'"'                            ) REPLY=DQUOTE ;;
+	$'\t'                           ) REPLY=TAB ;;
+	$''                             ) REPLY=ENTER ;;
+
+	$'\e[A' | $'\e[OA'              ) REPLY=UP ;;
+	$'\e[B' | $'\e[0B'              ) REPLY=DOWN ;;
+	$'\e[C' | $'\e[OC'              ) REPLY=RIGHT ;;
+	$'\e[D' | $'\e[OD'              ) REPLY=LEFT ;;
+
+	$'\e[2~'                        ) REPLY=INS ;;
+	$'\e[3~'                        ) REPLY=DEL ;;
+	$'\e[1~' | $'\e[H'              ) REPLY=HOME ;;
+	$'\e[4~' | $'\e[F'              ) REPLY=END ;;
+	$'\e[5~'                        ) REPLY=PGUP ;;
+	$'\e[6~'                        ) REPLY=PGDN ;;
+
+	$'\e[11~' | $'\e[[A' | $'\eOP'  ) REPLY=F1 ;;
+	$'\e[12~' | $'\e[[B' | $'\eOQ'  ) REPLY=F2 ;;
+	$'\e[13~' | $'\e[[C' | $'\eOR'  ) REPLY=F3 ;;
+	$'\e[14~' | $'\e[[D' | $'\eOS'  ) REPLY=F4 ;;
+	$'\e['15~ | $'\e[''[E'          ) REPLY=F5 ;;
+	$'\e['17~ | $'\e[''[F'          ) REPLY=F6 ;;
+	$'\e['18~                       ) REPLY=F7 ;;
+	$'\e['19~                       ) REPLY=F8 ;;
+	$'\e['20~                       ) REPLY=F9 ;;
+	$'\e['21~                       ) REPLY=F10 ;;
+	$'\e['23~                       ) REPLY=F11 ;;
+	$'\e['24~                       ) REPLY=F12 ;;
+
+	$'\001'                         ) REPLY=CTL-A ;;
+	$'\002'                         ) REPLY=CTL-B ;;
+	#$'\0??'                        ) REPLY=CTL-C ;;
+	$'\004'                         ) REPLY=CTL-D ;;
+	$'\005'                         ) REPLY=CTL-E ;;
+	$'\006'                         ) REPLY=CTL-F ;;
+	$'\a'                           ) REPLY=CTL-G ;;
+	$'\b'                           ) REPLY=CTL-H ;;
+	#$'\0??'                        ) REPLY=CTL-I ;;
+	#$'\0??'                        ) REPLY=CTL-J ;;
+	$'\v'                           ) REPLY=CTL-K ;;
+	$'\f'                           ) REPLY=CTL-L ;;
+	#$'\0??'                        ) REPLY=CTL-M ;;
+	$'\016'                         ) REPLY=CTL-N ;;
+	$'\017'                         ) REPLY=CTL-O ;;
+	$'\020'                         ) REPLY=CTL-P ;;
+	$'\021'                         ) REPLY=CTL-Q ;;
+	$'\022'                         ) REPLY=CTL-R ;;
+	$'\023'                         ) REPLY=CTL-S ;;
+	$'\024'                         ) REPLY=CTL-T ;;
+	$'\025'                         ) REPLY=CTL-U ;;
+	$'\026'                         ) REPLY=CTL-V ;;
+	$'\027'                         ) REPLY=CTL-W ;;
+	$'\030'                         ) REPLY=CTL-X ;;
+	$'\031'                         ) REPLY=CTL-Y ;;
+	#$'\0??'                        ) REPLY=CTL-Z ;;
+esac
+
+#[[ "$2" ]] && printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$KEY_NAME" "${key}" "$E1" "$E2" "$E3" "$E4"
+
+IFS="$OIFS"
+}
+
+
