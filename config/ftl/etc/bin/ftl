@@ -70,7 +70,7 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc"
 
 	[[ -f "$pnc" ]] && [[ -z $first_file ]] && first_file=$nfiles
-	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" =~ $search ]] && found=$nfiles ; ((nfiles++))
+	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" == "$search" ]] && found=$nfiles ; ((nfiles++))
 done
 
 shopt -u nocasematch ; qd=0 ; ((show_size)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=

@@ -16,8 +16,10 @@ case "$REPLY" in
 	m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
 	p  ) [[ $e == pdf ]] && pdf_optimize ;;
 	P  ) [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ;;
-	s  ) tcpreview
-	     tsplit "{ stat '$n' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ;} | piper --global '\w+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn1" ;;
+	s  ) tcpreview ; mime_get 
+
+		tsplit "{ echo -n '  File: ' ; echo ${n@Q} | lscolors ; hsize=\$(echo -n 'H_size: ' ; stat -c %s '$n' | numfmt --to=iec) ; stat '$n' | sed -e '/File:/d' -e \"s/Device:/\$hsize            Device:/\" -e 's/IO Block/IO_Block/' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ; } | piper --global '[A-Za-z-_]+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn 1" ;;
+
 	t  ) tmux popup -E -d "$PWD" -w 80%  ;;
 	v  ) [[ $e == mp4 ]] && video_optimize ;;
 	x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
