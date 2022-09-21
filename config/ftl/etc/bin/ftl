@@ -33,7 +33,7 @@ bindings[$command]="$map	$section	$shortcut	$command	$help"
 
 key_command()
 {
-# pdhn "${key_map}+$REPLY" ; pdh_kfunc=1 
+# [[ $REPLY == ERROR_142 ]] || pdhn "${key_map}+$REPLY" #; pdh_kfunc=1 
 
    { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
 || { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && { ((pdh_kfunc)) && pdhn "-> ${iarray[$REPLY]}" ; true ; } && ${iarray[$REPLY]} ; } \

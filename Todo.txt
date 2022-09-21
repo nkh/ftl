@@ -28,5 +28,3 @@ arch: filter per directory, inherit from parent
 arch: let hidden pane do preview so main pane data isn't overridden by extra pane's
 	this may also make it possible to use fz, rg, etc... as filters and ftl as preview
 
-feature: add command to bash history when failure in tscommand
-

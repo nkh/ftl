@@ -14,7 +14,7 @@ ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux re
 cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -r" || cmd=mv ; tscommand "$cmd $(printf '%q ' "${@:3}") ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv $1 "$2" "${!ltags[@]}" ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
-delete()    { prompt "$1 [y|d|N|c]: " -n1 && [[ $REPLY =~ y|d|c ]] && { $2 ; [[ $REPLY == c ]] && $RM "$n" || $RM "${@:3}" ; mime=() ; cdir "" "" $file ; }  || { list ; false ; } ; }
+delete()    { prompt "$1 [y|d|N|c]: " -n1 && [[ $REPLY =~ y|d|c ]] && { $2 ; [[ $REPLY == c ]] && $RM "$n" || $RM "${@:3}" ; mime=() ; } ; header '' "$head" ; }
 delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delete "delete *tags: ${#ltags[@]}*?" "tags_unset $class" "${!ltags[@]}" ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter2 ; files "-xtype p,l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
@@ -104,15 +104,15 @@ tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$t
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }
 tags_clear(){ ((stagsi++)) ; tags=() ; tags_size=0 ; true ; }
 tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; }
-tags_unset(){ [[ "$1" ]] && { unset -v 'tags[$t]' ; tags_size - "$t" ; ((stagsi++)) ; } ; }
 tag_flip()  { ((stagsi++)) ; [[ "${tags[$1]}" ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; true ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_set()   { ((stagsi++)) ; [[ ! ${tags[$1]} ]] && { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
+tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$t" ; ((stagsi++)) ; } ; done ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 tag_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
 tags_size() { [[ $1 == + ]] && { ((tags_size+=$(stat --printf="%s" "$2"))) ; true ; } || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
 tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" $tags_size ; } ; }
-tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_tags && ostagsi != stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }
+tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_tags && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
 tsnew()     { tmux has-session -t ftl$$ &>/dev/null || { tmux new -A -d -s ftl$$ ; sleep 0.2 ; } ; }
