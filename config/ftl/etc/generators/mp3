@@ -3,7 +3,7 @@ exec 2>> "$2/generators_log"
 
 t="$2/$1.et"
 
-[[ -f "$t" ]] || 
+[[ FORCE == "$3" || ! -f "$t" ]] &&
 	{
 	exiftool "$1" | piper '^.*?:' blue >"$t"
 	}

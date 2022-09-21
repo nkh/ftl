@@ -43,7 +43,7 @@ tbcolor 67 67				# set tmux separation line color
 TBCOLORS='236 52'
 
 # External Tags
-etag=0 					# show wtag
+etag=0 					# show etags
 #. $FTL_CFG/etc/etags/git ; etag=1 # if you want to show git tags by default
 
 sort_type0=0 # default sort. 0: alphanumeric, 1: size, 2: date.
@@ -226,7 +226,7 @@ bind ftl view		o		sort_entries		"sort type"
 bind ftl view		v		preview_pane		"preview show/hide"
 bind ftl view		"${A[x]}"	hexedit			"hexedit"
 bind ftl view		"${SA[i]}"	image_fzf		"fzfi, using ueberzurg"
-bind ftl view		"${SA[m]}"	montage_refresh		"refresh montage"
+bind ftl view		"${SA[m]}"	preview_refresh		"refresh file preview/montage"
 bind ftl view		"${A[e]}"	preview_tail		"file preview at end"
 bind ftl view		"${A[m]}"	montage_preview		"montage mode"
 bind ftl view		"${A[s]}"	show_size		"show/hide size"
