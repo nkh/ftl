@@ -5,9 +5,9 @@ find_entry() { key_map=incremental_search ; to_search= ; cursor_color="$cursor_c
 incremental_search()
 {
 case "$REPLY" in 
-	ENTER     ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=ftl_key_map ;;
-	ERROR_142 ) : ;;
-	*         ) to_search="$to_search$REPLY" ; find_next
+	ENTER|ESCAPE ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=ftl_key_map ;;
+	ERROR_142    ) : ;;
+	*            ) to_search="$to_search$REPLY" ; find_next
 esac
 }
 

@@ -537,7 +537,7 @@ sequences of keys to perform a command. The default is '\\'
 		Entries can be opened in a new tab with 'ctrl+t'.
 
 	Incremental search             «/»
-		Press 'enter' to end.
+		Press «ENTER» or «ESCAPE» to end.
 
 	Find next                      «n»
 	Find previous                  «N»
