@@ -23,10 +23,10 @@ I wanted a file manager that would use tmux and give me "live" preview and works
 
 ## Installation
 
-There a very simple installer that mirrors my environment. I run
+There's a very simple installer that mirrors my environment. I run
 Ubuntu (KUbuntu) and install a few dependencies from source.
 
-Since some dependencies gets build during the install multiple development
+Since some dependencies get build during the install, multiple development
 environment are also installed.
 
 *ftl* uses full apllications which need to be installed so the disk usage
@@ -37,7 +37,7 @@ To install *ftl* you need download the bash INSTALL file
 
 wget https://raw.githubusercontent.com/nkh/ftl/main/INSTALL
 
-Follow the instructions.
+READ IT. Follow the instructions.
 
 # LICENSE AND COPYRIGHT
 

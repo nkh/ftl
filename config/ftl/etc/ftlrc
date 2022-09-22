@@ -46,18 +46,18 @@ TBCOLORS='236 52'
 etag=0 					# show etags
 #. $FTL_CFG/etc/etags/git ; etag=1 # if you want to show git tags by default
 
-sort_type0=0 # default sort. 0: alphanumeric, 1: size, 2: date.
-sort_reversed0= #default reverse sort order
+sort_type0=0				# default sort. 0: alphanumeric, 1: size, 2: date.
+sort_reversed0=				#default reverse sort order
 
 # Glyphs
-sglyph=( ⍺ 🡕 )
-iglyph=('' ᴵ ᴺ)
-lglyph=('' ᵈ ᶠ)
-tglyph=('' ¹ ² ³ D) 
+sglyph=( ⍺ 🡕 )				# sorting: alphanumeric, size
+iglyph=('' ᴵ ᴺ)				# image mode: all, no-image, image
+lglyph=('' ᵈ ᶠ)				# preview: all, directory-only, file-only
+tglyph=('' ¹ ² ³ D)			# tag classes 
 
 # Media Filters
-ifilter='svg|webp|jpg|jpeg|JPG|png|gif';
-mfilter='mp3|mp4|flv|mkv';
+ifilter='svg|webp|jpg|jpeg|JPG|png|gif'	# images
+mfilter='mp3|mp4|flv|mkv|webm'		# video
 
 # FZF Options
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
@@ -66,34 +66,34 @@ fzfp_opt="--cycle --expect=ctrl-t --reverse"
 # External Commands
 EDITOR=vim
 
-FTLI_CLEAN=0 # set to 1 if not using konsole
-FTLI_W=10 # hint FTLI about Character width
-FTLI_H=19 # hint FTLI about Character height
+FTLI_CLEAN=0				# set to 1 if not using konsole
+FTLI_W=10				# hint FTLI about Character width
+FTLI_H=19				# hint FTLI about Character height
 
 GPGID=CHANGE.ME
 
-G_PLAYER=vlc 			# gui media player
-T_PLAYER="mplayer -vo null" 	# terminal media player
+G_PLAYER="vlc -f"			# gui media player
+T_PLAYER="mplayer -vo null" 		# terminal media player
 T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
 PREVIEW_SHOW="$FTL_CFG/etc/viewers/cmus"
 
-PAGER_ANSI='/usr/bin/less -R'
-MD_PAGER='/usr/bin/less -R'	# pager when showing markdown preview, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
-MD_RENDER1='vmd'		# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
-MD_RENDER2='vmd'		# markdown renderer #2
+PAGER_ANSI='/usr/bin/less -R'		# default pager
+MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
+MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
+MD_RENDER2='vmd'			# markdown renderer #2
 
-HEXEDIT=hexedit			# hex viewer/editor
-MIMETYPE=mimemagic		# mimetype generator
-NCDU=ncdu 			# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
+HEXEDIT=hexedit				# hex viewer/editor
+MIMETYPE=mimemagic			# mimetype generator
+NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 
-# Deletion
+# Deletion command
 RM="rm -rf"
 	# how you want your files deleted
 	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
 	# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 	# RM=my_delete
 
-CMD_COLS=150 # columns when displaying command mapping in popup
+CMD_COLS=150 				# columns when displaying command mapping in popup
 
 # Bindings, [07-9] are used by ftl and correspond to SIG_XXX entries below
 

@@ -51,7 +51,7 @@ own tabs, filters, ...
 ## Preview Pane And Live Previews
 
 If preview is on (on by default), a preview pane is displayed. It can
-be switched on and off during the session; it's size can be changed. Some
+be switched on and off during the session; its size can be changed. Some
 entry types have multiple previews (IE: directories) that can be accessed
 with a keyboard shortcut (Alt-gr+v and Alt-gr+V by default)
 
@@ -243,7 +243,7 @@ sequences of keys to perform a command. The default is '\\'
 	# set leader to "space"
 	bind ftl bind BACKSPACE leader_key 'leader key SPACE'
 
-# COMMANDS TOC
+# COMMANDS
 
 - General *ftl* Commands
 - Viewing modes
@@ -309,7 +309,7 @@ sequences of keys to perform a command. The default is '\\'
 	Set maximum listing depth «*»
 
 		Set the maximum depth of listing, 1 shows the entries in the
-		current directory. It's sometime practicall but using multiple
+		current directory. It's sometimes practical but using multiple
 		tabs or panes is more ergonomic.
 
 	Copy selection to clipboard «⇑t/þ»
@@ -360,9 +360,9 @@ sequences of keys to perform a command. The default is '\\'
 	Montage mode «⇑m/µ»
 		Directory preview will be a montage of the images in the directory.
 
-	Refresh montage «⇈m/º»
-		The montage is generated once, a manual refresh is needed if new
-		images are added to the directory
+	Refresh preview or montage «⇈m/º»
+		The previews, or montage, is generated once, a manual refresh is 
+		needed if a file content changes or new images are added to a directory
 
 	Preview directory only/all «=»
 		No file preview is generated
@@ -413,20 +413,20 @@ sequences of keys to perform a command. The default is '\\'
 	cd into directory or edit file «ENTER»
 		edit file if not binary, for binary files try hexedit command
 
-	Cd to parent directory «h»
-	Down to next entry     «j»
-	Up to previous entry   «k»
-	cd into entry   «l»
+	Cd to parent directory   «h»
+	Down to next entry       «j»
+	Up to previous entry     «k»
+	cd into entry            «l»
 
 	Using arrow:
 
-	Cd to parent directory   «arrow_left/D»
-	Down to next entry       «arrow_down/B»
-	Up to previous entry     «arrow_up/A»
-	cd into directory «arrow_right/C»
+	Cd to parent directory   «LEFT»
+	Down to next entry       «DOWN»
+	Up to previous entry     «UP»
+	cd into directory        «RIGHT»
 
-	Page down «page_down/5»
-	Page up   «page_up/6»
+	Page down                «PGDN»
+	Page up                  «PGUP»
 
 	Move to «g»
 		goes to, depending of where in the listing you are:
@@ -435,23 +435,23 @@ sequences of keys to perform a command. The default is '\\'
 		- first file
 		- last file
 
-	Next entry of same extension «ö»
+	Next entry of same extension      «ö»
 	Next entry of different extension «Ö»
-	Goto entry by index «ä»
+	Goto entry by index               «ä»
 
-	Scroll preview up   «K»
-	Scroll preview down «J»
+	Scroll preview up                 «K»
+	Scroll preview down               «J»
 
 	or this alternative, see rc file
-		Move up multiple lines   «K»
-		Move down multiple lines «J»
+		Move up multiple lines    «K»
+		Move down multiple lines  «J»
 
 ## Preview
 
 	Preview show/hide «v»
 
 	Change preview size «+»
-		choose a size in a predefined, see rc file, set of sizes
+		choose a size in a predefined set of sizes, see rc file
 
 	Preview once «V»
 		Preview current entry (if preview pane is close), close the
@@ -612,7 +612,7 @@ sequences of keys to perform a command. The default is '\\'
 	Fzf go to mark «⇈'/×»
 		You can open multiple marks in tabs with «ctrl-t»
 
-	Add persistent mark «,»
+	Add persistent mark    «,»
 	Fzf to persistent mark «;»
 		You can open multiple marks in tabs with «ctrl-t»
 
@@ -740,7 +740,7 @@ You can run commands in different ways
 
 - user defined ftl command
 
-if you run the same command often you can create a command that you can call
+If you run the same command often you can create a command that you can call
 directly from *ftl*.
 
 Create a shortcut, maybe using a function keys, and put your code
@@ -862,8 +862,8 @@ are run by default.
 
 _ftl_ reads it's configuration from ~/.config/ftl/etc/ftlrc
 
-you can override configuration in your own ~/.ftlrc after sourcing the 
-default configuration
+You can override configuration in your own ~/.ftlrc after sourcing the 
+default configuration.
 
 # ENVIRONMENT
 
@@ -921,8 +921,6 @@ See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details.
 	# load git support 
 	. ~/.config/ftl/etags/git
 
-	# vim: set filetype=bash :
-
 ## User Command With Binding
 
 This example can be found in $FTL_CONFIG/user_bindings/01_shred
@@ -948,8 +946,6 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
 	# bind shortcut «s» in the leader map
 	bind leader file s shred_command "*** bypasses RM *** ..."
-
-	# vim: set filetype=bash :
 
 ## Directory Picker
 
