@@ -33,6 +33,7 @@ go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while 
 fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }
 fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d" || nd="$d" ; cdir "$nd" "$(basename "$3")" ; }
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
+tag_go()    { ti=0 ; for tag_path in "${!tags[@]}" ; do ((ti == $1)) && nn="$tag_path" ; ((ti++)) ; done ; cdir "$(dirname "$nn")" "$(basename "$nn")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
 gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $pgen/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
@@ -47,7 +48,7 @@ is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$?  ; }
 kbdf()      { while read -t 0.01 ; do : ; done ; }
 k_bindings(){ printf '%s\n' "${bindings[@]}" | sort | column -t --table-columns map,section,key,command, -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
 mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
-mime_cache(){ while IFS=$': ' read fm mm ; do mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
+mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }
 player_k()  { ((player)) && { kill $player &>/dev/null ; player= ; } ; }

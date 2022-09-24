@@ -376,9 +376,8 @@ sequences of keys to perform a command. The default is '\\'
 	Fzfi, using ueberzurg «⇈i/ı»
 		Use fzf and ueberzurg to find and display images
 
-	Preview lock «⍰»
-	Preview lock clear «⍰»
-		tbd
+	Preview lock           not_assigned
+	Preview lock clear     not_assigned
 
 ## Panes
 
@@ -438,6 +437,8 @@ sequences of keys to perform a command. The default is '\\'
 	Next entry of same extension      «ö»
 	Next entry of different extension «Ö»
 	Goto entry by index               «ä»
+	Goto previous tag                 not_assigned
+	Goto next tag                     not_assigned
 
 	Scroll preview up                 «K»
 	Scroll preview down               «J»

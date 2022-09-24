@@ -21,12 +21,6 @@ presentation script:
 	config
 	follow the man page
 
-command:
-	goto next tag
-	goto previous tag
-
-	we need to have a current tag, what happens when that tagged file is untagged?
-
 # Later
 
 arch: multi column attributes
