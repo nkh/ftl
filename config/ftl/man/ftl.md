@@ -265,130 +265,99 @@ sequences of keys to perform a command. The default is '\\'
 
 ## General *ftl* Commands
 
-	Show keyboard bindings «⇑c/©» 
+	«?»		Show this man page 
 
-		The bindings listing is generated at runtime, if you add
-		or modify bindings it will show in the listing. The listing
-		is displayed in fzf which allows you to search by name but
-		also by binding.
+			The man page shows the default bindings. You can configure *ftl*
+			to show a different help if you prefer to cook your own.
 
-	Show this man page «?»
+	«⇑c/©»		Show keyboard bindings 
 
-		The man page is generated and shows the default bindings. You
-		can configure *ftl* to show a different help if you prefer to
-		cook your own.
+			The bindings listing is generated at runtime, if you add
+			or modify bindings it will show in the listing. The listing
+			is displayed in fzf which allows you to search by name but
+			also by binding.
 
-	Quit «q»
+	«q»		Quit, closes the current tab, it there are tabs, then closes the
+			last created pane, then closes *ftl*.
 
-		Closes the current tab, it there are tabs, then closes the
-		last created pane, closes *ftl*.
+	«Q»		Quit all, closes all tabs and panes at once.
 
-	Quit all «Q»
-		
-		Closes all tabs and panes at once
+	«@»		Quit, quit all but doesn't close the shell pane if one exists.
 
-	Quit, keep shell «@»
+	«⇈q/Ω»  	Quit, doesn't close the preview pane if one exists and zooms it.
 
-		Quit all but doesn't close the shell pane if one exists
+	«$»		Detach the preview from ftl, open a new preview pane.
 
-	Quit, keep preview zoomed «⇈q/Ω»
+	«*»		Set maximum listing depth
 
-		Quit *ftl* but doesn't close the preview pane if one exists and
-		zooms it.
+			Set the maximum depth of listing, 1 shows the entries in the
+			current directory. It's sometimes practical but using multiple
+			tabs or panes is more ergonomic.
 
-	Detach the preview «$»
-		
-		Open a new preview pane, detach the old preview pane from *ftl*.
+	«⇑t/þ»		Copy selection to clipboard, full path, separated with by a space.
 
-	Cd «G»
-		
-		*ftl* prompts you for a path, the promt has path completions.
-		You can also change directory with marks or by finding it, this
-		is the most simplistic way. 
-
-	Set maximum listing depth «*»
-
-		Set the maximum depth of listing, 1 shows the entries in the
-		current directory. It's sometimes practical but using multiple
-		tabs or panes is more ergonomic.
-
-	Copy selection to clipboard «⇑t/þ»
-		
-		The selected entries are copied to the clipboard with full
-		path, separated with by a space.
-
-	Pdh, pane used for debugging «¿»
+	«¿»		Pdh, pane used for debugging.
 
 	Bindings used internaly by *ftl*
 
-		Refresh curent pane «r»
-		Handle pane event   «7»
-		Preview pane signal «8»
-		Handle pane preview «9»
-		Cd to shell pane    «0»
+			Refresh curent pane «r»
+			Handle pane event   «7»
+			Preview pane signal «8»
+			Handle pane preview «9»
+			Cd to shell pane    «0»
 
 ## Viewing Mode
 
-	Show size «⇑s/ß»
-		Changes the state of size display option (circular) :
-			- no size
-			- only files
-			- file size and directory entries
-			- file size and directory sizes (scans the sub directories)
+	«⇑s/ß»		Show size (circular)
+				- no size
+				- only files
+				- file size and directory entries
+				- file size and directory sizes
 
-	Show/hide dot-files «.»
-		Default config shows dot files
+	«.»		Show/hide dot-files.
 	
-	Show/hide stat «^»
-		Entry stat is added to the header 
+	«^»		Show/hide stat, entry stat is added to the header.
 
-	Show/hide etags «⇑./·»
-		See "Select etag type" below.
+	«⇑./·»		Show/hide etags, see "Select etag type" below.
 
-	File/dir view mode «)»
-		Set the file/dir to (circular):
-			- only files
-			- only directories
-			- files and directories
+	«)»		File/dir view mode (circular)
+				- only files
+				- only directories
+				- files and directories
 
-	View mode «M»
-		Set image mode (circular):
-			- filter out images
-			- filter out non images
-			- show all files
+	«M»		View mode (circular)
+				- filter out images
+				- filter out non images
+				- show all files
 
-	Montage mode «⇑m/µ»
-		Directory preview will be a montage of the images in the directory.
+	«⇑m/µ»		Montage mode, directory preview is a montage of the images.
 
-	Refresh preview or montage «⇈m/º»
-		The previews, or montage, is generated once, a manual refresh is 
-		needed if a file content changes or new images are added to a directory
+	«⇈m/º»  	Refresh preview or montage.
 
-	Preview directory only/all «=»
-		No file preview is generated
+	«=»		Preview directory only/all. 
 
-	Show/hide image preview «DQUOTE»
-		Preview everything but not images
+	«"»		Show/hide image preview.
 
-	Show/hide extension preview «#»
-		No preview for the current entry extension will be shown
+	«#»		Show/hide current extension preview.
 
-	Fzfi, using ueberzurg «⇈i/ı»
-		Use fzf and ueberzurg to find and display images
+	«⇈i/ı»		Fzfi, use fzf and ueberzurg to find and display images
 
-	Preview lock           not_assigned
-	Preview lock clear     not_assigned
+	not assigned	Preview lock
+	not assigned	Preview lock clear
 
 ## Panes
 
-	New ftl pane below «_»
-	New ftl pane left «|»
-	New ftl pane left, keep focus «>»
-	New ftl pane right «¦»
-	New ftl pane right, keep focus «<»
+	«_»		New ftl pane below 
 
-	Next pane or viewer «'-'»
-		Set focus on the next pane
+	«|»		New ftl pane left 
+
+	«>»		New ftl pane left, keep focus 
+
+	«¦»		New ftl pane right 
+
+	«<»		New ftl pane right, keep focus 
+
+	«-»		Set focus on the next pane
 
 ## Tabs
 
@@ -396,8 +365,9 @@ sequences of keys to perform a command. The default is '\\'
 	its own tabs. Tabs are close with «q», when the last tab is closed
 	the pane is closed.
 
-	New tab «⇈s/§»
-	Next tab «TAB»
+	«⇈s/§»		New tab 
+
+	«TAB»		Next tab 
 
 ## Moving around
 
@@ -409,139 +379,130 @@ sequences of keys to perform a command. The default is '\\'
 	were on.
 
 	
-	cd into directory or edit file «ENTER»
-		edit file if not binary, for binary files try hexedit command
+	«ENTER»		cd into directory or edit file if not binary
 
-	Cd to parent directory   «h»
-	Down to next entry       «j»
-	Up to previous entry     «k»
-	cd into entry            «l»
+	«h»		Cd to parent directory            
+	«LEFT»		Cd to parent directory            
 
-	Using arrow:
+	«j»		Down to next entry                
+	«DOWN»		Down to next entry                
 
-	Cd to parent directory   «LEFT»
-	Down to next entry       «DOWN»
-	Up to previous entry     «UP»
-	cd into directory        «RIGHT»
+	«k»		Up to previous entry              
+	«UP»		Up to previous entry              
 
-	Page down                «PGDN»
-	Page up                  «PGUP»
+	«l»		cd into entry                     
+	«RIGHT»		cd into entry                     
 
-	Move to «g»
-		goes to, depending of where in the listing you are:
+	«PGDN»		Page down                         
+	«PGUP»		Page up                           
 
-		- top
-		- first file
-		- last file
+	«g»		Move to:                           
+				- top
+				- first file
+				- last file
 
-	Next entry of same extension      «ö»
-	Next entry of different extension «Ö»
-	Goto entry by index               «ä»
-	Goto previous tag                 not_assigned
-	Goto next tag                     not_assigned
+	«G»		CD, *ftl* prompts you for a path, the promt has path completions.
+			You can also change directory with marks or by searching for it
 
-	Scroll preview up                 «K»
-	Scroll preview down               «J»
+	«ö»		Next entry of same extension      
 
-	or this alternative, see rc file
-		Move up multiple lines    «K»
-		Move down multiple lines  «J»
+	«Ö»		Next entry of different extension 
+
+	«ä»		Goto entry by index               
+
+	not assigned	Goto previous tag
+	not assigned	Goto next tag
+
+	«K»		Scroll preview up                 
+
+	«J»		Scroll preview down               
 
 ## Preview
 
-	Preview show/hide «v»
+	«v»		Preview show/hide      
 
-	Change preview size «+»
-		choose a size in a predefined set of sizes, see rc file
+	«+»		Change preview size, see rc file predefined sizes
 
-	Preview once «V»
-		Preview current entry (if preview pane is close), close the
-		preview at the next command.
+	«V»		Preview current entry once (if preview pane is close)
 
-	Alternative preview #1 «⇑v/“»
-	Alternative preview #2 «⇈v/‘»
-		Some entry have multiple preview types, these bindings let you
-		to see the other type of preview.
+	Some entry have multiple preview types, these bindings let you
+	to see the other type of preview.
 
-		entry types with multiple preview types:
-			- directories
-			- music
-				will show information and play the music
-			- pdf
-			- tar files 
+	entry types with multiple preview types:
+		- directories
+		- music, will show information and play the music
+		- pdf
+		- tar files 
 
-	File preview at end «⇈t/Þ»
-		show the bottom of the entry (text files in vim)
+	«⇑v/“»		Alternative preview #1 
 
-	Hexadecimal preview «⇑x/»»
+	«⇈v/‘»		Alternative preview #2 
+
+
+	«⇈t/Þ»		File preview at end (text files in vim)
+
+	«⇑x/»»		Hexadecimal preview    
 
 ## Sorting 
 
-	Select sort order «o» from:
-		- alphanumeric
-		- size
-		- date
+	«o»		Set sort order :
+				- alphanumeric
+				- size
+				- date
 
-	Reverse sort order «O»
+	«O»		Reverse sort order 
 
-	Select a sort order from a list of external sorts «⇑f/đ»
-		IE: by extension
+	«⇑f/đ»		Choose  sort order from external sorts 
 
 ## Filtering
 
-	Set filter #1 «f»
-	Set filter #2 «F»
+	«f»		Set filter #1 
 
-	Clear all filters «⇑d/ð»
+	«F»		Set filter #2 
+			
+	«⇑d/ð»		Clear all filters 
+			
+	«⇑f/đ»		Choose filter from external filters 
+			
+	«⇑a/ª»		Set reverse-filter 
+			
+			Filters out what you don't want to see. Applied after other
+			filters are applied. It can be set in your ftlrc file.
+			
+			eg: keep files containing 'f' and not containing 'i'
+				«f»  -> f
+				«⇑a» -> i
+			
+			eg: always hide vim swap files, set by default in _ftlrc_
+				rfilter0='\.sw.$'
+			
+	«¤»		Hide files having the same extention as the current file, per tag 
 
-	Select a filter from a list of external filters «⇑f/đ» ;
-
-	by_extension			# keep files matching extensions
-	by_file				# keep selected files, additive
-	by_file_reset_dir		# keep selected files, exclusive
-	by_file_global			# keep selected files, all tabs, additive
-	by_file_global_reset_dir	# keep selected files, all tabs, exclusive
-	by_no_extension			# keep files not matching extensions
-	by_only_tagged			# keep tagged files
-	by_regexp			# keep files, filter with regexp or fyzzy
-	by_size				# keep files over minimum size
-
-	Set reverse-filter «⇑a/ª»
-		Filters out what you don't want to see. Applied after other
-		filters are applied. It can be set in your ftlrc file.
-
-		eg: keep files containing 'f' and not containing 'i'
-			«f»  -> f
-			«⇑a» -> i
-
-		eg: always hide vim swap files, set by default in _ftlrc_
-			rfilter0='\.sw.$'
-
-	Hide extension «¤», per tab
-	Hide extension «%», globally
-		Hide files having the same extention as the current file.
-		You can hide multiple extensions.
-
-	Show hidden extensions «⇈k/&»
+	«%»		Hide files having the same extention as the current file, global 
+			
+	«&»		Show hidden extensions 
 
 ## Searching
 
-	Fzf find in current directory  «b»
-	Fzf find                       «⇑b/”»
-	Fzf find regexp/fuzzy          «⇈b/’»
-	Fzf find only directories      «⇈'/’/÷»
+	«b»		Fzf find in current directory  
 
-	Ripgreg with preview           «}»
+	«⇑b/”»		Fzf find                       
+
+	«⇈b/’»		Fzf find regexp/fuzzy          
+
+	«⇈'/’/÷»	Fzf find only directories      
+
+	«}»		Ripgreg with preview           
 
 	Opening search results in tabs:
 		If you use one of the above you can pick multiple entries.
 		Entries can be opened in a new tab with 'ctrl+t'.
 
-	Incremental search             «/»
-		Press «ENTER» or «ESCAPE» to end.
+	«/»		Incremental search, «ENTER» or «ESCAPE» to end.
 
-	Find next                      «n»
-	Find previous                  «N»
+	«n»		Find next                      
+
+	«N»		Find previous                  
 
 ## Tags/Etags
 
@@ -552,144 +513,123 @@ sequences of keys to perform a command. The default is '\\'
 	When using tags and multiple class tags are present, *ftl* will ask
 	which class to use. The number of entries is displayed in the header.
 
-	Tag down «y»
-		Tag current entry in "normal" tag class and move one entry down
+	«y»		Tag current entry in "normal" tag class and move down
 
-	Tag up «Y»
-		Tag current entry in "normal" tag class and move one entry up
+	«Y»		Tag current entry in "normal" tag class and move up
 
-	Class tag «1» «2» «3»
-		Tag current entry in given class and move one entry down. The
-		entry is addorned with the class name
+	«1» «2» «3»	Tag current entry in given class and move down.
 
-	Class tag D «4»
-		Tag current entry in D class and move one entry down. The entry
-		is addorned with the class name "D".
+	«4»		Tag current entry in D class and move down.
 		
-	Tag all files «⇑y/←»
-		Tag all the files, no sub directories, in the current directory
+	«⇑y/←»		Tag all the files in the current directory
 
-	Tag all files and subdirs «⇈y/¥»
-		Tag all the files and sub directories in the current directory
+	«⇈y/¥»		Tag all files and subdirs in the current directory
 
-	Fzf tag files «t»
-		Open fzf to tag files, no sub directories, select with «TAB>,
-		multiple selection is possible.
+	«t»		Open fzf to tag files, multiple selection is possible.
 
-	Fzf tag files and subdirs «T»
-		Open fzf to tag files and sub directories, select with «TAB>,
-		multiple selection is possible.
+	«T»		Open fzf to tag files and sub directories.
 
-	Untag all «u»
-		Untag all files and directories, including those in other
-		directories.
+	«u»		Untag all files and directories, including those in other
+			directories.
 
-	Untag fzf «U»
-		Opens fzf to let you choose which entries to untag
+	«U»		Opens fzf to let you choose which entries to untag
 
-	Fzf goto «⇑g/ŋ»
-		Opens fzf to let you choose an entry among the tags, then
-		changes directory to where the tag is.
+	«⇑g/ŋ»		Opens fzf to choose an entry among the tags, then
+			changes directory to where the tag is.
 
-		This is can be handy when tags are read from a file with option
-		-t on the command line or via the 'load_tags' shell command
+			This is  handy when tags are read from a file with option
+			-t on the command line or via the 'load_tags'
 
-	Merge tags from all panes «⇑o/œ»
-		if option auto_tags=0,  merge tags from all panes
+	«⇑o/œ»		Merge tags from all panes, see option auto_tags
 
-	Fzf merge tags from panes «⇈0/°»
-		if option auto_tags=0, choose the pane to merge tags from
+	«⇈0/°»		Fzf merge tags from panes 
 
-	Select etag type from list «⇈./˙»
-		See "Show/hide etags" above.
+	«⇈./˙»		Select etag type from list
 
 ## Marks
 
-	Mark directory/file «m» + character
+	«m» + char	Mark directory/file 
 
-	Go to mark «QUOTE» + character
-		QUOTE+QUOTE will take you to the last directory
+	«'» + char	Go to mark 
 
-	Fzf go to mark «⇈'/×»
-		You can open multiple marks in tabs with «ctrl-t»
+	«'» + "'"	Go to last directory
 
-	Add persistent mark    «,»
-	Fzf to persistent mark «;»
-		You can open multiple marks in tabs with «ctrl-t»
+	«⇈'/×»		Fzf go to mark, open multiple tabs with «ctrl-t»
 
-	Clear persistent marks «⇑k/ĸ»
+	«,»		Add persistent mark    
+
+	«;»		Fzf to persistent mark, open multiple tabs with «ctrl-t»
+
+	«⇑k/ĸ»		Clear persistent marks 
 
 ## History
 
 	*ftl* keeps two location histories, one for the current session and one
-	global (sum of all sessions).
+	global.
 
-	Fzf history all sessions «¨»
-	Fzf history all sessions «⇑h/ħ»
-		You can open multiple marks in tabs with «ctrl-t»
+	«⇑h/ħ» «¨»	Fzf history all sessions, open multiple tabs with «ctrl-t»
 
-	Fzf history current session «H»
-		You can open multiple marks in tabs with «ctrl-t»
+	«H»		Fzf history current session, open multiple tabs with «ctrl-t»
 
-	Fzf delete from all sessions history «⇈h/Ħ»
-		Uses fzf to mark entries that will be removed from the history
+	«⇈h/Ħ»		Uses fzf to mark entries that will be removed from the history
 
-	Delete all session history «⇈d/Ð»
+	«⇈d/Ð»		Delete all session history 
 
 ## File and directory operations
 
-	Create new file        «i»
-	Create new directory   «I»
-	Create entries in bulk «⇑i/→»
-		Opens _vim_, lines ending with / will create directories
+	«i»		Create new file        
 
-	Delete selection «d»
-		uses configuration *RM* variable, see ftlrc.
+	«I»		Create new directory   
 
-	Copy entry        «c»
-	Copy selection    «p»
+	«⇑i/→»		Create entries in bulk, in _vim_, end lines with / for directories
 
-	Move selection    «P»
-	Move selection to «⇈p/þ»
-		Uses _fzf_mv_.
+	«d»		Delete selection, uses configuration *RM* variable, see ftlrc.
 
-	Rename «R»
-		Uses _vidir_.
+	«c»		Copy entry        
 
-	Symlink selection «⇑l/ł»
-	Symlink follow    «⇈l/Ł»
+	«p»		Copy selection    
 
-	Flip selection executable bit «x»
+	«P»		Move selection    
+
+	«⇈p/þ»		Move selection to, Uses _fzf_mv_.
+
+	«R»		Rename, Uses _vidir_.
+
+	«⇑l/ł»		Symlink selection 
+
+	«⇈l/Ł»		Symlink follow    
+
+	«x»		Flip selection executable bit 
 
 ## External Commands
 
 	Example of command integration, see 'etc/bindings/leader_ftl'.
 
-	Compress/decompress            «˽fc»
+	«˽fc»		Compress/decompress            
 
-	Convert pdf to text file       «˽fP»
+	«˽fP»		Convert pdf to text file       
 
-	Display stat in preview pane   «˽fs»
+	«˽fs»		Display stat in preview pane   
 
-	Encrypt/decrypt using password «˽fz»
+	«˽fz»		Encrypt/decrypt using password 
 
-	Encrypt/decrypt using _gpg_    «˽fx»
+	«˽fx»		Encrypt/decrypt using _gpg_    
 
-	Shred selection using _shred_  «˽s»
+	«˽s»		Shred selection using _shred_  
 
-	Reduce jpg image size          «˽fi»
+	«˽fi»		Reduce jpg image size          
 
-	Reduce png to jpg              «˽fi»
+	«˽fi»		Reduce png to jpg              
 
-	Reduce pdf size                «˽fp»
+	«˽fp»		Reduce pdf size                
 
-	Reduce video size              «˽fv»
+	«˽fv»		Reduce video size              
 
-	Lint current directory         «˽fl»
+	«˽fl»		Lint current directory         
 
-	Send mail                      «˽fm»
+	«˽fm»		Send mail                      
 
-	Terminal popup                 «˽ft»
+	«˽ft»		Terminal popup                 
 
 ## External Viewer
 
@@ -701,19 +641,23 @@ sequences of keys to perform a command. The default is '\\'
 	*ftl* had a some viewers for images, videos, comics, directories
 	containing media, mp3, ...
 
-	External viewer, mode #1 «e»
-	External viewer, mode #2, detached «E»
-	External viewer, mode #3 «⇑e/€»
-	External viewer, mode #4 «⇈e/¢»
+	«e»		External viewer, mode #1 
+
+	«E»		External viewer, mode #2, detached 
+
+	«⇑e/€»		External viewer, mode #3 
+
+	«⇈e/¢»		External viewer, mode #4 
 
 	Music has a sound preview mode #1, it lets you play a file in the 
 	background. you can stop it when you want or it stops when you
 	leave *ftl*. Modes #2-#4 open _G_PLAYER_ which is _vlc_ by default.
 
-	Kill sound preview «a»
+	«a»		Kill sound preview 
 
-	run viewer        «w»
-	Fzf choose viewer «W»
+	«w»		run viewer        
+
+	«W»		Fzf choose viewer 
 
 	The viewer for music queues the files in cmus. I recommend adding
 	a binding for cmus in *tmux* to access the application easilly.
@@ -724,14 +668,15 @@ sequences of keys to perform a command. The default is '\\'
 		extra viewers are in'$FTL_CFG/viewers'
 		
 ## Shell Pane
-	Shell pane «s»
-	Shell pane with selected files «S»
-	Shell pane, zoomed out «not asssigned»
+	«s»		Shell pane
 
-	Cd to shell pane «⇈0/°»
-		synch shell pane directory to ftl
+	«S»		Shell pane with selected files 
 
-	Send selection to shell pane «X»
+	not assigned	Shell pane, zoomed out 
+
+	«⇈0/°»		Cd shell pane to ftl directory
+
+	«X»		Send selection to shell pane 
 
 # Command Mode
 
@@ -752,8 +697,9 @@ You can also add commands without bindings, in $FTL_CFG/commands/, *ftl*
 will lets you choose a command to run with the invaluable _fzf_ or at the
 command prompt.
 
-	Run user command «˽u»
-	Command prompt   «:»
+	«:»		Command prompt   
+
+	«˽u»		Run user command 
 
 	the scripts are either
 		- bash scripts that are sourced (can change *ftl* state)
@@ -763,7 +709,7 @@ command prompt.
 
 - from the command prompt
 
-	Command prompt «:»
+	«:»		Command prompt 
 
 	You are prompted, with edit/history/completion, for a command:
 
@@ -790,18 +736,18 @@ command prompt.
 *ftl* has one _session-shell_, a pane running bash, where your external commands
 are run by default.
 
-	Command  prompt «:»
-		command [args]
+	«:»		Command  prompt, command [args]
 
-	Switch to session-shell pane «!»
+	«!»		Switch to session-shell pane 
 
-	Switch back from tmux pane «tmux-prefix+L»
+	«tmux-prefix+L»	Switch back from tmux pane 
 
 	Selection an shells:
 	
 	*fsel* list ftl selection, null separated
 		
 		«:» fsel | xargs -0 ls --color=always
+
 		«:» fsel | xargs -0 -n 1 ls --color=always
 	
 	*fsh* command [command args]
@@ -814,11 +760,17 @@ are run by default.
 	                                           run command in:
 	
 	«:» command                                default shell
+
 	«:» fsh command                            own shell
+
 	«:» fsel | xargs -0 command                default shell, one command for all selection
+
 	«:» fsel | xargs -0 -n1 command            default shell, one command per selection
+
 	«:» fsh fsel | xargs -0 command            own shell, one command for all selection
+
 	«:» fsh fsel | xargs -0 -n1 command        own shell, one command per selection
+
 	«:» fsel | xargs -0 -n1 fsh command        one shell per selection
 
 # FILES
@@ -957,6 +909,7 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 	use to navigate your directories, jump to marks, ...
 
 	Press «q» to quit and jump to the directory you're currently in.
+
 	Press «Q» to cancel.
 
 ## Vim File Picker

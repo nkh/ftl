@@ -3,8 +3,13 @@ declare -Ag leader_key_map
 leader_key() { key_map=leader_key_map ; }
 
 leader_key_map[t]=leader_test
-leader_test() { tmux popup "echo -n ftl: leader_test" ; key_map=ftl_key_map ; }
-bind leader test	˽˽t	leader_test	"test leader key"
+leader_test()
+{
+[[ "$FTL_LEADER_TEST_CMD" ]] && test_cmd="$FTL_LEADER_TEST_CMD" || test_cmd='echo -n ftl: leader_test: variable FTL_LEADER_TEST_CMD not set'
+tmux popup -h 70% -d "$PWD" "p='$p' ; n='$n'; $test_cmd" ; key_map=ftl_key_map
+}
+
+bind leader test	˽t	leader_test	"test leader key"
 
 #----------------------------------------------------------------------
 
