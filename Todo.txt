@@ -7,48 +7,50 @@ issue: inotify, focuses main! resize missed when pane is closed
 
 issue: space in names when passing env var to shell
 
+implement: filter
+	allow regexp, check in preview
+
 presentation:
 	Reduce videos size with H265 encodigng
-		ffmpeg -i Kazam_screencast_00000.mp4 -c:v libx265 kazam_265.mp4
 
-presentation script:
-	TEST_CMD='vim config/ftl/man/ftl.md +/"## Panes" -c "normal zt"' ftl
+	script:
+		FTL_LEADER_TEST_CMD='vim config/ftl/man/ftl.md +/"## Panes" -c "normal zt"' ftl 
 
-	hello -> remake
-		what's in the name
-		credit to other
-		status
-		split into multiple videos
-		overview of display
-		concepts
+		hello
+			what's in the name
+			credit to other
+			status
+			split into multiple videos
+			overview of display
+			concepts
 
-	- install
-	- config
-		- Helpful Tmux Bindings
-		- RCfile
-		- Directory Picker
-		- Vim File Picker
-		- Vim As Man Pager
+		- install
+		- config
+			- Helpful Tmux Bindings
+			- RCfile
+			- Directory Picker
+			- Vim File Picker
+			- Vim As Man Pager
 
-	- General *ftl* Commands
-	- Moving Around
-	- Viewing modes
-	- Sorting
-	- Panes-Tabs
-	- Preview
-	- Filtering
-	- Searching
-	- Tags/Selection
-	- Marks
-	- History
-	- File And Directory Operations
-	- External Commands
-	- External Viewer
-	- Shell Pane
-	- Command Mode
-	- User defined Commands
-		With/without Binding
-		sourced, executed
+		- General *ftl* Commands
+		- Moving Around
+		- Viewing modes
+		- Sorting
+		- Panes-Tabs
+		- Preview
+		- Filtering
+		- Searching
+		- Tags/Selection
+		- Marks
+		- History
+		- File And Directory Operations
+		- External Commands
+		- External Viewer
+		- Shell Pane
+		- Command Mode
+		- User defined Commands
+			With/without Binding
+			sourced, executed
 
 # Later
 

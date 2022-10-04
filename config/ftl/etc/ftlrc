@@ -35,6 +35,7 @@ cursor_color0='\e[7;34m'		# default cursor color
 cursor_color="$cursor_color0"		# cursor color
 cursor_color_search='\e[7;35m'		# cursor color in interactive search
 quick_display=512			# display entries during scanning if over this number
+rfilter0=				# default reverse filter, eg: rfilter0='\.sw.$'
 show_line=1				# show line (entry index)
 show_size=0				# 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
 show_date=1				# show date in header if sort mode is by date
@@ -123,11 +124,11 @@ bind ftl filter		"&"		extension_clear		"enable all extensions"
 bind ftl filter		"."		show_hidden		"show/hide dot-files"
 bind ftl filter		F		set_filter2		"set filter 2"
 bind ftl filter		f		set_filter		"set filter 1"
-bind ftl filter		"${SA[f]}"	filter_reverse		"set reverse filter"
+bind ftl filter		"${SA[f]}"	set_filter_reverse	"set reverse filter"
 bind ftl filter		"${A[.]}"	etag_show		"show/hide etags"
 bind ftl filter		"${SA[.]}"	etag_select		"select etag type"
 bind ftl filter		"${A[d]}"	clear_filters		"clear filters"
-bind ftl filter		"${A[f]}"	filter_ext		"select filter"
+bind ftl filter		"${A[f]}"	set_filter_ext		"select external filter"
 bind ftl find		"/"		find_entry		"find"
 bind ftl find		N		find_previous		"find previous"
 bind ftl find		b		find_fzf		"fzf find current directory file"

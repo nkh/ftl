@@ -31,7 +31,7 @@ tag_4()			{ [[ ${tags[$n]} == ${tglyph[$REPLY]} ]] && unset -v 'tags[$n]' || tag
 pdh_pane()		{ pdh_show ; }
 change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ; }
 chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
-clear_filters()		{ filters[tab]= ; filters2[tab]= ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
+clear_filters()		{ filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gcn ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
 gcn()			{ { find "$FTL_CFG/commands" -type f -printf "%f\n" ; printf "%s\n" "${!C[@]}" fsh fsel show_cmd_log ; } >$fs/command_names ; }
 copy()			{ prompt 'cp to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
@@ -47,10 +47,10 @@ external_mode2()	{ emode=2 ; preview ; }
 external_mode3()	{ emode=3 ; preview ; }
 external_mode4()	{ emode=4 ; preview ; }
 file_dir_mode()		{ ((lmode[tab]--)) ; ((lmode[tab] < 0)) && lmode[tab]=2 ; cdir '' "$f" ; }
-set_filter()		{ prompt "filter: " -i "${filters[tab]}" ; filters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
-set_filter2()		{ prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
-filter_ext()		{ p="$FTL_CFG/filters" ; filter_ext=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle) ; [[ $filter_ext ]] && . "$p/$filter_ext" ; cdir '' "$f"; }
-filter_reverse()	{ prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
+set_filter()		{ prompt "filter: " -i "${filters[tab]}" ; filters[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
+set_filter2()		{ prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
+set_filter_ext()	{ p="$FTL_CFG/filters" ; filter_ext=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle) ; [[ $filter_ext ]] && . "$p/$filter_ext" ; cdir '' "$f"; }
+set_filter_reverse()	{ prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
 find_entry()		{ prompt "find: " -i to_search ; R="${C[find_next]}" ; }
 find_next()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
 find_previous()		{ for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }

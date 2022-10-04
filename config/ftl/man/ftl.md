@@ -456,6 +456,15 @@ sequences of keys to perform a command. The default is '\\'
 
 ## Filtering
 
+	filter #1, filter #2, and reverse-filter are arguments passed to rg
+
+		examples: 
+			.		# selct everything
+			-i inst		# select entries containing "inst", case insensitive
+			INST		# select entries containing "INST", case sensitive
+			
+			regular expressions not supported yet
+
 	«f»		Set filter #1 
 
 	«F»		Set filter #2 

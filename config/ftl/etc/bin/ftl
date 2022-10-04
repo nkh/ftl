@@ -7,8 +7,7 @@ declare -Ag ftl_key_map C bindings ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc
 my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
 [[ "$1" == '-t' ]] && { tag_read "$@" && shift 2 ; }
 
-tab=0 ; tabs+=("$PWD") ; ntabs=1 ; pdir_only[tab]= ; max_depth[tab]=1 ; imode[tab]=0 ; lmode[tab]=0 ; rfilters[tab]=$rfilter0
-[[ "$1" == '-T' ]] && { tab_read "$@" && shift 2 ; }
+tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-T' ]] && { tab_read "$@" && shift 2 ; }
 
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
@@ -100,7 +99,7 @@ for((i=$top ; i <= bottom ; i++))
 
 preview()
 {
-((main || prev_all)) \
+((main && prev_all || prev_all)) \
 	&& { ((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
         || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
 }
