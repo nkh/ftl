@@ -2,10 +2,6 @@
 # NAME
 ftl - terminal file manager, hyperorthodox, with live previews
 
-![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
-
-![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
-
 # SYNOPSIS
 
 ftl
@@ -84,7 +80,7 @@ are per tab so you can have two tabs with different filters.
 
 The listing consists of a header and directory listing.
 
-The header consists of multiple elements, some depending on the current state:
+The header displays information depending on the current state:
 
 	- current directory, possibly truncated
 	- listing mode, directory/file
@@ -459,12 +455,31 @@ sequences of keys to perform a command. The default is '\\'
 	filter #1, filter #2, and reverse-filter are arguments passed to rg
 
 		examples: 
-			.		# selct everything
+			.		# select everything
 			-i inst		# select entries containing "inst", case insensitive
 			INST		# select entries containing "INST", case sensitive
 			
-			regular expressions not supported yet
-
+		regular expressions:
+			
+			If you want to filter entries with a regular expression things get a
+			bit more complicated. What you give as a filter is passed directly to
+			rg, including options such as '-i', but the data passed to rg is not 
+			just the entry name.
+			
+			*ftl* passes a string which contains the size, the date, and the name
+			to rg, separated with a '\t'; here's an example:
+			
+				62[\t]1663067416.1648839110[\t].gitignore
+			
+			To find an entry that starts with digits you'll need this filter which
+			handless the first two fields:
+			
+				\t.+\t[[:digit:]]
+			
+			It's also possible to define a filter in a function, instead for using
+			filter #1/#2/reverse. The filters directory contains ten external
+			filters you can load with shortcut «⇑f/đ». 
+			
 	«f»		Set filter #1 
 
 	«F»		Set filter #2 
@@ -485,11 +500,11 @@ sequences of keys to perform a command. The default is '\\'
 			eg: always hide vim swap files, set by default in _ftlrc_
 				rfilter0='\.sw.$'
 			
-	«¤»		Hide files having the same extention as the current file, per tag 
+	«¤»		Hide files having the same extention as the current file, per tab
 
 	«%»		Hide files having the same extention as the current file, global 
 			
-	«&»		Show hidden extensions 
+	«&»		Show all hidden extensions 
 
 ## Searching
 
