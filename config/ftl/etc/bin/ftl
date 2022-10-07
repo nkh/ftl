@@ -2,7 +2,7 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-declare -Ag ftl_key_map C bindings ; key_map=ftl_key_map ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
+declare -Ag C bindings kbd_trie key_map ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
 [[ "$1" == '-t' ]] && { tag_read "$@" && shift 2 ; }
@@ -12,7 +12,7 @@ tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-T' ]] && { tab_read 
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
-[[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; } ;
+[[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; }
 fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
@@ -21,22 +21,28 @@ while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}"
 
 bind()
 {
-local map="$1" section="$2" key="$3" command="$4" help="$5"
+local map="$1" section="$2" keys="$3" command="$4" help="$5" shortcut= dscut=
 
-eval "declare -Ag ${map}_key_map ; ${map}_key_map[$key]='$command'"
-C[$command]="$key"
+keysa=($keys)
 
-{ [[ -n "${LA[$key]}" ]] && shortcut="⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && shortcut="⇈${LSA[$key]}/$key" ; } || shortcut="$key"
-bindings[$command]="$map	$section	$shortcut	$command	$help"
+for key in "${keysa[@]}"
+	do
+		shortcut="$shortcut$key" ; kbd_trie[$shortcut]=1 
+		{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
+	done
+
+C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$command]="$map	$section	$dscut	$command	$help"
 }
 
 key_command()
 {
-# [[ $REPLY == ERROR_142 ]] || pdhn "${key_map}+$REPLY" #; pdh_kfunc=1 
+[[ -n "$key_map"             ]] && { $key_map ; return ; }
+[[ "$REPLY" == ERROR_142     ]] && { keys_command= ; return ; }
+[[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 
 
-   { [[ $(type -t "${key_map}") == function ]] && $key_map $REPLY ; } \
-|| { declare -nl iarray="$key_map" ; [[ $(type -t "${iarray[$REPLY]}") == function ]] && { ((pdh_kfunc)) && pdhn "-> ${iarray[$REPLY]}" ; true ; } && ${iarray[$REPLY]} ; } \
-|| key_map=ftl_key_map
+keys_command="$keys_command$REPLY" #; pdhn "$keys_command -> ${kbd_trie[$keys_command]}"
+
+[[ $(type -t "${kbd_trie[$keys_command]}") == function ]] && { ${kbd_trie[$keys_command]} ; keys_command= ; }
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }

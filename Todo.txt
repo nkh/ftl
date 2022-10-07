@@ -53,10 +53,6 @@ presentation:
 functionality: grep in binary files
 	https://github.com/phiresky/ripgrep-all
 
-arch: bind accepts multi key input
-	removes the need for maps and makes it easier to declare bindings when
-	number of single keys is low
-
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...
 	

@@ -185,7 +185,7 @@ ftlrc file but it better to create your own rcfile.
 'Alt-gr'+c will open a window listing all the current binding, in _fzf_,
 wich allows you to search per key or name.
 
-        map    section  key      command                
+        map    section  keys     command                
         -------------------------------------------------------------------
         ftl    file     c        copy          copy file to, prompts inline
         ...
@@ -194,14 +194,15 @@ wich allows you to search per key or name.
 
         bind function arguments, all mendatory:
 
-                map                        map where the binding is saved
-                section                    logical group the binding belongs to (hint)
-                key                        the keyboard key
+                map                        map name (hint)
+                section                    section name (hint)
+                keys                       key combination
                 command                    name of the internal command that is called
                 short_ help                help displayed in command listing
               
 
-        eg: bind ftl file k copy "copy file to, prompts inline"
+        eg: bind ftl        file  k            copy     "copy file to, prompts inline"
+	eg: bind leader_ftl extra "LEADER f h" ftl_help "display help"
 
 You can also override _ftl_event_quit_ which is called when *ftl* is closing,
 you can see it in use in _'$FTL_CFG/bindings/type_handlers'_
@@ -216,6 +217,8 @@ is replaced by  _⇈_; as well as the key the combination would generate
 that makes it easier to search by name or by binding. 
 
 Available symbolic key name (depending on your OS bindings and terminal) :
+
+        LEADER
 
         AT, BACKSPACE, DEL, ENTER, ESCAPE, INS
 
@@ -234,10 +237,9 @@ See example in "# EXAMPLES" below.
 The “Leader key” is a prefix key used to extend *ftl* shortcuts by using
 sequences of keys to perform a command. The default is '\\'
 
-        # set leader to "space"
-        bind ftl bind BACKSPACE leader_key 'leader key SPACE'
+        leader_key=SPACE # set LEADER to SPACE
 
-# COMMANDS
+# COMMANDS
 
 - General *ftl* Commands
 - Viewing modes
@@ -627,31 +629,31 @@ sequences of keys to perform a command. The default is '\\'
 
         Example of command integration, see 'etc/bindings/leader_ftl'.
 
-        «˽fc»              Compress/decompress            
+        «LEADER f c»       Compress/decompress            
 
-        «˽fP»              Convert pdf to text file       
+        «LEADER f P»       Convert pdf to text file       
 
-        «˽fs»              Display stat in preview pane   
+        «LEADER f s»       Display stat in preview pane   
 
-        «˽fz»              Encrypt/decrypt using password 
+        «LEADER f z»       Encrypt/decrypt using password 
 
-        «˽fx»              Encrypt/decrypt using _gpg_    
+        «LEADER f x»       Encrypt/decrypt using _gpg_    
 
-        «˽s»               Shred selection using _shred_  
+        «LEADER s »        Shred selection using _shred_  
 
-        «˽fi»              Reduce jpg image size          
+        «LEADER f i»       Reduce jpg image size          
 
-        «˽fi»              Reduce png to jpg              
+        «LEADER f i»       Reduce png to jpg              
 
-        «˽fp»              Reduce pdf size                
+        «LEADER f p»       Reduce pdf size                
 
-        «˽fv»              Reduce video size              
+        «LEADER f v»       Reduce video size              
 
-        «˽fl»              Lint current directory         
+        «LEADER f l»       Lint current directory         
 
-        «˽fm»              Send mail                      
+        «LEADER f m»       Send mail                      
 
-        «˽ft»              Terminal popup                 
+        «LEADER f t»       Terminal popup                 
 
 ## External Viewer
 
@@ -721,7 +723,7 @@ command prompt.
 
         «:»                Command prompt   
 
-        «˽u»               Run user command 
+        «LEADER u»               Run user command 
 
         the scripts are either
                 - bash scripts that are sourced (can change *ftl* state)
@@ -865,7 +867,7 @@ See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details.
         source $FTL_CFG/etc/ftlrc
 
         # change leader-key to SPACE key
-        bind ftl bind SPACE leader_key 'leader key "˽"'
+        leader_key=SPACE
 
         # don't show swap files
         rfilter0='\.sw.$'
@@ -915,8 +917,6 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
                 } ||
                 # redisplay list to override prompt
                 list
-
-        false # reset key_map to default
         }
 
         # bind shortcut «s» in the leader map

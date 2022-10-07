@@ -16,7 +16,7 @@ shell_command()
 	}
 
 # command or shortcut bound to command
-[[ "${ftl_key_map[$1]}" ]] && R=${ftl_key_map[$1]} && return ;
+[[ "${kbd_trie[$1]}" ]] && R=${kbd_trie[$1]} && return ;
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 
 # split command and serialize ftl information

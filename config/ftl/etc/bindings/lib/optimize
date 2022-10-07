@@ -9,6 +9,8 @@ true
 
 pdf_optimize()
 {
+[[ $e == jpg ]] || return
+
 cp "$f" "$b.original.$e"
 ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$f "$b.original.$e"
 # -dFILTERIMAGE: produces an output where all raster images are removed.
@@ -20,6 +22,8 @@ cdir '' "$f"
 
 video_optimize()
 {
+[[ $e == mp4 ]] || return
+
 mv "$f" "$b.original.$e"
 id=ftl$$$(date +%s%N)
 tmux new-session -d -s $id "ffmpeg -i '$b.original.$e' -vcodec libx265 -crf 24 '$f' ; tmux popup -h 5 echo Done re-encoding '$n'"

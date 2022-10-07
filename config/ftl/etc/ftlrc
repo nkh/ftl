@@ -16,7 +16,7 @@ help_command="man \"$FTL_CFG/man/ftl.1\"" # command to run to show help, see # V
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
 # Options 
-KEY_TIMEOUT=0.4				# timeout between key presses
+KEY_TIMEOUT=0.5				# timeout between key presses
 shell_h=40%				# shell pane height
 auto_tags=1				# automatically synch tags between panes
 pdhl=					# log pdh message in file too
@@ -97,13 +97,12 @@ RM="rm -rf"
 CMD_COLS=150 				# columns when displaying command mapping in popup
 
 # Bindings, [07-9] are used by ftl and correspond to SIG_XXX entries below
+leader_key='BACKSLASH'
 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
 declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=i [ĸ]=k [ł]=l [µ]=m [œ]=o [þ]=p ['@']=q [®]=r [ß]=s [þ]=t [↓]=u [“]=v [»]=x [←]=y [«]=z ["´"]="'" [·]='.')
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)
 declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i ['&']=k [Ł]=l [º]=m [Œ]=o [Þ]=p [Ω]=q [®]=r [§]=s [Þ]=t [↑]=u [‘]=v ['>']=x [¥]=y ['<']=z [×]="'" [˙]=. [°]=0 [÷]=/)
-
-bind ftl bind	 	BACKSPACE	leader_key		'leader key "\"'
 
 bind ftl file		I		create_dir		"creat new directory, prompts inline"
 bind ftl file		P		tag_move		"move selection to current directory"

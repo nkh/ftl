@@ -3,7 +3,8 @@ get_key()
 {
 OIFS="$IFS" ; IFS=
 
-[[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; }
+[[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; } ; OREPLY="$REPLY"
+
 read -rsn 4 -t 0.004 E1 E2 E3 E4
 
 case "$REPLY$E1$E2$E3$E4" in 
@@ -18,10 +19,10 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\t'                           ) REPLY=TAB ;;
 	$''                             ) REPLY=ENTER ;;
 
-	$'\e[A' | $'\e[OA'              ) REPLY=UP ;;
-	$'\e[B' | $'\e[0B'              ) REPLY=DOWN ;;
-	$'\e[C' | $'\e[OC'              ) REPLY=RIGHT ;;
-	$'\e[D' | $'\e[OD'              ) REPLY=LEFT ;;
+	$'\e[A' | $'\e[OA' | $'\e[A\e[' ) REPLY=UP ;;
+	$'\e[B' | $'\e[0B' | $'\e[B\e[' ) REPLY=DOWN ;;
+	$'\e[C' | $'\e[OC' | $'\e[C\e[' ) REPLY=RIGHT ;;
+	$'\e[D' | $'\e[OD' | $'\e[D\e[' ) REPLY=LEFT ;;
 
 	$'\e[2~'                        ) REPLY=INS ;;
 	$'\e[3~'                        ) REPLY=DEL ;;
@@ -34,8 +35,8 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\e[12~' | $'\e[[B' | $'\eOQ'  ) REPLY=F2 ;;
 	$'\e[13~' | $'\e[[C' | $'\eOR'  ) REPLY=F3 ;;
 	$'\e[14~' | $'\e[[D' | $'\eOS'  ) REPLY=F4 ;;
-	$'\e['15~ | $'\e[''[E'          ) REPLY=F5 ;;
-	$'\e['17~ | $'\e[''[F'          ) REPLY=F6 ;;
+	$'\e['15~ | $'\e[[E'            ) REPLY=F5 ;;
+	$'\e['17~ | $'\e[[F'            ) REPLY=F6 ;;
 	$'\e['18~                       ) REPLY=F7 ;;
 	$'\e['19~                       ) REPLY=F8 ;;
 	$'\e['20~                       ) REPLY=F9 ;;
@@ -71,9 +72,11 @@ case "$REPLY$E1$E2$E3$E4" in
 	#$'\0??'                        ) REPLY=CTL-Z ;;
 esac
 
-#[[ "$2" ]] && printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$KEY_NAME" "${key}" "$E1" "$E2" "$E3" "$E4"
+# [[ "$2" ]] && printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$REPLY" "${OREPLY}" "$E1" "$E2" "$E3" "$E4"
+# pdhn "$(printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$REPLY" "${OREPLY}" "$E1" "$E2" "$E3" "$E4")"
 
 IFS="$OIFS"
 }
 
 
+# vim: set filetype=bash :

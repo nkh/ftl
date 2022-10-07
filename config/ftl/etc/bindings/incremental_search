@@ -1,11 +1,10 @@
 
-ftl_key_map=[find_entry]="/"
-find_entry() { key_map=incremental_search ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
+incremental_search() { key_map=incremental_find ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
 
-incremental_search()
+incremental_find()
 {
 case "$REPLY" in 
-	ENTER|ESCAPE ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map=ftl_key_map ;;
+	ENTER|ESCAPE ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map= ;;
 	ERROR_142    ) : ;;
 	*            ) to_search="$to_search$REPLY" ; find_next
 esac

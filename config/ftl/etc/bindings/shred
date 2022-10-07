@@ -12,8 +12,6 @@ prompt "shred: ${#selection[@]} entr${plural} [yes|N]? "
 	} ||
 	# redisplay list to override prompt
 	list
-
-false # reset key_map to default
 }
 
 # bind shortcut «s» in the leader map

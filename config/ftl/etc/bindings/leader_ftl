@@ -1,44 +1,18 @@
-declare -Ag leader_key_map
-leader_key() { key_map=leader_key_map ; }
-
 . $FTL_CFG/etc/bindings/lib/compress
 . $FTL_CFG/etc/bindings/lib/optimize
+. $FTL_CFG/etc/bindings/lib/extra
 
-leader_key_map[f]=leader_ftl
-leader_ftl() { key_map=super_leader_ftl ; }
-super_leader_ftl()
-{
-case "$REPLY" in
-	c  ) compress ;;
-	h  ) ftl_help ;;
-	i  ) image_optimize ;;
-	l  ) rmlint "$PWD" ; cdir '' 'rmlint' ;;
-	m  ) mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ;;
-	p  ) [[ $e == pdf ]] && pdf_optimize ;;
-	P  ) [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ;;
-	s  ) tcpreview ; mime_get 
-
-		tsplit "{ echo -n '  File: ' ; echo ${n@Q} | lscolors ; hsize=\$(echo -n 'H_size: ' ; stat -c %s '$n' | numfmt --to=iec) ; stat '$n' | sed -e '/File:/d' -e \"s/Device:/\$hsize            Device:/\" -e 's/IO Block/IO_Block/' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ; } | piper --global '[A-Za-z-_]+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn 1" ;;
-
-	t  ) tmux popup -E -d "$PWD" -w 80%  ;;
-	v  ) [[ $e == mp4 ]] && video_optimize ;;
-	x  ) [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ;;
-	z  ) [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ;;
-esac
-
-key_map=ftl_key_map
-}
-
-bind leader_ftl extra	˽fP	pdf2txt			"convert current pdf to text file"
-bind leader_ftl extra	˽fc	compress		"compress/decompress"
-bind leader_ftl extra	˽fi	optimize_image		"reduce jpg image size, converts png to jpg"
-bind leader_ftl extra	˽fl	lint			"run rmlint in current_directory"
-bind leader_ftl extra	˽fm	mutt			"send selection in mail"
-bind leader_ftl extra	˽fp	optimize_pdf		"reduce pdf size"
-bind leader_ftl extra	˽fs	stat_file		"display stat information for file in preview pane"
-bind leader_ftl extra	˽ft	shell_pop		"terminal popup"
-bind leader_ftl extra	˽fv	optimize_video		"reduce video size"
-bind leader_ftl extra	˽fx	gpg_encrypt		"GPG encrypt/decrypt"
-bind leader_ftl extra	˽fz	password_encrypt	"password encrypt/decrypt"
+bind leader_ftl extra	"LEADER f h"	ftl_help		"display help"
+bind leader_ftl extra	"LEADER f P"	pdf2txt			"convert current pdf to text file"
+bind leader_ftl extra	"LEADER f c"	compress		"compress/decompress"
+bind leader_ftl extra	"LEADER f i"	image_optimize		"reduce jpg image size, converts png to jpg"
+bind leader_ftl extra	"LEADER f l"	lint			"run rmlint in current_directory"
+bind leader_ftl extra	"LEADER f m"	run_mutt		"send selection in mail"
+bind leader_ftl extra	"LEADER f p"	pdf_optimize		"reduce pdf size"
+bind leader_ftl extra	"LEADER f s"	stat_file		"display stat information for file in preview pane"
+bind leader_ftl extra	"LEADER f t"	shell_pop		"terminal popup"
+bind leader_ftl extra	"LEADER f v"	video_optimize		"reduce video size"
+bind leader_ftl extra	"LEADER f x"	gpg_encrypt		"GPG encrypt/decrypt"
+bind leader_ftl extra	"LEADER f z"	pass_encrypt		"password encrypt/decrypt"
 
 # vim: set filetype=bash :
