@@ -11,45 +11,51 @@ presentation:
 	Reduce videos size with H265 encodigng
 
 	script:
-		FTL_LEADER_TEST_CMD='vim config/ftl/man/ftl.md +/"## Panes" -c "normal zt"' ftl 
-
-		hello
+		Introduction
 			what's in the name
 			credit to other
 			status
-			split into multiple videos
-			overview of display
-			concepts
+			videos:
 
-		- install
-		- config
-			- Helpful Tmux Bindings
-			- RCfile
-			- Directory Picker
-			- Vim File Picker
-			- Vim As Man Pager
+				- CONCEPTS
+					overview of display
 
-		- General *ftl* Commands
-		- Moving Around
-		- Viewing modes
-		- Sorting
-		- Panes-Tabs
-		- Preview
-		- Filtering
-		- Searching
-		- Tags/Selection
-		- Marks
-		- History
-		- File And Directory Operations
-		- External Commands
-		- External Viewer
-		- Shell Pane
-		- Command Mode
-		- User defined Commands
-			With/without Binding
-			sourced, executed
+				- General *ftl* Commands
+				- Moving Around
+				- Viewing modes
+				- Sorting
+				- Panes-Tabs
+				- Preview
+				- Filtering
+				- Searching
+				- Tags/Selection
+				- Marks
+				- History
+				- File And Directory Operations
+				- External Commands
+				- External Viewer
+				- Shell Pane
+				- Command Mode
+				- User defined Commands
+					With/without Binding
+					sourced, executed
 
+				- config
+					- Helpful Tmux Bindings
+					- RCfile
+					- Directory Picker
+					- Vim File Picker
+					- Vim As Man Pager
+
+				INSTALL
 # Later
+
+functionality: grep in binary files
+	https://github.com/phiresky/ripgrep-all
+
+arch: bind accepts multi key input
+	removes the need for maps and makes it easier to declare bindings when
+	number of single keys is low
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...

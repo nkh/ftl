@@ -33,16 +33,14 @@ file picker in _vim_
 
 ## Hyperorthodoxy
 
-ftl is hyperothodox, or not at all depending on your preferences, it starts
-with two panes but can start with just one pane or have more than two panes.
-The default is two panes, one showing you a directory listing and the other
-a preview of the current entry. The outstanding _tmux_ makes this possible.
-
-You can choose to remove the preview as well as having multiple panes showing
-the same or different directories.
+ftl is hyperothodox, that starts as a file-list manager with a preview. You can
+choose to remove the preview as well as adding more panes showing the same or
+different directories.
 
 Panes are independent instances of ftl that work in synch, each pane has its
 own tabs, filters, ... 
+
+The outstanding _tmux_ makes this possible.
 
 ## Preview Pane And Live Previews
 
@@ -435,7 +433,7 @@ sequences of keys to perform a command. The default is '\\'
         «⇈v/‘»                Alternative preview #2 
 
 
-        «⇈t/Þ»                File preview at end (text files in vim)
+        not assigned          Preview file's end (text files in vim)
 
         «⇑x/»»                Hexadecimal preview    
 

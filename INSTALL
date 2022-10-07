@@ -65,13 +65,13 @@ source ~/.bashrc
 
 cargo install 		lscolors
 
-sudo cpanm			File::MimeInfo \
-				Term::ANSIColor \
-				File::Spec \
-				Term::ANSIColor \
-				Getopt::Long \
-				FileHandle \
-				IPC::Open2 \
+sudo cpanm		File::MimeInfo \
+			Term::ANSIColor \
+			File::Spec \
+			Term::ANSIColor \
+			Getopt::Long \
+			FileHandle \
+			IPC::Open2 \
 
 sudo ln -s /usr/bin/fdfind /usr/bin/fd # old fdfind name is used
 cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party
