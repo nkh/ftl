@@ -28,7 +28,7 @@ echo -e "0;1;$img_x;$img_y;$img_sw;$img_sh;;;;;$image\n4;\n3;" >&7 ;
 [[ -e "$image_bg" ]] && (( CLEAN_IMAGE )) &&
 	{
 	((img_sw < pane_w)) && echo -e "0;1;$((img_x+img_sw));$img_y;$((pane_w - img_sw));$img_sh;;;;;$image_bg\n4;\n3;" >&7
-	((img_sh < pane_h)) && echo -e "0;1;$img_x;$((img_y+img_sh));$pane_w;$((pane_h - img_sh));;;;;$image_bg\n4;\n3;" >&7
+	((img_sh < pane_h)) && echo -e "0;1;$img_x;$((img_y+img_sh));$pane_w;$(((pane_h + FONT_H)- img_sh));;;;;$image_bg\n4;\n3;" >&7
 	}
 
 # sleep 0.1 ; echo $image

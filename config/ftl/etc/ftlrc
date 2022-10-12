@@ -67,7 +67,7 @@ fzfp_opt="--cycle --expect=ctrl-t --reverse"
 # External Commands
 EDITOR=vim
 
-FTLI_CLEAN=0				# set to 1 if not using konsole
+FTLI_CLEAN=1				# set to 0 if using konsole
 FTLI_W=10				# hint FTLI about Character width
 FTLI_H=19				# hint FTLI about Character height
 
