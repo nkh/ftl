@@ -94,7 +94,7 @@ save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$
 							ntfilter[tab]=\"${ntfilter[tab]}\" "; }
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
 		((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
-		ftl_imode "${imode[tab]}"
+		((gpreview)) && { ftl_imode "${imode[tab]}" ; }
 		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
 _tab_new()  { [[ "$1" == '.' ]] && dir= || dir="$1" ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; tab_setup ; }
