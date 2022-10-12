@@ -11,7 +11,7 @@ tcpreview ; mime_get
 tsplit "{ echo -n '  File: ' ; echo ${n@Q} | lscolors ; hsize=\$(echo -n 'H_size: ' ; stat -c %s '$n' | numfmt --to=iec) ; stat '$n' | sed -e '/File:/d' -e \"s/Device:/\$hsize            Device:/\" -e 's/IO Block/IO_Block/' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ; } | piper --global '[A-Za-z-_]+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn 1"
 }
 
-shell_popup()	{ tmux popup -E -d "$PWD" -w 80%  ; }
+shell_popup()	{ tmux popup -E -d "$PWD" -w 80%  -h 80% ; }
 
 gpg_encrypt()	{ [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ; }
 

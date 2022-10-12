@@ -12,7 +12,7 @@ mkdir -p $thumbs # make sure the directory exists
 
 help_command="man \"$FTL_CFG/man/ftl.1\"" # command to run to show help, see # Vim in man page
 
-# Marks
+# Bookmarks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
 # Options 
@@ -104,6 +104,7 @@ declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)
 declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i ['&']=k [Ł]=l [º]=m [Œ]=o [Þ]=p [Ω]=q [®]=r [§]=s [Þ]=t [↑]=u [‘]=v ['>']=x [¥]=y ['<']=z [×]="'" [˙]=. [°]=0 [÷]=/)
 
+bind ftl ftl		QUESTION_MARK	ftl_help		"show help"
 bind ftl file		I		create_dir		"creat new directory, prompts inline"
 bind ftl file		P		tag_move		"move selection to current directory"
 bind ftl file		R		rename			"rename/bulk rename selection using vidir"
@@ -138,7 +139,6 @@ bind ftl find		"${SA[b]}"	find_frf		"find file using regexp or fuzzy matching"
 bind ftl find		"${SA[/]}"	find_fzf_dirs		"fzf find directories"
 bind ftl ftl		"$"		editor_detach		"detach editor preview"
 bind ftl ftl		STAR		depth			"maximum listing depth"
-bind ftl ftl		"?"		ftl_help		"show help"
 bind ftl ftl		G		change_dir		"cd"
 bind ftl ftl		q		quit_ftl		"quit"
 bind ftl ftl		Q		quit_all		"quit all"

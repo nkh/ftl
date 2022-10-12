@@ -26,53 +26,18 @@ many other programs.
 
 The display consists of panes containing files listings and optional preview.
 
-*ftl* can be used as a directory picker (see cdf in the source) and as a 
-file picker in _vim_
- 
 # CONCEPTS
 
-## Hyperorthodoxy
+## Unix Spirit
 
-ftl is hyperothodox, that starts as a file-list manager with a preview. You can
-choose to remove the preview as well as adding more panes showing the same or
-different directories.
+*ftl* strives to follow the spirit of Unix by reusing what's available and
+is designed to integrate other Unix applications and tools. *ftl* can be used
+as a directory picker (see cdf in the source) and as a file picker in _vim_
 
-Panes are independent instances of ftl that work in synch, each pane has its
-own tabs, filters, ... 
-
-The outstanding _tmux_ makes this possible.
-
-## Preview Pane And Live Previews
-
-If preview is on (on by default), a preview pane is displayed. It can
-be switched on and off during the session; its size can be changed. Some
-entry types have multiple previews (IE: directories) that can be accessed
-with a keyboard shortcut (Alt-gr+v and Alt-gr+V by default)
-
-The preview pane is not, generally, a static view of the file but, thanks to
-_tmux_, a running program. If you are positioned on a text file, _vim_ will be
-run to display it. If you change the position in the listing pane, the preview
-program is killed and a new program is started.
-
-The idea is to use within *ftl* what you normally use on the command line.
-
-## Extended And Detached Viewers
-
-For some file types, often media types, *ftl* can show an extended view and 
-even start a detached viewer. 
-
-See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
-
-## Vim
-
-*ftl* uses the awesome _vim_, if it's not your favorite editor you can install it
-just for previewing (and maybe find it awesome). Patches for other editors are
-welcome.
-
-## Tabs
-
-Tabs are views, to same or different directories, in the same pane. Filters
-are per tab so you can have two tabs with different filters.
+*ftl* is written in Bash, the language that packs a real punch ... and sometimes
+punches you; it will not work in other shells but it may be a cool exercise to
+make it portable. Most of the code is one liners, albeit long, and it's
+structured to be "easy" to expand.
 
 ## File Listing
 
@@ -98,7 +63,7 @@ The directory listing consists of:
 
         - entry index
         - optional etag
-        - entries colored by _lscolors_
+        - colored entries according to LS_COLORS
 
 Example:
 
@@ -119,15 +84,65 @@ Example:
          |                                   │
          `- [index]                          │...
                                               
-## Marks
+## Preview Pane And Live Previews
 
-You can bookmak locations and jump back to them. Marks can be set in the
-configuration file, added for the current session or made persistent.
+The preview pane can be switched on and off during the session and its size can
+be changed. 
 
-## Tags/Etags
+Some entry types have multiple types of preview (IE: directories) that can be
+accessed with a keyboard shortcut (Alt-gr+v and Alt-gr+V by default)
+
+The preview pane is not, generally, a static view of the file but, thanks to
+_tmux_, a running program. If you are positioned on a text file, _vim_ will be
+run to display it. If you change the position in the listing pane, the preview
+program is killed and a new program is started.
+
+The idea is to use within *ftl* what you normally use on the command line.
+
+## Extended And Detached Viewers
+
+For some file types, often media types, *ftl* can show an extended view and 
+even start a detached viewer. 
+
+See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
+
+## Vim
+
+*ftl* uses the awesome _vim_ for text preview, if it's not your favorite editor
+you can install it just for previewing (and maybe find it awesome). Patches for
+other editors are welcome.
+
+## Hyperorthodoxy
+
+*ftl* is hyperothodox, it starts as a file-list manager with a preview. You can
+choose to remove the preview as well as adding more panes showing the same or
+different directories. The outstanding _tmux_ makes this possible.
+
+Panes are independent instances of ftl that work in synch, each pane has its
+own tabs, filters, ... 
+
+## Filtering 
+
+*ftl* can filter the entries in many ways to list only those you want to see.
+
+See "## Filtering" in commands.
+
+## Tabs
+
+Tabs are views, to same or different directories, in the same pane. Filters
+are per tab so you can have two tabs with different filters.
+
+## Bookmarks
+
+You can bookmark locations and jump back to them. Bookmarks can be set in the
+configuration file, added in the current session and made persistent.
+
+## Tags
 
 You can tag (select) entries, tags are synched between panes when option
 _auto_tag_ is set (set by default). 
+
+## Etags
 
 Etags is extra information that is optionally prepended to the entries.
 
@@ -155,26 +170,6 @@ _7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip_ archives are automounted.
 
 You can add handlers in _'$FTL_CFG/bindings/type_handlers'_
 
-## Filtering 
-
-*ftl* can filter the files in the directory to present only those you want
-to see.
-
-See "## Filtering" in commands.
-
-## Bash
-
-*ftl* is written in Bash, the language that packs a real punch ... and
-sometimes punches you. It also strives to follow the spirit of unix by
-reusing what's available. *ftl* is designed to integrate other Unix
-tools and applications.
-
-*ftl*  will probably not work in other shells but it may be a cool exercise
-making things portable.
-
-Most of the code is one liners, albeit long, and it's structured to be "easy"
-to expand.
-
 # KEY BINDINGS
 
 *ftl* uses vim-like key bindings, the bindings can be changed in the default
@@ -189,6 +184,13 @@ wich allows you to search per key or name.
         -------------------------------------------------------------------
         ftl    file     c        copy          copy file to, prompts inline
         ...
+
+## Leader key
+
+The “Leader key” is a prefix key used to extend *ftl* shortcuts by using
+sequences of keys to perform a command. The default is '\\'
+
+        leader_key=SPACE # set LEADER to SPACE
 
 ## User defined bindings
 
@@ -222,7 +224,7 @@ Available symbolic key name (depending on your OS bindings and terminal) :
 
         AT, BACKSPACE, DEL, ENTER, ESCAPE, INS
 
-        BACKSLASH, QUOTE and DQUOTE, SPACE, STAR, TAB
+        BACKSLASH, QUOTE and DQUOTE, SPACE, STAR, TAB, QUESTION_MARK
 
         UP, DOWN, RIGHT, LEFT, PGUP, PGDN, HOME, END 
 
@@ -232,14 +234,7 @@ Available symbolic key name (depending on your OS bindings and terminal) :
 
 See example in "# EXAMPLES" below.
 
-## Leader key
-
-The “Leader key” is a prefix key used to extend *ftl* shortcuts by using
-sequences of keys to perform a command. The default is '\\'
-
-        leader_key=SPACE # set LEADER to SPACE
-
-# COMMANDS
+# COMMANDS
 
 - General *ftl* Commands
 - Viewing modes
@@ -251,7 +246,8 @@ sequences of keys to perform a command. The default is '\\'
 - Filtering
 - Searching
 - Tags/Selection
-- Marks
+- Etags
+- Bookmarks
 - History
 - File And Directory Operations
 - External Commands
@@ -278,7 +274,7 @@ sequences of keys to perform a command. The default is '\\'
 
         «Q»             Quit all, closes all tabs and panes at once.
 
-        «@»             Quit, quit all but doesn't close the shell pane if one exists.
+        «⇑q/@»          Quit, quit all but doesn't close the shell pane if one exists.
 
         «⇈q/Ω»          Quit, doesn't close the preview pane if one exists and zooms it.
 
@@ -367,7 +363,7 @@ sequences of keys to perform a command. The default is '\\'
 
 ## Moving around
 
-        Also see "cd" in *General Commands* above and *Marks* and
+        Also see "cd" in *General Commands* above and *Bookmarks* and
         *History* below
 
         *ftl* will automatically put you on a README if you haven't visited
@@ -398,7 +394,7 @@ sequences of keys to perform a command. The default is '\\'
                                   - last file
 
         «G»                CD, *ftl* prompts you for a path, the promt has path completions.
-                           You can also change directory with marks or by searching for it
+                           You can also change directory with bookmarks or by searching for it
 
         «ö»                Next entry of same extension      
 
@@ -528,7 +524,7 @@ sequences of keys to perform a command. The default is '\\'
 
         «N»                Find previous                  
 
-## Tags/Etags
+## Tags
 
         A tag is a selected file, *ftl* will display a glyph next to tagged
         files. Option auto_tags controls if tags are automatically merged to
@@ -564,27 +560,28 @@ sequences of keys to perform a command. The default is '\\'
                            This is  handy when tags are read from a file with option
                            -t on the command line or via the 'load_tags'
 
+## Etags
         «⇑o/œ»             Merge tags from all panes, see option auto_tags
 
         «⇈0/°»             Fzf merge tags from panes 
 
         «⇈./˙»             Select etag type from list
 
-## Marks
+## Bookmarks
 
-        «m» + char         Mark directory/file 
+        «m» + char         Bookmark directory/file 
 
-        «'» + char         Go to mark 
+        «'» + char         Go to bookmark 
 
         «'» + "'"          Go to last directory
 
-        «⇈'/×»             Fzf go to mark, open multiple tabs with «ctrl-t»
+        «⇈'/×»             Fzf go to bookmark, open multiple tabs with «ctrl-t»
 
-        «,»                Add persistent mark    
+        «,»                Add persistent bookmark    
 
-        «;»                Fzf to persistent mark, open multiple tabs with «ctrl-t»
+        «;»                Fzf to persistent bookmark, open multiple tabs with «ctrl-t»
 
-        «⇑k/ĸ»             Clear persistent marks 
+        «⇑k/ĸ»             Clear persistent bookmarks 
 
 ## History
 
@@ -887,7 +884,7 @@ See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details.
         # alternative directory preview
         NCDU=gdu
 
-        # define your marks
+        # define your bookmarks
         declare -A marks=(
                 [0]=/
                 [1]=$HOME/$
@@ -928,7 +925,7 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
                 source $path_to_ftl/cdf
 
         This adds a _cdf_ function which will open an *ftl* instance you can
-        use to navigate your directories, jump to marks, ...
+        use to navigate your directories, jump to bookmarks, ...
 
         Press «q» to quit and jump to the directory you're currently in.
 
@@ -982,7 +979,7 @@ Please report bug to <https://https://github.com/nkh/ftl/issues>
 
 Contributions are best done via pull requests on github. Keep code to a bare minimum.
 
-# AUTHOR
+#AUTHOR
 
 © Nadim Khemir 2020-2022
 
@@ -992,8 +989,11 @@ CPAN/Github ID: NKH
 
 # LICENSE
 
-Artistic licence 2.0 or GNU General Public License 3, at your option.
+*ftl* is under Artistic licence 2.0 or GNU General Public License 3, at your option.
+
+*ftl* logo is base on tmux logo; tmux license is at https://github.com/tmux/tmux/blob/master/logo/LICENSE
 
 # SEE ALSO
 
 ranger, fff, clifm, lfm, nnn, vifm, broot, gitfm, ...
+
