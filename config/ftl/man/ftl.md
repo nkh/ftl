@@ -765,11 +765,31 @@ are run by default.
 
         Selection an shells:
         
-        *fsel* list ftl selection, null separated
-                
-                «:» fsel | xargs -0 ls --color=always
+        *finfo* can list the following data:
 
-                «:» fsel | xargs -0 -n 1 ls --color=always
+                - FTL_PID (ftl's pid)
+
+                - FTL_FS (ftl's data directory)
+
+                - FTL_PWD (ftl's current directory)
+
+                - n (current file)
+
+                - selection (selected files)
+
+
+                without arguments *finfo* lists ftl's selection, null separated
+                        
+                        «:» finfo | xargs -0 ls --color=always
+
+                        «:» finfo | xargs -0 -n 1 ls --color=always
+
+                first argument is the separator used to display data, remaining
+                arguments are the name of the data to list:
+
+                        finfo \\n selection # list selection separated by '\n'
+
+                *finfo* can also be used in the default shell  
         
         *fsh* command [command args]
         
@@ -784,15 +804,15 @@ are run by default.
 
         «:» fsh command                            own shell
 
-        «:» fsel | xargs -0 command                default shell, one command for all selection
+        «:» finfo | xargs -0 command               default shell, one command for all selection
 
-        «:» fsel | xargs -0 -n1 command            default shell, one command per selection
+        «:» finfo | xargs -0 -n1 command           default shell, one command per selection
 
-        «:» fsh fsel | xargs -0 command            own shell, one command for all selection
+        «:» fsh finfo | xargs -0 command           own shell, one command for all selection
 
-        «:» fsh fsel | xargs -0 -n1 command        own shell, one command per selection
+        «:» fsh finfo | xargs -0 -n1 command       own shell, one command per selection
 
-        «:» fsel | xargs -0 -n1 fsh command        one shell per selection
+        «:» finfo | xargs -0 -n1 fsh command       one shell per selection
 
 # FILES
 

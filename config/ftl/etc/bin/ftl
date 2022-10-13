@@ -14,7 +14,10 @@ echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; fli
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; }
 fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
+
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
+
+ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_main_info_file" ;
 
 while : ; do tag_synch ; winch ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key $KEY_TIMEOUT ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
@@ -42,7 +45,7 @@ key_command()
 
 keys_command="$keys_command$REPLY" #; pdhn "<$keys_command> -> ${kbd_trie[$keys_command]}"
 
-[[ $(type -t "${kbd_trie[$keys_command]}") == function ]] && { ${kbd_trie[$keys_command]} ; keys_command= ; }
+[[ $(type -t "${kbd_trie[$keys_command]}") == function ]] && { ${kbd_trie[$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_command= ; }
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
@@ -108,6 +111,16 @@ preview()
 ((main && prev_all || prev_all)) \
 	&& { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
         || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
+}
+
+setup_finfo()
+{
+[[ -n "$1" ]] && ftl_info_file="$1" || ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
+
+export ftl_info_file
+ftl_env+=([ftl_info_file]=$ftl_info_file) ; 
+
+{ FTL_PID=$$ ; FTL_FS=$fs ; FTL_PWD=${PWD@Q} ; declare -p FTL_PID FTL_FS FTL_PWD n selection ; } >$ftl_info_file
 }
 
 [[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; export FTL_CFG ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run me in tmux'

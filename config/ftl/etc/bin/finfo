@@ -1,0 +1,26 @@
+#!/bin/bash
+
+separator="${1:-\0}"
+what=("${@:2}") ; (( ${#what[@]} )) || what=(selection)
+
+[[ -e "$ftl_info_file" ]] && source "$ftl_info_file" || { echo "finfo: no ftl info file" >&2 ; exit 1 ; }
+
+for w in "${what[@]}"
+	do
+		type=$(declare -p "$w" 2>/dev/null)
+		declare -n name="$w"
+
+		if [[ "$type" =~ "declare --" ]] ; then
+			printf "%s$separator" "$name" 
+		elif [[ "$type" =~ "declare -a" ]] ; then
+			printf "%s$separator" "${name[@]}" 
+		else
+			echo "finfo: unknown type '$type'" >&2 ; exit 1
+		# elif [[ "$type_signature" =~ "declare -A" ]] ; then
+		# 	printf "%s$separator" "${[@]}" 
+		fi
+	done
+
+
+# vim: set filetype=bash :
+

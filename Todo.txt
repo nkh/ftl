@@ -18,12 +18,9 @@ presentation:
 			detail videos
 
 functionality: add tagging program  TMSU  support
+
 functionality: rmlint alternative that looks better? https://github.com/pauldreik/rdfind https://github.com/pkolaczk/fclones
 functionality: https://github.com/andreafrancia/trash-cli
-
-functionality: ftl_sel | command in normal shell
-			export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
-			update on cdir
 
 # Later
 

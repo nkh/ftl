@@ -4,7 +4,6 @@ shell_command()
 [[ "$1" =~ ^[1-9][0-9]*$ ]] && { file="${files[(($1 - 1))]}"  ; [[ -d "$file" ]] && cdir "$file" || list $(($1 - 1)) ; return 1 ; }
 
 # commands can be implemented here or in files found in "user_commands"
-
 [[ "$1" == "load_tags" ]] && \
 	{
 	# eg: select all files in a directory: fd -a . > $ftl_root/load_tags 
@@ -19,15 +18,14 @@ shell_command()
 [[ "${kbd_trie[$1]}" ]] && R=${kbd_trie[$1]} && return ;
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 
-# split command and serialize ftl information
+# split command
 eval "$($FTL_CFG/etc/bin/parse_parts "$1")" 
 cmd="$cmd_parts"
 
-export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
-{ FTL_PID=$$ ; FTL_FS=$fs ; FTL_PWD=${PWD@Q} ; declare -p FTL_PID FTL_FS FTL_PWD n selection ; } >$ftl_info_file
+# serialize ftl information
+setup_finfo
 
 # user command
-
 user_cmd="$FTL_CFG/commands/$cmd"
 [[ -f  "$user_cmd" ]] && 
 	{
@@ -36,7 +34,6 @@ user_cmd="$FTL_CFG/commands/$cmd"
 	}
 
 # shell command
-
 ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
 [[ "$cmd_parts" == fsh ]] &&
