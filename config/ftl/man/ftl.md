@@ -614,7 +614,7 @@ See example in "# EXAMPLES" below.
 
         «⇈p/þ»             Move selection to, Uses _fzf_mv_.
 
-        «R»                Rename, Uses _vidir_.
+        «R»                Rename selection.
 
         «⇑l/ł»             Symlink selection 
 

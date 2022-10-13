@@ -106,7 +106,7 @@ for((i=$top ; i <= bottom ; i++))
 preview()
 {
 ((main && prev_all || prev_all)) \
-	&& { ((emode)) && { eviewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
+	&& { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
         || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
 }
 

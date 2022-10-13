@@ -106,7 +106,7 @@ quit_keep_shell()	{ keep_shell=1 ; quit_all ; }
 quit_keep_preview()	{ quit2 ; [[ $pane_id ]] && { echo >$pfs/pane ; tmux selectp -t $pane_id ; tmux resizep -Z -t $pane_id ; } ; exit 0 ; }
 ftl_event_quit()	{ : ; }
 refresh_pane()		{ ((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "$PWD" "$f" ; } # directory content change signal
-rename()		{ tcpreview ; printf "%s\n" "${selection[@]}" | vidir - && tags_clear && cdir '' "$f" ; }
+rename()		{ tcpreview ; printf "%s\n" "${selection[@]}" | edir && tags_clear && cdir '' "$f" ; }
 shell()			{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_files()		{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } && R=${C[shell_file]} || shell_pane 1 ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_file()		{ for i in "${selection[@]}" ; do shell_send 1 "'$i'" " " ; done ; }

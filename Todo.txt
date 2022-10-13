@@ -7,8 +7,6 @@ issue: inotify, focuses main! resize missed when pane is closed
 
 issue: space in names when passing env var to shell
 
-functionality: show how many files are filtered out
-
 presentation:
 	Reduce videos size with H265 encodigng
 
@@ -17,39 +15,16 @@ presentation:
 			what's in the name
 			credit to other
 			status
-			videos:
+			detail videos
 
-				- CONCEPTS
-					overview of display
+functionality: add tagging program  TMSU  support
+functionality: rmlint alternative that looks better? https://github.com/pauldreik/rdfind https://github.com/pkolaczk/fclones
+functionality: https://github.com/andreafrancia/trash-cli
 
-				- General *ftl* Commands
-				- Moving Around
-				- Viewing modes
-				- Sorting
-				- Panes-Tabs
-				- Preview
-				- Filtering
-				- Searching
-				- Tags/Selection
-				- Marks
-				- History
-				- File And Directory Operations
-				- External Commands
-				- External Viewer
-				- Shell Pane
-				- Command Mode
-				- User defined Commands
-					With/without Binding
-					sourced, executed
+functionality: ftl_sel | command in normal shell
+			export ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
+			update on cdir
 
-				- config
-					- Helpful Tmux Bindings
-					- RCfile
-					- Directory Picker
-					- Vim File Picker
-					- Vim As Man Pager
-
-				INSTALL
 # Later
 
 functionality: grep in binary files
