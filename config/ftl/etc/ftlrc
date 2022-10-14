@@ -66,6 +66,7 @@ fzfp_opt="--cycle --expect=ctrl-t --reverse"
 
 # External Commands
 EDITOR=vim
+FILE_DIFF=vimdiff
 
 FTLI_CLEAN=1				# set to 0 if using konsole
 FTLI_W=10				# hint FTLI about Character width
@@ -89,8 +90,11 @@ NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for
 
 # Deletion command
 RM="rm -rf"
-	# how you want your files deleted
+	# using rm-improved
 	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
+	# using FreeDesktop.org Trash 
+	# RM="trash-put"
+	# using your own delete function
 	# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
 	# RM=my_delete
 

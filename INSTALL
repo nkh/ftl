@@ -87,6 +87,9 @@ cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party
 # optional "a better rm" (https://github.com/nivekuil/rip)
 #cargo install rm-improved
 
+# optional Command Line Interface to FreeDesktop.org Trash; https://github.com/andreafrancia/trash-cli
+#pip3 install trash-cli
+
 # optional pager, you need brew installed and change MD_PAGER in rc file
 # see https://docs.brew.sh/Homebrew-on-Linux
 # brew install moar
