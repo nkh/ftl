@@ -1,7 +1,14 @@
 #!/bin/bash
 
 separator="${1:-\0}"
+format="%s"
+delimiter=
+
+[[ "$separator" =~ @Q$ ]] && { format="%q" ; separator="${separator%%@Q}" ; }
+[[ "$separator" =~ @q$ ]] && { delimiter="'" ; format="%s" ; separator="${separator%%@q}" ; }
+
 what=("${@:2}") ; (( ${#what[@]} )) || what=(selection)
+
 
 [[ -e "$ftl_info_file" ]] && source "$ftl_info_file" || { echo "finfo: no ftl info file" >&2 ; exit 1 ; }
 
@@ -11,13 +18,13 @@ for w in "${what[@]}"
 		declare -n name="$w"
 
 		if [[ "$type" =~ "declare --" ]] ; then
-			printf "%s$separator" "$name" 
+			printf "$delimiter$format$delimiter$separator" "$name" 
 		elif [[ "$type" =~ "declare -a" ]] ; then
-			printf "%s$separator" "${name[@]}" 
+			printf "$delimiter$format$delimiter$separator" "${name[@]}" 
 		else
 			echo "finfo: unknown type '$type'" >&2 ; exit 1
 		# elif [[ "$type_signature" =~ "declare -A" ]] ; then
-		# 	printf "%s$separator" "${[@]}" 
+		# 	printf "$format$separator" "${[@]}" 
 		fi
 	done
 

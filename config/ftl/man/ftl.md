@@ -32,7 +32,8 @@ The display consists of panes containing files listings and optional preview.
 
 *ftl* strives to follow the spirit of Unix by reusing what's available and
 is designed to integrate other Unix applications and tools. *ftl* can be used
-as a directory picker (see cdf in the source) and as a file picker in _vim_
+to change directory, to pick files/directories in scripts or as a _vim_ file
+picker (see # EXAMPLES)
 
 *ftl* is written in Bash, the language that packs a real punch ... and sometimes
 punches you; it will not work in other shells but it may be a cool exercise to
@@ -767,6 +768,8 @@ are run by default.
         
         *finfo* can list the following data:
 
+                - selection (selected files)
+
                 - FTL_PID (ftl's pid)
 
                 - FTL_FS (ftl's data directory)
@@ -774,9 +777,6 @@ are run by default.
                 - FTL_PWD (ftl's current directory)
 
                 - n (current file)
-
-                - selection (selected files)
-
 
                 without arguments *finfo* lists ftl's selection, null separated
                         
@@ -928,7 +928,7 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
         [[ $REPLY == yes ]] && # reply must be "yes"
                 {
                 # use shred utility and clear the selection tags
-                shred -n 2 -z -u "${selection[@]}" && tags_clear
+               shred -n 2 -z -u "${selection[@]}" && tags_clear
 
                 cdir # reload directory
                 } ||
@@ -939,7 +939,7 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
         # bind shortcut «s» in the leader map
         bind leader file s shred_command "*** bypasses RM *** ..."
 
-## Directory Picker
+## Directory Changer
 
         Add the following code to your bashrc:
                 source $path_to_ftl/cdf
@@ -951,7 +951,24 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
         Press «Q» to cancel.
 
-## Vim File Picker
+## Files/Directories Picker
+
+        Add the following code to your bashrc:
+                source $path_to_ftl/ftll
+
+        This adds a _ftll_ function which will open an *ftl* instance in a new
+	tmux window, select the entries you want, without selection the current
+        entry is selected
+
+		readarray -t a < <(ftll) ; for n in "${a[@]}" ; do echo ---$n--- ; done
+
+        Press «q» to quit to return the selection.
+
+        Press «Q» to cancel.
+
+
+
+## Vim Files Picker
 
         Add the following code to your vimrc:
 

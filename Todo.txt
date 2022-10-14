@@ -17,15 +17,19 @@ presentation:
 			status
 			detail videos
 
-functionality: add tagging program  TMSU  support
-
-functionality: rmlint alternative that looks better? https://github.com/pauldreik/rdfind https://github.com/pkolaczk/fclones
-functionality: https://github.com/andreafrancia/trash-cli
-
 # Later
 
-functionality: grep in binary files
-	https://github.com/phiresky/ripgrep-all
+functionality: https://github.com/andreafrancia/trash-cli
+
+functionality: add tagging program  TMSU  support
+
+functionality: directory diff via vfs
+
+functionality: file diff, what's the UX?
+
+functionality: drag drop via dragon
+
+functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...
