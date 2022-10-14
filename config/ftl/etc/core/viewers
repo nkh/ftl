@@ -29,6 +29,7 @@ pviewers()
 [[ $e =~ $mfilter ]]              && { pmedia    ; return ; }
 [[ $e =~ ^md|MD$ ]]               && { pmd       ; return ; }
 [[ $e == pdf ]]                   && { ppdf      ; return ; }
+[[ $e == 1   ]]                   && { pman      ; return ; }
 [[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
@@ -81,6 +82,7 @@ ptext()     { vipreview "$n" ; }
 ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
+pman()      { ctsplit "man \"$n\" ; read -sn 1000" ; true ; }
 pcomp()     { [[ $e == zip ]] && _pcomp unzip -l || { [[ $e == rar ]] && _pcomp unrar list ; } || { [[ $f =~ \.tar ]] && _pcomp tar --list --verbose -f ; } ; }
 _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@" "$f" >"$fp" ; vipreview "$fp" ; } ; }
 
