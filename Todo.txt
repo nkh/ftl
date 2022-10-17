@@ -17,15 +17,23 @@ presentation:
 			status
 			detail videos
 
-# Later
-
 functionality: add tagging program  TMSU  support
 
-functionality: ? directory diff via vfs
+issue: -T not working
+		ftl -T "/usr/local/man /usr/local/share/man /usr/share/man"
+		ftl -T /usr/local/man -T /usr/local/share/man -T /usr/share/man
+		
+	need to run reset after error
+
+functionality: show setuid files
+
+# Later
+
+functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 
 functionality: drag drop via dragon
 
-functionality: grep in binary files https://github.com/phiresky/ripgrep-all
+functionality: ? directory diff via vfs
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...

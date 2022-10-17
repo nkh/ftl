@@ -8,7 +8,7 @@ declare -g -A fexts=()
 			sort -u | { echo "-no_extension-" ; cat ; } | lscolors | \
 			fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
 		do 
-			fexts[$ext]=1 ; filter_tag="~"
+			fexts[$ext]=1 ; ftag="~"
 		done
 	
 	declare -p fexts >"$fs/by_extension"

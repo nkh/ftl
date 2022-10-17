@@ -1,0 +1,58 @@
+declare -g -A keep=() PWDS=()
+
+[[ "$1" == load ]] && [[ -e "$pfs/by_tag_query" ]] && source "$pfs/by_tag_query" || \
+	{
+	tcpreview
+	query_file="$(mktemp -p $fs ftl_tmsu_tag_query_XXXXXXX)"
+
+	{
+	echo
+	echo
+	tac "$ftl_root/tag_query_history" 2>&- | awk '!seen[$0]++' | head -n 15 2>&-
+	echo "# Available tags:"
+	echo
+	tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | column | sed 's/^/# /'
+	echo
+	echo  "# Example: (mp3 or flac) and not big-jazz"
+	} > $query_file
+
+	
+	for((i=$top ; i <= $nfiles ; i++)) ; do [[ -d "${files[$i]}" ]] && keep["$tab-${files[$i]}"]=1 && PWDS[$tab-$PWD]=1 ; done
+	
+	vi +start $query_file &&
+		{
+		ftag="~"
+		
+		while read l
+			do
+				[[ "$l" =~ ^$ || "$l" =~ ^# ]] && continue # skip empty_line or comments
+				
+				echo "# $l" >> "$ftl_root/tag_query_history" 2>&-
+				
+				# run query, keep files
+				readarray -t matches < <(tmsu files "$l")
+					
+				for file in "${matches[@]}"
+					do
+						file="${file#./}"
+						[[ ! "$file" =~ / ]] && keep["$tab-$PWD/$file"]=1 && PWDS[$tab-$PWD]=1
+					done
+			done  <$query_file
+		} || return
+	
+	declare -p keep PWDS >"$pfs/by_tag_query"
+	}
+
+ftl_filter()
+{
+[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
+	{
+	while read -r file_data
+		do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat 
+}
+
+# vim: set filetype=sh :

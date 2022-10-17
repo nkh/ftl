@@ -10,7 +10,7 @@ declare -g -A keep PWDS
 		do 
 			keep["$PWD/$file"]=1
 			PWDS[$PWD]=1
-			filter_tag="~"
+			ftag="~"
 		done
 	IFS=$OIFS
 

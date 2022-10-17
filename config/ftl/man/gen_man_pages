@@ -1,2 +1,4 @@
 #!/bin/bash
 pandoc --standalone -p --tab-stop=8 --to man ftl.md -o ftl.1
+gzip < ftl.1 > ftl.1.gz
+sudo cp ftl.1.gz /usr/share/man/man1

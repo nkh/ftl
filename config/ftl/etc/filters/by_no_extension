@@ -10,7 +10,7 @@ shopt -s dotglob
 			fzf-tmux -p 30% -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
 		do 
 			[[ $ext == "-without_extension-" ]] && remove_no_ext=1 || fnexts[$ext]=1
-			filter_tag="~"
+			ftag="~"
 		done
 
 	declare -p remove_no_ext fnexts >"$pfs/by_no_extension"

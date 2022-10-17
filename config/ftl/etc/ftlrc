@@ -18,7 +18,7 @@ declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_M
 # Options 
 KEY_TIMEOUT=0.5				# timeout between key presses
 shell_h=40%				# shell pane height
-auto_tags=1				# automatically synch tags between panes
+auto_selection=1			# automatically synch tags between panes
 pdhl=					# log pdh message in file too
 : ${prev_all:=1}			# open preview window
 zooms=(70 50 30)			# sizes of preview pane in percent
@@ -198,7 +198,7 @@ bind ftl pane		"|"		pane_L			"extra pane: left"
 bind ftl pane		"-"		pane_go_next		"next pane or viewer"
 bind ftl pane		"¦"		pane_R			"extra pane: right"
 bind ftl shell		"!"		shell_view		"view shell"
-bind ftl shell		":"		command_prompt		"run commands: q, etags, load_tags, ..."
+bind ftl shell		":"		command_prompt		"run commands: q, etags, load_sel, ..."
 bind ftl shell		S		shell_files		"shell pane with selected files"
 bind ftl shell		s		shell			"shell pane"
 # bind ftl shell		not_assigned	shell_zoomed		"shell pane, zoomed out"

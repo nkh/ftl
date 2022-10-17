@@ -1,0 +1,5 @@
+file_diff() { (( ${#selection[@]} == 2 )) && { tcpreview ; $FILE_DIFF "${selection[@]}" ; } ; }
+
+bind leader_ftl extra	"LEADER f d"	file_diff		"diff two selected files"
+
+# vim: set filetype=bash :

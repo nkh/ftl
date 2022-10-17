@@ -4,12 +4,12 @@ shell_command()
 [[ "$1" =~ ^[1-9][0-9]*$ ]] && { file="${files[(($1 - 1))]}"  ; [[ -d "$file" ]] && cdir "$file" || list $(($1 - 1)) ; return 1 ; }
 
 # commands can be implemented here or in files found in "user_commands"
-[[ "$1" == "load_tags" ]] && \
+[[ "$1" == "load_sel" ]] && \
 	{
-	# eg: select all files in a directory: fd -a . > $ftl_root/load_tags 
-	[[ -s "$fs/load_tags" ]] \
-		&& { <"$fs/load_tags" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
-		|| tmux popup "echo -n ftl: no such file '$fs/load_tags'"
+	# eg: select all files in a directory: fd -a . > $ftl_root/load_sel
+	[[ -s "$fs/load_sel" ]] \
+		&& { <"$fs/load_sel" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
+		|| tmux popup "echo -n ftl: no such file '$fs/load_sel'"
 
 	return
 	}

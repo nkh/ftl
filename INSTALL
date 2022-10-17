@@ -97,6 +97,9 @@ cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party
 # optional markdown previewer
 #https://kristaps.bsd.lv/lowdown/
 
+# optional TMSU for tagging
+#https://github.com/oniony/TMSU
+
 # shallow clone ftl
 git clone --depth=1 https://github.com/nkh/ftl.git ftl_repo
 cp -r $FTL_CFG/ftl_repo/config/ftl/* .

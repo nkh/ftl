@@ -10,14 +10,14 @@ ftl [ [-t file] [-T file] ][directory[/file]]
 
 # OPTIONS
 
--t file         file contains paths to files to tag
+-s file         file contains paths to files to select
 
-                eg: ftl -t <(find -name 'ftl*') 
+                eg: ftl -s <(find -name 'ftl*') 
 
--T file         file contains paths to files to show in own tab, must come
+-t file         file contains paths to files to show in own tab, must come
                 after optionial _-t_ 
 
-                eg: ftl -T <(find -name 'ftl*') 
+                eg: ftl -t <(find -name 'ftl*') 
 
 # DESCRIPTION
 
@@ -138,10 +138,10 @@ are per tab so you can have two tabs with different filters.
 You can bookmark locations and jump back to them. Bookmarks can be set in the
 configuration file, added in the current session and made persistent.
 
-## Tags
+## Selection
 
-You can tag (select) entries, tags are synched between panes when option
-_auto_tag_ is set (set by default). 
+You can select multiple entries, the selection is synchronized between panes
+when option _auto_election is set (set by default). 
 
 ## Etags
 
@@ -155,13 +155,21 @@ Available etags are:
 
         /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
         1  M ftl
-        1 ?? tags
+        1 ?? doc
           ⮤⮥ git-status
 
         /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
         11 1598x2100 image.jpg
         12  720x 507 image.png
            ⮤ etag  ⮥ image-size
+
+        /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
+        1 ᵀ ftl
+        1   doc
+          ⮤ tmsu tagged
+
+## Tags
+*ftl* has support for tags via TMSU
 
 ## Type handlers
 
@@ -246,8 +254,9 @@ See example in "# EXAMPLES" below.
 - Sorting
 - Filtering
 - Searching
-- Tags/Selection
+- Selection
 - Etags
+- Tags
 - Bookmarks
 - History
 - File And Directory Operations
@@ -403,8 +412,8 @@ See example in "# EXAMPLES" below.
 
         «ä»                Goto entry by index               
 
-        not assigned       Goto previous tag
-        not assigned       Goto next tag
+        not assigned       Goto previous selected entry
+        not assigned       Goto next selected entry
 
         «K»                Scroll preview up                 
 
@@ -525,48 +534,63 @@ See example in "# EXAMPLES" below.
 
         «N»                Find previous                  
 
-## Tags
+## Selection
 
-        A tag is a selected file, *ftl* will display a glyph next to tagged
-        files. Option auto_tags controls if tags are automatically merged to
-        other panes.
+        *ftl* will display a glyph next to selected files. Option auto_select
+        controls if the selection is automatically merged to other panes.
 
-        When using tags and multiple class tags are present, *ftl* will ask
-        which class to use. The number of entries is displayed in the header.
+        Multiple selection classes are available, *ftl* will ask which class
+        to use. The number of entries is displayed in the header.
 
-        «y»                Tag current entry in "normal" tag class and move down
+        «y»                Select current entry in "normal" class and move down
 
-        «Y»                Tag current entry in "normal" tag class and move up
+        «Y»                Select current entry in "normal" class and move up
 
-        «1» «2» «3»        Tag current entry in given class and move down.
+        «1» «2» «3»        Select current entry in given class and move down.
 
-        «4»                Tag current entry in D class and move down.
+        «4»                Select current entry in D class and move down.
                 
-        «⇑y/←»             Tag all the files in the current directory
+        «⇑y/←»             Select all the files in the current directory
 
-        «⇈y/¥»             Tag all files and subdirs in the current directory
+        «⇈y/¥»             Select all files and subdirs in the current directory
 
-        «t»                Open fzf to tag files, multiple selection is possible.
+        «t»                Open fzf to select files, multiple selection is possible.
 
-        «T»                Open fzf to tag files and sub directories.
+        «T»                Open fzf to select files and sub directories.
 
-        «u»                Untag all files and directories, including those in other
+        «u»                Deselect all files and directories, including those in other
                            directories.
 
-        «U»                Opens fzf to let you choose which entries to untag
+        «U»                Opens fzf to let you choose which entries to deselect.
 
-        «⇑g/ŋ»             Opens fzf to choose an entry among the tags, then
-                           changes directory to where the tag is.
+        «⇑g/ŋ»             Opens fzf to choose an entry in the selection, then
+                           changes directory to where the selection is.
 
-                           This is  handy when tags are read from a file with option
-                           -t on the command line or via the 'load_tags'
+                           This is handy when selections are read from a file with option
+                           -t on the command line or via the 'load_selection'
+
+        «⇑o/œ»             Merge selection from all panes, see option auto_select
+
+        «⇈0/°»             Fzf merge selection from panes 
 
 ## Etags
-        «⇑o/œ»             Merge tags from all panes, see option auto_tags
-
-        «⇈0/°»             Fzf merge tags from panes 
-
         «⇈./˙»             Select etag type from list
+
+## Tags
+
+        «LEADER T»         show tmsu tags in preview
+
+        «LEADER t g»       goto tagged file via fzf
+
+        «LEADER t f»       tmsu tag selection via fzf
+
+        «LEADER t m»       tmsu mount
+
+        «LEADER t q»       filter based on tmsu tags or query
+
+        «LEADER t r»       filter based on tmsu tags via fzf
+
+        «LEADER t t»       tag selection
 
 ## Bookmarks
 
@@ -629,6 +653,8 @@ See example in "# EXAMPLES" below.
 
         «LEADER f c»       Compress/decompress            
 
+        «LEADER f t»       ivim diff two selected files                 
+
         «LEADER f P»       Convert pdf to text file       
 
         «LEADER f s»       Display stat in preview pane   
@@ -652,6 +678,9 @@ See example in "# EXAMPLES" below.
         «LEADER f m»       Send mail                      
 
         «LEADER f t»       Terminal popup                 
+
+
+	«:url URL|»        open URL in qutebrowser
 
 ## External Viewer
 
@@ -741,7 +770,7 @@ command prompt.
 
                 - ^etags                 Chose tagging method
 
-                - "load_tags"            Load tags from a file
+                - "load_selection"       Load selection from a file
 
                 - ^tree                  display a tree in a popup pane
 
@@ -927,8 +956,8 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
         [[ $REPLY == yes ]] && # reply must be "yes"
                 {
-                # use shred utility and clear the selection tags
-               shred -n 2 -z -u "${selection[@]}" && tags_clear
+                # use shred utility and clear the selection
+                shred -n 2 -z -u "${selection[@]}" && selection_clear
 
                 cdir # reload directory
                 } ||

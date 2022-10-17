@@ -5,9 +5,9 @@ ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licenc
 declare -Ag C bindings kbd_trie key_map ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
 
 my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
-[[ "$1" == '-t' ]] && { tag_read "$@" && shift 2 ; }
+[[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
 
-tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-T' ]] && { tab_read "$@" && shift 2 ; }
+tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
 echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 

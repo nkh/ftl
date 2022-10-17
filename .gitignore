@@ -5,4 +5,5 @@ config/ftl/image_bg.png
 config/ftl/ftlrc
 config/ftl/var
 config/ftl/man/ftl.1
+config/ftl/man/ftl.1.gz
 

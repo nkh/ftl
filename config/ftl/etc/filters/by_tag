@@ -1,0 +1,45 @@
+declare -g -A keep=() PWDS=()
+
+[[ "$1" == load ]] && [[ -e "$pfs/by_tag" ]] && source "$pfs/by_tag" || \
+	{
+	exec 2>&9
+	
+	readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | fzf-tmux $fzf_opt -0 -1 -m -p 30% -h 80%)
+	declare -A tags ; for tag in "${all_tags[@]}" ; do tags[$tag]=1 ; done
+	
+	readarray -t files_and_tags < <(shopt -s dotglob ; tmsu tags * 2>&-)
+	for file_and_tag in "${files_and_tags[@]}"
+		do
+			file_tag_array=($file_and_tag)
+			file="${file_tag_array%%:}" ; 
+			
+			[[ -d "$file" ]] && keep["$tab-$PWD/$file"]=1 && PWDS[$tab-$PWD]=1 && continue
+			
+			for file_tag in "${file_tag_array[@]:1}"
+				do
+					[[ $file_tag =~ ^([^=]+)=+(.+) ]] && file_tag="${BASH_REMATCH[1]}"
+					
+					[[ -n "${tags[$file_tag]}" ]] && keep["$tab-$PWD/$file"]=1 && PWDS[$tab-$PWD]=1
+				done
+		done  
+	
+	exec 2>"$fs/log"
+
+	declare -p keep PWDS >"$pfs/by_tag"
+	}
+
+ftl_filter()
+{
+ftag="~"
+
+[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
+	{
+	while read -r file_data
+		do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat 
+}
+
+# vim: set filetype=sh :

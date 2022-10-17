@@ -1,0 +1,14 @@
+etag_dir()
+{
+declare -g -A tmsu_untags=() ;
+((etag)) &&
+	{
+	readarray -t files < <(unbuffer tmsu untagged | grep -v '/.*/' | sed 's/^.\///')
+	for file in "${files[@]}" ; do tmsu_untags[$file]="  " ; done
+	}
+}
+
+#ᵀ⁝
+etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; (( etag )) && { r2="${tmsu_untags[$1]:-ᵀ }" ; r3=2 ; } ; }
+
+# vim: set filetype=sh :

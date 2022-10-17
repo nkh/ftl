@@ -1,12 +1,12 @@
-leader_test()
+leader_help()
 {
-[[ "$FTL_LTC" ]] && test_cmd="$FTL_LTC" || test_cmd='echo -n ftl: leader_test: variable FTL_LTC not set'
+[[ "$FTL_LTC" ]] && test_cmd="$FTL_LTC" || test_cmd='echo -n ftl: leader_help: variable FTL_LTC not set'
 tmux popup -h 80% -w 80% -d "$PWD" "p='$p' ; n='$n'; $test_cmd"
 }
 
 leader_space_test() { tmux popup "echo -n ftl: leader + space + space" ; }
 
-bind leader test	"LEADER t"		leader_test		"test leader key"
+bind leader test	"LEADER h"		leader_help		"leader help"
 bind leader selection	"LEADER ${A[t]}"	add_selection_to_file	"add selection to file"
 bind leader test	"LEADER LEADER LEADER"	leader_space_test	"test leader + leader + leader"
 

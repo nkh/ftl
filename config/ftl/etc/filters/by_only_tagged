@@ -1,4 +1,4 @@
-filter_tag="~"
+ftag="~"
 ftl_filter()
 {
 while IFS=$'\t' read -a file_data

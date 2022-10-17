@@ -5,7 +5,7 @@
 	declare -p ftl_min_size >"$pfs/by_size"
 	}
 
-filter_tag="~"
+ftag="~"
 
 ftl_filter() 
 {

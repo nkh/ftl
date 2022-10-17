@@ -26,7 +26,7 @@ edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-$
 files()     { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1  -printf '%s\t%T@\t%P\n' 2>&- | ftl_filter | $2 ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg ${filters2[tab]} | { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } | filter2 ; }
 filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
-filter_rst(){ filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
+filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read p ; do fzf_in_tab "$p" && continue ; ${1}_go $in_tab "$P" "$p" ; done<<<"$2" ; }
@@ -46,7 +46,7 @@ inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$?  ; }
 kbdf()      { while read -t 0.01 ; do : ; done ; }
-k_bindings(){ printf '%s\n' "${bindings[@]}" | sort | column -t --table-columns "map,section, key,command," -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
+k_bindings(){ printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "map,section, key,command," -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
 mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
 mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
@@ -111,10 +111,10 @@ tag_set()   { ((stagsi++)) ; [[ ! ${tags[$1]} ]] && { tags[$1]=${2:-▪} ; tags_
 tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
 tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$t" ; ((stagsi++)) ; } ; done ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
-tag_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
+sel_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
 tags_size() { [[ $1 == + ]] && { ((tags_size+=$(stat --printf="%s" "$2"))) ; true ; } || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
 tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" $tags_size ; } ; }
-tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_tags && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }
+tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_selection && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
 tsnew()     { tmux has-session -t ftl$$ &>/dev/null || { tmux new -A -d -s ftl$$ ; sleep 0.2 ; } ; }

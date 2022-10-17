@@ -40,7 +40,7 @@ add_selection_to_file()	{ prompt 'add selection to: ' && [[ $REPLY ]] && { print
 create_bulk()		{ B=$fs/BULK ; >$B ; $EDITOR $B && perl -i -pe 'chomp ; if(length){ if(m-/$-){ $_=qq-mkdir "$_"\n- }else{ $_=qq-touch "$_"\n- } }' $B && bash $B ; cdir ; }
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }
-delete_selection()	{ tag_check && { delete_tag ; true ; } || delete 'delete ?' 'true' "${selection[@]}" ; }
+delete_selection()	{ tag_check && { delete_tag ; true ; } || delete 'delete ?' 'true' "${selection[@]}" ; cdir ; }
 depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && { max_depth[tab]=$REPLY && cdir '' "$f" ; } || list ; }
 editor_detach()		{ ((in_viprev)) && in_viprev= && pane_id= && cdir ; }
 external_mode1()	{ emode=1 ; preview ; }
