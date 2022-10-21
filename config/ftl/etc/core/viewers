@@ -69,7 +69,7 @@ pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$f" "$thumbs/cb
 pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$f" "$thumbs/cbz" ; pw3image "$t" ; }
 
 pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && tmux send -t $pane_id ${C[SIG_REFRESH]} || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
+pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id Å ; } || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 pdir_du()   { ctsplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_ls()   { ctsplit "ls -lsh --group-directories-first --color=always \"$n\" ; read -sn 1000" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }

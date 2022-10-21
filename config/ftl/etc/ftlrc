@@ -206,10 +206,12 @@ bind ftl shell		X		shell_file		"send selection to shell pane"
 bind ftl shell		"${SA[0]}"	shell_synch		"cd to shell pane"
 bind ftl tabs		TAB		tab_next		"next tab"
 bind ftl tabs		"${SA[s]}"	tab_new			"new tab"
-bind ftl tags		1		tag_1			"class 1 tag"
-bind ftl tags		2		tag_2			"class 2 tag"
-bind ftl tags		3		tag_3			"class 3 tag"
-bind ftl tags		4		tag_4			"class 4 tag"
+
+bind ftl tags		F1		tag_1			"class 1 tag"
+bind ftl tags		F2		tag_2			"class 2 tag"
+bind ftl tags		F3		tag_3			"class 3 tag"
+bind ftl tags		F4		tag_4			"class 4 tag"
+
 bind ftl tags		T		tag_fzf_all		"fzf tag files and subdirs"
 bind ftl tags		U		tag_untag_fzf		"untag fzf"
 bind ftl tags		Y		tag_flip_up		"tag up"
@@ -241,10 +243,12 @@ bind ftl view		"${A[v]}"	preview_m1		"alternative preview for : dir, media, pdf,
 bind ftl view		"${SA[v]}"	preview_m2		"alternative preview for : dir, media, pdf, tar, ..."
 # bind ftl view		not_assigned	preview_lock		"preview lock, using external script"
 # bind ftl view		not_assigned	preview_lock_clr	"preview lock clear"
-bind ftl SIG		7		SIG_PANE		"handle pane event"
-bind ftl SIG		8		SIG_REFRESH		"preview pane signal"
-bind ftl SIG		9		SIG_REMOTE		"handle pane preview"
-bind ftl SIG		0		SIG_SYNCH_SHELL		"cd to shell pane"
+
+# don't change, reserved for *ftl*: [ÅåÄ]
+bind ftl SIG		'å'		SIG_PANE		"handle pane event"
+bind ftl SIG		'Å'		SIG_REFRESH		"preview pane signal"
+bind ftl SIG		'Ä'		SIG_REMOTE		"handle pane preview"
+# bind ftl SIG		not assigned		SIG_SYNCH_SHELL		"cd to shell pane"
 
 # Extra Bindings
 for b in $(fd  . "$FTL_CFG/etc/bindings" --type f | sort -u) ; do source "$b" ; done

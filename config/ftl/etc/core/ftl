@@ -67,7 +67,7 @@ pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
-quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane ${C[SIG_PANE]} ; } ; rm -rf $fs ; exit 0 ; }
+quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane å ; } ; rm -rf $fs ; exit 0 ; }
 quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
 cdfl()      { true 2>&- >&3 && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; }
 quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }

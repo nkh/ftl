@@ -5,7 +5,7 @@ OIFS="$IFS" ; IFS=
 
 [[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; } ; OREPLY="$REPLY"
 
-read -rsn 4 -t 0.004 E1 E2 E3 E4
+read -rsn 4 -t 0.002 E1 E2 E3 E4
 
 case "$REPLY$E1$E2$E3$E4" in 
 	$'\e'                           ) REPLY=ESCAPE ;;

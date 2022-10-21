@@ -39,13 +39,15 @@ C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$command]="$
 key_command()
 {
 [[ -n "$key_map"             ]] && { $key_map ; return ; }
-[[ "$REPLY" == ERROR_142     ]] && { keys_command= ; return ; }
+[[ "$REPLY" == ERROR_142     ]] && { keys_command= HAS_COUNT= COUNT= ; return ; }
 [[ "$REPLY" == "?"           ]] && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 
 
-keys_command="$keys_command$REPLY" #; pdhn "<$keys_command> -> ${kbd_trie[$keys_command]}"
+[[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; return ; }
 
-[[ $(type -t "${kbd_trie[$keys_command]}") == function ]] && { ${kbd_trie[$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_command= ; }
+keys_command="$keys_command$REPLY" ; pdhn "[$COUNT] <$keys_command> -> ${kbd_trie[$HAS_COUNT$keys_command]}"
+
+[[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && { ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_command= HAS_COUNT= COUNT= ; }
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
@@ -110,7 +112,7 @@ preview()
 {
 ((main && prev_all || prev_all)) \
 	&& { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
-        || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane ${C[SIG_REMOTE]} &>/dev/null ; return ; }
+        || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane Ä &>/dev/null ; return ; }
 }
 
 setup_finfo()

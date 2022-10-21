@@ -25,10 +25,6 @@ issue: -T not working
 		
 	need to run reset after error
 
-functionality: move vim like commands
-			gh, gm, gl, cd -> gd, gtop, gfile, gbottom, gg, G
-			gt gT
-
 functionality: show setuid files
 
 functionality: tmsu scim
@@ -46,7 +42,6 @@ functionality: commands/shortcuts that open some application split or full scree
 			todo list
 			remind
 			...
-
 
 # Later
 

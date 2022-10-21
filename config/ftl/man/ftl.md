@@ -107,7 +107,9 @@ even start a detached viewer.
 
 See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
 
-## Vim
+## Vim Like Bindings And Vim
+*ftl* shortcuts try to be as vim-like as possible, more vim-like bindings will
+be added.
 
 *ftl* uses the awesome _vim_ for text preview, if it's not your favorite editor
 you can install it just for previewing (and maybe find it awesome). Patches for
@@ -151,27 +153,31 @@ Available etags are:
 
         /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
         1  08/11/2022-12:00 ftl
-           ⮤     etag     ⮥ date 
+
+           ⮤              ⮥ date 
 
         /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
         1  M ftl
         1 ?? doc
+
           ⮤⮥ git-status
 
         /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
         11 1598x2100 image.jpg
         12  720x 507 image.png
-           ⮤ etag  ⮥ image-size
+        
+           ⮤       ⮥ image-size
 
         /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
-        1 ᵀ ftl
-        1   doc
-          ⮤ tmsu tagged
+        1   ftl
+        1 ᵀ doc
+
+          ⮤ tmsu tag
 
 ## Tags
 *ftl* has support for tags via TMSU
 
-## Type handlers
+## Type 
 
 Text files are opened in _vim_.
 
@@ -181,10 +187,12 @@ You can add handlers in _'$FTL_CFG/bindings/type_handlers'_
 
 # KEY BINDINGS
 
-*ftl* uses vim-like key bindings, the bindings can be changed in the default
-ftlrc file but it better to create your own rcfile.
+The bindings can be changed in the default ftlrc file but it's better to createi
+your own rcfile. See example in "# EXAMPLES" below.
 
-## Default bindings
+Reserved for *ftl*: [ÅåÄ]
+
+## Default Bindings
 
 'Alt-gr'+c will open a window listing all the current binding, in _fzf_,
 wich allows you to search per key or name.
@@ -194,14 +202,14 @@ wich allows you to search per key or name.
         ftl    file     c        copy          copy file to, prompts inline
         ...
 
-## Leader key
+## Leader Key
 
 The “Leader key” is a prefix key used to extend *ftl* shortcuts by using
 sequences of keys to perform a command. The default is '\\'
 
         leader_key=SPACE # set LEADER to SPACE
 
-## User defined bindings
+## User Defined Bindings
 
         bind function arguments, all mendatory:
 
@@ -227,9 +235,9 @@ When bindings are shown _alt-gr_ is replaced by _⇑_ and "_shift+alt-gr_
 is replaced by  _⇈_; as well as the key the combination would generate
 that makes it easier to search by name or by binding. 
 
-Available symbolic key name (depending on your OS bindings and terminal) :
+Available symbolic names (depending on your OS bindings and terminal) :
 
-        LEADER
+        LEADER COUNT
 
         AT, BACKSPACE, DEL, ENTER, ESCAPE, INS
 
@@ -242,6 +250,15 @@ Available symbolic key name (depending on your OS bindings and terminal) :
         CTL-A to CTL-Z
 
 See example in "# EXAMPLES" below.
+
+## Binding Commands That Take A Count
+If you prepend symbol "COUNT" in your binding definition, *ftl* will gather the
+count in $COUNT variable before calling your command.
+
+
+	bind test count		"COUNT t"	count_test		""
+
+	count_test() { tmux popup -h90% -w90% -E "echo count = $COUNT | less " ; }
 
 # COMMANDS
 
@@ -264,6 +281,9 @@ See example in "# EXAMPLES" below.
 - External Viewer
 - Shell Pane
 - Command Mode
+
+## Commands That Take A Count
+*pbs*, in this version, has no commands that takes a count but some are planned.
 
 ## General *ftl* Commands
 
@@ -300,13 +320,6 @@ See example in "# EXAMPLES" below.
 
         «¿»             Pdh, pane used for debugging.
 
-        Bindings used internaly by *ftl*
-
-                        Refresh curent pane «r»
-                        Handle pane event   «7»
-                        Preview pane signal «8»
-                        Handle pane preview «9»
-                        Cd to shell pane    «0»
 
 ## Viewing Mode
 
