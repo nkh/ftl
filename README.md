@@ -7,7 +7,7 @@ ftl - file manager using tmux panes and live previews
 
 # DOCUMENTATION
 
-There are many promising file managers for the terminal, from fff to nnn, clifm, ranger, vimfm, broot, etc ... 
+There are many promising file managers for the terminal, from fff to nnn, clifm, ranger, vifm, broot, etc ... 
 
 ftl is Written in Bash, the language that packs a real punch (and sometimes punches you).
 

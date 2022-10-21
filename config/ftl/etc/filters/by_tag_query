@@ -11,7 +11,7 @@ declare -g -A keep=() PWDS=()
 	tac "$ftl_root/tag_query_history" 2>&- | awk '!seen[$0]++' | head -n 15 2>&-
 	echo "# Available tags:"
 	echo
-	tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | column | sed 's/^/# /'
+	tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | sed 's/^/# /'
 	echo
 	echo  "# Example: (mp3 or flac) and not big-jazz"
 	} > $query_file

@@ -25,9 +25,36 @@ issue: -T not working
 		
 	need to run reset after error
 
+functionality: move vim like commands
+			gh, gm, gl, cd -> gd, gtop, gfile, gbottom, gg, G
+			gt gT
+
 functionality: show setuid files
 
+functionality: tmsu scim
+
+functionality: commands/shortcuts that open some application split or full screen
+			not on the current selection but just as applications
+				isn't it better to do that via tmux shortcuts
+
+			some take arguments even if started from shortcut
+
+		user configurable
+		
+		example
+			git commands
+			todo list
+			remind
+			...
+
+
 # Later
+
+functionality: undo deletes via rip
+
+functionality: more vim like shortcuts with double keys ... maybe
+
+functionality: changing files attributes, today x, go doube key, xx, xr, xw - xux, xur, xuw - xgz, xgw, xgr
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 

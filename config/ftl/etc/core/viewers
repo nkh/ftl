@@ -1,16 +1,21 @@
+source "$FTL_CFG/etc/commands/open_with"
+
 ext_viewers()
 {
+((emode == 3))       && { open_with ; return ; }
+
 [[ -d "$n" ]]        && { ext_dir   ; return ; }
 [[ $e =~ html ]]     && { ext_html  ; return ; }
 [[ $e =~ $ifilter ]] && { ext_image ; return ; }
 [[ $e =~ $mfilter ]] && { ext_media ; return ; }
 [[ $e == pdf ]]      && { ext_pdf   ; return ; }
+[[ $e == sc ]]       && { ext_scim  ; return ; }
 
 mime_get
 
 [[ $e =~ ^json|yml$ || $mtype =~ ^text ]] && [[ -s "$n" ]] && { ext_text ; return ; }
 
-ext_with
+open_with
 }
 
 
@@ -35,6 +40,7 @@ pviewers()
 [[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
 [[ -p "$n" ]]                     && { ppipe     ; return ; }
 [[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
+[[ $e == sc ]]                    && { pscim     ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
 mime_get ; is_bin "$n"
@@ -53,6 +59,7 @@ ext_media()    { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev
 ext_pdf()      { ((emode == 1)) && ext_pdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) && true ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } ; }
 ext_pdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
 ext_text()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
+ext_scim()     { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
@@ -83,6 +90,9 @@ ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
 pman()      { ctsplit "man \"$n\" ; read -sn 1000" ; true ; }
+
+pscim()     { ctsplit "scim \"$n\" ; read -sn100" ; }
+
 pcomp()     { [[ $e == zip ]] && _pcomp unzip -l || { [[ $e == rar ]] && _pcomp unrar list ; } || { [[ $f =~ \.tar ]] && _pcomp tar --list --verbose -f ; } ; }
 _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@" "$f" >"$fp" ; vipreview "$fp" ; } ; }
 

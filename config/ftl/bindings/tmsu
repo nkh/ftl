@@ -46,6 +46,7 @@ tcpreview
 tag_file="$(mktemp -p $fs ftl_tmsu_tag_XXXXXXX)"
 
 tmsu tags "${selection[@]}" 2>&- > $tag_file
+{ echo ; tmsu tags 2>&- | sort -u | sed 's/^/# /' ; } >> $tag_file
 
 vi +start +"norm! gg$" $tag_file && 
 	{
