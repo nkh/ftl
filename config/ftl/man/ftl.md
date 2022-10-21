@@ -382,6 +382,7 @@ count in $COUNT variable before calling your command.
 
         «⇈s/§»             New tab 
 
+        «gt»               Next tab 
         «TAB»              Next tab 
 
 ## Moving around
@@ -411,12 +412,12 @@ count in $COUNT variable before calling your command.
         «PGDN»             Page down                         
         «PGUP»             Page up                           
 
-        «g»                Move to:                           
-                                  - top
-                                  - first file
-                                  - last file
+        «gd»               Move to first directory
+        «gg»               Move to first file
+        «G»                Move to las file
+	«g LEADER»         cycle between top/file/bottom
 
-        «G»                CD, *ftl* prompts you for a path, the promt has path completions.
+        «gD»               CD, *ftl* prompts you for a path, with path completions.
                            You can also change directory with bookmarks or by searching for it
 
         «ö»                Next entry of same extension      

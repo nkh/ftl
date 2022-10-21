@@ -20,6 +20,9 @@ enter()			{ ((nfiles)) && { { [[ -f "${files[file]}" ]] && edit ; } || { [[ -d "
 move_page_up()		{ move -$LINES ; list ; }
 move_page_down()	{ move $LINES ; list ; }
 top_file_bottom()	{ twd="${tab}_$PWD" ; [[ -f "$n" ]] && { (($file == $nfiles - 1)) && dir_file[$twd]=0 || dir_file[$twd]=$nfiles ; } || dir_file[$twd]=$first_file ; list ; }
+goto_first_directory()	{ twd="${tab}_$PWD" ; (($nfiles)) && dir_file[$twd]=0 ; list ; }
+goto_first_file()	{ twd="${tab}_$PWD" ; (($nfiles)) && dir_file[$twd]=$first_file ; list ; }
+goto_last_file()	{ twd="${tab}_$PWD" ; (($nfiles)) && dir_file[$twd]=$nfiles ; list ; }
 goto_alt1()		{ to_search=".$e" ; R="${C[find_next]}" ; }
 goto_alt2()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ ! "${files[i]##*/}" =~ ".$e" ]] && { list $i ; return ; } ; done ; list ; }
 preview_down()		{ ((in_viprev)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ; }
