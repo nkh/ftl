@@ -361,18 +361,17 @@ count in $COUNT variable before calling your command.
         not assigned       Preview lock clear
 
 ## Panes
+        «CTL-W s»                New ftl pane below 
 
-        «_»                New ftl pane below 
+        «CTL-W l»                New ftl pane left 
 
-        «|»                New ftl pane left 
+        «CTL-W L»                New ftl pane left, keep focus 
 
-        «>»                New ftl pane left, keep focus 
+        «CTL-W v»                New ftl pane right 
 
-        «¦»                New ftl pane right 
+        «CTL-W V»                New ftl pane right, keep focus 
 
-        «<»                New ftl pane right, keep focus 
-
-        «-»                Set focus on the next pane
+        «gp»                Set focus on the next pane
 
 ## Tabs
 
@@ -416,6 +415,8 @@ count in $COUNT variable before calling your command.
         «gg»               Move to first file
         «G»                Move to las file
 	«g LEADER»         cycle between top/file/bottom
+	«gh»               position cursor on the first file in the window
+	«gl»               position cursor on the last file in the window
 
         «gD»               CD, *ftl* prompts you for a path, with path completions.
                            You can also change directory with bookmarks or by searching for it
@@ -659,7 +660,7 @@ count in $COUNT variable before calling your command.
 
         «⇈l/Ł»             Symlink follow    
 
-        «x»                Flip selection executable bit 
+        «xx»               Flip selection executable bit 
 
 ## External Commands
 
@@ -667,7 +668,7 @@ count in $COUNT variable before calling your command.
 
         «LEADER f c»       Compress/decompress            
 
-        «LEADER f t»       ivim diff two selected files                 
+        «LEADER f t»       vim diff two selected files                 
 
         «LEADER f P»       Convert pdf to text file       
 
@@ -734,11 +735,11 @@ count in $COUNT variable before calling your command.
                 extra viewers are in'$FTL_CFG/viewers'
                 
 ## Shell Pane
-        «s»                Shell pane
+        «CTL-W Ss» or «s»  Shell pane
 
-        «S»                Shell pane with selected files 
+        «CTL-W SS»          Shell pane with selected files 
 
-        not assigned       Shell pane, zoomed out 
+        «CTL-W Z»          Shell pane, zoomed out 
 
         «⇈0/°»             Cd shell pane to ftl directory
 
@@ -803,7 +804,7 @@ are run by default.
 
         «:»                    Command  prompt, command [args]
 
-        «!»                    Switch to session-shell pane 
+        «CTL-W !»              Switch to session-shell pane 
 
         «tmux-prefix+L»        Switch back from tmux pane 
 

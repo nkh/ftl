@@ -27,8 +27,6 @@ issue: -T not working
 
 functionality: show setuid files
 
-functionality: tmsu scim
-
 functionality: commands/shortcuts that open some application split or full screen
 			not on the current selection but just as applications
 				isn't it better to do that via tmux shortcuts
@@ -42,6 +40,11 @@ functionality: commands/shortcuts that open some application split or full scree
 			todo list
 			remind
 			...
+
+functionality: interactive file attribute changing
+		external script using scim
+
+functionality: tmsu scim
 
 # Later
 
