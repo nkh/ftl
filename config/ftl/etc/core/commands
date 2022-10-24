@@ -5,7 +5,7 @@ goto_prev_tag()		{ (( ${#tags[@]} )) && { [[ -z $ctag ]] && ctag=0 || ((ctag--))
 
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
-ftl_help()		{ tmux popup -h90% -w90% -E "$help_command" ; }
+ftl_help()		{ tcpreview ; exec 2>&9 ; $help_command ; exec 2>"$fs/log" ; }
 move_left()		{ [[ "$PWD" != / ]]  && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
 move_down()		{ ((nfiles)) && { move 1 && list ; } ; }

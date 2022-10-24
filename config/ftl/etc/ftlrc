@@ -1,16 +1,16 @@
 # Directories
-pgen="$FTL_CFG/etc/generators" #location of preview generators
-ftl_root=$FTL_CFG/var # runtime directory, every session gets a directory here
+pgen="$FTL_CFG/etc/generators"          #location of preview generators
+ftl_root=$FTL_CFG/var                   # runtime directory, every session gets a directory here
 mkdir -p $ftl_root
 
-ftl_cmds=$ftl_root/cmds # history of shell commands
-ghist=$ftl_root/history # global history file
+ftl_cmds=$ftl_root/cmds                 # history of shell commands
+ghist=$ftl_root/history                 # global history file
 touch $ftl_cmds $ghist
 
-thumbs=$ftl_root/thumbs #where preview generators cache the previews
-mkdir -p $thumbs # make sure the directory exists
+thumbs=$ftl_root/thumbs                 # where preview generators cache the previews
+mkdir -p $thumbs                        # make sure the directory exists
 
-help_command="man \"$FTL_CFG/man/ftl.1\"" # command to run to show help, see # Vim in man page
+help_command="man ftl.1"                # command to run to show help, see # Vim in man page
 
 # Bookmarks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
