@@ -54,6 +54,8 @@ functionality: vim like shortcuts
 			Files and directories are filtered separately.
 				append a slash to directory filter
 
+issue: preview_image not found #bind ftl view		zmI		preview_image		"show/hide image preview"
+
 # Later
 
 functionality: undo deletes via rip

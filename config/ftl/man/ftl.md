@@ -316,14 +316,14 @@ count in $COUNT variable before calling your command.
                         current directory. It's sometimes practical but using multiple
                         tabs or panes is more ergonomic.
 
-        «⇑t/þ»          Copy selection to clipboard, full path, separated with by a space.
+        «yc»            Copy selection to clipboard, full path, separated with by a space.
 
         «¿»             Pdh, pane used for debugging.
 
 
 ## Viewing Mode
 
-        «⇑s/ß»             Show size (circular)
+        «zs»               Show size (circular)
                                   - no size
                                   - only files
                                   - file size and directory entries
@@ -331,27 +331,27 @@ count in $COUNT variable before calling your command.
 
         «z.»               Show/hide dot-files.
         
-        «^»                Show/hide stat, entry stat is added to the header.
+        «zg»               Show/hide stat, entry stat is added to the header.
 
         «zt»               Show/hide etags, see "Select etag type" below.
 
-        «)»                File/dir view mode (circular)
+        «zmv»              File/dir view mode (circular)
                                   - only files
                                   - only directories
                                   - files and directories
 
-        «M»                View mode (circular)
+        «zmi»              View mode (circular)
                                   - filter out images
                                   - filter out non images
                                   - show all files
 
-        «⇑m/µ»             Montage mode, directory preview is a montage of the images.
+        «zmp»              Montage mode, directory preview is a montage of the images.
 
-        «⇈m/º»             Refresh preview or montage.
+        «zmP»              Refresh preview or montage.
 
-        «=»                Preview directory only/all. 
+        «zmd»              Preview directory only/all. 
 
-        «"»                Show/hide image preview.
+        «zmI»              Show/hide image preview.
 
         «zep»              Show/hide current extension preview.
 
@@ -440,11 +440,11 @@ count in $COUNT variable before calling your command.
 
 ## Preview
 
-        «v»                Preview show/hide      
+        «zv»               Preview show/hide      
 
-        «+»                Change preview size, see rc file predefined sizes
+        «+» «z+»           Change preview size, see rc file predefined sizes
 
-        «V»                Preview current entry once (if preview pane is close)
+        «zV»               Preview current entry once (if preview pane is close)
 
         Some entry have multiple preview types, these bindings let you
         to see the other type of preview.
@@ -460,20 +460,20 @@ count in $COUNT variable before calling your command.
         «⇈v/‘»                Alternative preview #2 
 
 
-        not assigned          Preview file's end (text files in vim)
-
         «⇑x/»»                Hexadecimal preview    
+
+        not assigned          Preview file's end (text files in vim)
 
 ## Sorting 
 
-        «o»                Set sort order :
+        «zo»               Set sort order :
                                 - alphanumeric
                                 - size
                                 - date
 
-        «O»                Reverse sort order 
+        «zO»               Reverse sort order 
 
-        «⇑f/đ»             Choose  sort order from external sorts 
+        «zE»               Choose  sort order from external sorts 
 
 ## Filtering
 
@@ -511,7 +511,7 @@ count in $COUNT variable before calling your command.
                         
         «zc»               Clear all filters 
                         
-        «zE»             Choose filter from external filters 
+        «zE»               Choose filter from external filters 
                         
         «zr»               Set reverse-filter 
                         
@@ -561,28 +561,28 @@ count in $COUNT variable before calling your command.
         Multiple selection classes are available, *ftl* will ask which class
         to use. The number of entries is displayed in the header.
 
-        «y»                Select current entry in "normal" class and move down
+        «yy»               Select current entry in "normal" class and move down
 
-        «Y»                Select current entry in "normal" class and move up
+        not_assigned       Select current entry in "normal" class and move up
 
-        «1» «2» «3»        Select current entry in given class and move down.
+        «y1» «y2» «y3»     Select current entry in given class and move down.
 
-        «4»                Select current entry in D class and move down.
+        «y4»               Select current entry in D class and move down.
                 
-        «⇑y/←»             Select all the files in the current directory
+        «yf»               Select all the files in the current directory
 
-        «⇈y/¥»             Select all files and subdirs in the current directory
+        «ya»               Select all files and subdirs in the current directory
 
-        «t»                Open fzf to select files, multiple selection is possible.
+        «yF»               Open fzf to select files, multiple selection is possible.
 
-        «T»                Open fzf to select files and sub directories.
+        «yA»               Open fzf to select files and sub directories.
 
-        «u»                Deselect all files and directories, including those in other
+        «yu»               Deselect all files and directories, including those in other
                            directories.
 
-        «U»                Opens fzf to let you choose which entries to deselect.
+        «yU»               Opens fzf to let you choose which entries to deselect.
 
-        «⇑g/ŋ»             Opens fzf to choose an entry in the selection, then
+        «gy»               Opens fzf to choose an entry in the selection, then
                            changes directory to where the selection is.
 
                            This is handy when selections are read from a file with option
