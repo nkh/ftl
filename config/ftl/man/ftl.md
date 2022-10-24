@@ -108,8 +108,8 @@ even start a detached viewer.
 See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
 
 ## Vim Like Bindings And Vim
-*ftl* shortcuts try to be as vim-like as possible, more vim-like bindings will
-be added.
+*ftl* shortcuts has vim-like as possible, tips for better bindings are always
+welcome. Not so vim like bindings can be found in file _ftl_not_so_vim_like_.
 
 *ftl* uses the awesome _vim_ for text preview, if it's not your favorite editor
 you can install it just for previewing (and maybe find it awesome). Patches for
@@ -304,9 +304,9 @@ count in $COUNT variable before calling your command.
 
         «Q»             Quit all, closes all tabs and panes at once.
 
-        «⇑q/@»          Quit, quit all but doesn't close the shell pane if one exists.
+        «ZS»            Quit, quit all but doesn't close the shell pane if one exists.
 
-        «⇈q/Ω»          Quit, doesn't close the preview pane if one exists and zooms it.
+        «ZP»            Quit, doesn't close the preview pane if one exists and zooms it.
 
         «$»             Detach the preview from ftl, open a new preview pane.
 
@@ -329,11 +329,11 @@ count in $COUNT variable before calling your command.
                                   - file size and directory entries
                                   - file size and directory sizes
 
-        «.»                Show/hide dot-files.
+        «z.»               Show/hide dot-files.
         
         «^»                Show/hide stat, entry stat is added to the header.
 
-        «⇑./·»             Show/hide etags, see "Select etag type" below.
+        «zt»               Show/hide etags, see "Select etag type" below.
 
         «)»                File/dir view mode (circular)
                                   - only files
@@ -353,7 +353,7 @@ count in $COUNT variable before calling your command.
 
         «"»                Show/hide image preview.
 
-        «#»                Show/hide current extension preview.
+        «zep»              Show/hide current extension preview.
 
         «⇈i/ı»             Fzfi, use fzf and ueberzurg to find and display images
 
@@ -383,6 +383,8 @@ count in $COUNT variable before calling your command.
 
         «gt»               Next tab 
         «TAB»              Next tab 
+        «COUNT gt»         Goto tab
+        «gT»               Previous tab
 
 ## Moving around
 
@@ -406,20 +408,22 @@ count in $COUNT variable before calling your command.
         «UP»               Up to previous entry              
 
         «l»                cd into entry                     
-        «RIGHT»                cd into entry                     
+        «RIGHT»            cd into entry                     
 
-        «PGDN»             Page down                         
-        «PGUP»             Page up                           
+        «PGDN» «CTL-F»     Page down                         
+        «PGUP» «CTL-B»     Page up                           
 
         «gd»               Move to first directory
         «gg»               Move to first file
         «G»                Move to las file
-	«g LEADER»         cycle between top/file/bottom
-	«gh»               position cursor on the first file in the window
-	«gl»               position cursor on the last file in the window
+        «g LEADER»         cycle between top/file/bottom
+        «gh»               position cursor on the first file in the window
+        «gl»               position cursor on the last file in the window
 
         «gD»               CD, *ftl* prompts you for a path, with path completions.
                            You can also change directory with bookmarks or by searching for it
+
+        «COUNT %»          position cursor iat COUNT percent in the entries
 
         «ö»                Next entry of same extension      
 
@@ -501,15 +505,15 @@ count in $COUNT variable before calling your command.
                         filter #1/#2/reverse. The filters directory contains ten external
                         filters you can load with shortcut «⇑f/đ». 
                         
-        «f»                Set filter #1 
+        «zf»               Set filter #1 
 
-        «F»                Set filter #2 
+        «zF»               Set filter #2 
                         
-        «⇑d/ð»             Clear all filters 
+        «zc»               Clear all filters 
                         
-        «⇑f/đ»             Choose filter from external filters 
+        «zE»             Choose filter from external filters 
                         
-        «⇑a/ª»             Set reverse-filter 
+        «zr»               Set reverse-filter 
                         
                            Filters out what you don't want to see. Applied after other
                            filters are applied. It can be set in your ftlrc file.
@@ -521,11 +525,11 @@ count in $COUNT variable before calling your command.
                            eg: always hide vim swap files, set by default in _ftlrc_
                                 rfilter0='\.sw.$'
                         
-        «¤»                Hide files having the same extention as the current file, per tab
+        «zee»              Hide files having the same extention as the current file, per tab
 
-        «%»                Hide files having the same extention as the current file, global 
+        «zeE»              Hide files having the same extention as the current file, global 
                         
-        «&»                Show all hidden extensions 
+        «zec»              Show all hidden extensions 
 
 ## Searching
 
@@ -589,7 +593,7 @@ count in $COUNT variable before calling your command.
         «⇈0/°»             Fzf merge selection from panes 
 
 ## Etags
-        «⇈./˙»             Select etag type from list
+        «zT»             Select etag type from list
 
 ## Tags
 
@@ -646,7 +650,7 @@ count in $COUNT variable before calling your command.
 
         «d»                Delete selection, uses configuration *RM* variable, see ftlrc.
 
-        «c»                Copy entry        
+        «w»                Copy entry        
 
         «p»                Copy selection    
 
@@ -654,11 +658,11 @@ count in $COUNT variable before calling your command.
 
         «⇈p/þ»             Move selection to, Uses _fzf_mv_.
 
-        «R»                Rename selection.
+        «cw»               Rename selection.
 
         «⇑l/ł»             Symlink selection 
 
-        «⇈l/Ł»             Symlink follow    
+        «gL»               Goto symlinked file     
 
         «xx»               Flip selection executable bit 
 
@@ -672,7 +676,7 @@ count in $COUNT variable before calling your command.
 
         «LEADER f P»       Convert pdf to text file       
 
-        «LEADER f s»       Display stat in preview pane   
+        «CTL-G»            Display stat in preview pane   
 
         «LEADER f z»       Encrypt/decrypt using password 
 
@@ -713,17 +717,16 @@ count in $COUNT variable before calling your command.
 
         «⇑e/€»             External viewer, mode #3 
 
-        «⇈e/¢»             External viewer, mode #4 
+        «⇈e/¢»             Fzf choose viewer 
+
 
         Music has a sound preview mode #1, it lets you play a file in the 
         background. you can stop it when you want or it stops when you
         leave *ftl*. Modes #2-#4 open _G_PLAYER_ which is _vlc_ by default.
 
-        «a»                Kill sound preview 
+        «a»                background sound preview        
 
-        «w»                run viewer        
-
-        «W»                Fzf choose viewer 
+        «A»                Kill sound preview 
 
         The viewer for music queues the files in cmus. I recommend adding
         a binding for cmus in *tmux* to access the application easilly.

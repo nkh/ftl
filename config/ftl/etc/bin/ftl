@@ -43,7 +43,7 @@ key_command()
 [[ "$REPLY" == "?"           ]] && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 
 
-[[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; return ; }
+[[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 
 keys_command="$keys_command$REPLY" ; pdhn "[$COUNT] <$keys_command> -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
@@ -72,7 +72,7 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
 	((show_size)) && { ((sum += size, pl += 5)) ; [[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="     $pc" ; true ; } \
 			 || { for u in '' K M G T ; do ((size < 1024)) && printf -v pc "\e[94m%4s\e[m $pc" $size$u && break ; ((size/=1024)) ; done  ; } ; }
-	((show_line)) && { ((line++)) ; printf -v pc "$line_color%-${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += 4)) ; }
+	((show_line)) && { ((line++)) ; printf -v pc "$line_color%${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += $pad + 1)) ; }
 
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((pl > (COLS - 1))) && { [[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }

@@ -24,7 +24,7 @@ enter()
 ftl_event_quit() { unmount_archives ; umount "$tmsu_mp" ; rm -rf "$tmsu_mp" ;}
 
 mount_archive()    { mpt="$fs/mnt/${1}_#" ; { [[ -e "$mpt" ]] || { mkdir -p "$mpt" && fuse-archive -o allow_other "$1" "$mpt" && ftl_mount_points+=("$mpt") ; } && cdir "$mpt" ; } ; }
-unmount_archives() { for mpt in "${ftl_mount_points[@]}" ; fusermount -uz "$mpt" ; done ; }
+unmount_archives() { for mpt in "${ftl_mount_points[@]}" ; do fusermount -uz "$mpt" ; done ; }
 exit_archive()     { nd="${PWD#$fs/mnt}" ; nd=${nd%_mnt_root} ; cdir "$(dirname "$nd")" ; }
 
 # vim: set filetype=bash :

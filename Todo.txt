@@ -46,6 +46,14 @@ functionality: interactive file attribute changing
 
 functionality: tmsu scim
 
+functionality: vim like shortcuts
+			^O  go backwards through directory history
+
+			?regular expression backwards
+
+			Files and directories are filtered separately.
+				append a slash to directory filter
+
 # Later
 
 functionality: undo deletes via rip
