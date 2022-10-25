@@ -95,6 +95,7 @@ preview_pane()		{((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
 preview_once()		{ preview=1 ; tcpreview ; sleep 0.05 ; cdir ; geo_winch ; }
 preview_dir_only()	{ [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ; }
 preview_ext_ign()	{ [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ; }
+preview_image()		{ ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; cdir ; } 
 extension_hide_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
 extension_hide()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
 extension_clear()	{ lignore=() ; cdir ; }

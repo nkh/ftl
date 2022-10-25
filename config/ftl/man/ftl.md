@@ -143,7 +143,7 @@ configuration file, added in the current session and made persistent.
 ## Selection
 
 You can select multiple entries, the selection is synchronized between panes
-when option _auto_election is set (set by default). 
+when option _auto_selection is set (set by default). 
 
 ## Etags
 
@@ -632,13 +632,13 @@ count in $COUNT variable before calling your command.
         *ftl* keeps two location histories, one for the current session and one
         global.
 
-        «⇑h/ħ» «¨»         Fzf history all sessions, open multiple tabs with «ctrl-t»
+        «⇑h/ħ+h» «¨»       Fzf history all sessions, open multiple tabs with «ctrl-t»
 
         «H»                Fzf history current session, open multiple tabs with «ctrl-t»
 
-        «⇈h/Ħ»             Uses fzf to mark entries that will be removed from the history
+        «⇑h/ħ+e»           Uses fzf to mark entries that will be removed from the history
 
-        «⇈d/Ð»             Delete all session history 
+        «⇑h/ħ+d»           Delete all session history 
 
 ## File and directory operations
 
@@ -724,9 +724,9 @@ count in $COUNT variable before calling your command.
         background. you can stop it when you want or it stops when you
         leave *ftl*. Modes #2-#4 open _G_PLAYER_ which is _vlc_ by default.
 
-        «a»                background sound preview        
+        «aa»               background sound preview        
 
-        «A»                Kill sound preview 
+        «aq»               Kill sound preview 
 
         The viewer for music queues the files in cmus. I recommend adding
         a binding for cmus in *tmux* to access the application easilly.

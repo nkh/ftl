@@ -19,12 +19,6 @@ presentation:
 
 functionality: add tagging program  TMSU  support
 
-issue: -T not working
-		ftl -T "/usr/local/man /usr/local/share/man /usr/share/man"
-		ftl -T /usr/local/man -T /usr/local/share/man -T /usr/share/man
-		
-	need to run reset after error
-
 functionality: show setuid files
 
 functionality: commands/shortcuts that open some application split or full screen
@@ -49,12 +43,14 @@ functionality: tmsu scim
 functionality: vim like shortcuts
 			^O  go backwards through directory history
 
-			?regular expression backwards
-
 			Files and directories are filtered separately.
 				append a slash to directory filter
 
-issue: preview_image not found #bind ftl view		zmI		preview_image		"show/hide image preview"
+issue: -T not working
+		ftl -T "/usr/local/man /usr/local/share/man /usr/share/man"
+		ftl -T /usr/local/man -T /usr/local/share/man -T /usr/share/man
+		
+	need to run reset after error
 
 # Later
 
