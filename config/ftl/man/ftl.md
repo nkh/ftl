@@ -6,7 +6,7 @@ ftl - terminal file manager, hyperorthodox, with live previews
 
 ftl
 
-ftl [ [-t file] [-T file] ][directory[/file]]
+ftl [ [-s file] [-T file] ] [directory[/file]]
 
 # OPTIONS
 
@@ -15,7 +15,7 @@ ftl [ [-t file] [-T file] ][directory[/file]]
                 eg: ftl -s <(find -name 'ftl*') 
 
 -t file         file contains paths to files to show in own tab, must come
-                after optionial _-t_ 
+                after _-s_ if any
 
                 eg: ftl -t <(find -name 'ftl*') 
 
@@ -108,8 +108,8 @@ even start a detached viewer.
 See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
 
 ## Vim Like Bindings And Vim
-*ftl* shortcuts has vim-like as possible, tips for better bindings are always
-welcome. Not so vim like bindings can be found in file _ftl_not_so_vim_like_.
+*ftl* bindings are vim-like, tips for better bindings are always welcome.
+Look at _ftl_not_so_vim_like_ in the distributions for less vim-like bindings.
 
 *ftl* uses the awesome _vim_ for text preview, if it's not your favorite editor
 you can install it just for previewing (and maybe find it awesome). Patches for
@@ -608,6 +608,8 @@ count in $COUNT variable before calling your command.
         «LEADER t q»       filter based on tmsu tags or query
 
         «LEADER t r»       filter based on tmsu tags via fzf
+
+        «LEADER t s»       sc-im interface to tmsu tags
 
         «LEADER t t»       tag selection
 

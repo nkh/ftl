@@ -7,19 +7,7 @@ issue: inotify, focuses main! resize missed when pane is closed
 
 issue: space in names when passing env var to shell
 
-presentation:
-	Reduce videos size with H265 encodigng
-
-	script:
-		Introduction
-			what's in the name
-			credit to other
-			status
-			detail videos
-
-functionality: add tagging program  TMSU  support
-
-functionality: show setuid files
+functionality: Directories filter, append a slash to directory filter
 
 functionality: commands/shortcuts that open some application split or full screen
 			not on the current selection but just as applications
@@ -35,22 +23,18 @@ functionality: commands/shortcuts that open some application split or full scree
 			remind
 			...
 
-functionality: interactive file attribute changing
-		external script using scim
+presentation:
+	Reduce videos size with H265 encodigng
 
-functionality: tmsu scim
+	script:
+		Introduction
+			what's in the name
+			credit to other
+			status
+			detail videos
 
-functionality: vim like shortcuts
-			^O  go backwards through directory history
+functionality: interactive file attribute changing, external script using scim
 
-			Files and directories are filtered separately.
-				append a slash to directory filter
-
-issue: -T not working
-		ftl -T "/usr/local/man /usr/local/share/man /usr/share/man"
-		ftl -T /usr/local/man -T /usr/local/share/man -T /usr/share/man
-		
-	need to run reset after error
 
 # Later
 

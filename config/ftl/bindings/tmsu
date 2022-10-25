@@ -75,6 +75,13 @@ for F in "${selection[@]}" ; do tmsu tag "$F" "${new_tags[@]}" 2>&- ; done
 cdir
 }
 
+tmsu_tag_scim()
+{
+tcpreview
+# ctsplit "$FTL_CFG/etc/bin/scim_tmsu" ; tmux selectp -t $pane_id 
+exec 2>&9 ; "$FTL_CFG/etc/bin/scim_tmsu" ; exec 2>"$fs/log"
+}
+
 tmsu_mount()
 {
 tmsu_mp="/tmp/ftl/mnt/tmsu_$$"
@@ -119,6 +126,7 @@ bind tmsu tag	"LEADER t LEADER"	tmsu_preview		"show tmsu tags"
 bind tmsu tag	"LEADER t e"		tmsu_filter_query	"tmsu tag filter via query"
 bind tmsu tag	"LEADER t g"		tmsu_goto		"tmsu goto via fzf"
 bind tmsu tag	"LEADER t f"		tmsu_tag_fzf		"tmsu tag selection via fzf"
+bind tmsu tag	"LEADER t s"		tmsu_tag_scim		"tmsu tag selection via scim"
 bind tmsu tag	"LEADER t m"		tmsu_mount		"tmsu mount"
 bind tmsu tag	"LEADER t r"		tmsu_filter		"tmsu tag filter via fzf"
 bind tmsu tag	"LEADER t t"		tmsu_tag		"tmsu tag selection"
