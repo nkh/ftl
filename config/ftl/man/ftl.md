@@ -710,8 +710,7 @@ count in $COUNT variable before calling your command.
         key bindings set the _emode_ variable and an external viewer decide how
         to display an entry, that may be in a text based application or not.
 
-        *ftl* had a some viewers for images, videos, comics, directories
-        containing media, mp3, ...
+        *ftl* had a some viewers for images, videos, comics, ...
 
         «e»                External viewer, mode #1 
 
@@ -719,21 +718,21 @@ count in $COUNT variable before calling your command.
 
         «⇑e/€»             External viewer, mode #3 
 
-        «⇈e/¢»             Fzf choose viewer 
+        «aA»               Fzf choose viewer 
 
+        Music viewers
 
-        Music has a sound preview mode #1, it lets you play a file in the 
-        background. you can stop it when you want or it stops when you
-        leave *ftl*. Modes #2-#4 open _G_PLAYER_ which is _vlc_ by default.
+        «aa» «e»           Background sound preview, stops *ftl* closes.
 
-        «aa»               background sound preview        
+        «ak»               Kill sound preview 
 
-        «aq»               Kill sound preview 
+        «E» «⇑e/€»         Open _G_PLAYER_ which is _vlc_ by default.
 
-        The viewer for music queues the files in cmus. I recommend adding
-        a binding for cmus in *tmux* to access the application easilly.
+        «aq»               Queue entries in music player. default to cmus.
 
-        Creating and using a viewer:
+                           You can binding cmus in *tmux* for easy access.
+
+        Creating you own viewer:
 
                 core viewers are in '$FTL_CFG/etc/core/viewers/ftl'
 
@@ -742,7 +741,7 @@ count in $COUNT variable before calling your command.
 ## Shell Pane
         «CTL-W Ss» or «s»  Shell pane
 
-        «CTL-W SS»          Shell pane with selected files 
+        «CTL-W SS»         Shell pane with selected files 
 
         «CTL-W Z»          Shell pane, zoomed out 
 
@@ -770,7 +769,7 @@ command prompt.
 
         «:»                Command prompt   
 
-        «LEADER u»               Run user command 
+        «LEADER u»         Run user command 
 
         the scripts are either
                 - bash scripts that are sourced (can change *ftl* state)
@@ -778,7 +777,7 @@ command prompt.
 
         Look in $FTL_CFG/etc/commands/XX_example for documentation.
 
-- from the command prompt
+From the command prompt
 
         «:»                Command prompt 
 
@@ -807,11 +806,11 @@ command prompt.
 *ftl* has one _session-shell_, a pane running bash, where your external commands
 are run by default.
 
-        «:»                    Command  prompt, command [args]
+        «:»                Command  prompt, command [args]
 
-        «CTL-W !»              Switch to session-shell pane 
+        «CTL-W !»          Switch to session-shell pane 
 
-        «tmux-prefix+L»        Switch back from tmux pane 
+        «tmux-prefix+L»    Switch back from tmux pane 
 
         Selection an shells:
         
@@ -840,28 +839,55 @@ are run by default.
 
                 *finfo* can also be used in the default shell  
         
+        "${selection[@]}" and "$n" (the current entry) can also be used in commands.
+
+Running commands in a separate shell pane in the *ftl* session
+
         *fsh* command [command args]
         
-        Run you commands in a separate shell pane in the *ftl*
-        session, eg: when commands that take time to complete.
+	Can be used when commands that take a long time to complete.
                 
         The shell pane is closed if the command exit code is 0. 
+
+Running commands in the current window
+
+        You can split windows with tmux commands or you can use _full_ and _split_ which
+        give you access to _finfo_.
+
+                *full*  command [command args]
+
+                *split* command [command args]
+
+Command aliases
         
-                                                   run command in:
+        *ftl* checks for aliases in the _cmd_aliases_ array defined
+        in _ftlrc_.
+
+                declare -A cmd_aliases=([csx]="split finfo | xargs -0" [cfx]="full finfo | xargs -0")
+
+Examples
+                                                       run command in:
         
-        «:» command                                default shell
+        «:» command                                    default shell
 
-        «:» fsh command                            own shell
+        «:» fsh command                                own shell
 
-        «:» finfo | xargs -0 command               default shell, one command for all selection
+        «:» finfo | xargs -0 command                   default shell, one command for all selection
 
-        «:» finfo | xargs -0 -n1 command           default shell, one command per selection
+        «:» finfo | xargs -0 -n1 command               default shell, one command per selection
 
-        «:» fsh finfo | xargs -0 command           own shell, one command for all selection
+        «:» fsh finfo | xargs -0 command               own shell, one command for all selection
 
-        «:» fsh finfo | xargs -0 -n1 command       own shell, one command per selection
+        «:» fsh finfo | xargs -0 -n1 command           own shell, one command per selection
 
-        «:» finfo | xargs -0 -n1 fsh command       one shell per selection
+        «:» finfo | xargs -0 -n1 fsh command           one shell per selection
+
+        «:» split finfo | xargs -0 echo ; read -sn1    split window
+
+        «:» csx echo ; read -sn1                       split window, using an alias
+
+        «:» full finfo | xargs -0 echo ; read -sn1     full screen
+
 
 # FILES
 

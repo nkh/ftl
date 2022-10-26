@@ -51,7 +51,7 @@ mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
 mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }
-player_k()  { ((player)) && { kill $player &>/dev/null ; player= ; } ; }
+player_k()  { ((mplayer)) && { kill $mplayer &>/dev/null ; mplayer= ; } ; }
 pane_extra(){ echo "${ofs:-$fs}" >$fsp/fs ; pane_ftl "'$n' $pfs" "$1" "$2" ; sleep 0.05 ; rdir ; tmux selectp -t $new_pane ; echo -e "\e[H\e[K" ; header '2' "$head" ; }
 pane_ftl()  { pane_read ; tcpreview ; tsplit "prev_all=0 ftl $1" 30% "$2" $3 ; panes+=($pane_id) ; new_pane=$pane_id ; pane_id= ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | sponge $pfs/panes ; tmux send -t ${panes[0]} ${C[quit_ftl]} 2>&- ; sleep 0.03 ; } ; }

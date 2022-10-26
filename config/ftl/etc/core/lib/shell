@@ -19,8 +19,7 @@ shell_command()
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 
 # split command
-eval "$($FTL_CFG/etc/bin/parse_parts "$1")" 
-cmd="$cmd_parts"
+cmd_parts=() ; eval "$($FTL_CFG/etc/bin/parse_parts "$1")" ; cmd="$cmd_parts"
 
 # serialize ftl information
 setup_finfo
@@ -33,23 +32,27 @@ user_cmd="$FTL_CFG/commands/$cmd"
 	return
 	}
 
-# shell command
+# Shell command
 ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
-[[ "$cmd_parts" == fsh ]] &&
-	{ fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; true ; } ||
-	{
-		{
-		echo "export ftl_info_file=$ftl_info_file"
-		echo "cd '$PWD'"
-		echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
-		echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$fs/cmd_log"
-		echo "${cmd_parts[@]}"
-		echo "exit_code=\$?"
-		echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$fs/cmd_log"
-		echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
-		} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
-	}
+# check command aliases
+[[ -n "${cmd_aliases[$cmd]}" ]] && cmd_parts=(${cmd_aliases[$cmd]} $(printf "%s " "${cmd_parts[@]:1}")) ; cmd="$cmd_parts"
+
+[[ "$cmd" == full  ]] && { tcpreview ; clear ; eval "${cmd_parts[@]:1}" ; cdir ; return ; }
+[[ "$cmd" == split ]] && { tcpreview ; tmux split-window -e ftl_info_file="$ftl_info_file" -l 50% "$(printf "%s " "${cmd_parts[@]:1}")" ; cdir ; tmux selectp -D ; return ; }
+[[ "$cmd" == fsh   ]] && { fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; return ; }
+
+{
+echo "export ftl_info_file=$ftl_info_file"
+echo "cd '$PWD'"
+echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
+echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$fs/cmd_log"
+echo "${cmd_parts[@]}"
+echo "exit_code=\$?"
+echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$fs/cmd_log"
+echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
+} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
+
 }
 
 # vim: set filetype=bash :

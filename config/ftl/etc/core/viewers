@@ -55,7 +55,7 @@ ptype
 ext_dir()      {  $G_PLAYER "$n" &>/dev/null & }
 ext_html()     { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; }
 ext_image()    { run_maxed fim -a "$n" "$PWD" ; }
-ext_media()    { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "$n" &>/dev/null &) ; player=$! ; }
+ext_media()    { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "$n" &>/dev/null &) ; mplayer=$! ; }
 ext_pdf()      { ((emode == 1)) && ext_pdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) && true ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } ; }
 ext_pdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
 ext_text()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }

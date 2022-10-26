@@ -77,7 +77,8 @@ GPGID=CHANGE.ME
 G_PLAYER="vlc -f"			# gui media player
 T_PLAYER="mplayer -vo null" 		# terminal media player
 T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
-PREVIEW_SHOW="$FTL_CFG/etc/viewers/cmus"
+B_PLAYER="$FTL_CFG/etc/viewers/mplayer_local" # background player
+Q_PLAYER="$FTL_CFG/etc/viewers/cmus"    # music player to queue to
 
 PAGER_ANSI='/usr/bin/less -R'		# default pager
 MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
@@ -99,6 +100,9 @@ RM="rm -rf"
 	# RM=my_delete
 
 CMD_COLS=150 				# columns when displaying command mapping in popup
+
+# Command aliases
+declare -A cmd_aliases=([csx]="split finfo | xargs -0" [cfx]="full finfo | xargs -0")
 
 # Bindings, [07-9] are used by ftl and correspond to SIG_XXX entries below
 leader_key='BACKSLASH'
@@ -175,12 +179,13 @@ bind ftl marks		"${A[","]}"	gmark_fzf		"fzf to persistent mark"
 bind ftl marks		"${SA[","]}"	gmarks_clear		"clear persistent marks"
 
 bind ftl media		aa		preview_show		"terminal media player in background"
-bind ftl media		aq		player_kill		"kill sound preview"
+bind ftl media		ak		player_kill		"kill sound preview"
+bind ftl media		aq		preview_queue		"fzf a viewer"
+bind ftl media		aA		preview_show_fzf	"fzf a viewer"
 
 bind ftl media		e		external_mode1		"external viewer, m1"
 bind ftl media		E		external_mode2		"external viewer m2, detached"
 bind ftl media		"${A[e]}"	external_mode3		"external viewer m3, detached, fullscreen"
-bind ftl media		"${SA[e]}"	preview_show_fzf	"fzf a viewer"
 
 bind ftl move		ENTER		enter			"enter; cd or open file"
 bind ftl move		PGUP		move_page_up		"page down"

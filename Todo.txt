@@ -9,20 +9,6 @@ issue: space in names when passing env var to shell
 
 functionality: Directories filter, append a slash to directory filter
 
-functionality: commands/shortcuts that open some application split or full screen
-			not on the current selection but just as applications
-				isn't it better to do that via tmux shortcuts
-
-			some take arguments even if started from shortcut
-
-		user configurable
-		
-		example
-			git commands
-			todo list
-			remind
-			...
-
 presentation:
 	Reduce videos size with H265 encodigng
 

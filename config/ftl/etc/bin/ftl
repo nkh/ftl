@@ -45,7 +45,7 @@ key_command()
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 
-keys_command="$keys_command$REPLY" ; pdhn "[$COUNT] <$keys_command> -> ${kbd_trie[$HAS_COUNT$keys_command]}"
+keys_command="$keys_command$REPLY" #; pdhn "[$COUNT] <$keys_command> -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
 [[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && { ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_command= HAS_COUNT= COUNT= ; }
 }
