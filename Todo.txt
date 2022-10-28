@@ -7,8 +7,6 @@ issue: inotify, focuses main! resize missed when pane is closed
 
 issue: space in names when passing env var to shell
 
-functionality: Directories filter, append a slash to directory filter
-
 presentation:
 	Reduce videos size with H265 encodigng
 

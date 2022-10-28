@@ -477,7 +477,13 @@ count in $COUNT variable before calling your command.
 
 ## Filtering
 
-        filter #1, filter #2, and reverse-filter are arguments passed to rg
+        External filters are applied first (to directories and files).
+
+        Filter #d is applied to directories.
+
+        Filter #1, filter #2, and reverse-filter are applied to files.
+
+        Filters are arguments passed to rg.
 
                 examples: 
                         .                # select everything
@@ -505,13 +511,13 @@ count in $COUNT variable before calling your command.
                         filter #1/#2/reverse. The filters directory contains ten external
                         filters you can load with shortcut «⇑f/đ». 
                         
+        «zE»               Choose filter from external filters 
+                        
+        «zd»               Set filter #d
+                        
         «zf»               Set filter #1 
 
         «zF»               Set filter #2 
-                        
-        «zc»               Clear all filters 
-                        
-        «zE»               Choose filter from external filters 
                         
         «zr»               Set reverse-filter 
                         
@@ -524,6 +530,8 @@ count in $COUNT variable before calling your command.
                         
                            eg: always hide vim swap files, set by default in _ftlrc_
                                 rfilter0='\.sw.$'
+                        
+        «zc»               Clear all filters 
                         
         «zee»              Hide files having the same extention as the current file, per tab
 
