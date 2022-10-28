@@ -1,9 +1,11 @@
 L=({A..Z})
 ToAA() { AA= ; local i=$1 ; (($i == 0)) && AA='@' ; while ((i)) ; do AA="${L[((--i % 26))]}$AA" ; ((i /= 26)) ; done ; }
 
-
 st()
 {
+lookup_file="$1" ; shift 1
+((${#@} > 1 )) && files_to_tag=("$@") || files_to_tag=($PWD/*)
+
 cat <<EOF
 color "type=DEFAULT fg=WHITE bg=DEFAULT_COLOR"
 color "type=HEADINGS fg=CYAN bg=BLACK bold=0"
@@ -12,15 +14,11 @@ color "type=CELL_SELECTION bg=CYAN fg=WHITE bold=0"
 color "type=CELL_SELECTION_SC bg=CYAN fg=WHITE"
 color "type=STRG fg=WHITE bg=DEFAULT_COLOR bold=0"
 
-freeze A
-format A 30 0 0
-cellcolor A0 "bg=BLACK fg=YELLOW bold=1"
-# leftstring A0 = "+/- to change"
 goto B1
 
 EOF
 
-readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sed -e '/^$/d' | sort -u)
+readarray -t all_tags < <(tmsu tags | sed -e '/^$/d' | sort -u)
 
 column=1
 for tag in "${all_tags[@]}"
@@ -29,21 +27,23 @@ for tag in "${all_tags[@]}"
 
 	done
 
-readarray -t files_and_tags < <(shopt -s dotglob ; tmsu tags $PWD/* 2>&-)
+readarray -t files_and_tags < <(shopt -s dotglob ; tmsu tags "${files_to_tag[@]}" 2>&-)
 
 declare -A lookup
 
-row=0
+row=0 ; max_width=40
 for file_and_tag in "${files_and_tags[@]}"
 	do
 		((row++))
 		
-		declare -A file_tags=()
-		file_tag_array=($file_and_tag)
-		for tag in "${file_tag_array[@]:1}" ; do file_tags[$tag]="$tag" ; done
+		file="${file_and_tag%%:*}"
+		((max_width < ${#file})) && max_width=${#file}
+
+		echo "leftstring A$row = \"$file\""
 		
-		file="${file_tag_array%%:}"
-		echo "leftstring A$row = \"${file##*/}\""
+		ftags=(${file_and_tag#*:})
+		declare -A file_tags=()
+		for tag in "${ftags[@]}" ; do file_tags[$tag]=1 ; done
 		
 		column=1
 		for tag in "${all_tags[@]}"
@@ -51,23 +51,24 @@ for file_and_tag in "${files_and_tags[@]}"
 				((column++)) ; ToAA $column
 				
 				lu_tag="> let $AA$row = 1"
-				lookup[$lu_tag]="tmsu tag $file $tag"
+				lookup[$lu_tag]="tmsu tag '$file' $tag"
 				
 				lu_untag="> let $AA$row = 0"
-				lookup[$lu_untag]="tmsu untag $file $tag"
+				lookup[$lu_untag]="tmsu untag '$file' $tag"
 				
-				[[ -n "${file_tags[$tag]}" ]] && { echo "cellcolor $AA$row \"fg=BLACK bg=WHITE\"" ; echo "let $AA$row = 1" ; } || echo "let $AA$row = 0"
+				((${file_tags[$tag]})) && { echo "cellcolor $AA$row \"fg=BLACK bg=WHITE\"" ; echo "let $AA$row = 1" ; } || echo "let $AA$row = 0"
 			done
 	done
 
-declare -p lookup &>"$1"
-}
+((max_width+=5)) ; echo -e "freeze A\nformat A $max_width 0 0"
 
+declare -p lookup &>"$lookup_file"
+}
 
 mkdir -p /tmp/ftl/
 scim_tmsu_file="$(mktemp /tmp/ftl/scim_tmsu_XXXXXXX)" 
 
-st "${scim_tmsu_file}_lookup" | tee "${scim_tmsu_file}_original.sc" >"${scim_tmsu_file}_new.sc"
+st "${scim_tmsu_file}_lookup" "${@}" | tee "${scim_tmsu_file}_original.sc" >"${scim_tmsu_file}_new.sc"
 
 sc-im "${scim_tmsu_file}_new.sc"
 
@@ -76,8 +77,8 @@ source "${scim_tmsu_file}_lookup"
 while read -r tmsu_diff
 	do
 		tmsu_diff=$(echo $tmsu_diff | tr -d '\n')
-		# echo "<${lookup["$tmsu_diff"]}>"
-		${lookup["$tmsu_diff"]}
+		# echo "${lookup["$tmsu_diff"]}"
+		eval "${lookup["$tmsu_diff"]}" 2>&-
 
 	done < <(diff "${scim_tmsu_file}_original.sc" "${scim_tmsu_file}_new.sc" | rg "> let")
 

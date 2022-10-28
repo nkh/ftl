@@ -36,8 +36,10 @@ selection_class_3()	{ [[ ${tags[$n]} == ${tglyph[3]} ]] && unset -v 'tags[$n]' |
 selection_class_4()	{ [[ ${tags[$n]} == ${tglyph[4]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[4]} ; ((stagsi++)) ; move 1 ; list ; }
 pdh_pane()		{ pdh_show ; }
 change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ; }
-chmod_x()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
-# chmod_dialog()		{ tcpreview ; sc-im 2>&- ; cdir ; }
+chmod_ar()		{ for i in "${selection[@]}" ; do [[ -r "$i" ]] && mode=a-r || mode=a+r ; chmod $mode "$i" ; done ; cdir ; }
+chmod_aw()		{ for i in "${selection[@]}" ; do [[ -w "$i" ]] && mode=a-w || mode=a+w ; chmod $mode "$i" ; done ; cdir ; }
+chmod_ax()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
+chmod_dialog()		{ tcpreview ; exec 2>&9 ; "$FTL_CFG/etc/bin/scim_permission" "${selection[@]}" ; exec 2>"$fs/log" ; }
 clear_filters()		{ filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gcn ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
 gcn()			{ { find "$FTL_CFG/commands" -type f -printf "%f\n" ; printf "%s\n" "${!C[@]}" fsh finfo show_cmd_log ; } >$fs/command_names ; }

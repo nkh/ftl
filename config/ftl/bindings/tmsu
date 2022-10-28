@@ -1,42 +1,26 @@
-tmsu_table()
-{
-readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sed -e '/^$/d' | sort -u)
-
-readarray -t files_and_tags < <(shopt -s dotglob ; tmsu tags $PWD/* 2>&-)
-
-for file_and_tag in "${files_and_tags[@]}"
-	do
-		declare -A file_tags=()
-		
-		file_tag_array=($file_and_tag)
-		
-		for tag in "${file_tag_array[@]:1}" ; do file_tags[$tag]="$tag" ; done
-		
-		echo -ne "${file_tag_array%%:}\t" ; 
-		
-		for tag in "${all_tags[@]}" ; do [[ -n "${file_tags[$tag]}" ]] && printf "${file_tags[$tag]}\t" || printf -- "⸱\t" ; done
-
-		echo
-	done  | column -t
-}
-
 tmsu_preview()
 {
-readarray -t table < <(tmsu_table)
-
-declare -A file_to_tag
-all_tags=
-
-for row in "${table[@]}" ; do [[ $row =~ ^([^[:space:]]+)[[:space:]]+(.+) ]] && file_to_tag[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]}" ; done
-
 continuation_color="$(echo -en '\e[90m')"
-for((i=$top ; i <= bottom ; i++))
+tags_table=
+
+readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sed -e '/^$/d' | sort -u)
+readarray -t files_tags < <(tmsu tags "${files[@]:$top:$lines}" | sed -e 's/^.*: *//')
+
+tags_index=0
+for((i=top ; i <= bottom ; i++))
 	do
-		[[ $i == $file ]] && tags_color="$cursor_color" || tags_color="$continuation_color"
-		all_tags="$all_tags\n$tags_color${file_to_tag[${files[$i]}]}\e[m"
+		(($i == $file)) && tags_table+="$cursor_color" || tags_table+="$continuation_color"
+		file_name="${files[$i]}"
+		
+		ftags=(${files_tags[$tags_index]}) ; ((tags_index++))
+		declare -A file_tags=() ; for tag in "${ftags[@]}" ; do file_tags[$tag]=1 ; done
+		
+		for tag in "${all_tags[@]}" ; do ((${file_tags[$tag]})) && tags_table+="$tag\t" || tags_table+="⸱\t" ; done
+		
+		tags_table+="\n"
 	done
 
-tcpreview ; ctsplit "clear ; echo -ne '$all_tags' | $MD_PAGER ; read -sn 100"
+tcpreview ; ctsplit "clear ; { echo ; echo -ne '$tags_table' | column -t -s $'\t' ; } | $MD_PAGER ; read -sn 100"
 }
 
 tmsu_tag()
@@ -79,7 +63,7 @@ tmsu_tag_scim()
 {
 tcpreview
 # ctsplit "$FTL_CFG/etc/bin/scim_tmsu" ; tmux selectp -t $pane_id 
-exec 2>&9 ; "$FTL_CFG/etc/bin/scim_tmsu" ; exec 2>"$fs/log"
+exec 2>&9 ; "$FTL_CFG/etc/bin/scim_tmsu" "${selection[@]}" ; exec 2>"$fs/log"
 }
 
 tmsu_mount()

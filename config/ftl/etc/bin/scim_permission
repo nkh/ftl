@@ -1,0 +1,94 @@
+L=({A..Z})
+ToAA() { AA= ; local i=$1 ; (($i == 0)) && AA='@' ; while ((i)) ; do AA="${L[((--i % 26))]}$AA" ; ((i /= 26)) ; done ; }
+
+st()
+{
+lookup_file="$1" ; shift 1
+((${#@} > 1 )) && files_to_change=("$@") || files_to_change=($PWD/*)
+
+cat <<EOF
+color "type=DEFAULT fg=WHITE bg=DEFAULT_COLOR"
+color "type=HEADINGS fg=CYAN bg=BLACK bold=0"
+color "type=HEADINGS_ODD fg=CYAN bg=BLACK bold=0"
+color "type=CELL_SELECTION bg=CYAN fg=WHITE bold=0"
+color "type=CELL_SELECTION_SC bg=CYAN fg=WHITE"
+color "type=STRG fg=WHITE bg=DEFAULT_COLOR bold=0"
+
+format B 2 0 0
+goto C3
+EOF
+
+column=2
+for tag in r w x r w x r w x   
+	do
+		((column == 2 || column == 5 || column == 8 )) && width=6 || width=3
+		((column++)) ; ToAA $column ; echo -e "format $AA $width 0 0\nrightstring ${AA}1 = \"$tag\""
+	done
+declare -A lookup
+
+user_name=(d u u u g g g o o o)
+permission_name=(d r w x r w x r w x)
+
+row=2 ; max_width=40
+
+for file in "${files_to_change[@]}"
+	do
+		((row++))
+		
+		((max_width < ${#file})) && max_width=${#file}
+		echo "leftstring A$row = \"$file\""
+		
+		column=1
+		bit_index=0
+		for bit in $(stat -c "%A" "$file" | sed 's/./& /g')
+			do 
+				((column++)) ; ToAA $column
+				
+				set_1="> let $AA$row = 1"
+				lookup[$set_1]="chmod ${user_name[$bit_index]}+${permission_name[$bit_index]} '$file'"
+				
+				set_0="> let $AA$row = 0"
+				lookup[$set_0]="chmod ${user_name[$bit_index]}-${permission_name[$bit_index]} '${file}'"
+				
+				[[ $column == 2 ]] &&
+					{
+					[[ "-" == "$bit" ]] || { echo "label $AA$row =\"d\""; }
+					} ||
+					{
+					[[ "-" == "$bit" ]] &&
+						{ echo "cellcolor $AA$row \"bg=BLACK fg=RED\"" ; echo "let $AA$row = 0" ; } ||
+						{ echo "cellcolor $AA$row \"bg=BLACK fg=WHITE\"" ; echo "let $AA$row = 1" ; }
+					}
+					
+					((bit_index++))
+			
+			done
+	done
+
+((max_width+=5)) ; echo -e "freeze A\nformat A $max_width 0 0"
+
+declare -p lookup &>"$lookup_file"
+}
+
+
+mkdir -p /tmp/ftl/
+scim_tmsu_file="$(mktemp /tmp/ftl/scim_permission_XXXXXXX)" 
+
+st "${scim_tmsu_file}_lookup" "$@" | tee "${scim_tmsu_file}_original.sc" >"${scim_tmsu_file}_new.sc"
+
+sc-im "${scim_tmsu_file}_new.sc"
+
+source "${scim_tmsu_file}_lookup"
+
+while read -r tmsu_diff
+	do
+		tmsu_diff=$(echo $tmsu_diff | tr -d '\n')
+		#echo "${lookup["$tmsu_diff"]}"
+		eval "${lookup["$tmsu_diff"]}"
+
+	done < <(diff "${scim_tmsu_file}_original.sc" "${scim_tmsu_file}_new.sc" | rg "> let")
+
+rm  "${scim_tmsu_file}_lookup" "${scim_tmsu_file}_original.sc" "${scim_tmsu_file}_new.sc"
+
+# vim: set filetype=bash :
+

@@ -666,7 +666,13 @@ count in $COUNT variable before calling your command.
 
         «gL»               Goto symlinked file     
 
-        «xx»               Flip selection executable bit 
+        «xar»              Flip selection read bit 
+
+        «xaw»              Flip selection write bit 
+
+        «xax»              Flip selection execute bit 
+
+        «xaa»              Set permissions interactively 
 
 ## External Commands
 

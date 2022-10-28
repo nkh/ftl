@@ -19,16 +19,9 @@ presentation:
 			status
 			detail videos
 
-functionality: interactive file attribute changing, external script using scim
-
-
 # Later
 
 functionality: undo deletes via rip
-
-functionality: more vim like shortcuts with double keys ... maybe
-
-functionality: changing files attributes, today x, go doube key, xx, xr, xw - xux, xur, xuw - xgz, xgw, xgr
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 
