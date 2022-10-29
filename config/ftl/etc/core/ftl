@@ -47,7 +47,7 @@ inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
 is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$?  ; }
 kbdf()      { while read -t 0.01 ; do : ; done ; }
-k_bindings(){ printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "map,section, key,command," -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
+k_bindings(){ printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "map,section, key,command,does" -s $'\t' -c $CMD_COLS | fzf-tmux $fzf_opt --header-lines=1 ; list ; }
 mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
 mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }

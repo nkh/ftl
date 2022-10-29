@@ -1,6 +1,5 @@
 # older and not maintained bindings that were less vim-like
 
-# Bindings, [07-9] are used by ftl and correspond to SIG_XXX entries below
 leader_key='BACKSLASH'
 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
@@ -49,7 +48,7 @@ bind ftl ftl		Q		quit_all		"quit all"
 bind ftl ftl		AT		quit_keep_shell		"quit, keep shell"
 bind ftl ftl		"${SA[q]}"	quit_keep_preview	"quit, keep preview zoomed"
 bind ftl ftl		r		refresh_pane		"refresh"
-bind ftl ftl		¿		pdh_pane		"pdh pane"
+bind ftl ftl		¿		pdh_show		"pdh pane"
 bind ftl ftl		"${A[c]}"	k_bindings		"show keyboard bindings"
 bind ftl ftl		"${A[t]}"	copy_clipboard		"copy selection to clipboard"
 bind ftl history	H		history_go		"fzf history current session"

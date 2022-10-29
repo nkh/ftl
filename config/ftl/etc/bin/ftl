@@ -29,16 +29,23 @@ local keysa=( $keys )
 
 for key in "${keysa[@]}"
 	do
-		shortcut="$shortcut$key" ; kbd_trie[$shortcut]=1 
+		shortcut="$shortcut$key" 
+		
+		((ftl_bind_check)) && "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
+			echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding '${kbd_trie[$shortcut]}'" 
+
+		((kbd_trie[$shortcut]++)) 
 		{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
 	done
 
-C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$command]="$map	$section	$dscut	$command	$help"
+((ftl_bind_check && ${kbd_trie[$shortcut]} > 1)) && echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding command path" 
+C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$map	$section	$dscut	$command	$help"
 }
 
 key_command()
 {
 [[ -n "$key_map"             ]] && { $key_map ; return ; }
+((${#keys_command} > 10))       && { keys_command= HAS_COUNT= COUNT= ; return ; }
 [[ "$REPLY" == ERROR_142     ]] && { keys_command= HAS_COUNT= COUNT= ; return ; }
 [[ "$REPLY" == "?"           ]] && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 

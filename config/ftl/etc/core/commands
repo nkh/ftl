@@ -30,11 +30,12 @@ goto_alt1()		{ to_search=".$e" ; R="${C[find_next]}" ; }
 goto_alt2()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ ! "${files[i]##*/}" =~ ".$e" ]] && { list $i ; return ; } ; done ; list ; }
 preview_down()		{ ((in_viprev)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ; }
 preview_up()		{ ((in_viprev)) && tmux send -t $pane_id C-U || [[ $pane_id ]] && tmux send -t $pane_id k ; }
-selection_class_1()	{ [[ ${tags[$n]} == ${tglyph[1]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[1]} ; ((stagsi++)) ; move 1 ; list ; }
-selection_class_2()	{ [[ ${tags[$n]} == ${tglyph[2]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[2]} ; ((stagsi++)) ; move 1 ; list ; }
-selection_class_3()	{ [[ ${tags[$n]} == ${tglyph[3]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[3]} ; ((stagsi++)) ; move 1 ; list ; }
-selection_class_4()	{ [[ ${tags[$n]} == ${tglyph[4]} ]] && unset -v 'tags[$n]' || tags[$n]=${tglyph[4]} ; ((stagsi++)) ; move 1 ; list ; }
-pdh_pane()		{ pdh_show ; }
+selection_class_1()	{ selection_class_c 1 ; }
+selection_class_2()	{ selection_class_c 2 ; }
+selection_class_3()	{ selection_class_c 3 ; }
+selection_class_4()	{ selection_class_c 4 ; }
+selection_class_c()	{ for ((i=0 ; i < ${COUNT:-1} && file < nfiles ; i++)) ; do pdhn "$file/$nfiles $n" ; selection_class_n $1 ; move 1 ; file=$nf ; done ; ((stagsi++)) ; list ; }
+selection_class_n()	{ [[ ${tags[${files[file]}]} == ${tglyph[$1]} ]] && unset -v "tags[${files[file]}]" || tags[${files[file]}]=${tglyph[$1]} ; }
 change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || list ; }
 chmod_ar()		{ for i in "${selection[@]}" ; do [[ -r "$i" ]] && mode=a-r || mode=a+r ; chmod $mode "$i" ; done ; cdir ; }
 chmod_aw()		{ for i in "${selection[@]}" ; do [[ -w "$i" ]] && mode=a-w || mode=a+w ; chmod $mode "$i" ; done ; cdir ; }
@@ -138,7 +139,7 @@ select_all()		{ for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
 tag_move_to()		{ fzf_mv "${selection[@]}" && tags_clear ; cdir '' "$f"; }
 tag_move()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
-selection_flip_down()	{ tag_flip "${files[file]}" ; move 1 ; list ; }
+selection_flip_down()	{ for ((i=file ; i < file + ${COUNT:-1} && i < nfiles ; i++)) ; do tag_flip "${files[i]}" ; done ; move ${COUNT:-1} ; list ; }
 selection_flip_up()	{ tag_flip "${files[file]}" ; move -1 ; list ; }
 selection_fzf()		{ fzf_tag T "$(fd -H --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 selection_fzf_all()	{ fzf_tag T "$(fd -H --color=always | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }

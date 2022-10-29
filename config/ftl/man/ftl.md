@@ -107,13 +107,19 @@ even start a detached viewer.
 
 See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
 
-## Vim Like Bindings And Vim
-*ftl* bindings are vim-like, tips for better bindings are always welcome.
-Look at _ftl_not_so_vim_like_ in the distributions for less vim-like bindings.
-
+## Vim And Vim-like Bindings
 *ftl* uses the awesome _vim_ for text preview, if it's not your favorite editor
 you can install it just for previewing (and maybe find it awesome). Patches for
 other editors are welcome.
+
+*ftl* bindings are vim-like, vim-bindings take time to get used to, and often
+take multiple key presses but they are more logical as families of commands are
+accessed with shortcuts that start with the same letter. You can find the file
+_ftl_not_so_vim_like_ in the distributions for much less vim-like bindings. Mix
+and match to your liking and let me know what better bindings you use, vim-like
+or otherwise.
+
+See section "# KEY BINDINGS" below.
 
 ## Hyperorthodoxy
 
@@ -253,8 +259,9 @@ See example in "# EXAMPLES" below.
 
 ## Binding Commands That Take A Count
 If you prepend symbol "COUNT" in your binding definition, *ftl* will gather the
-count in $COUNT variable before calling your command.
-
+count in $COUNT variable before calling your command. If you specify "COUNT" in
+your binding then the user has to type a, non zero, count; if you want "COUNT"
+to be optional you must specify two bindings; one with "COUNT" and one without.
 
 	bind test count		"COUNT t"	count_test		""
 
@@ -283,6 +290,7 @@ count in $COUNT variable before calling your command.
 - Command Mode
 
 ## Commands That Take A Count
+
 *pbs*, in this version, has no commands that takes a count but some are planned.
 
 ## General *ftl* Commands
@@ -302,7 +310,7 @@ count in $COUNT variable before calling your command.
         «q»             Quit, closes the current tab, it there are tabs, then closes the
                         last created pane, then closes *ftl*.
 
-        «Q»             Quit all, closes all tabs and panes at once.
+        «Q» «ZZ»        Quit all, closes all tabs and panes at once.
 
         «ZS»            Quit, quit all but doesn't close the shell pane if one exists.
 
@@ -371,7 +379,7 @@ count in $COUNT variable before calling your command.
 
         «CTL-W V»                New ftl pane right, keep focus 
 
-        «gp»                Set focus on the next pane
+        «gp»                     Set focus on the next pane
 
 ## Tabs
 
@@ -382,12 +390,14 @@ count in $COUNT variable before calling your command.
         «⇈s/§»             New tab 
 
         «gt»               Next tab 
+
         «TAB»              Next tab 
+
         «COUNT gt»         Goto tab
+
         «gT»               Previous tab
 
 ## Moving around
-
         Also see "cd" in *General Commands* above and *Bookmarks* and
         *History* below
 
@@ -414,10 +424,15 @@ count in $COUNT variable before calling your command.
         «PGUP» «CTL-B»     Page up                           
 
         «gd»               Move to first directory
+
         «gg»               Move to first file
+
         «G»                Move to las file
+
         «g LEADER»         cycle between top/file/bottom
+
         «gh»               position cursor on the first file in the window
+
         «gl»               position cursor on the last file in the window
 
         «gD»               CD, *ftl* prompts you for a path, with path completions.
@@ -425,11 +440,11 @@ count in $COUNT variable before calling your command.
 
         «COUNT %»          position cursor iat COUNT percent in the entries
 
-        «ö»                Next entry of same extension      
+        «(» «ö»            Next entry of same extension      
 
-        «Ö»                Next entry of different extension 
+        «{» «Ö»            Next entry of different extension 
 
-        «ä»                Goto entry by index               
+        «[» «ä»            Goto entry by index               
 
         not assigned       Goto previous selected entry
         not assigned       Goto next selected entry
@@ -458,7 +473,6 @@ count in $COUNT variable before calling your command.
         «⇑v/“»                Alternative preview #1 
 
         «⇈v/‘»                Alternative preview #2 
-
 
         «⇑x/»»                Hexadecimal preview    
 
@@ -541,25 +555,25 @@ count in $COUNT variable before calling your command.
 
 ## Searching
 
-        «b»                Fzf find in current directory  
-
-        «⇑b/”»             Fzf find                       
-
-        «⇈b/’»             Fzf find regexp/fuzzy          
-
-        «⇈'/’/÷»           Fzf find only directories      
-
-        «}»                Ripgreg with preview           
-
-        Opening search results in tabs:
-                If you use one of the above you can pick multiple entries.
-                Entries can be opened in a new tab with 'ctrl+t'.
-
         «/»                Incremental search, «ENTER» or «ESCAPE» to end.
 
         «n»                Find next                      
 
         «N»                Find previous                  
+
+        «gff» «b»          Fzf find in current directory  
+
+        «gfa» «⇑b/”»       Fzf find                       
+
+        «gfr»              Fzf find regexp/fuzzy          
+
+        «gfd»              Fzf find only directories      
+
+        «gr»               Ripgreg with preview           
+
+        Opening search results in tabs:
+                If you use one of the above you can pick multiple entries.
+                Entries can be opened in a new tab with 'ctrl+t'.
 
 ## Selection
 
@@ -569,13 +583,13 @@ count in $COUNT variable before calling your command.
         Multiple selection classes are available, *ftl* will ask which class
         to use. The number of entries is displayed in the header.
 
-        «yy»               Select current entry in "normal" class and move down
+        «[COUNT] yy»       Select current entry in "normal" class and move down
 
         not_assigned       Select current entry in "normal" class and move up
 
-        «y1» «y2» «y3»     Select current entry in given class and move down.
+        «[COUNT] y1/2/3/4» Select current entry in given class and move down, the
+                           glyph used for each class is defined in _ftlrc_ tglyph. 
 
-        «y4»               Select current entry in D class and move down.
                 
         «yf»               Select all the files in the current directory
 
@@ -713,7 +727,6 @@ count in $COUNT variable before calling your command.
         «LEADER f m»       Send mail                      
 
         «LEADER f t»       Terminal popup                 
-
 
 	«:url URL|»        open URL in qutebrowser
 
