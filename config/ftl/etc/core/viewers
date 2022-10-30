@@ -21,6 +21,8 @@ open_with
 
 pviewers()
 {
+((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_prev && return ; } 
+
 [[ $e ]] && ((pignore["${e@Q}"])) && { pignore   ; return ; }
 [[ -e "$fs/lock_preview/$n" ]]    && { plock     ; return ; }
 [[ "${pdir_only[tab]}" ]]         && { [[ -d "$n" ]] || { tcpreview ; return ; } ; }
@@ -43,11 +45,15 @@ pviewers()
 [[ $e == sc ]]                    && { pscim     ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
-mime_get ; is_bin "$n"
+mime_get ; is_bin "$n" ;
 
 ((! is_bin)) && [[ -s "$n" ]] && \
 	[[ $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && \
 	{ ptext && return ; }
+
+file_b=$(file -b "$n")
+[[ "$file_b" == "ASCII text, with escape sequences"  || "$file_b" == "Unicode text, UTF-8 text, with escape sequences" ]] &&
+	 { ctsplit "ansi_show \"$n\" | $MD_PAGER " ; return ; }
 
 ptype
 }
@@ -63,7 +69,7 @@ ext_scim()     { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
-ptype()     { mime_get ; ctsplit "echo ${f@Q} ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
+ptype()     { mime_get ; ctsplit "echo ${f@Q} | lscolors ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
 pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$f" "$thumbs/cbr" ; pw3image "$t" ; }
 pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$f" "$thumbs/cbz" ; pw3image "$t" ; }

@@ -1,0 +1,4 @@
+etag_dir() { : ; } 
+etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; (( etag )) && { local b1="$(basename "$1")" ; ((${vfiles[$b1]:-0} || ${vdirs[$b1]:-0})) && r2='ᵛ ' || r2='  ' ; r3=2 ; } ; }
+
+# vim: set filetype=sh :

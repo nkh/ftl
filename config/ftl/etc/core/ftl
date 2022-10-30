@@ -16,17 +16,20 @@ cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tag
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
 delete()    { prompt "$1 [y|d|N|c]: " -n1 && [[ $REPLY =~ y|d|c ]] && { $2 ; [[ $REPLY == c ]] && $RM "$n" || $RM "${@:3}" ; mime=() ; } ; header '' "$head" ; }
 delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delete "delete *tags: ${#ltags[@]}*?" "tags_unset $class" "${!ltags[@]}" ; }
-dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter_d ; files "-xtype p,l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter ; dir_done ; }
+dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter_d vd ; files "-xtype p,l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter vf ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m%4s\e[m" "${du_size[$PWD/$1]}" ; }
 dir_esize() { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
 dir_dusize(){ reset="$(printf '\e[0m')" ; declare -Ag du_size ; while IFS=$'\t' read color size file ; do du_size[$PWD/$file]="$color$size$reset" ; done < <(get_dusize) ; }
 get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(.*?)\e\[0m\t.\/(.*)/ ; printf "$c\t%4s\t$f\n", $s' ; }
 edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; emode=0 ; cdir ; }
-files()     { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1  -printf '%s\t%T@\t%P\n' 2>&- | ftl_filter | $2 ; }
+files()     { { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1 -printf '%s\t%T@\t%P\n' 2>&- ; virt_inj $3 ; } | ftl_filter | $2 ; }
+virt_inj()  { [[ $1 == vf ]] && files_virt ; [[ $1 == vd ]] && dirs_virt ; }
+files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t$vf\n" ; done ; }
+dirs_virt() { ((${#vdirs[@]}))  && for vd in "${!vdirs[@]}"  ; do printf "0\t0\t$vd\n" ; done ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg ${filters2[tab]} | { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } | filter2 ; }
 filter_d()  { rg ${filters_dir[tab]} | filter2 ; }
-filter2()   { ftl_sort | tee >(cat >&4) | lscolors >&5 ; }
+filter2()   { ftl_sort | tee >(cat >&4) | vfiles_clr | lscolors >&5 ; }
 filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 ftl_imode() { ((imode[tab] == 2)) && { tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; } || { ((imode[tab])) && { ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; } || tfilters[tab]= ; } ; }
@@ -83,7 +86,8 @@ sort_glyph(){ echo ${sglyph[s_type]} ; }
 save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
 		((!nfiles)) && : >${1:-$fs}/ftl \
 			    || >${1:-$fs}/ftl echo "sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
-							ftag=$ftag		; etag=$etag					; show_size=$show_size 
+							ftag=$ftag		; show_size=$show_size				; prev_cb=\"$prev_cb\"
+							etag=$etag		; etag_s=\"$etag_s\"				; etag_cb=\"$etag_cb\"
 							filter_ext=\"$filter_ext\"
 							imode[tab]=\"${imode[tab]}\"
 							sort_type[tab]=${sort_type[tab]}
@@ -95,6 +99,8 @@ save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$
 							ntfilter[tab]=\"${ntfilter[tab]}\" "; }
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
 		((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
+		((gpreview)) && { [[ "$prev_cb" ]] && eval "$prev_cb" ; }
+		((gpreview)) && { [[ "$etag_s" ]] && { source "$FTL_CFG/etags/$etag_s" ; [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
 		((gpreview)) && { ftl_imode "${imode[tab]}" ; }
 		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
@@ -121,13 +127,18 @@ tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-bor
 tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
 tsnew()     { tmux has-session -t ftl$$ &>/dev/null || { tmux new -A -d -s ftl$$ ; sleep 0.2 ; } ; }
 tsc_head()  { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w-=2)) ; (( w > 0 )) && echo -e " \e[4;33m$w\e[0m" ; }
-tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.03 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
+tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.04 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { [[ "$1" =~ ^% ]] && tmux selectp -t $1 || tmux selectp -t $pane_id ${1:--L} ; }
 winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh_pane]}$R" ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
+vfiles_on() { etag_cb+="; vfiles_on $1" ; vfiles_on=$1 ; declare -Ag vfiles=() vdirs=() ; }
+vfiles_rst(){    eval 'vdirs_get(){ : ; }  ; vfiles_get(){ : ; }  ; vfiles_clr(){ cat ; } ; vfile_prev(){ : ; }  ; vfile_key(){ : ; }' ;         etag_cb= ; vfiles_on=0 ; } 
+vfiles_set(){ etag_cb="vdirs_get(){ $1 ; } ; vfiles_get(){ $2 ; } ; vfiles_clr(){ $3 ; }  ; vfile_prev(){ $4 ; } ; vfile_key(){ $5 \"\$@\"; }" ; eval "$etag_cb" ; }
+v_entries() { vfiles=() vdirs=() ; ((vfiles_on)) && { while read -r v ; do vdirs[$v]=1 ; done < <(vdirs_get "$@")  ; while read -r v ; do vfiles[$v]=1 ; done < <(vfiles_get "$@") ; } ; }
+
 # temporal functions
-etag_dir() { : ; }
-etag_tag() { : ; }
+etag_dir()  { : ; }
+etag_tag()  { : ; }
 
 # vim: set filetype=bash :

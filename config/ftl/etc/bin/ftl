@@ -2,14 +2,13 @@
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-declare -Ag C bindings kbd_trie key_map ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
-
+declare -Ag C bindings kbd_trie key_map vfiles vdirs ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
 my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
 [[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
-echo -en '\e[?1049h' ; stty -echo ; filter_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
+echo -en '\e[?1049h' ; stty -echo ; filter_rst ; vfiles_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; }
@@ -54,12 +53,15 @@ key_command()
 
 keys_command="$keys_command$REPLY" #; pdhn "[$COUNT] <$keys_command> -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
+((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
+
 [[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && { ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_command= HAS_COUNT= COUNT= ; }
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
 get_dir() # dir, search
 {
+pdhn "get_dir $etag" ;
 cd "${1:-$PWD}" || return ; [[ "$PPWD" != "$PWD" ]] && { marks["'"]="$n" ; PPWD="$PWD" ; ((gpreview)) || echo "$n" | tee -a $fs/history >> $ghist ; }
 tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
 
@@ -68,13 +70,15 @@ tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep=
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
-declare -A uniq_file ; pad=(* ? ?) ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; dir &
+declare -A uniq_file ; shopt -s dotglob ; pad=(* ? ?) ; shopt -u dotglob ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; v_entries ; dir &
+
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	[[ $pnc == $dir_done ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1
 	[[ "$pnc" =~ '.' ]] && { e=${pnc##*.} ; ((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue ; } ; pl=${#pnc}
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; qd=1 ; list $found ; }
 
-	[[ ! -r "$pnc" ]] && pc="\e[7m$pnc\e[m" ; [[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
+	# special cases
+	[[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
 
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
 	((show_size)) && { ((sum += size, pl += 5)) ; [[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="     $pc" ; true ; } \
@@ -103,7 +107,7 @@ head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage}" ; h
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
 ((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅  $head$ftag$tabsd" ; header '' "$head" ; tcpreview ; clear_list 0 ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
-((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R') || date=
+((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R' 2>&-) || date=
 head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$flip" ; header '' "$head"
 
 for((i=$top ; i <= bottom ; i++))

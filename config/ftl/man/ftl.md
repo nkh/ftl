@@ -105,7 +105,7 @@ The idea is to use within *ftl* what you normally use on the command line.
 For some file types, often media types, *ftl* can show an extended view and 
 even start a detached viewer. 
 
-See "## External Viewer" below and config in '$FTL_CFG/etc/ftlrc'. 
+See "## External Viewer" below and config in _'$FTL_CFG/etc/ftlrc'_. 
 
 ## Vim And Vim-like Bindings
 *ftl* uses the awesome _vim_ for text preview, if it's not your favorite editor
@@ -132,7 +132,8 @@ own tabs, filters, ...
 
 ## Filtering 
 
-*ftl* can filter the entries in many ways to list only those you want to see.
+*ftl* can filter the entries in many ways, even using external filters you
+define, to list only the entries you want to see.
 
 See "## Filtering" in commands.
 
@@ -180,6 +181,12 @@ Available etags are:
 
           ⮤ tmsu tag
 
+        /home/nadim/nadim/devel/repositories/ftl 2/14 ⍺
+        1   ftl
+        1 ᵛ a virtual file
+
+          ⮤ virtual entry
+
 ## Tags
 *ftl* has support for tags via TMSU
 
@@ -190,6 +197,13 @@ Text files are opened in _vim_.
 _7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip_ archives are automounted.
 
 You can add handlers in _'$FTL_CFG/bindings/type_handlers'_
+
+## Virtual Entry Injection
+
+*pbs* has a very simple mechanism that allows you to inject _virtual entries_
+in the listing. You can control their colors, preview, and keyboard actions.
+
+See "# Virtual file injection" in '#EXAMPLES'.
 
 # KEY BINDINGS
 
@@ -227,7 +241,8 @@ sequences of keys to perform a command. The default is '\\'
               
 
         eg: bind ftl        file  k            copy     "copy file to, prompts inline"
-	eg: bind leader_ftl extra "LEADER f h" ftl_help "display help"
+
+        eg: bind leader_ftl extra "LEADER f h" ftl_help "display help"
 
 You can also override _ftl_event_quit_ which is called when *ftl* is closing,
 you can see it in use in _'$FTL_CFG/bindings/type_handlers'_
@@ -288,10 +303,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 - External Viewer
 - Shell Pane
 - Command Mode
-
-## Commands That Take A Count
-
-*pbs*, in this version, has no commands that takes a count but some are planned.
 
 ## General *ftl* Commands
 
@@ -763,7 +774,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
                 core viewers are in '$FTL_CFG/etc/core/viewers/ftl'
 
-                extra viewers are in'$FTL_CFG/viewers'
+                extra viewers are in '$FTL_CFG/viewers'
                 
 ## Shell Pane
         «CTL-W Ss» or «s»  Shell pane
@@ -968,7 +979,7 @@ $FTL_CFG (set by default to $HOME/.config/ftl) is the directory that contains
 
 # CONFIGURATION
 
-See "$FTL_CFG/etc/ftlrc", ftl's default config file, for details. 
+See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details. 
 
 # EXAMPLES
 
@@ -1041,6 +1052,31 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
         # bind shortcut «s» in the leader map
         bind leader file s shred_command "*** bypasses RM *** ..."
 
+## Virtual Entry Injection
+
+To inject entries in the listing you need to define functions to:
+
+        - get directory entries
+        - get file entries
+        - color virtual entries
+        - handle the preview of virtual entries
+        - handle keyboard input for virtual entries
+
+The names of the functions are up to you, but try something unique to
+what you are implementing. 
+ 
+        Call vfiles_set() with the above function in that order.
+
+        Call vfiles_go() to turn injection on, "get directory entries" and "get file entries"
+        will be call every time the listing need to be updated, "$PWD" is set before the calls.  
+
+        Call vfiles_rst() to reset everything.
+        
+        See '$FTL_CFG/etags/virtual' and '$FTL_CFG/bindings/virtual_files' which add:
+                 «LEADER v v»        insert a virtual entries
+                 «LEADER v V»        removes virtual entries
+                 «LEADER v e»        show virtual entries etag
+
 ## Directory Changer
 
         Add the following code to your bashrc:
@@ -1067,8 +1103,6 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
         Press «q» to quit to return the selection.
 
         Press «Q» to cancel.
-
-
 
 ## Vim Files Picker
 

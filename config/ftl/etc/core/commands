@@ -149,7 +149,7 @@ selection_merge_all()	{ source "$FTL_CFG/etc/core/lib/merge/all" ; list ; }
 selection_untag_all()	{ tags_clear ; list ; }
 selection_untag_fzf()	{ tag_check && { fzf_tag U "$(printf "%s\n" "${!tags[@]}" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '⊟')" ; list ; } ; }
 etag_show()		{ ((etag^=1)) ; cdir ; }
-etag_select()		{ p="$FTL_CFG/etags" ; { fe=$(cd $p ; fd | fzf-tmux -p 50% --cycle --reverse --info=inline) ; [[ $fe ]] && { . $p/$fe $fs ; etag=1 ; cdir ; } ; } ; }
+etag_select()		{ p="$FTL_CFG/etags" ; { etag_s=$(cd $p ; fd | fzf-tmux -p 50% --cycle --reverse --info=inline) ; [[ $etag_s ]] && { . $p/$etag_s $fs ; etag=1 ; cdir ; } ; } ; }
 SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
 SIG_REFRESH()		{ ((gpreview)) && kbdf && prev_synch ; }
 SIG_REMOTE()		{ ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }

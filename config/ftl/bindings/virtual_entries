@@ -1,0 +1,93 @@
+# Example of entry injection
+
+# callbacks
+
+virt_dirs_get()
+{
+# return list of virtual directories, $PWD is set
+
+echo "VIRTUAL DIRECTORY 0"
+echo "VIRTUAL DIRECTORY ${#PWD}"
+}
+
+virt_files_get()
+{
+# return list of virtual files
+
+echo "a virtual file.txt"
+}
+
+virt_color()
+{
+# colorize virtual entries
+
+((${#vfiles[@]} || ${#vdirs[@]})) && 
+	{
+	while read cfile
+		do 
+			((${#vfiles[$cfile]})) && echo -e "\e[4m$cfile" || { ((${#vdirs[$cfile]})) && echo -e "\e[32m$cfile" || echo "$cfile" ; }
+		done
+	} || cat
+}
+
+virt_prev()
+{
+# show preview for virtual entries
+
+((${#vdirs["$(basename "$n")"]})) && { ctsplit "echo \"ftl virtual directory '$n'\"; read -sn 100" ; return 0 ; } || 
+((${#vfiles["$(basename "$n")"]})) && { ctsplit "echo \"ftl virtual file '$n'\"; read -sn 100"  ; return 0 ; }
+
+return 1
+}
+
+virt_key()
+{
+# handle key press for virtual entries, return 1 if not handled
+
+((${#vfiles[$(basename "$n")]} || ${#vdirs[$(basename "$n")]})) && 
+	{
+	# update the preview when a ENTER key is pressed
+
+	[[ "$1" == ENTER ]] && { ctsplit "echo \"ftl virtual entry: <ENTER>\" ; read -sn 100" ; keys_command= HAS_COUNT= COUNT= ; return 0 ; }
+	} || return 1
+}
+
+# commands
+
+ventries_off()
+{
+# turn injection off
+vfiles_rst
+
+# set virtual entries in preview  off
+prev_cb="ventries_off"
+
+cdir
+}
+
+ventries_on()
+{
+# turn injection on
+
+# register call backs
+vfiles_set virt_dirs_get virt_files_get virt_color virt_prev virt_key
+
+# turn injection on
+vfiles_on 1
+
+# set virtual entries in preview 
+prev_cb="ventries_on"
+
+cdir
+}
+
+ventries_etag(){ etag_s="virtual" ; source "$FTL_CFG/etags/$etag_s" ; etag=1 ; cdir '' "$f" ; } # etag_s synchs source with preview
+
+# bind a short key to start/stop the test
+
+bind leader_ftl extra	"LEADER v v"	ventries_on	"insert a virtual entries"
+bind leader_ftl extra	"LEADER v V"	ventries_off	"removes virtual entries"
+bind leader_ftl extra	"LEADER v e"	ventries_etag	"show virtual entries etag"
+
+# vim: set filetype=bash :
+
