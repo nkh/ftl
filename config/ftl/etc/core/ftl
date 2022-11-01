@@ -71,8 +71,17 @@ pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
-quit()      { tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane å ; } ; rm -rf $fs ; exit 0 ; }
+quit()      { qshell && return ; tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane å ; } ; rm -rf $fs ; exit ; }
 quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
+{
+qshell_c=0
+qshell()    { ((qshell_c++, qshell_c > 2)) && return 1 ; (( $(tmux lsw -t ftl$$ 2>&- | wc -l) > 2 )) && { tmux popup -h 5 "echo Shells open! «session: ctl-w !». " ; true ; } || false ; }
+
+# declare -Ag time_event_handlers
+# rqsc=0
+# reset_qshell_call(){ ((qshell_c)) && { ((rqsc)) && { (($SECONDS - rqsc > 3)) && qshell_c=0 rqsc=0 ; } || ((rqsc)) || rqsc=$SECONDS ; } ; }
+# time_event_handlers[reset_qshell_call]=reset_qshell_call
+}
 cdfl()      { true 2>&- >&3 && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; }
 quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=${2:-1} ; list ; qd=0 ; }
@@ -119,6 +128,10 @@ tag_set()   { ((stagsi++)) ; [[ ! ${tags[$1]} ]] && { tags[$1]=${2:-▪} ; tags_
 tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
 tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$t" ; ((stagsi++)) ; } ; done ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
+{
+time_event0=$SECONDS
+time_event(){ ((time_event)) && (($SECONDS - $time_event0 >= $time_event)) && { for teh in "${!time_event_handlers[@]}" ; do $teh ; done ;  time_event0=$SECONDS ; } ; }
+}
 sel_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
 tags_size() { [[ $1 == + ]] && { ((tags_size+=$(stat --printf="%s" "$2"))) ; true ; } || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
 tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" $tags_size ; } ; }

@@ -19,6 +19,7 @@ declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_M
 KEY_TIMEOUT=0.5				# timeout between key presses
 shell_h=40%				# shell pane height
 auto_selection=1			# automatically synch tags between panes
+time_event=0				# set to positive integer to trigger time events
 pdhl=					# log pdh message in file too
 : ${prev_all:=1}			# open preview window
 zooms=(70 50 30)			# sizes of preview pane in percent

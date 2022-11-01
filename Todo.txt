@@ -17,13 +17,7 @@ presentation:
 			status
 			detail videos
 
-functionality: on exit check if there are  more processes running in the background
-
 # Later
-
-functionality: rsynch directories and files to current directory
-	in background or not
-	popup when finished
 
 functionality: undo deletes via rip
 

@@ -303,6 +303,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 - External Viewer
 - Shell Pane
 - Command Mode
+- Time Events
 
 ## General *ftl* Commands
 
@@ -926,6 +927,20 @@ Examples
 
         «:» full finfo | xargs -0 echo ; read -sn1     full screen
 
+
+## Time Events
+You can register functions in *ftl* to be run at when a'Time Event' occurs.
+
+Set "time_event" in _ftlrc_ to a positive integer n, a 'Time Event' will
+occurs every n seconds.
+
+Register your function:
+
+        print_seconds(){ pdhn $SECONDS ; }
+        time_event_handlers[print_seconds]=print_seconds
+
+If you want your function to be run every 'x' seconds, you'll need to handle it
+yourself, *ftl* will call your function every 'n' seconds.
 
 # FILES
 
