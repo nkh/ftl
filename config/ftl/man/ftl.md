@@ -100,6 +100,41 @@ program is killed and a new program is started.
 
 The idea is to use within *ftl* what you normally use on the command line.
 
+Supported files:
+        - images
+
+        - videos
+
+        - ASCII text with escape sequences
+
+        - cbr/cbz
+
+        - directories
+
+        - html
+
+        - json
+
+        - manpage
+
+        - markdown
+
+        - mp3s
+
+        - pdf
+
+        - rar
+
+        - sc-im
+
+        - shellscript
+
+        - svg
+
+        - text files
+
+See "Creating you own viewer" in "## External Viewer"
+
 ## Extended And Detached Viewers
 
 For some file types, often media types, *ftl* can show an extended view and 
@@ -481,6 +516,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 - music, will show information and play the music
                 - pdf
                 - tar files 
+                - markdown
+                ...
 
         «⇑v/“»                Alternative preview #1 
 

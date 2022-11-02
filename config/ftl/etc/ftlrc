@@ -35,6 +35,8 @@ mount_archive=0				# set if fuse-archive is installed
 cursor_color0='\e[7;34m'		# default cursor color
 cursor_color="$cursor_color0"		# cursor color
 cursor_color_search='\e[7;35m'		# cursor color in interactive search
+pop_help=0				# show help in popup
+pop_kbindings=1				# show bindings in popup
 quick_display=512			# display entries during scanning if over this number
 rfilter0=				# default reverse filter, eg: rfilter0='\.sw.$'
 show_line=1				# show line (entry index)
