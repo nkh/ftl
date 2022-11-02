@@ -17,6 +17,15 @@ presentation:
 			status
 			detail videos
 
+issue: when running a video optimization, q quits!
+	runs in its own session, shouldn't quit
+
+functionality: goto tmsu query, got in tabs, select the query results
+
+functionality: accept list of virtual files as parameter
+
+functionality: get sort and other to work with virtual files
+
 # Later
 
 functionality: undo deletes via rip

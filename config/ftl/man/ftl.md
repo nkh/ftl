@@ -430,9 +430,10 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
 ## Tabs
 
-        Each tab has its own index, indexes are not reused; each pane has
-        its own tabs. Tabs are close with «q», when the last tab is closed
-        the pane is closed.
+        Each tab has its own index-name, indexes are not reused;
+        tabs have their own filters; each pane has its own tabs.
+        Tabs are close with «q», when the last tab is closed the pane
+        is closed.
 
         «⇈s/§»             New tab 
 
@@ -965,20 +966,6 @@ Examples
         «:» full finfo | xargs -0 echo ; read -sn1     full screen
 
 
-## Time Events
-You can register functions in *ftl* to be run at when a'Time Event' occurs.
-
-Set "time_event" in _ftlrc_ to a positive integer n, a 'Time Event' will
-occurs every n seconds.
-
-Register your function:
-
-        print_seconds(){ pdhn $SECONDS ; }
-        time_event_handlers[print_seconds]=print_seconds
-
-If you want your function to be run every 'x' seconds, you'll need to handle it
-yourself, *ftl* will call your function every 'n' seconds.
-
 # FILES
 
 ## Directory structure
@@ -1128,6 +1115,20 @@ what you are implementing.
                  «LEADER v v»        insert a virtual entries
                  «LEADER v V»        removes virtual entries
                  «LEADER v e»        show virtual entries etag
+
+## Time Events
+You can register functions in *ftl* to be run at when a'Time Event' occurs.
+
+Set "time_event" in _ftlrc_ to a positive integer n, a 'Time Event' will
+occurs every n seconds.
+
+Register your function:
+
+        print_seconds(){ pdhn $SECONDS ; }
+        time_event_handlers[print_seconds]=print_seconds
+
+If you want your function to be run every 'x' seconds, you'll need to handle it
+yourself, *ftl* will call your function every 'n' seconds.
 
 ## Directory Changer
 

@@ -82,10 +82,10 @@ image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q 
 image_mode()		{ ((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ftl_imode ; cdir '' "$f"; }
 link()			{ tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags_clear && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ; }
 follow_link()		{ [[ -L "$n" ]] && cdir "$(dirname $(realpath "$n"))"  "$(basename $(realpath "$n"))" ; }
-mark()			{ read -sn1 ; [[ -n $REPLY ]] && marks[$REPLY]="${files[file]}" ; }
+mark()			{ read -sn1 ; [[ -n $REPLY ]] && { [[ -d  "${files[file]}" ]] && marks[$REPLY]="${files[file]}/$" || marks[$REPLY]="${files[file]}" ; } ; }
 mark_fzf()		{ go_loop f fzf "$(printf "%s\n" "${marks[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)" ; }
-mark_go()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" '' "${dir_file[${tab}_$d]}" ; } || list ; }
-mark_go_tab()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" '' "${dir_file[${tab}_$d]}" ; } || list ; }
+mark_go()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
+mark_go_tab()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
 preview_refresh()	{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&- ; true ; } || { $pgen/generator_one "$thumbs" "$n" "$e" ; } ; pw3image FTL_RESTART_W3M ; list ; }
 montage_preview()	{ [[ "$montage" ]] && montage= || montage="⠶" ; list ; }
 player_kill()		{ player_k ; }
