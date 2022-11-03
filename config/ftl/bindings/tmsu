@@ -80,9 +80,9 @@ tmsu_filter_query() { source "$FTL_CFG/filters/by_tag_query" ; cdir '' "$f" ; }
 
 tmsu_table2()
 {
-readarray -t all_tags < <(tmsu files | xargs tmsu tags --name=never | tr ' ' '\n' | sed -e '/^$/d' | sort -u)
+readarray -t all_tags < <(tmsu files 2>&- | xargs tmsu tags --name=never 2>&- | tr ' ' '\n' | sed -e '/^$/d' | sort -u)
 
-readarray -t files_and_tags < <(tmsu files | xargs tmsu tags 2>&-)
+readarray -t files_and_tags < <(tmsu files 2>&- | xargs tmsu tags 2>&-)
 
 continuation_color="$(echo -en '\e[90m')"
 

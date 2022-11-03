@@ -25,7 +25,7 @@ video_optimize()
 [[ $e == mp4 ]] || return
 
 mv "$f" "$b.original.$e"
-id=ftl$$$(date +%s%N)
+id=ftl_video$$$(date +%s%N)
 tmux new-session -d -s $id "ffmpeg -i '$b.original.$e' -vcodec libx265 -crf 24 '$f' ; tmux popup -h 5 echo Done re-encoding '$n'"
 cdir ''  "$b.original.$e"
 }

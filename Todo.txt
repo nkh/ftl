@@ -17,14 +17,21 @@ presentation:
 			status
 			detail videos
 
-issue: when running a video optimization, q quits!
-	runs in its own session, shouldn't quit
-
-functionality: goto tmsu query, got in tabs, select the query results
-
 functionality: accept list of virtual files as parameter
+		accept them with color
+		what do we do with them
+			must have at least keyboard handler
+
+		better get code to source
+			code can itself get list of virtual files from whereever or generate them
+
+		let user define ftl options?
+
 
 functionality: get sort and other to work with virtual files
+			external commands would fail
+				mount a union fs ?
+
 
 # Later
 
