@@ -524,7 +524,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «⇈v/‘»                Alternative preview #2 
 
-        «⇑x/»»                Hexadecimal preview    
+        «⇑x/»                 Hexadecimal preview    
 
         not assigned          Preview file's end (text files in vim)
 
@@ -665,7 +665,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «⇈0/°»             Fzf merge selection from panes 
 
 ## Etags
-        «zT»             Select etag type from list
+        «zT»               Select etag type from list
 
 ## Tags
 
