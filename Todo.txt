@@ -22,16 +22,20 @@ functionality: accept list of virtual files as parameter
 		what do we do with them
 			must have at least keyboard handler
 
-		better option points to bash scrip
+		better option points to bash script
 			code can itself get list of virtual files from wherever or generate them
 
 		let user define ftl options?
 			point to bash scripts sourced
 				source when?
 					before/after ftlrc?
+						let user do it in user's ftlrc!
 
+		
 		only display virtual files
 			a browser for virtual data
+
+
 
 		files could exist in tmp but ftl displays a different path
 
@@ -71,11 +75,16 @@ functionality: accept list of virtual files as parameter
 				re-located files
 				virtual files
 
+
+		union fs layer
+			bottom, read only from the top layer (can be changed directly)
+			middle, written on write in top layer
+			top, virtual layer, mounted
+
 functionality: interactive tree
 		ugrep
 		tre-agrep
 		fstrcmp
-
 
 
 
