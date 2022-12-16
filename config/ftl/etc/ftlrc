@@ -22,8 +22,8 @@ auto_selection=1			# automatically synch tags between panes
 time_event=0				# set to positive integer to trigger time events
 pdhl=					# log pdh message in file too
 : ${prev_all:=1}			# open preview window
-zooms=(70 50 30)			# sizes of preview pane in percent
-zoom=0					# start zoon level
+zooms=(85 70 50 30)			# sizes of preview pane in percent
+zoom=1					# start zoon level
 move_step=4				# fast movement size
 msg_m='Creating montage ...'		# message displayed when creating image montage for directories
 msg_du='Computing dir sizes ...'	# message displayed when computing directory sizes
@@ -60,7 +60,7 @@ lglyph=('' ᵈ ᶠ)				# preview: all, directory-only, file-only
 tglyph=('' ¹ ² ³ D)			# tag classes 
 
 # Media Filters
-ifilter='svg|webp|jpg|jpeg|JPG|png|gif'	# images
+ifilter='svg|webp|jpg|jpeg|JPG|png|gif|bmp'	# images
 mfilter='mp3|mp4|flv|mkv|webm'		# video
 
 # FZF Options
@@ -72,8 +72,9 @@ EDITOR=vim
 FILE_DIFF=vimdiff
 
 FTLI_CLEAN=1				# set to 0 if using konsole
-FTLI_W=10				# hint FTLI about Character width
 FTLI_H=19				# hint FTLI about Character height
+FTLI_W=10				# hint FTLI about Character width
+FTLI_Z=0				# show image zoomed 
 
 GPGID=CHANGE.ME
 
@@ -278,6 +279,7 @@ bind ftl view		zmp		montage_preview		"montage mode"
 bind ftl view		zmP		preview_refresh		"refresh file preview/montage"
 bind ftl view		zmv		file_dir_mode		"file/dir view mode"
 bind ftl view		zmd		preview_dir_only	"preview directory only"
+bind ftl view		zz		image_zoom		"zoom image preview"
 bind ftl view		z+		preview_size		"change preview size"
 bind ftl view		+		preview_size		"change preview size"
 bind ftl view		zg		show_stat		"show/hide stat"

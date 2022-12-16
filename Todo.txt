@@ -81,12 +81,17 @@ functionality: accept list of virtual files as parameter
 			middle, written on write in top layer
 			top, virtual layer, mounted
 
+
 functionality: interactive tree
 		ugrep
 		tre-agrep
 		fstrcmp
 
 
+issue: after moving file numfmt fails, clearing the selection fixes it
+
+issue: moving many files goes over command line limit
+		use xargs in cp_mv()
 
 # Later
 

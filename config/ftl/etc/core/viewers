@@ -55,7 +55,7 @@ ptype
 
 ext_dir()      {  $G_PLAYER "$n" &>/dev/null & }
 ext_html()     { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; }
-ext_image()    { pdhn ext_image ; images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]] && images+=("$img") ; done ; run_maxed fim "$n" $(printf "%q " "${images[@]}") ; }
+ext_image()    { images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]] && images+=("$img") ; done ; run_maxed fim "$n" $(printf "%q " "${images[@]}") ; }
 ext_media()    { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "$n" &>/dev/null &) ; mplayer=$! ; }
 ext_pdf()      { ((emode == 1)) && ext_pdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) && true ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } ; }
 ext_pdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
