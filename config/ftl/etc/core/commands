@@ -58,7 +58,7 @@ editor_detach()		{ ((in_viprev)) && in_viprev= && pane_id= && cdir ; }
 external_mode1()	{ emode=1 ; preview ; }
 external_mode2()	{ emode=2 ; preview ; }
 external_mode3()	{ emode=3 ; preview ; }
-file_dir_mode()		{ ((lmode[tab]--)) ; ((lmode[tab] < 0)) && lmode[tab]=2 ; cdir '' "$f" ; }
+file_dir_mode()		{ ((lmode[tab]++)) ; ((lmode[tab] > 2)) && lmode[tab]=0 ; cdir '' "$f" ; }
 set_filter()		{ prompt "filter: " -i "${filters[tab]}" ; filters[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
 set_filter_dir()	{ prompt "filter dir: " -i "${filters_dir[tab]}" ; filters_dir[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
 set_filter2()		{ prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
@@ -81,7 +81,6 @@ ghistory2()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $
 ghistory_clear()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
 ghistory_edit()		{ dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ; }
 image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
-image_mode()		{ ((imode[tab]--)) ; ((imode[tab] < 0)) && imode[tab]=2 ; ftl_imode ; cdir '' "$f"; }
 image_zoom()		{ ((FTLI_Z ^= 1)) ; list ; }
 link()			{ tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags_clear && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ; }
 follow_link()		{ [[ -L "$n" ]] && cdir "$(dirname $(realpath "$n"))"  "$(basename $(realpath "$n"))" ; }
@@ -142,6 +141,11 @@ select_all()		{ for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
 tag_move_to()		{ fzf_mv "${selection[@]}" && tags_clear ; cdir '' "$f"; }
 tag_move()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
+view_mode_all()		{ vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; cdir '' "$f"; }
+view_mode_image()	{ vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; cdir '' "$f"; }
+view_mode_not_image()	{ vmode[tab]=2 ; tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; cdir '' "$f"; }
+view_mode_next()	{ ((vmode[tab]++)) ; ((vmode[tab] > 2)) && vmode[tab]=0 ; view_mode ${vmode[tab]} ; }
+view_mode()		{ [[ $1 == 0 ]] && view_mode_all ; [[ $1 == 1 ]] && view_mode_image ; [[ $1 == 2 ]] && view_mode_not_image ; }
 selection_flip_down()	{ for ((i=file ; i < file + ${COUNT:-1} && i < nfiles ; i++)) ; do tag_flip "${files[i]}" ; done ; move ${COUNT:-1} ; list ; }
 selection_flip_up()	{ tag_flip "${files[file]}" ; move -1 ; list ; }
 selection_fzf()		{ fzf_tag T "$(fd -H --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }

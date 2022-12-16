@@ -105,7 +105,7 @@ list() # select
 ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none ; ((gpreview)) || save_state $fs ; selection ; geo_winch
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center, bottom = top + lines - 1, bottom = bottom < 0 ? 0 : bottom)) ; l=0
 
-head="${lglyph[lmode[tab]]}${iglyph[imode[tab]]}${pdir_only[tab]}${montage}" ; head=${head:+$head }
+head="${lglyph[lmode[tab]]}${iglyph[vmode[tab]]}${pdir_only[tab]}${montage}" ; head=${head:+$head }
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
 ((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅  $head$ftag$tabsd" ; header '' "$head" ; tcpreview ; clear_list 0 ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;

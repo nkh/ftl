@@ -26,7 +26,7 @@ OLD FILE! NEEDS LOTS OF UPDATES!
 - cdir      get list of files in directory and colorize them
 - list      list directory files
 - ftl_pmode setup directory preview
-- ftl_imode setup image mode
+- view_mode setup image mode
 - c*        close previews
 - e*        external viewers
 - p*        "internal" viewers
