@@ -88,10 +88,18 @@ functionality: interactive tree
 		fstrcmp
 
 
+functionality:
+	add dirrc, pick from list, in current directory
+
 issue: after moving file numfmt fails, clearing the selection fixes it
 
 issue: moving many files goes over command line limit
 		use xargs in cp_mv()
+
+
+	tag_check tag_get tag_unset take long time on 8000 entries
+	cp_mv xargs command not run
+	
 
 # Later
 

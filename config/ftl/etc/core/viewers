@@ -2,14 +2,15 @@ source "$FTL_CFG/etc/commands/open_with"
 
 ext_viewers()
 {
-((emode == 3))       && { open_with ; return ; }
-
 [[ -d "$n" ]]        && { ext_dir   ; return ; }
 [[ $e =~ html ]]     && { ext_html  ; return ; }
 [[ $e =~ $ifilter ]] && { ext_image ; return ; }
 [[ $e =~ $mfilter ]] && { ext_media ; return ; }
 [[ $e == pdf ]]      && { ext_pdf   ; return ; }
+[[ $e == PDF ]]      && { ext_pdf   ; return ; }
 [[ $e == sc ]]       && { ext_scim  ; return ; }
+
+((emode == 3))       && { open_with ; return ; }
 
 mime_get
 
@@ -35,7 +36,7 @@ pviewers()
 [[ $e == mp3 ]]                   && { pmp3      ; return ; }
 [[ $e =~ $mfilter ]]              && { pmedia    ; return ; }
 [[ $e =~ ^md|MD$ ]]               && { pmd       ; return ; }
-[[ $e == pdf ]]                   && { ppdf      ; return ; }
+[[ $e == pdf || $e == PDF ]]      && { ppdf      ; return ; }
 [[ $e == 1   ]]                   && { pman      ; return ; }
 [[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
@@ -57,7 +58,7 @@ ext_dir()      {  $G_PLAYER "$n" &>/dev/null & }
 ext_html()     { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; }
 ext_image()    { images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]] && images+=("$img") ; done ; run_maxed fim "$n" $(printf "%q " "${images[@]}") ; }
 ext_media()    { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "$n" &>/dev/null &) ; mplayer=$! ; }
-ext_pdf()      { ((emode == 1)) && ext_pdf_vi || { ((emode == 2)) && (mupdf "$n" 2>/dev/null &) && true ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } ; }
+ext_pdf()      { ((emode == 1)) && ext_pdf_vi || { ((emode == 3)) && run_maxed mupdf "$n" ; true ; } || { ((emode == 2)) && { mupdf "$n" 2>/dev/null & } ; } ; }
 ext_pdf_vi()   { t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
 ext_text()     { tcpreview ; tsplit "$EDITOR ${n@Q}" "33%" '-h -b' -R ; pane_id= ; }
 ext_scim()     { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
@@ -87,7 +88,7 @@ pmlive()    { ((extmode)) && { player_k ; ctsplit "cat $(gen_exift) ; $T_PLAYER_
 pmd()       { ((extmode)) && ctsplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || ctsplit "$MD_RENDER1 \"$n\" | $MD_PAGER" ;  }
 ptext()     { vipreview "$n" ; }
 
-ppdf()      { [[ $e == pdf ]] && { ((extmode==2)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; true ; } ; }
+ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
 pman()      { ctsplit "man \"$n\" ; read -sn 1000" ; true ; }

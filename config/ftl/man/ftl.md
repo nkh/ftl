@@ -390,25 +390,35 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zt»               Show/hide etags, see "Select etag type" below.
 
+        «zp»               Montage mode, directory preview is a montage of the images.
+
+        «zP»               Refresh preview or montage.
+
+        «zep»              Show/hide current extension preview.
+
+        «zmd»              file/directory mode
+
         «zmv»              File/dir view mode (circular)
                                   - only files
                                   - only directories
                                   - files and directories
 
-        «zmi»              View mode (circular)
+        «zmm»              View mode (circular)
+                                  - filter out non-images
                                   - filter out images
-                                  - filter out non images
                                   - show all files
 
-        «zmp»              Montage mode, directory preview is a montage of the images.
+        «zma»              Show all files
 
-        «zmP»              Refresh preview or montage.
+        «zmi»              filter out non-images              
 
-        «zmd»              Preview directory only/all. 
+        «zmn»              filter out images
+
+        «zmp»              Show pdf preview as text or image.
 
         «zmI»              Show/hide image preview.
 
-        «zep»              Show/hide current extension preview.
+        «zmD»              Preview directory only/all. 
 
         «⇈i/ı»             Fzfi, use fzf and ueberzurg to find and display images
 

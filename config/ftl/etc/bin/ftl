@@ -30,7 +30,7 @@ for key in "${keysa[@]}"
 	do
 		shortcut="$shortcut$key" 
 		
-		((ftl_bind_check)) && "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
+		((ftl_bind_check)) && [[ "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
 			echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding '${kbd_trie[$shortcut]}'" 
 
 		((kbd_trie[$shortcut]++)) 
@@ -53,7 +53,7 @@ key_command()
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 
-keys_command="$keys_command$REPLY" ; (( key_commands++))# ; pdhn "[$COUNT] <$keys_command> ($key_commands) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
+keys_command="$keys_command$REPLY" ; (( key_commands++)) ; pdhn "[$COUNT] <$keys_command> ($key_commands) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
 ((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
 

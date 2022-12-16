@@ -61,7 +61,8 @@ tglyph=('' ¹ ² ³ D)			# tag classes
 
 # Media Filters
 ifilter='svg|webp|jpg|jpeg|JPG|png|gif|bmp'	# images
-mfilter='mp3|mp4|flv|mkv|webm'		# video
+mfilter='mp3|mp4|flv|mkv|webm'			# video
+pdf_prev_image=0				# show pdf as images if set
 
 # FZF Options
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
@@ -189,7 +190,6 @@ bind ftl media		aa		preview_show		"terminal media player in background"
 bind ftl media		ak		player_kill		"kill sound preview"
 bind ftl media		aq		preview_queue		"fzf a viewer"
 bind ftl media		aA		preview_show_fzf	"fzf a viewer"
-
 bind ftl media		e		external_mode1		"external viewer, m1"
 bind ftl media		E		external_mode2		"external viewer m2, detached"
 bind ftl media		"${A[e]}"	external_mode3		"external viewer m3, detached, fullscreen"
@@ -278,10 +278,12 @@ bind ftl view		zmd		file_dir_mode		"file/dir view mode"
 bind ftl view		zmi		view_mode_image		"view mode: image"
 bind ftl view		zmn		view_mode_not_image	"view mode: not image"
 bind ftl view		zmm		view_mode_next		"view mode: not image/image/all"
+bind ftl view		zmp		view_mode_pdf		"show pdf preview as text or image"
 
 bind ftl view		zmI		preview_image		"show/hide image preview"
-bind ftl view		zmp		montage_preview		"montage mode"
-bind ftl view		zmP		preview_refresh		"refresh file preview/montage"
+
+bind ftl view		zp		montage_preview		"montage mode"
+bind ftl view		zP		preview_refresh		"refresh file preview/montage"
 bind ftl view		zmD		preview_dir_only	"preview directory only"
 
 bind ftl view		zz		image_zoom		"zoom image preview"
@@ -298,6 +300,7 @@ bind ftl view		"${A[x]}"	hexedit			"hexedit"
 bind ftl view		"${SA[i]}"	image_fzf		"fzfi, using ueberzurg"
 bind ftl view		"${A[v]}"	preview_m1		"alternative preview for : dir, media, pdf, tar, ..."
 bind ftl view		"${SA[v]}"	preview_m2		"alternative preview for : dir, media, pdf, tar, ..."
+
 # bind ftl view		not_assigned	preview_tail		"file preview at end"
 # bind ftl view		not_assigned	preview_lock		"preview lock, using external script"
 # bind ftl view		not_assigned	preview_lock_clr	"preview lock clear"
