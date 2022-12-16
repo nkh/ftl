@@ -16,7 +16,7 @@ help_command="man ftl.1"                # command to run to show help, see # Vim
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
 # Options 
-KEY_TIMEOUT=0.5				# timeout between key presses
+KEY_TIMEOUT=1.5				# timeout between key presses
 shell_h=40%				# shell pane height
 auto_selection=1			# automatically synch tags between panes
 time_event=0				# set to positive integer to trigger time events
