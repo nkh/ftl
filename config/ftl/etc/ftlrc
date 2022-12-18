@@ -249,7 +249,6 @@ bind ftl tabs		TAB		tab_next		"next tab"
 bind ftl tabs		"gt"		tab_next		"next tab"
 bind ftl tabs		"COUNT gt"	tab_goto		"go to tab"
 bind ftl tabs		"gT"		tab_prev		"previous tab"
-
 bind ftl tabs		"${SA[s]}"	tab_new			"new tab"
 
 bind ftl selection	"COUNT y1"	selection_class_1	"class 1 selection"

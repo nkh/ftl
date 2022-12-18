@@ -87,10 +87,6 @@ functionality: interactive tree
 		tre-agrep
 		fstrcmp
 
-
-functionality:
-	add dirrc, pick from list, in current directory
-
 issue: after moving file numfmt fails, clearing the selection fixes it
 
 issue: moving many files goes over command line limit
@@ -99,7 +95,6 @@ issue: moving many files goes over command line limit
 
 	tag_check tag_get tag_unset take long time on 8000 entries
 	cp_mv xargs command not run
-	
 
 # Later
 

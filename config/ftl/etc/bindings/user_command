@@ -1,6 +1,6 @@
 run_user_command() 
 {
-p="$FTL_CFG/commands" ; cmd=$(cd $p 2>&- && fd | sed 's/^.\///' | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $cmd ]] && . $p/$cmd ; list
+p="$FTL_CFG/commands" ; cmd=$(cd $p 2>&- && fd -t f | sed 's/^.\///' | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $cmd ]] && . $p/$cmd ; list
 }
 
 bind leader shell "LEADER u" run_user_command "choose a user command to run"

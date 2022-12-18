@@ -1,0 +1,8 @@
+#/bin/bash
+
+{
+echo "s_type=2"
+echo "s_reversed=-r"
+} >".ftlrc_dir"
+
+# vim: set filetype=bash :
