@@ -33,6 +33,7 @@ for key in "${keysa[@]}"
 		((ftl_bind_check)) && [[ "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
 			echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding '${kbd_trie[$shortcut]}'" 
 
+
 		((kbd_trie[$shortcut]++)) 
 		{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
 	done
@@ -43,9 +44,9 @@ C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$ma
 
 key_command()
 {
-(( key_commands )) && [[ "$REPLY" == ESCAPE ]] && { key_commands= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
-(( key_commands > 4 ))                         && { key_commands= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
-[[ "$REPLY" == ERROR_142     ]]                && { key_commands= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
+(( keys_in )) && [[ "$REPLY" == ESCAPE ]] && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
+(( keys_in > 4 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
+[[ "$REPLY" == ERROR_142     ]]                && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
 [[ "$REPLY" == "?"           ]]                && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]]                && REPLY=LEADER 
 
@@ -53,12 +54,12 @@ key_command()
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 
-keys_command="$keys_command$REPLY" ; (( key_commands++)) ; pdhn "[$COUNT] <$keys_command> ($key_commands) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
+keys_command="$keys_command$REPLY" ; (( keys_in++)) ; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
 ((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
 
 [[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && 
-	{ ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; key_commands= keys_command= HAS_COUNT= COUNT= ; }
+	{ ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_in= keys_command= HAS_COUNT= COUNT= REPLY= ; }
 }
 
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }

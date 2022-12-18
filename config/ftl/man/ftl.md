@@ -722,7 +722,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «⇑h/ħ+e»           Uses fzf to mark entries that will be removed from the history
 
-        «⇑h/ħ+d»           Delete all session history 
+        «⇑h/ħ+d»           Delete all sessions history 
 
 ## File and directory operations
 

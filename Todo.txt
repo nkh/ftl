@@ -91,8 +91,7 @@ issue: after moving file numfmt fails, clearing the selection fixes it
 
 issue: moving many files goes over command line limit
 		use xargs in cp_mv()
-
-
+	
 	tag_check tag_get tag_unset take long time on 8000 entries
 	cp_mv xargs command not run
 
@@ -113,6 +112,8 @@ arch: multi column attributes
 	columns can be added by background process
 		eg: many files need processing and that thats a long time
 			list every time a batch is processed
+
+arch: asynch list display for very large directories
 
 arch: put all options in one array
 
