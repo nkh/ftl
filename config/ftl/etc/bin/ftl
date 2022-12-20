@@ -14,7 +14,7 @@ echo -en '\e[?1049h' ; stty -echo ; filter_rst ; vfiles_rst ; sort_filters=(-k3 
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; }
 fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
 
-[[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
+[[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; cd "$dir" ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
 ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_main_info_file" ;
 
@@ -126,7 +126,7 @@ preview()
 {
 ((main && prev_all || prev_all)) \
 	&& { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
-        || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane Ä &>/dev/null ; return ; }
+        || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; return ; }
 }
 
 setup_finfo()
