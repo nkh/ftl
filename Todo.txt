@@ -97,8 +97,6 @@ issue: moving many files goes over command line limit
 
 # Later
 
-functionality: undo deletes via rip
-
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 
 functionality: drag drop via dragon

@@ -96,13 +96,18 @@ NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for
 
 # Deletion command
 RM="rm -rf"
-	# using rm-improved
-	# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
-	# using FreeDesktop.org Trash 
-	# RM="trash-put"
-	# using your own delete function
-	# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
-	# RM=my_delete
+
+# using rm-improved
+# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
+# bind ftl file	U	unbury		"undo last deletion in current directory"
+# unbury() { last_bury="$(rip --graveyard $HOME/graveyard -s | tail -n1)" ; [[ -n "$last_bury" ]] && { rip --graveyard $HOME/graveyard -u ; cdir "$PWD" "$(basename "$last_bury")" ; } ; } 
+
+# using FreeDesktop.org Trash 
+# RM="trash-put"
+
+# using your own delete function
+# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
+# RM=my_delete
 
 CMD_COLS=150 				# columns when displaying command mapping in popup
 
