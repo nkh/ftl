@@ -69,7 +69,7 @@ fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="--cycle --expect=ctrl-t --reverse"
 
 # External Commands
-EDITOR=vim
+EDITOR="vim -p"
 FILE_DIFF=vimdiff
 
 FTLI_CLEAN=1				# set to 0 if using konsole
