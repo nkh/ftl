@@ -506,7 +506,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «{» «Ö»            Next entry of different extension 
 
-        «[» «ä»            Goto entry by index               
+        «#»                Goto entry by index               
 
         yn                 Goto next selected entry
 
@@ -739,7 +739,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «P»                Move selection    
 
-        «⇈p/þ»             Move selection to, Uses _fzf_mv_.
+        «⇑p/þ»             Move selection to, Uses _fzf_mv_.
 
         «cw»               Rename selection.
 
