@@ -87,14 +87,6 @@ functionality: interactive tree
 		tre-agrep
 		fstrcmp
 
-issue: after moving file numfmt fails, clearing the selection fixes it
-
-issue: moving many files goes over command line limit
-		use xargs in cp_mv()
-	
-	tag_check tag_get tag_unset take long time on 8000 entries
-	cp_mv xargs command not run
-
 issue: tag_go jumps around
 	tag_go moves across directories
 	tag_go "indexes" an associative array, is the result always the same when getting entries
