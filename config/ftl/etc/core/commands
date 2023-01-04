@@ -78,7 +78,6 @@ gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y 
 go_rg()			{ exec 2>&9 ; tcpreview ; go_loop rg "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/log" ; }
 history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
-ghistory2()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory_delete()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
 ghistory_edit()		{ dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ; }
 image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
@@ -98,8 +97,7 @@ pane_right()		{ pane_ftl "'$n' $pfs" "-h -b" -R ; [[ "$n" ]] && rdir "$n" ; echo
 pane_R()		{ pane_extra "" "" ; }
 pane_L()		{ pane_extra "-h -b" "-R" ; }
 pane_go_next()		{ p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh_pane]} ; }
-preview_pane()		{((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
-preview_once()		{ preview=1 ; tcpreview ; sleep 0.05 ; cdir ; geo_winch ; }
+preview_pane()		{ ((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
 preview_dir_only()	{ [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ; }
 preview_ext_ign()	{ [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ; }
 preview_image()		{ ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; cdir ; } 
@@ -125,7 +123,7 @@ refresh_pane()		{ ((nfiles)) && path "${files[file]}" || f= ; tag_check ; cdir "
 rename()		{ tcpreview ; printf "%s\n" "${selection[@]}" | edir && tags_clear && cdir '' "$f" ; }
 shell()			{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; }
 shell_files()		{ { [[ "$shell_id" ]] && $(tmux has -t $shell_id 2>&-) ; } && R=${C[shell_file]} || shell_pane 1 ; tmux selectp -t $shell_id &>/dev/null ; }
-shell_file()		{ for i in "${selection[@]}" ; do shell_send 1 "'$i'" " " ; done ; }
+shell_send_files()	{ for i in "${selection[@]}" ; do shell_send 1 "'$i'" " " ; done ; }
 shell_view()		{ ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; } ; tmux switch -t ftl$$:ftl$$_bash ; }
 shell_synch()		{ shell_send 1 "cd '$p'" C-m ; }
 shell_zoomed()		{ { [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } || shell_pane ; tmux selectp -t $shell_id &>/dev/null ; tmux resizep -Z -t $shell_id &>/dev/null ; }
@@ -138,6 +136,7 @@ tab_new()		{ [[ -d "$f" ]] && _tab_new "$n" || _tab_new "$PWD" ; cdir "${tabs[ta
 tab_next()		{ ctab=$tab ; _tab_next ; ((tab != ctab)) && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
 tab_prev()		{ ctab=$tab ; _tab_prev ; ((tab != ctab)) && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
 tab_goto()		{ ((ntab = $COUNT - 1)) ; ((ntab != tab)) && [[ -n "${tabs[ntab]}" ]] && tab=ntab && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
+select_all_directories(){ for p in "${files[@]}" ; do [[ -d "$p" ]] && tags["$p"]='▪' ; done ; list ; }
 select_all_files()	{ for p in "${files[@]}" ; do [[ -f "$p" ]] && tags["$p"]='▪' ; done ; list ; }
 select_all()		{ for p in "${files[@]}" ; do tags["$p"]='▪' ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }

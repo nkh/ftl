@@ -365,14 +365,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «$»             Detach the preview from ftl, open a new preview pane.
 
-        «*»             Set maximum listing depth
-
-                        Set the maximum depth of listing, 1 shows the entries in the
-                        current directory. It's sometimes practical but using multiple
-                        tabs or panes is more ergonomic.
-
-        «yc»            Copy selection to clipboard, full path, separated with by a space.
-
         «¿»             Pdh, pane used for debugging.
 
 
@@ -420,7 +412,19 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zmD»              Preview directory only/all. 
 
-        «⇈i/ı»             Fzfi, use fzf and ueberzurg to find and display images
+        «gfi»              Fzfi, use fzf and ueberzurg to find and display images
+
+        «zeh»              Hide files having the same extention as the current file, per tab
+
+        «zeH»              Hide files having the same extention as the current file, global 
+                        
+        «zec»              Show all hidden extensions 
+
+        «z*»               Set maximum listing depth
+
+                               Set the maximum depth of listing, 1 shows the entries in the
+                               current directory. It's sometimes practical but using multiple
+                               tabs or panes is more ergonomic.
 
         not assigned       Preview lock
         not assigned       Preview lock clear
@@ -504,8 +508,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «[» «ä»            Goto entry by index               
 
-        not assigned       Goto previous selected entry
-        not assigned       Goto next selected entry
+        yn                 Goto next selected entry
+
+        yN                 Goto previous selected entry
 
         «K»                Scroll preview up                 
 
@@ -516,8 +521,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «zv»               Preview show/hide      
 
         «+» «z+»           Change preview size, see rc file predefined sizes
-
-        «zV»               Preview current entry once (if preview pane is close)
 
         Some entry have multiple preview types, these bindings let you
         to see the other type of preview.
@@ -530,11 +533,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 - markdown
                 ...
 
-        «⇑v/“»                Alternative preview #1 
+        «z1»                  Alternative preview #1 
 
-        «⇈v/‘»                Alternative preview #2 
-
-        «⇑x/»                 Hexadecimal preview    
+        «z2»                  Alternative preview #2 
 
         not assigned          Preview file's end (text files in vim)
 
@@ -585,15 +586,15 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                         filter #1/#2/reverse. The filters directory contains ten external
                         filters you can load with shortcut «⇑f/đ». 
                         
-        «zE»               Choose filter from external filters 
+        «fE»               Choose filter from external filters 
                         
-        «zd»               Set filter #d
+        «fd»               Set filter #d
                         
-        «zf»               Set filter #1 
+        «ff»               Set filter #1 
 
-        «zF»               Set filter #2 
+        «fF»               Set filter #2 
                         
-        «zr»               Set reverse-filter 
+        «fr»               Set reverse-filter 
                         
                            Filters out what you don't want to see. Applied after other
                            filters are applied. It can be set in your ftlrc file.
@@ -605,14 +606,10 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                            eg: always hide vim swap files, set by default in _ftlrc_
                                 rfilter0='\.sw.$'
                         
-        «zc»               Clear all filters 
+        «fy»               filter out non selection
+ 
+        «fc»               Clear all filters 
                         
-        «zee»              Hide files having the same extention as the current file, per tab
-
-        «zeE»              Hide files having the same extention as the current file, global 
-                        
-        «zec»              Show all hidden extensions 
-
 ## Searching
 
         «/»                Incremental search, «ENTER» or «ESCAPE» to end.
@@ -625,11 +622,11 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gfa» «⇑b/”»       Fzf find                       
 
-        «gfr»              Fzf find regexp/fuzzy          
+        «gfA»              Fzf find regexp/fuzzy          
 
         «gfd»              Fzf find only directories      
 
-        «gr»               Ripgreg with preview           
+        «gfr»              Ripgreg with preview           
 
         Opening search results in tabs:
                 If you use one of the above you can pick multiple entries.
@@ -664,15 +661,17 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «yU»               Opens fzf to let you choose which entries to deselect.
 
+        «yc»               Copy selection to clipboard, full path, separated by a space.
+
         «gy»               Opens fzf to choose an entry in the selection, then
                            changes directory to where the selection is.
 
                            This is handy when selections are read from a file with option
                            -t on the command line or via the 'load_selection'
 
-        «⇑o/œ»             Merge selection from all panes, see option auto_select
+        not_assigned       Merge selection from all panes, see option auto_select
 
-        «⇈0/°»             Fzf merge selection from panes 
+        not_assigned       Fzf merge selection from panes 
 
 ## Etags
         «zT»               Select etag type from list
@@ -716,13 +715,13 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         *ftl* keeps two location histories, one for the current session and one
         global.
 
-        «⇑h/ħ+h» «¨»       Fzf history all sessions, open multiple tabs with «ctrl-t»
+        «HH» «¨»           Fzf history all sessions, open multiple tabs with «ctrl-t»
 
-        «H»                Fzf history current session, open multiple tabs with «ctrl-t»
+        «Hh»               Fzf history current session, open multiple tabs with «ctrl-t»
 
-        «⇑h/ħ+e»           Uses fzf to mark entries that will be removed from the history
+        «He»               Uses fzf to mark entries that will be removed from the history
 
-        «⇑h/ħ+d»           Delete all sessions history 
+        «Hd»               Delete all sessions history 
 
 ## File and directory operations
 
@@ -744,17 +743,21 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «cw»               Rename selection.
 
-        «⇑l/ł»             Symlink selection 
+        «xl»               Symlink selection 
 
         «gL»               Goto symlinked file     
 
-        «xar»              Flip selection read bit 
+        «xmr»              Flip selection read bit 
 
-        «xaw»              Flip selection write bit 
+        «xmw»              Flip selection write bit 
 
-        «xax»              Flip selection execute bit 
+        «xmx»              Flip selection execute bit 
 
-        «xaa»              Set permissions interactively 
+        «xmm»              Set permissions interactively 
+
+        «xh»               Hexadecimal preview    
+
+        «xv»               open in vim    
 
 ## External Commands
 
@@ -807,17 +810,17 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «aA»               Fzf choose viewer 
 
-        Music viewers
+        Media viewers
 
-        «aa» «e»           Background sound preview, stops *ftl* closes.
+        «aa»               Background sound preview, stops when *ftl* closes.
 
         «ak»               Kill sound preview 
-
-        «E» «⇑e/€»         Open _G_PLAYER_ which is _vlc_ by default.
 
         «aq»               Queue entries in music player. default to cmus.
 
                            You can binding cmus in *tmux* for easy access.
+
+        «E» «⇑e/€»         Open _G_PLAYER_ which is _vlc_ by default.
 
         Creating you own viewer:
 
@@ -826,15 +829,15 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 extra viewers are in '$FTL_CFG/viewers'
                 
 ## Shell Pane
-        «CTL-W Ss» or «s»  Shell pane
+        «CTL-W ss» or «s»  Shell pane
 
-        «CTL-W SS»         Shell pane with selected files 
+        «CTL-W sS»         Shell pane with selected files 
 
-        «CTL-W Z»          Shell pane, zoomed out 
+        «CTL-W sz»         Shell pane, zoomed out 
 
-        «⇈0/°»             Cd shell pane to ftl directory
+        «CTL-W sg»         Cd shell pane to ftl directory
 
-        «X»                Send selection to shell pane 
+        «CTL-W sp»         Send selection to shell pane 
 
 # Command Mode
 

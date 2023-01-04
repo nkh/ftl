@@ -95,6 +95,11 @@ issue: moving many files goes over command line limit
 	tag_check tag_get tag_unset take long time on 8000 entries
 	cp_mv xargs command not run
 
+issue: tag_go jumps around
+	tag_go moves across directories
+	tag_go "indexes" an associative array, is the result always the same when getting entries
+		order is not related to when a tag was added nor where the tag is in the current directory
+
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
