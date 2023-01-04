@@ -1,7 +1,5 @@
 etag_dir()
 {
-pdhn "etag_dir git" ;
-
 declare -g -A git_tags=() ; is_git=0
 ((etag)) && git rev-parse HEAD &>/dev/null && 
 	{
