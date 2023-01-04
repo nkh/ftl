@@ -1,10 +1,5 @@
 # Current
 
-issue: key grabbed by other pane
-	when dir preview is opened
-
-issue: inotify, focuses main! resize missed when pane is closed
-
 issue: space in names when passing env var to shell
 
 presentation:
@@ -86,11 +81,6 @@ functionality: interactive tree
 		ugrep
 		tre-agrep
 		fstrcmp
-
-issue: tag_go jumps around
-	tag_go moves across directories
-	tag_go "indexes" an associative array, is the result always the same when getting entries
-		order is not related to when a tag was added nor where the tag is in the current directory
 
 # Later
 

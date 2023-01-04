@@ -680,7 +680,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «LEADER T»         show tmsu tags in preview
 
-        «LEADER t g»       goto tagged file via fzf
+        «LEADER t g»       goto tmsu tagged file via fzf
 
         «LEADER t f»       tmsu tag selection via fzf
 
