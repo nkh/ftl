@@ -46,11 +46,11 @@ key_command()
 {
 (( keys_in )) && [[ "$REPLY" == ESCAPE ]] && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
 (( keys_in > 4 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
-[[ "$REPLY" == ERROR_142     ]]                && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
-[[ "$REPLY" == "?"           ]]                && REPLY=QUESTION_MARK
-[[ "$REPLY" == "$leader_key" ]]                && REPLY=LEADER 
+[[ "$REPLY" == ERROR_142     ]]           && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
+[[ "$REPLY" == "?"           ]]           && REPLY=QUESTION_MARK
+[[ "$REPLY" == "$leader_key" ]]           && REPLY=LEADER 
 
-[[ -n "$key_map"             ]]                && { $key_map ; return ; }
+[[ -n "$key_map"             ]]           && { $key_map ; return ; }
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 

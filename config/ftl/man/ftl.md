@@ -91,7 +91,7 @@ The preview pane can be switched on and off during the session and its size can
 be changed. 
 
 Some entry types have multiple types of preview (IE: directories) that can be
-accessed with a keyboard shortcut (Alt-gr+v and Alt-gr+V by default)
+accessed with a keyboard shortcut («z1» and «z2» by default)
 
 The preview pane is not, generally, a static view of the file but, thanks to
 _tmux_, a running program. If you are positioned on a text file, _vim_ will be
@@ -101,6 +101,7 @@ program is killed and a new program is started.
 The idea is to use within *ftl* what you normally use on the command line.
 
 Supported files:
+
         - images
 
         - videos
@@ -137,7 +138,7 @@ See "Creating you own viewer" in "## External Viewer"
 
 ## Extended And Detached Viewers
 
-For some file types, often media types, *ftl* can show an extended view and 
+For some file types, often media types, *ftl* can show an extended preview and 
 even start a detached viewer. 
 
 See "## External Viewer" below and config in _'$FTL_CFG/etc/ftlrc'_. 
@@ -235,7 +236,7 @@ You can add handlers in _'$FTL_CFG/bindings/type_handlers'_
 
 ## Virtual Entry Injection
 
-*pbs* has a very simple mechanism that allows you to inject _virtual entries_
+*ftl* has a very simple mechanism that allows you to inject _virtual entries_
 in the listing. You can control their colors, preview, and keyboard actions.
 
 See "# Virtual file injection" in '#EXAMPLES'.
@@ -350,7 +351,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «⇑c/©»          Show keyboard bindings 
 
                         The bindings listing is generated at runtime, if you add
-                        or modify bindings it will show in the listing. The listing
+                        or modify bindings they will show in the listing. The listing
                         is displayed in fzf which allows you to search by name but
                         also by binding.
 
@@ -430,15 +431,15 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         not assigned       Preview lock clear
 
 ## Panes
-        «CTL-W s»                New ftl pane below 
+        «CTL-W j»                New ftl pane below 
 
-        «CTL-W l»                New ftl pane left 
+        «CTL-W h»                New ftl pane left 
 
-        «CTL-W L»                New ftl pane left, keep focus 
+        «CTL-W H»                New ftl pane left, keep focus 
 
-        «CTL-W v»                New ftl pane right 
+        «CTL-W l»                New ftl pane right 
 
-        «CTL-W V»                New ftl pane right, keep focus 
+        «CTL-W L»                New ftl pane right, keep focus 
 
         «gp»                     Set focus on the next pane
 
@@ -446,6 +447,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         Each tab has its own index-name, indexes are not reused;
         tabs have their own filters; each pane has its own tabs.
+
         Tabs are close with «q», when the last tab is closed the pane
         is closed.
 
@@ -460,14 +462,12 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «gT»               Previous tab
 
 ## Moving around
-        Also see "cd" in *General Commands* above and *Bookmarks* and
-        *History* below
+        Also see "cd" in *General Commands*, *Bookmarks* and *History* below
 
         *ftl* will automatically put you on a README if you haven't visited
         the directory before; afterward *ftl* will remembers which entry you
         were on.
 
-        
         «ENTER»            cd into directory or edit file if not binary
 
         «h»                Cd to parent directory            
@@ -497,7 +497,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gl»               position cursor on the last file in the window
 
-        «gD»               CD, *ftl* prompts you for a path, with path completions.
+        «gD»               *ftl* prompts you for a path, with path completions, and cd.
                            You can also change directory with bookmarks or by searching for it
 
         «COUNT %»          position cursor iat COUNT percent in the entries
@@ -520,7 +520,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zv»               Preview show/hide      
 
-        «+» «z+»           Change preview size, see rc file predefined sizes
+        «z+» «+»           Change preview size, see rc file predefined sizes
 
         Some entry have multiple preview types, these bindings let you
         to see the other type of preview.
@@ -600,8 +600,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                            filters are applied. It can be set in your ftlrc file.
                         
                            eg: keep files containing 'f' and not containing 'i'
-                                «f»  -> f
-                                «⇑a» -> i
+                                «ff»  -> f
+                                «fr» -> i
                         
                            eg: always hide vim swap files, set by default in _ftlrc_
                                 rfilter0='\.sw.$'
@@ -674,6 +674,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         not_assigned       Fzf merge selection from panes 
 
 ## Etags
+        «zt»               Show/hide etags
+
         «zT»               Select etag type from list
 
 ## Tags
@@ -700,15 +702,15 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «'» + char         Go to bookmark 
 
-        «'» + "'"          Go to last directory
+        «'» + "'"          Go to previous directory
 
-        «⇈'/×»             Fzf go to bookmark, open multiple tabs with «ctrl-t»
+        «gm»               Fzf go to bookmark, open multiple tabs with «ctrl-t»
 
-        «,»                Add persistent bookmark    
+        «MM»               Add persistent bookmark    
 
-        «;»                Fzf to persistent bookmark, open multiple tabs with «ctrl-t»
+        «gM»               Fzf to persistent bookmark, open multiple tabs with «ctrl-t»
 
-        «⇑k/ĸ»             Clear persistent bookmarks 
+        «Mc»               Clear persistent bookmarks 
 
 ## History
 
@@ -741,7 +743,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «⇑p/þ»             Move selection to, Uses _fzf_mv_.
 
-        «cw»               Rename selection.
+        «cw»               Rename selection
 
         «xl»               Symlink selection 
 
@@ -810,7 +812,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «aA»               Fzf choose viewer 
 
-        Media viewers
+        Media types
 
         «aa»               Background sound preview, stops when *ftl* closes.
 
@@ -829,15 +831,17 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 extra viewers are in '$FTL_CFG/viewers'
                 
 ## Shell Pane
-        «CTL-W ss» or «s»  Shell pane
+        «CTL-W ss» «s»     Shell pane
 
-        «CTL-W sS»         Shell pane with selected files 
+        «CTL-W sS» «SS»    Shell pane with selected files 
 
-        «CTL-W sz»         Shell pane, zoomed out 
+        «CTL-W sz» «Sz»    Shell pane, zoomed out 
 
-        «CTL-W sg»         Cd shell pane to ftl directory
+        «CTL-W sg» «gS»    Cd shell pane to ftl directory
 
-        «CTL-W sp»         Send selection to shell pane 
+        «CTL-W sp» «Sp»    Send selection to shell pane 
+
+        «CTL-W !»  «S!»    Switch to session-shell pane 
 
 # Command Mode
 
@@ -897,8 +901,6 @@ From the command prompt
 are run by default.
 
         «:»                Command  prompt, command [args]
-
-        «CTL-W !»          Switch to session-shell pane 
 
         «tmux-prefix+L»    Switch back from tmux pane 
 
@@ -974,9 +976,10 @@ Examples
 
         «:» split finfo | xargs -0 echo ; read -sn1    split window
 
-        «:» csx echo ; read -sn1                       split window, using an alias
+        «:» csx ls -l ; read -sn1                      split window and use an alias, read necessary to
+                                                           keep window open
 
-        «:» full finfo | xargs -0 echo ; read -sn1     full screen
+        «:» full finfo | xargs -0 ls -l ; read -sn1    full screen
 
 
 # FILES
@@ -1043,7 +1046,7 @@ See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details.
         # start ftl on a specific directory in a new window
         tmux bind C-D new-window -n download "ftl $HOME/downloads"
 
-## RCfile
+## User RCfile
 
         # source default config
         source $FTL_CFG/etc/ftlrc
@@ -1101,8 +1104,8 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
                 list
         }
 
-        # bind shortcut «s» in the leader map
-        bind leader file s shred_command "*** bypasses RM *** ..."
+        # bind shortcut «LEADER s» 
+        bind leader file "LEADER s" shred_command "overrides selection, bypasses \$RM"
 
 ## Virtual Entry Injection
 
@@ -1130,7 +1133,7 @@ what you are implementing.
                  «LEADER v e»        show virtual entries etag
 
 ## Time Events
-You can register functions in *ftl* to be run at when a'Time Event' occurs.
+You can register functions in *ftl* to be run at when a 'Time Event' occurs.
 
 Set "time_event" in _ftlrc_ to a positive integer n, a 'Time Event' will
 occurs every n seconds.

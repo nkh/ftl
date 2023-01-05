@@ -23,7 +23,7 @@ time_event=0				# set to positive integer to trigger time events
 pdhl=					# log pdh message in file too
 : ${prev_all:=1}			# open preview window
 zooms=(85 70 50 30)			# sizes of preview pane in percent
-zoom=1					# start zoon level
+zoom=1					# start zoom level
 move_step=4				# fast movement size
 msg_m='Creating montage ...'		# message displayed when creating image montage for directories
 msg_du='Computing dir sizes ...'	# message displayed when computing directory sizes
@@ -35,8 +35,8 @@ mount_archive=0				# set if fuse-archive is installed
 cursor_color0='\e[7;34m'		# default cursor color
 cursor_color="$cursor_color0"		# cursor color
 cursor_color_search='\e[7;35m'		# cursor color in interactive search
-pop_help=0				# show help in popup
-pop_kbindings=1				# show bindings in popup
+pop_help=0				# show help in pop up
+pop_kbindings=1				# show bindings in pop up
 quick_display=512			# display entries during scanning if over this number
 rfilter0=				# default reverse filter, eg: rfilter0='\.sw.$'
 show_line=1				# show line (entry index)
@@ -48,10 +48,10 @@ TBCOLORS='236 52'
 
 # External Tags
 etag=0 					# show etags
-#. $FTL_CFG/etc/etags/git ; etag=1 # if you want to show git tags by default
+#. $FTL_CFG/etc/etags/git ; etag=1	# if you want to show git tags by default
 
 sort_type0=0				# default sort. 0: alphanumeric, 1: size, 2: date.
-sort_reversed0=				#default reverse sort order
+sort_reversed0=				# default reverse sort order
 
 # Glyphs
 sglyph=( ⍺ 🡕 )				# sorting: alphanumeric, size
@@ -114,7 +114,7 @@ CMD_COLS=150 				# columns when displaying command mapping in popup
 # Command aliases
 declare -A cmd_aliases=([csx]="split finfo | xargs -0" [cfx]="full finfo | xargs -0")
 
-# Bindings, [07-9] are used by ftl and correspond to SIG_XXX entries below
+# Bindings
 leader_key='BACKSLASH'
 
 declare -A A=(  [a]=ª [b]=” [c]=© [d]=ð [e]=€ [f]=đ [g]=ŋ [h]=ħ [i]=→ [k]=ĸ [l]=ł [m]=µ [o]=œ [p]=þ [q]='@' [r]=® [s]=ß [t]=þ [u]=↓ [v]=“ [x]=» [y]=← [z]=« ["'"]="´" [.]=·)
@@ -127,8 +127,8 @@ bind ftl ftl		QUESTION_MARK	ftl_help		"show help"
 bind ftl entry		d		delete_selection	"delete selection using config \$RM"
 bind ftl entry		i		create_file		"create new file, prompts inline"
 bind ftl entry		I		create_dir		"create new directory, prompts inline"
-bind ftl entry		"${A[i]}"	create_bulk		"create in files and directories in bulk, uses $EDITOR, lines ending with / will create directories"
-bind ftl entry		cw		rename			"rename/bulk rename selection"
+bind ftl entry		"${A[i]}"	create_bulk		"create files and directories in bulk, uses $EDITOR, lines ending with / will create directories"
+bind ftl entry		cw		rename			"rename selection"
 bind ftl entry		w		copy			"copy file to, prompts inline"
 bind ftl entry		p		tag_copy		"copy selection to current directory"
 bind ftl entry		P		tag_move		"move selection to current directory"
@@ -144,18 +144,18 @@ bind ftl entry		xl		link			"symlink selection in current directory"
 
 bind ftl filter		fE		set_filter_ext		"select external filter"
 bind ftl filter		fy		set_filter_only_tagged	"show only tagged files"
-bind ftl filter		fd		set_filter_dir		"set filter d"
+bind ftl filter		fd		set_filter_dir		"set directories filter"
 bind ftl filter		ff		set_filter		"set filter 1"
 bind ftl filter		fF		set_filter2		"set filter 2"
 bind ftl filter		fr		set_filter_reverse	"set reverse filter"
 bind ftl filter		fc		clear_filters		"clear filters"
 
 bind ftl find		"/"		find_entry		"find"
-bind ftl find		N		find_previous		"find previous"
 bind ftl find		n		find_next		"find next"
+bind ftl find		N		find_previous		"find previous"
 bind ftl find		gff		find_fzf		"fzf find current directory file"
 bind ftl find		b		find_fzf		"fzf find current directory file"
-bind ftl find		gfa		find_fzf_all		"fzf find from durrent directory"
+bind ftl find		gfa		find_fzf_all		"fzf find from current directory"
 bind ftl find		"${A[b]}"	find_fzf_all		"fzf find"
 bind ftl find		gfA		find_frf		"find file using regexp or fuzzy matching"
 bind ftl find		gfr		go_rg			"rg to file"
@@ -168,7 +168,7 @@ bind ftl ftl		Q		quit_all		"quit all"
 bind ftl ftl		ZZ		quit_all		"quit all"
 bind ftl ftl		ZS		quit_keep_shell		"quit, keep shell"
 bind ftl ftl		ZP		quit_keep_preview	"quit, keep preview zoomed"
-bind ftl ftl		"${A[c]}"	k_bindings		"show keyboard bindings"
+bind ftl ftl		"${A[c]}"	k_bindings		"show command bindings"
 bind ftl ftl		"$"		editor_detach		"detach editor preview"
 bind ftl ftl		":"		command_prompt		"run commands: q, etags, load_sel, ..."
 bind ftl ftl		r		refresh_pane		"refresh"

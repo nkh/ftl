@@ -2,91 +2,17 @@
 
 issue: space in names when passing env var to shell
 
-presentation:
-	Reduce videos size with H265 encodigng
+issue: command alias, in ftlrc, not working
 
-	script:
-		Introduction
-			what's in the name
-			credit to other
-			status
-			detail videos
-
-functionality: accept list of virtual files as parameter
-		accept them with color
-		what do we do with them
-			must have at least keyboard handler
-
-		better option points to bash script
-			code can itself get list of virtual files from wherever or generate them
-
-		let user define ftl options?
-			point to bash scripts sourced
-				source when?
-					before/after ftlrc?
-						let user do it in user's ftlrc!
-
-		
-		only display virtual files
-			a browser for virtual data
-
-
-
-		files could exist in tmp but ftl displays a different path
-
-		leaves creation and removal of temporary files to external application
-
-		need to handle PWD in source code not only display of it
-			could be a option
-
-		want to see and act on the real files
-
-		unionfs / and ftl/virtual_entries to directory ftl_root
-
-		use case #1 show file that doesn't exist
-				in specific directories
-				data computed on the run
-				
-				how do we open the files in an editor, ...
-					fail as file doesn't exist
-					works only for specific command for that file
-					use union fs and cheat on the directory
-						how does the user specify that
-
-		use case #2 show subset of real files
-				find files | filter | create shadow file system | ftl
-				can be done with union fs, need to delete all other files in the overlay
-					to hide them, mount only directories where files are, much less to delete
-
-		use case #3 show real files in other places
-				we could link them temporarily
-					problem is that they don't go away on their own
-						program crash, how do we recover
-
-					if they are removed, how can we specify some of them to be kept
-
-		use case #4 show a mix of the above
-				filtered files
-				re-located files
-				virtual files
-
-
-		union fs layer
-			bottom, read only from the top layer (can be changed directly)
-			middle, written on write in top layer
-			top, virtual layer, mounted
-
-
-functionality: interactive tree
-		ugrep
-		tre-agrep
-		fstrcmp
+functionality: z3 alt preview
 
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 
 functionality: drag drop via dragon
+
+functionality: accept list of virtual files as parameter
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...
