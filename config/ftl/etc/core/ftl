@@ -15,15 +15,16 @@ ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux re
 cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -r" || cmd=mv ; cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; tscommand "xargs -a $cmvs -t -- $cmd -t ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv $1 "$2" "${!ltags[@]}" ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
-delete()    { prompt "$1 [y|d|N|c]: " -n1 && [[ $REPLY =~ y|d|c ]] && { $2 ; [[ $REPLY == c ]] && $RM "$n" || $RM "${@:3}" ; mime=() ; } ; header '' "$head" ; }
-delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && delete "delete *tags: ${#ltags[@]}*?" "tags_unset $class" "${!ltags[@]}" ; }
+delete()    { [[ $1 ]] && { [[ $REPLY =~ y|d ]] && delete_tag || { [[ $REPLY =~ c ]] && delete_cur ; } ; } || { [[ $REPLY =~ y|d ]] && delete_cur ; } ; } 
+delete_cur(){ [[ "${tags[$n]}" ]] && { unset -v 'tags[$n]' ; tags_size - "$n" ; ((stagsi++)) ; } ; $RM "$n" ; mime=() ; true ; } 
+delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && tags_unset $class && { $RM "${!ltags[@]}" ; mime=() ; } ; true ; }
 dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter_d vd ; files "-xtype p,l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter vf ; dir_done ; }
 dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m%4s\e[m" "${du_size[$PWD/$1]}" ; }
 dir_esize() { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
 dir_dusize(){ reset="$(printf '\e[0m')" ; declare -Ag du_size ; while IFS=$'\t' read color size file ; do du_size[$PWD/$file]="$color$size$reset" ; done < <(get_dusize) ; }
 get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(.*?)\e\[0m\t.\/(.*)/ ; printf "$c\t%4s\t$f\n", $s' ; }
-edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; "${EDITOR}" "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; emode=0 ; cdir ; }
+edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; emode=0 ; cdir ; }
 files()     { { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1 -printf '%s\t%T@\t%P\n' 2>&- ; virt_inj $3 ; } | ftl_filter | $2 ; }
 virt_inj()  { [[ $1 == vf ]] && files_virt ; [[ $1 == vd ]] && dirs_virt ; }
 files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t$vf\n" ; done ; }
