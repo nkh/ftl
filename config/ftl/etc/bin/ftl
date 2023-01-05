@@ -8,7 +8,7 @@ my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lig
 
 tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
-echo -en '\e[?1049h' ; stty -echo ; filter_rst ; vfiles_rst ; sort_filters=(-k3 -n -k2) ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
+echo -en '\e[?1049h' ; stty -echo ; filter_rst ; vfiles_rst ; sort_filters=('-k3 -V' '-n' '-k2 -V') ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; }
@@ -111,7 +111,7 @@ head="${lglyph[lmode[tab]]}${iglyph[vmode[tab]]}${pdir_only[tab]}${montage}" ; h
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
 ((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅  $head$ftag$tabsd" ; header '' "$head" ; tcpreview ; clear_list 0 ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
-((s_type == 2 && show_date)) && date=$(date -r "${files[file]}" +' %D-%R' 2>&-) || date=
+((s_type == 2 && show_date)) && date=$(find "${files[file]}" -maxdepth 0 -printf ' %Tx-%TH:%TM') || date=
 head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$flip" ; header '' "$head"
 
 for((i=$top ; i <= bottom ; i++))
