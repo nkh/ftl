@@ -2,10 +2,6 @@
 
 issue: space in names when passing env var to shell
 
-issue: command alias, in ftlrc, not working
-
-functionality: z3 alt preview
-
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
