@@ -48,8 +48,8 @@ gcn()			{ { find "$FTL_CFG/commands" -type f -printf "%f\n" ; printf "%s\n" "${!
 copy()			{ prompt 'write to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
 copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
 add_selection_to_file()	{ prompt 'add selection to: ' && [[ $REPLY ]] && { printf "%q\n" "${selection[@]}" >> "$REPLY" ; }  ; cdir ; }
-create_bulk()		{ B=$fs/BULK ; >$B ; $EDITOR $B && { grep '/$' "$B" | tr '\n' '\0' | xargs -0 mkdir -p ; create_bulk_files "$B"; } ; cdir ; }
-create_bulk_files()	{ grep -v '/$' "$1" | tr '\n' '\0' | xargs -0 dirname -z | xargs -0 mkdir -p ; grep -v '/$' "$1" | sed -e '/^$/d' | tr '\n' '\0' | xargs -0 touch ; }
+create_bulk()		{ B=$fs/BULK ; >$B ; $EDITOR $B && { grep '/$' "$B" | tr '\n' '\0' | xargs -r -0 mkdir -p ; create_bulk_files "$B"; } ; cdir ; }
+create_bulk_files()	{ grep -v '/$' "$1" | tr '\n' '\0' | xargs -r -0 dirname -z | xargs -0 mkdir -p ; grep -v '/$' "$1" | grep -v '^$' | tr '\n' '\0' | xargs -r -0 touch ; }
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }
 delete_selection()	{ PC= PT= ; tag_check && { PC="|c" ; PT="*tags* " ; } ; prompt "delete $PT[y|d|N$PC] ? " -n1 && delete "$PT" ; REPLY= ; cdir ; }
