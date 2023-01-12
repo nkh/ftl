@@ -48,7 +48,7 @@ pviewers()
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
 
 ((! is_bin)) && [[ -s "$n" ]] && [[ $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && { ptext && return ; }
-[[ "$file_b" =~ ^ASCII\ text, ]] || [[ "$file_b" =~ ^Unicode\ text, ]] && { ctsplit "ansi_show \"$n\" | $MD_PAGER " ; return ; }
+[[ "$file_b" =~ ASCII\ text ]] || [[ "$file_b" =~ Unicode\ text ]] && { ctsplit "ansi_show \"$n\" | $MD_PAGER " ; return ; }
 
 ptype
 }

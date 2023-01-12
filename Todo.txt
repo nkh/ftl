@@ -2,9 +2,14 @@
 
 issue: space in names when passing env var to shell
 
-# Later
+issue: up/down slower when preview is not shown
+	spurious EVENT_REMOTE present
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
+		asciio files are compressed can we grep in them?
+
+# Later
+
 
 functionality: drag drop via dragon
 
