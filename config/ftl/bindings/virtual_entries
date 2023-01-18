@@ -25,7 +25,7 @@ virt_color()
 	{
 	while read cfile
 		do 
-			((${#vfiles[$cfile]})) && echo -e "\e[4m$cfile" || { ((${#vdirs[$cfile]})) && echo -e "\e[32m$cfile" || echo "$cfile" ; }
+			((${#vfiles[$cfile]})) && echo -e "\e[4m$cfile\e[m" || { ((${#vdirs[$cfile]})) && echo -e "\e[32m$cfile" || echo "$cfile" ; }
 		done
 	} || cat
 }
@@ -83,11 +83,22 @@ cdir
 
 ventries_etag(){ etag_s="virtual" ; source "$FTL_CFG/etags/$etag_s" ; etag=1 ; cdir '' "$f" ; } # etag_s synchs source with preview
 
-# bind a short key to start/stop the test
+# bind leader_ftl extra	"LEADER v v"	ventries_on	"insert virtual entries"
+# bind leader_ftl extra	"LEADER v V"	ventries_off	"removes virtual entries"
+# bind leader_ftl extra	"LEADER v e"	ventries_etag	"show virtual entries etag"
 
-bind leader_ftl extra	"LEADER v v"	ventries_on	"insert a virtual entries"
-bind leader_ftl extra	"LEADER v V"	ventries_off	"removes virtual entries"
-bind leader_ftl extra	"LEADER v e"	ventries_etag	"show virtual entries etag"
+#--------------------------------------------------------------------------------
+
+bind leader_ftl extra	"vf"		add_save_as	"insert a virtual entry for save_as"
+
+SAF='save_as.txt'
+
+add_save_as() { get_file_name ; ventry_save_as ; }
+get_file_name()	{ gcn ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt "name: ")" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && SAF="$C" ; list ; }
+ventry_save_as() { vfiles_set virt_dirs_save_as virt_files_save_as virt_color virt_prev virt_key ; vfiles_on 1 ; prev_cb="ventry_save_as" ; cdir '' "$SAF" ; }
+virt_dirs_save_as() { : ; }
+virt_files_save_as() { echo $SAF ; }
+
 
 # vim: set filetype=bash :
 

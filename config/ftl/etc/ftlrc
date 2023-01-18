@@ -139,7 +139,6 @@ bind ftl entry		xmx		chmod_ax		"chmod a+x selection"
 bind ftl entry		xmm		chmod_dialog		"chmod selection via sc-im"
 bind ftl entry		xh		hexedit			"hexedit"
 bind ftl entry		xv		vim_edit		"vim"
-bind ftl entry		v		vim_edit		"vim"
 bind ftl entry		xl		link			"symlink selection in current directory"
 
 bind ftl filter		fE		set_filter_ext		"select external filter"

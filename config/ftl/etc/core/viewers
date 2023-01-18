@@ -43,6 +43,7 @@ pviewers()
 [[ -p "$n" ]]                     && { ppipe     ; return ; }
 [[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
 [[ $e == sc ]]                    && { pscim     ; return ; }
+[[ $e =~ ^asciio ]]               && { pasciio   ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
@@ -92,7 +93,8 @@ ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png
 
 pman()      { ctsplit "man \"$n\" ; read -sn 1000" ; true ; }
 
-pscim()     { ctsplit "scim \"$n\" ; read -sn100" ; }
+pscim()     { ctsplit "scim \"$n\" | $PAGER ; read -sn100" ; }
+pasciio()   { ctsplit "asciio_to_text \"$n\" | $PAGER ; read -sn100" ; }
 
 pcomp()     { [[ $e == zip ]] && _pcomp unzip -l || { [[ $e == rar ]] && _pcomp unrar list ; } || { [[ $f =~ \.tar ]] && _pcomp tar --list --verbose -f ; } ; }
 _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@" "$f" >"$fp" ; vipreview "$fp" ; } ; }

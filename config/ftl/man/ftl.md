@@ -1127,10 +1127,7 @@ what you are implementing.
 
         Call vfiles_rst() to reset everything.
         
-        See '$FTL_CFG/etags/virtual' and '$FTL_CFG/bindings/virtual_files' which add:
-                 «LEADER v v»        insert a virtual entries
-                 «LEADER v V»        removes virtual entries
-                 «LEADER v e»        show virtual entries etag
+        See '$FTL_CFG/etags/virtual' and '$FTL_CFG/bindings/virtual_files'
 
 ## Time Events
 You can register functions in *ftl* to be run at when a 'Time Event' occurs.
@@ -1164,14 +1161,17 @@ yourself, *ftl* will call your function every 'n' seconds.
                 source $path_to_ftl/ftll
 
         This adds a _ftll_ function which will open an *ftl* instance in a new
-	tmux window, select the entries you want, without selection the current
+        tmux window, select the entries you want, without selection the current
         entry is selected
 
-		readarray -t a < <(ftll) ; for n in "${a[@]}" ; do echo ---$n--- ; done
+              readarray -t a < <(ftll) ; for n in "${a[@]}" ; do echo ---$n--- ; done
 
         Press «q» to quit to return the selection.
 
         Press «Q» to cancel.
+
+        You can also create a "virtual" file and select it, thus you can use ftl as
+        a save-as dialog.
 
 ## Vim Files Picker
 

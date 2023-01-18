@@ -9,7 +9,7 @@ pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { c
 select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id= ; in_pdir= ; in_viprev= ; in_ftli= ; sleep 0.01 ; } ; }
 vipreview() { ((in_viprev)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E -e 's/\$/\\$/g' -e 's/#/\\\\#/' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_viprev=1 ; }
-cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S 'ftl > ' -f $fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
+cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 clear_list(){ for(( i=$1 ; i < LINES - 1  ; i++)) ; do echo -ne "\e[K$flip" ; ((i < LINES - 2)) && echo ; done ; }
 ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
 cp_mv()     { [[ $1 == ${C[tag_copy]} ]] && cmd="cp -r" || cmd=mv ; cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; tscommand "xargs -a $cmvs -t -- $cmd -t ${2@Q}" ; }
