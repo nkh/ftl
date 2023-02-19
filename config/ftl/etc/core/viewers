@@ -43,7 +43,7 @@ pviewers()
 [[ -p "$n" ]]                     && { ppipe     ; return ; }
 [[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
 [[ $e == sc ]]                    && { pscim     ; return ; }
-[[ $e =~ ^asciio ]]               && { pasciio   ; return ; }
+[[ $e =~ ^asciio$ ]]              && { pasciio   ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
 
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
@@ -56,7 +56,7 @@ ptype
 
 ext_dir()   {  $G_PLAYER "$n" &>/dev/null & }
 ext_html()  { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; }
-ext_image() { images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]] && images+=("$img") ; done ; run_maxed fim "$n" $(printf "%q " "${images[@]}") ; }
+ext_image() { images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]] && images+=("$img") ; done ; sxiv -b -q -o -f "$n" $(printf "%q " "${images[@]}") ; }
 ext_media() { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "$n" &>/dev/null &) ; mplayer=$! ; }
 ext_pdf()   { ((emode == 1)) && { ((pdf_prev_image)) && run_maxed mupdf "$n" || ext_pdf_vi ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } || { mupdf "$n" 2>/dev/null & } ; }
 ext_pdf_vi(){ t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }

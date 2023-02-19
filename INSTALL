@@ -24,7 +24,7 @@ sudo apt install -y 	ack \
 			expect \
 			fd-find \
 			ffmpegthumbnailer \
-			fim \
+			sxiv \
 			fzf \
 			git \
 			imagemagick \

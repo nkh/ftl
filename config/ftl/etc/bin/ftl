@@ -32,8 +32,7 @@ for key in "${keysa[@]}"
 		
 		((ftl_bind_check)) && [[ "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
 			echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding '${kbd_trie[$shortcut]}'" 
-
-
+		
 		((kbd_trie[$shortcut]++)) 
 		{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
 	done
@@ -44,8 +43,8 @@ C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$ma
 
 key_command()
 {
-(( keys_in )) && [[ "$REPLY" == ESCAPE ]] && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
-(( keys_in > 4 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
+[[ "$REPLY" == ESCAPE ]]                  && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
+(( keys_in > 3 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
 [[ "$REPLY" == ERROR_142     ]]           && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
 [[ "$REPLY" == "?"           ]]           && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]]           && REPLY=LEADER 

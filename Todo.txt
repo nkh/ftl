@@ -1,5 +1,21 @@
 # Current
 
+functionality: use sxiv
+		
+		«Mi» mark files
+			all files under current directory
+		
+		«gfi» go to file
+			all files under current directory
+		
+		# «e» image preview
+			current image, all images
+		
+		~/.Xresources looks like at the moment:
+		Sxiv.background: #000000
+		Sxiv.foreground: #00C0FF
+		Sxiv.font: Hack-9
+
 issue: space in names when passing env var to shell
 
 issue: up/down slower when preview is not shown

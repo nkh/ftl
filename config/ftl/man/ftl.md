@@ -413,7 +413,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zmD»              Preview directory only/all. 
 
-        «gfi»              Fzfi, use fzf and ueberzurg to find and display images
+        «gfi»              go to image using sxiv
+
+        «gfI»              Fzfi, use fzf and ueberzurg to find and display images
 
         «zeh»              Hide files having the same extention as the current file, per tab
 
@@ -642,7 +644,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «[COUNT] yy»       Select current entry in "normal" class and move down
 
-        not_assigned       Select current entry in "normal" class and move up
+        «[COUNT] yY»       Select current entry in "normal" class and move up
 
         «[COUNT] y1/2/3/4» Select current entry in given class and move down, the
                            glyph used for each class is defined in _ftlrc_ tglyph. 
@@ -651,6 +653,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «yf»               Select all the files in the current directory
 
         «ya»               Select all files and subdirs in the current directory
+
+        «yi»               Select image via sxiv
 
         «yF»               Open fzf to select files, multiple selection is possible.
 
@@ -668,6 +672,10 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
                            This is handy when selections are read from a file with option
                            -t on the command line or via the 'load_selection'
+
+        «yn»               Go to next selected entry.
+
+        «yN»               Go to previous selected entry.
 
         not_assigned       Merge selection from all panes, see option auto_select
 
@@ -793,7 +801,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «LEADER f t»       Terminal popup                 
 
-	«:url URL|»        open URL in qutebrowser
+        «:url URL|»        open URL in qutebrowser
 
 ## External Viewer
 
