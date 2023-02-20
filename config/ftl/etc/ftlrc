@@ -67,6 +67,7 @@ pdf_prev_image=0				# show pdf as images if set
 # FZF Options
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="--cycle --expect=ctrl-t --reverse"
+fzf_sxiv_opt="-0 -1 -m --expect=ctrl-t --bind alt-a:select-all"
 
 # External Commands
 EDITOR="vim -p"
@@ -160,7 +161,8 @@ bind ftl find		gfA		find_frf		"find file using regexp or fuzzy matching"
 bind ftl find		gfr		go_rg			"rg to file"
 bind ftl find		gfd		find_fzf_dirs		"fzf find directories"
 bind ftl find		gfi		image_go_sxiv		"image goto, using sxiv"
-bind ftl find		gfI		image_fzf		"image goto, using fzf/ueberzurg"
+bind ftl find		gfI		image_go_sxiv_rec	"image goto, including sub directories, using sxiv"
+bind ftl find		gfu		image_fzf		"image goto, using fzf/ueberzurg"
 bind ftl find		gL		follow_link		"symlink follow"
 
 bind ftl ftl		q		quit_ftl		"quit"
@@ -260,6 +262,7 @@ bind ftl selection	ya		select_all		"select all files and subdirs"
 bind ftl selection	yf		select_all_files	"select all files"
 bind ftl selection	yd		select_all_directories	"select all directories"
 bind ftl selection	yi		image_select		"selected images via sxiv"
+bind ftl selection	yI		image_select_rec	"selected images, including sub directories, via sxiv"
 bind ftl selection	yF		selection_fzf		"fzf select files"
 bind ftl selection	yA		selection_fzf_all	"fzf select files and subdirs"
 bind ftl selection	yy		selection_flip_down	"select down"

@@ -415,7 +415,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gfi»              go to image using sxiv
 
-        «gfI»              Fzfi, use fzf and ueberzurg to find and display images
+        «gfi»              go to image using sxiv, including sub directories
+
+        «gfu»              Fzfi, use fzf and ueberzurg to find and display images
 
         «zeh»              Hide files having the same extention as the current file, per tab
 
@@ -655,6 +657,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «ya»               Select all files and subdirs in the current directory
 
         «yi»               Select image via sxiv
+
+        «yI»               Select image via sxiv, including sub directories
 
         «yF»               Open fzf to select files, multiple selection is possible.
 
@@ -1222,6 +1226,13 @@ yourself, *ftl* will call your function every 'n' seconds.
         I also added this to my vimrc:
 
                 au FileType man setlocal nospell
+
+## Sxiv background colors and font
+
+        Add the folloing lines in your ~/.Xresources:
+            Sxiv.background: #000000
+            Sxiv.foreground: #00C0FF
+            Sxiv.font: Mono-12
 
 # BUGS AND CONTRIBUTIONS
 
