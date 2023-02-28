@@ -70,6 +70,7 @@ fzfp_opt="--cycle --expect=ctrl-t --reverse"
 fzf_sxiv_opt="-0 -1 -m --expect=ctrl-t --bind alt-a:select-all"
 
 # External Commands
+SXIV=sxiv
 EDITOR="vim -p"
 FILE_DIFF=vimdiff
 

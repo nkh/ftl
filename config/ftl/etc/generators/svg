@@ -3,7 +3,7 @@ exec 2>> "$2/generators_log"
 
 [[ FORCE == "$3" || ! -f "$2/$1.jpg" ]] &&
 	{
-	rsvg-convert "$1" > "$2/$1.jpg"
+	rsvg-convert --background-color=white "$1" > "$2/$1.jpg"
 	}
 
 

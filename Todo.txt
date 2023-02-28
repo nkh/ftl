@@ -1,5 +1,7 @@
 # Current
 
+functionality: move core/viewer and type handlers to position where user can easily modify them
+
 issue: space in names when passing env var to shell
 
 issue: up/down slower when preview is not shown
@@ -23,7 +25,7 @@ arch: multi column attributes
 	user can sort per one or more of the columns 
 
 	columns can be added by background process
-		eg: many files need processing and that thats a long time
+		eg: many files need processing and take a long time
 			list every time a batch is processed
 
 arch: asynch list display for very large directories

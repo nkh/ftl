@@ -12,12 +12,14 @@ enter()
 	# mount archives
 	[[ $mount_archive && $e =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && { mount_archive "$n" ; return ; }
 	
+	#  type handlers below
+	[[ $e = asciio ]] && { run_maxed asciio "$n" ; cdir ; return ; }
+	
 	# edit text files with vi
 	mime_get ; is_bin "$n"
 
 	[[ $is_bin == 0 && $mtype =~ ^text || $mtype == application/x-zerosize || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && edit
 
-	# add other type handlers below
 	}
 }
 
