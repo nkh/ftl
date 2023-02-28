@@ -2,6 +2,8 @@
 
 functionality: move core/viewer and type handlers to position where user can easily modify them
 
+issue: match preview to object and remove zP
+
 issue: space in names when passing env var to shell
 
 issue: up/down slower when preview is not shown

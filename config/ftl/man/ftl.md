@@ -1234,6 +1234,12 @@ yourself, *ftl* will call your function every 'n' seconds.
             Sxiv.foreground: #00C0FF
             Sxiv.font: Mono-12
 
+       If you display svg files you may need a grey background, here's
+       and example is you decide to use nsxiv instead for sxiv.
+
+            Nsxiv.*.background: #808080
+            Nsxiv.*.foreground: #F0F0F0
+
 # BUGS AND CONTRIBUTIONS
 
 Please report bug to <https://https://github.com/nkh/ftl/issues>
