@@ -838,10 +838,10 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         Creating you own viewer:
 
-                core viewers are in '$FTL_CFG/etc/core/viewers/ftl'
-
-                extra viewers are in '$FTL_CFG/viewers'
+                viewers are in '$FTL_CFG/viewers'
                 
+                default viewers are in file '$FTL_CFG/viewers/core'
+
 ## Shell Pane
         «CTL-W ss» «s»     Shell pane
 

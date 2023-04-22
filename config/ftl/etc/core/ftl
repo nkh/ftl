@@ -1,5 +1,4 @@
 source "$FTL_CFG/etc/core/keyboard"
-source "$FTL_CFG/etc/core/viewers"
 source "$FTL_CFG/etc/core/commands"
 
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && eval "$(error_cmds)" || tmux popup -w 80% "$(error_cmds)" ; } ; }

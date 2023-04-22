@@ -1,7 +1,5 @@
 # Current
 
-functionality: move core/viewer and type handlers to position where user can easily modify them
-
 issue: numfmt error after moving files
 
 issue: match preview to object and remove zP

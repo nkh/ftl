@@ -116,6 +116,9 @@ CMD_COLS=150 				# columns when displaying command mapping in popup
 # Command aliases
 declare -A cmd_aliases=([csx]="split finfo | xargs -0" [cfx]="full finfo | xargs -0")
 
+# preview
+source "$FTL_CFG/viewers/core"
+
 # Bindings
 leader_key='BACKSLASH'
 
