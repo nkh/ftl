@@ -55,7 +55,7 @@ kbdf()      { while read -t 0.01 ; do : ; done ; }
 k_bindings(){ ((pop_kbindings)) && k_bpop || k_bfull ; list ; }
 k_bfull()   { tcpreview ; exec 2>&9 ; k_bgen | fzf ; exec 2>"$fs/log" ; true ; }
 k_bpop()    { k_bgen | fzf-tmux $fzf_opt ; true ; }
-k_bgen()    { printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "map,section, key,command,does" -s $'\t' -c $CMD_COLS ; }
+k_bgen()    { printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "____map____,____section____, ____key____,____command____,____does____" -s $'\t' -c $CMD_COLS ; }
 mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
 mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }

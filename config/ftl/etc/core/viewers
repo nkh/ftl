@@ -37,6 +37,7 @@ pviewers()
 [[ $e =~ $mfilter ]]              && { pmedia    ; return ; }
 [[ $e =~ ^md|MD$ ]]               && { pmd       ; return ; }
 [[ $e == pdf || $e == PDF ]]      && { ppdf      ; return ; }
+[[ $e == epub ]]                  && { pepub     ; return ; }
 [[ $e == 1   ]]                   && { pman      ; return ; }
 [[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
@@ -92,6 +93,9 @@ ptext()     { vipreview "$n" ; }
 
 ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
+
+pepub()     { (( extmode==2 || pdf_prev_image)) && pepubpng || { t="$thumbs/epub/$f$extmode.txt" ; [[ -e $t ]] || $pgen/epub "$f" $thumbs/epub $extmode && vipreview "$t" ; } ; }
+pepubpng()  { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
 pman()      { ctsplit "man \"$n\" ; read -sn 1000" ; true ; }
 
