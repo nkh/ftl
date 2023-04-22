@@ -146,7 +146,7 @@ select_all_directories(){ for p in "${files[@]}" ; do [[ -d "$p" ]] && [[ ! ${ta
 select_all_files()	{ for p in "${files[@]}" ; do [[ -f "$p" ]] && [[ ! ${tags[$p ]} ]] && tags["$p"]='▪' && tags_size + "$p" ; done ; list ; }
 select_all()		{ for p in "${files[@]}" ; do [[ ! ${tags[$p]} ]] && tags["$p"]='▪' &&  tags_size + "$p" ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
-tag_move_to()		{ fzf_mv "${selection[@]}" && tags_clear ; cdir '' "$f"; }
+tag_move_to()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; fzf_mv "${!ltags[@]}" ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
 tag_move()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
 view_mode_all()		{ vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; cdir '' "$f"; }
 view_mode_image()	{ vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; cdir '' "$f"; }

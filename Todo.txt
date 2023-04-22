@@ -20,6 +20,11 @@ functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 functionality: drag drop via dragon
 
 functionality: accept list of virtual files as parameter
+		in a file
+		
+		reasons to display virtual files
+		
+		what to display and how
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...
