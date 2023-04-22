@@ -1,4 +1,11 @@
 #!/bin/bash
+TMP_DIR=/tmp/rg-fzf
+mkdir -p "$TMP_DIR" 
+
+PID=$$
+frf_f="$TMP_DIR/frf_f_$PID"
+frf_r="$TMP_DIR/frf_r_$PID"
+
 frf_max_depth="${1:-1000}"
 # $2 can be set to "-tmux", and options, to open frf in fzf-tmux
 # $3 controls if option --expect=ctrl-t is used or not
@@ -9,15 +16,15 @@ FZF_DEFAULT_COMMAND="frl '' $frf_max_depth" fzf$2 \
 	--cycle \
 	--disabled \
 	--no-sort \
- 	--ansi \
+	--ansi \
 	--layout=reverse \
 	--info=inline \
 	--color="hl:51,header:238,bg+:236" \
 	--prompt '1. rg> ' \
 	--header '^rg ^fzf ᵃj-down ᵃk-up ?-preview ^select ^deselect ^toggle ^p-size' \
 	--bind "change:reload:sleep 0.1; frl {q} $frf_max_depth || true" \
-	--bind 'ctrl-f:unbind(change,ctrl-f)+change-prompt(2. fzf> )+enable-search+clear-query+rebind(ctrl-r)' \
-	--bind "ctrl-r:unbind(ctrl-r)+change-prompt(1. rg> )+disable-search+reload(frl {q} $frf_max_depth || true)+rebind(change,ctrl-f)" \
+	--bind "ctrl-f:unbind(change,ctrl-f)+change-prompt(2. fzf> )+enable-search+rebind(ctrl-r)+transform-query(echo {q} >$frf_r; cat $frf_f)" \
+	--bind "ctrl-r:unbind(ctrl-r)+change-prompt(1. rg> )+disable-search+reload(frl {q} $frf_max_depth || true)+rebind(change,ctrl-f)+transform-query(echo {q} >$frf_f; cat $frf_r)" \
 	--bind 'alt-k:preview-up,alt-j:preview-down' \
 	--bind '?:toggle-preview' \
 	--bind 'ctrl-s:select-all,ctrl-d:deselect-all' \
@@ -27,4 +34,5 @@ FZF_DEFAULT_COMMAND="frl '' $frf_max_depth" fzf$2 \
 	--preview '\
 		[[ -d {} ]] && ls -AgGh --group-directories-first --color=always {} || \
 		{ perl -e "exit -B \$ARGV[0]" -- {} && vimkat {} 100 -1 || { file {} | piper "[^,]+" "grey20" ",.*" "grey10" ; } ; } ' \
+	# --bind "enter:become:vim {1} +{2}"
 

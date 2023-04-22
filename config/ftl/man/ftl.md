@@ -949,7 +949,7 @@ Running commands in a separate shell pane in the *ftl* session
 
         *fsh* command [command args]
         
-	Can be used when commands that take a long time to complete.
+        Can be used when commands that take a long time to complete.
                 
         The shell pane is closed if the command exit code is 0. 
 

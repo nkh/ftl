@@ -2,7 +2,10 @@
 
 functionality: move core/viewer and type handlers to position where user can easily modify them
 
+issue: numfmt error after moving files
+
 issue: match preview to object and remove zP
+	add hash or timestamp to preview file
 
 issue: space in names when passing env var to shell
 
