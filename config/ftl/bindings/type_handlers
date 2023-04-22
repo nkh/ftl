@@ -18,7 +18,8 @@ enter()
 	# edit text files with vi
 	mime_get ; is_bin "$n"
 
-	[[ $is_bin == 0 && $mtype =~ ^text || $mtype == application/x-zerosize || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && edit
+	[[ $is_bin == 0 && "$file_b" =~ ^Unicode || $mtype =~ ^text || $mtype == application/x-zerosize || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] \
+		&& edit
 
 	}
 }
