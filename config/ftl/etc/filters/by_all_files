@@ -1,0 +1,64 @@
+declare -g -A keep PWDR
+
+[[ "$1" == load ]] && [[ -e "$pfs/by_all_files" ]] && source "$pfs/by_all_files" || \
+	{
+	OIFS=$IFS ; IFS=$'\n'
+	
+	ftag="~"
+	[[ "$PWDR" ]] && \
+		{
+		OPWDR="$PWDR"
+		
+		[[ ${#PWD} -lt ${#PWDR} ]] && \
+			{
+			PWDR="$PWD"
+			
+			last_component=
+			
+			while [[ "${OPWDR}" ]]
+				do
+					keep["$tab-$OPWDR"]=1
+					[[ $last_component ]] && break
+					OPWDR="${OPWDR%/*}"
+					[[ "$OPWDR" == "" ]] && break
+					[[ "$OPWDR" == "$PWD" ]] && break
+					[[ "$OPWDR" == "/" ]] && last_component=1
+				done
+			}
+		
+		} || PWDR="$PWD"
+	
+	for file in $(\
+			find -printf "%p\n" | grep -v '^\.$' | sed 's ^./  ' | sort -u | lscolors | \
+			fzf-tmux -p 80% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all \
+			)
+		do 
+			# keep all the path in between
+			last_component=
+			
+			while [[ "${file}" ]]
+				do
+					keep["$tab-$PWD/$file"]=1
+					[[ $last_component ]] && break
+					file="${file%/*}"
+					[[ "$file" =~ "/" ]] || last_component=1
+				done
+		done
+	IFS=$OIFS
+	
+	declare -p keep PWDR >"$pfs/by_all_files"
+	}
+
+ftl_filter()
+{
+[[ ${#PWD} -ge ${#PWDR} ]] && 
+	{
+	while read -r file_data
+		do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat 
+}
+
+# vim: set filetype=sh :

@@ -1,0 +1,2 @@
+declare -g -A keep=() PWDR
+ftl_filter() { cat ; }
