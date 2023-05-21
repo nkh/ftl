@@ -1,4 +1,44 @@
 
+bind()
+{
+local map="$1" section="$2" keys="$3" command="$4" help="$5" shortcut= dscut=
+local keysa=( $keys )
+
+for key in "${keysa[@]}"
+	do
+		shortcut="$shortcut$key" 
+		
+		((ftl_bind_check)) && [[ "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
+			echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding '${kbd_trie[$shortcut]}'" 
+		
+		((kbd_trie[$shortcut]++)) 
+		{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
+	done
+
+((ftl_bind_check && ${kbd_trie[$shortcut]} > 1)) && echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding command path" 
+C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$map	$section	$dscut	$command	$help"
+}
+
+key_command()
+{
+[[ "$REPLY" == ESCAPE ]]                  && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
+(( keys_in > 3 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
+[[ "$REPLY" == ERROR_142     ]]           && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
+[[ "$REPLY" == "?"           ]]           && REPLY=QUESTION_MARK
+[[ "$REPLY" == "$leader_key" ]]           && REPLY=LEADER 
+
+[[ -n "$key_map"             ]]           && { $key_map ; return ; }
+
+[[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
+
+keys_command="$keys_command$REPLY" ; (( keys_in++)) ; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
+
+((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
+
+[[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && 
+	{ ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_in= keys_command= HAS_COUNT= COUNT= REPLY= ; }
+}
+
 get_key()
 {
 OIFS="$IFS" ; IFS=

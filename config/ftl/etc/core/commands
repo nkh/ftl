@@ -2,7 +2,6 @@ source "$FTL_CFG/etc/core/lib/shell"
 
 goto_next_tag()		{ (( ${#tags[@]} )) && { [[ -z $ctag ]] && ctag=0 || ((ctag++)) ; (( ctag >= ${#tags[@]} )) && ctag=0 ; tag_go $ctag ; } ; }
 goto_prev_tag()		{ (( ${#tags[@]} )) && { [[ -z $ctag ]] && ctag=0 || ((ctag--)) ; (( ctag < 0 )) && ctag=$((${#tags[@]} - 1))  ; tag_go $ctag ; } ; }
-
 goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ; prompt 'to: ' ; [[ "$REPLY" ]] && shell_command "$REPLY" || cdir ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
 vim_edit()		{ tcpreview ; $EDITOR "${selection[@]}" ; }

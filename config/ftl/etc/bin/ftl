@@ -21,46 +21,6 @@ ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_
 while : ; do tag_synch ; winch ; time_event ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key $KEY_TIMEOUT ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
-bind()
-{
-local map="$1" section="$2" keys="$3" command="$4" help="$5" shortcut= dscut=
-local keysa=( $keys )
-
-for key in "${keysa[@]}"
-	do
-		shortcut="$shortcut$key" 
-		
-		((ftl_bind_check)) && [[ "${kbd_trie[$shortcut]}" =~ [[:alpha:]] ]] && \
-			echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding '${kbd_trie[$shortcut]}'" 
-		
-		((kbd_trie[$shortcut]++)) 
-		{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
-	done
-
-((ftl_bind_check && ${kbd_trie[$shortcut]} > 1)) && echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding command path" 
-C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$map	$section	$dscut	$command	$help"
-}
-
-key_command()
-{
-[[ "$REPLY" == ESCAPE ]]                  && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
-(( keys_in > 3 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
-[[ "$REPLY" == ERROR_142     ]]           && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
-[[ "$REPLY" == "?"           ]]           && REPLY=QUESTION_MARK
-[[ "$REPLY" == "$leader_key" ]]           && REPLY=LEADER 
-
-[[ -n "$key_map"             ]]           && { $key_map ; return ; }
-
-[[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
-
-keys_command="$keys_command$REPLY" ; (( keys_in++)) ; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
-
-((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
-
-[[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && 
-	{ ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_in= keys_command= HAS_COUNT= COUNT= REPLY= ; }
-}
-
 cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
 
 get_dir() # dir, search
@@ -122,11 +82,9 @@ for((i=$top ; i <= bottom ; i++))
 ((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { preview ; geo_winch ; }
 }
 
-preview()
-{
-((prev_all)) && { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
-        || { ((! main)) && { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; } ; }
-}
+preview() { ((prev_all)) && local_preview || { ((! main)) && remote_preview ; } ; }
+local_preview() { ((emode)) && { ext_viewers ; emode=0 ; } || { pviewers ; extmode=0 ; } ; true ; }
+remote_preview() { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; true ; }
 
 setup_finfo()
 {
