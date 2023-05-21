@@ -124,9 +124,8 @@ for((i=$top ; i <= bottom ; i++))
 
 preview()
 {
-((main && prev_all || prev_all)) \
-	&& { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
-        || { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; return ; }
+((prev_all)) && { ((emode)) && { ext_viewers ; emode=0 ; return ; } || { pviewers ; extmode=0 ; return ; } ; } \
+        || { ((! main)) && { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; } ; }
 }
 
 setup_finfo()

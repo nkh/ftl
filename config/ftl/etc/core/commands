@@ -97,10 +97,10 @@ montage_preview()	{ [[ "$montage" ]] && montage= || montage="⠶" ; list ; }
 player_kill()		{ player_k ; }
 pane_down()		{ pane_extra "-v" "" ; }
 pane_left()		{ pane_extra "-h -b" '' ; }
-pane_right()		{ pane_ftl "'$n' $pfs" "-h -b" -R ; [[ "$n" ]] && rdir "$n" ; echo -e "\e[H\e[K" ; header '2' "$head" ; }
+pane_right()		{ pane_ftl "'$n' $pfs" "-h -b" -R ; [[ "$n" ]] && [[ -d "$n" ]] && rdir "$n" ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
 pane_R()		{ pane_extra "" "" ; }
 pane_L()		{ pane_extra "-h -b" "-R" ; }
-pane_go_next()		{ p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh_pane]} ; }
+pane_go_next()		{ p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2;97' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh_pane]} ; }
 preview_pane()		{ ((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
 preview_dir_only()	{ [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ; }
 preview_ext_ign()	{ [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ; }

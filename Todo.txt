@@ -7,8 +7,8 @@ issue: match preview to object and remove zP
 
 issue: space in names when passing env var to shell
 
-issue: up/down slower when preview is not shown
-	spurious EVENT_REMOTE present
+issue: pane right not working
+	pane is open but focus is on the left pane
 
 # Later
 

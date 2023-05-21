@@ -552,7 +552,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zO»               Reverse sort order 
 
-        «zE»               Choose  sort order from external sorts 
+        «fE»               Choose sort order from external sorts 
 
 ## Filtering
 
@@ -587,8 +587,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                                 \t.+\t[[:digit:]]
                         
                         It's also possible to define a filter in a function, instead for using
-                        filter #1/#2/reverse. The filters directory contains ten external
-                        filters you can load with shortcut «⇑f/đ». 
+                        filter #1/#2/reverse. The filters directory contains extra filters. 
                         
         «fE»               Choose filter from external filters 
                         
@@ -613,7 +612,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «fy»               filter out non selection
  
         «fc»               Clear all filters 
-                        
+
+
 ## Searching
 
         «/»                Incremental search, «ENTER» or «ESCAPE» to end.
