@@ -75,7 +75,7 @@ EDITOR="vim -p"
 FILE_DIFF=vimdiff
 
 FTLI_CLEAN=1				# set to 0 if using konsole
-FTLI_H=19				# hint FTLI about Character height
+FTLI_H=21				# hint FTLI about Character height
 FTLI_W=10				# hint FTLI about Character width
 FTLI_Z=0				# show image zoomed 
 
@@ -83,6 +83,7 @@ GPGID=CHANGE.ME
 
 G_PLAYER="vlc -f"			# gui media player
 T_PLAYER="mplayer -vo null" 		# terminal media player
+TE_PLAYER="vlc -I curses" 		# terminal external media player
 T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
 B_PLAYER="$FTL_CFG/etc/viewers/mplayer_local" # background player
 Q_PLAYER="$FTL_CFG/etc/viewers/cmus"    # music player to queue to
@@ -235,8 +236,8 @@ bind ftl move		Ö		goto_alt2		"next entry of different extension"
 bind ftl move		yN		goto_prev_tag		"goto previous tag"
 bind ftl move		yn		goto_next_tag		"goto next tag"
 
-bind ftl pane		"CTL-W h"	pane_left		"extra pane right"
-bind ftl pane		"CTL-W l"	pane_right		"extra pane left"
+bind ftl pane		"CTL-W h"	pane_left		"extra pane left"
+bind ftl pane		"CTL-W l"	pane_right		"extra pane right"
 bind ftl pane		"CTL-W j"	pane_down		"extra pane below"
 bind ftl pane		"CTL-W H"	pane_L			"extra pane: left"
 bind ftl pane		"CTL-W L"	pane_R			"extra pane: right"

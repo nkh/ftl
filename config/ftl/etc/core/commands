@@ -95,10 +95,22 @@ preview_refresh()	{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&
 montage_preview()	{ [[ "$montage" ]] && montage= || montage="⠶" ; list ; }
 player_kill()		{ player_k ; }
 pane_down()		{ pane_extra "-v" "" ; }
-pane_left()		{ pane_extra "-h -b" '' ; }
-pane_right()		{ pane_ftl "'$n' $pfs" "-h -b" -R ; [[ "$n" ]] && [[ -d "$n" ]] && rdir "$n" ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
-pane_R()		{ pane_extra "" "" ; }
+
 pane_L()		{ pane_extra "-h -b" "-R" ; }
+pane_left()		{ pane_extra "-h -b" '' ; }
+pane_R()		{ pane_extra "" "" ; }
+pane_right()		{ pane_extra "" '-R' ; }
+# pane_right()		{ pane_ftl "'$n' $pfs" "-h -b" -R ; [[ "$n" ]] && [[ -d "$n" ]] && rdir "$n" ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
+# pane_right()		{ pane_extra "-h -b" -R ; [[ "$n" ]] && [[ -d "$n" ]] && rdir "$n" ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
+
+# pane_extra(){ pane_ftl "'$n' $pfs" "$1" "$2" ; tmux selectp -t $new_pane ; }
+# pane_ftl()  { tcpreview ; tsplit "prev_all=0 ftl $1" 30% "$2" $3 ; }
+# tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; }
+
+# new pane + activate or not
+# ¿how to make new pane on other side of preview?
+
+
 pane_go_next()		{ p=$(pane_next) ; [[ $p ]] && { echo -e "\e[H\e[K" ; header '2;97' "$head" ; } && tmux selectp -t $p &>/dev/null && tmux send -t $p ${C[refresh_pane]} ; }
 preview_pane()		{ ((prev_all ^= 1)) ; tcpreview ; sleep 0.05 ; cdir ; }
 preview_dir_only()	{ [[ "${pdir_only[tab]}" ]] && pdir_only[tab]= || pdir_only[tab]='ᴰ' ; list ; }
@@ -114,7 +126,7 @@ preview_m1()		{ extmode=1 ; list ; }
 preview_m2()		{ extmode=2 ; list ; }
 preview_m3()		{ extmode=3 ; list ; }
 preview_queue()		{ [[ $e =~ $mfilter ]] && { ($Q_PLAYER "${selection[@]}" & ) ; tags_clear ; list ; } ; }
-preview_show()		{ [[ $e =~ $mfilter ]] && { source $B_PLAYER "${selection[@]}" ; tags_clear ; list ; } ; }
+preview_show()		{ [[ $e =~ $mfilter ]] && { source $B_PLAYER "${selection[@]}" ; list ; } ; }
 preview_show_fzf()	{ p="$FTL_CFG/viewers" ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && source $p/$viewer ; list ; }
 preview_size()		{ ((zoom += 1, zoom >= ${#zooms[@]})) && zoom=0 ; zoom ; [[ $pane_id ]] && tmux resizep -t $pane_id -x $x &>/dev/null ; rdir '' 0 ; }
 preview_tail()		{ [[ "${tail[$n]}" == "+$ " ]] && tail[$n]='+0 ' || tail[$n]='+$ ' ; list ; }

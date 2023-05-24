@@ -7,8 +7,11 @@ issue: match preview to object and remove zP
 
 issue: space in names when passing env var to shell
 
-issue: pane right not working
-	pane is open but focus is on the left pane
+issue: pane splitting
+	what do we want?
+		split the current pane
+		keep focus or pass to new split
+		split on the other side of the preview
 
 # Later
 
