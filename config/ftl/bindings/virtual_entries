@@ -1,4 +1,6 @@
-# Example of entry injection
+# example 1 inject two virtual directories and a virtual file in all directories
+# show a preview
+# handle key presses
 
 # callbacks
 
@@ -88,6 +90,8 @@ ventries_etag(){ etag_s="virtual" ; source "$FTL_CFG/etags/$etag_s" ; etag=1 ; c
 # bind leader_ftl extra	"LEADER v e"	ventries_etag	"show virtual entries etag"
 
 #--------------------------------------------------------------------------------
+
+# example 2 using virtual entries to implement a save_as functionality
 
 bind leader_ftl extra	"vf"		add_save_as	"insert a virtual entry for save_as"
 

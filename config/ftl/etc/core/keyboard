@@ -31,7 +31,7 @@ key_command()
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 
-keys_command="$keys_command$REPLY" ; (( keys_in++)) ; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
+keys_command="$keys_command$REPLY" ; (( keys_in++)) #; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
 ((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
 

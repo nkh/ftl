@@ -1058,7 +1058,7 @@ See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details.
         # start ftl on a specific directory in a new window
         tmux bind C-D new-window -n download "ftl $HOME/downloads"
 
-## User RCfile
+## Example User RCfile
 
         # source default config
         source $FTL_CFG/etc/ftlrc
@@ -1092,7 +1092,7 @@ See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details.
                 [$"'"]="$(tail -n1 $ghist)" # last visited directory
                 )
 
-        # load git support 
+        # load git etag support 
         . ~/.config/ftl/etags/git
 
 ## User Command With Binding
@@ -1174,9 +1174,7 @@ yourself, *ftl* will call your function every 'n' seconds.
 
         This adds a _ftll_ function which will open an *ftl* instance in a new
         tmux window, select the entries you want, without selection the current
-        entry is selected
-
-              readarray -t a < <(ftll) ; for n in "${a[@]}" ; do echo ---$n--- ; done
+        entry is selected.
 
         Press «q» to quit to return the selection.
 

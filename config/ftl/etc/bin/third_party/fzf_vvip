@@ -18,5 +18,5 @@ cat | plc --values | \
  	"${@}" \
 	--preview '\
 		[[ -d {} ]] && ls -AgGh --group-directories-first --color=always {} || \
-		{ perl -le "exit -B \$ARGV[0]" -- {} && vimkat {} 100 -1 || { file {} | piper "[^,]+" "grey20" ",.*" "grey10" ; } ; } '
+		{ perl -le "exit -B \$ARGV[0]" -- {} && tvcat {} 100 -1 || { file {} | piper "[^,]+" "grey20" ",.*" "grey10" ; } ; } '
 
