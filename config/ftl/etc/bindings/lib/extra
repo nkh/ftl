@@ -15,5 +15,12 @@ shell_popup()	{ tmux popup -E -d "$PWD" -w 80%  -h 80% ; }
 
 gpg_encrypt()	{ [[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" || gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" || read -sn1 ; cdir '' "$f.gpg" ; }
 
-pass_encrypt()	{ [[ $e =~ gpg ]] && prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d "$n" > "$REPLY" || gpg --output "$f.gpg" --symmetric "$f" || read -sn1 ; cdir '' "$REPLY" ; }
+pass_encrypt()
+{
+[[ $e =~ gpg ]] && \
+	prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d --no-symkey-cache "$n" > "$REPLY" || \
+	{ gpg --no-symkey-cache --symmetric "$f" || read -sn1 ; }
+
+cdir '' "$REPLY"
+}
 
