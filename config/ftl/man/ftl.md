@@ -348,7 +348,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                         The man page shows the default bindings. You can configure *ftl*
                         to show a different help if you prefer to cook your own.
 
-        «⇑c/©»          Show keyboard bindings 
+        «c»             Show keyboard bindings 
 
                         The bindings listing is generated at runtime, if you add
                         or modify bindings they will show in the listing. The listing
@@ -624,7 +624,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gff» «b»          Fzf find in current directory  
 
-        «gfa» «⇑b/”»       Fzf find                       
+        «gfa» «B»          Fzf find                       
 
         «gfA»              Fzf find regexp/fuzzy          
 
@@ -646,7 +646,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «[COUNT] yy»       Select current entry in "normal" class and move down
 
-        «[COUNT] yY»       Select current entry in "normal" class and move up
+        «[COUNT] YY»       Select current entry in "normal" class and move up
 
         «[COUNT] y1/2/3/4» Select current entry in given class and move down, the
                            glyph used for each class is defined in _ftlrc_ tglyph. 
@@ -692,7 +692,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
 ## Tags
 
-        «LEADER T»         show tmsu tags in preview
+        «LEADER t LEADER»  show tmsu tags in preview
 
         «LEADER t g»       goto tmsu tagged file via fzf
 
@@ -739,23 +739,23 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
 ## File and directory operations
 
-        «i»                Create new file        
+        «if»               Create new file        
 
-        «I»                Create new directory   
+        «id»               Create new directory   
 
-        «⇑i/→»             Create entries in bulk, in _vim_, end lines with / for directories
+        «ib»               Create entries in bulk, in _vim_, end lines with / for directories
 
         «d»                Delete selection, uses configuration *RM* variable, see ftlrc.
 
         «w»                Copy entry        
 
-        «p»                Copy selection    
+        «pp»               Copy selection    
 
-        «P»                Move selection    
+        «pm»               Move selection    
 
-        «⇑p/þ»             Move selection to, Uses _fzf_mv_.
+        «P»                Move selection to, Uses _fzf_mv_.
 
-        «cw»               Rename selection
+        «R»                Rename selection
 
         «xl»               Symlink selection 
 
@@ -816,11 +816,11 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         *ftl* had a some viewers for images, videos, comics, ...
 
-        «e»                External viewer, mode #1 
+        «ee»               External viewer, mode #1 
 
-        «E»                External viewer, mode #2, detached 
+        «er»               External viewer, mode #2, detached 
 
-        «⇑e/€»             External viewer, mode #3 
+        «ew»               External viewer, mode #3 
 
         «aA»               Fzf choose viewer 
 

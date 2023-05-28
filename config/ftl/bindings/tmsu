@@ -107,12 +107,12 @@ tmsu_goto() { go_loop f fzf "$(tmsu_table2 | lscolors | fzf-tmux $fzf_opt -m --a
 # tmsu_get_queries() { echo "find queries/ -type d" ; }
 
 bind tmsu tag	"LEADER t LEADER"	tmsu_preview		"show tmsu tags"
-bind tmsu tag	"LEADER t e"		tmsu_filter_query	"tmsu tag filter via query"
-bind tmsu tag	"LEADER t g"		tmsu_goto		"tmsu goto via fzf"
 bind tmsu tag	"LEADER t f"		tmsu_tag_fzf		"tmsu tag selection via fzf"
-bind tmsu tag	"LEADER t s"		tmsu_tag_scim		"tmsu tag selection via scim"
+bind tmsu tag	"LEADER t g"		tmsu_goto		"tmsu goto via fzf"
 bind tmsu tag	"LEADER t m"		tmsu_mount		"tmsu mount"
+bind tmsu tag	"LEADER t q"		tmsu_filter_query	"tmsu tag filter via query"
 bind tmsu tag	"LEADER t r"		tmsu_filter		"tmsu tag filter via fzf"
+bind tmsu tag	"LEADER t s"		tmsu_tag_scim		"tmsu tag selection via scim"
 bind tmsu tag	"LEADER t t"		tmsu_tag		"tmsu tag selection"
 
 # vim: set filetype=bash :
