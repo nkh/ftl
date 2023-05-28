@@ -45,8 +45,8 @@ clear_filters()		{ filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ;
 command_prompt()	{ gcn ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
 gcn()			{ { find "$FTL_CFG/commands" -type f -printf "%f\n" ; printf "%s\n" "${!C[@]}" fsh finfo show_cmd_log ; } >$fs/command_names ; }
 copy()			{ prompt 'write to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags p "$REPLY" || cp_mv p "$REPLY" "${selection[@]}" ; } ; cdir ; }
-copy_clipboard()	{ printf "%q " "${selection[@]}" | xsel -b -i ; }
-add_selection_to_file()	{ prompt 'add selection to: ' && [[ $REPLY ]] && { printf "%q\n" "${selection[@]}" >> "$REPLY" ; }  ; cdir ; }
+copy_clipboard()	{ q_sel | xsel -b -i ; }
+add_selection_to_file()	{ prompt 'add selection to: ' && [[ $REPLY ]] && { q_sel >> "$REPLY" ; }  ; cdir ; }
 create_bulk()		{ B=$fs/BULK ; >$B ; $EDITOR $B && { grep '/$' "$B" | tr '\n' '\0' | xargs -r -0 mkdir -p ; create_bulk_files "$B"; } ; cdir ; }
 create_bulk_files()	{ grep -v '/$' "$1" | tr '\n' '\0' | xargs -r -0 dirname -z | xargs -0 mkdir -p ; grep -v '/$' "$1" | grep -v '^$' | tr '\n' '\0' | xargs -r -0 touch ; }
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
@@ -80,9 +80,9 @@ ghistory()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $f
 ghistory_delete()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
 ghistory_edit()		{ dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ; }
 image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
-image_go_sxiv()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(printf "%q\n" "${files[@]}" | $SXIV -i -b -q -o -f -t | fzf-tmux $fzf_opt $fzf_sxiv_opt)" ; exec 2>"$fs/log" ; }
-image_go_sxiv_rec()	{ exec 2>&9 ; tcpreview ; go_loop fzf "$($SXIV -b -q -o -f -t * | fzf-tmux $fzf_opt $fzf_sxiv_opt)" ; exec 2>"$fs/log" ; }
-image_select()		{ OIFS="$IFS" IFS=$'\n' ; for i in $(printf "%q\n" "${files[@]}" | $SXIV -i -b -q -o -f -t) ; do tags[$i]='▪' ; tags_size + "$i" ; done ; IFS="$OIFS" ; cdir ; }
+image_go_sxiv()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(q_files | $SXIV -i -b -q -o -f -t | fzf-tmux $fzf_opt $fzf_sxiv_opt)" ; exec 2>"$fs/log" ; }
+image_go_sxiv_rec()	{ exec 2>&9 ; tcpreview ; go_loop f fzf "$($SXIV -b -q -o -f -t * | fzf-tmux $fzf_opt $fzf_sxiv_opt)" ; exec 2>"$fs/log" ; }
+image_select()		{ OIFS="$IFS" IFS=$'\n' ; for i in $(q_files | $SXIV -i -b -q -o -f -t) ; do tags[$i]='▪' ; tags_size + "$i" ; done ; IFS="$OIFS" ; cdir ; }
 image_select_rec()	{ OIFS="$IFS" IFS=$'\n' ; for image in $($SXIV -b -q -o -f -t *) ; do tags[$PWD/$image]='▪' ; tags_size + "$image" ; done ; IFS="$OIFS" ; cdir ; }
 image_zoom()		{ ((FTLI_Z ^= 1)) ; list ; }
 link()			{ tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags_clear && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ; }

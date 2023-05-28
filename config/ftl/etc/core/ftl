@@ -116,6 +116,10 @@ prev_synch(){ tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
 		((gpreview)) && { [[ "$etag_s" ]] && { source "$FTL_CFG/etags/$etag_s" ; [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
 		((gpreview)) && { view_mode "${vmode[tab]}" ; }
 		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
+q_files()   { printf "%q\n" "${files[@]}" | perl -lne '-d || print' ; }
+q_dirs()    { printf "%q\n" "${files[@]}" | perl -lne '-d && print' ; }
+q_all()     { printf "%q\n" "${files[@]}" ; }
+q_sel()     { printf "%q\n" "${selection[@]}" ; }
 tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
 _tab_new()  { [[ "$1" == '.' ]] && dir= || dir="$1" ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; tab_setup ; }
 _tab_next() { ((tab++)) ; I=(${!tabs[@]}) ; for i in "${I[@]:$tab}" "${I[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
