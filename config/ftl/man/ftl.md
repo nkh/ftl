@@ -243,19 +243,19 @@ See "# Virtual file injection" in '#EXAMPLES'.
 
 # KEY BINDINGS
 
-The bindings can be changed in the default ftlrc file but it's better to createi
+The bindings can be changed in the default ftlrc file but it's better to create
 your own rcfile. See example in "# EXAMPLES" below.
 
 Reserved for *ftl*: [ÅåÄ]
 
 ## Default Bindings
 
-'Alt-gr'+c will open a window listing all the current binding, in _fzf_,
+«c» will open a window listing all the current binding, in _fzf_,
 wich allows you to search per key or name.
 
         map    section  keys     command                
         -------------------------------------------------------------------
-        ftl    file     c        copy          copy file to, prompts inline
+        ftl    file     w        copy          copy file to, prompts inline
         ...
 
 ## Leader Key
@@ -276,7 +276,7 @@ sequences of keys to perform a command. The default is '\\'
                 short_ help                help displayed in command listing
               
 
-        eg: bind ftl        file  k            copy     "copy file to, prompts inline"
+        eg: bind ftl        file  w            copy     "copy file to, prompts inline"
 
         eg: bind leader_ftl extra "LEADER f h" ftl_help "display help"
 
@@ -286,11 +286,13 @@ you can see it in use in _'$FTL_CFG/bindings/type_handlers'_
 In the default _ftlrc_ file, associative arrays A for alt-gr and SA for
 shift+Alt-gr are defined, they allow you to define bindings this way: 
 
-        eg: bin ftl filter "${A[d]}" clear_filters "clear filters"
+        eg: bin ftl filter fc clear_filters "clear filters"
 
-When bindings are shown _alt-gr_ is replaced by _⇑_ and "_shift+alt-gr_
-is replaced by  _⇈_; as well as the key the combination would generate
-that makes it easier to search by name or by binding. 
+
+AltGr and Shift+AltGr keys are also available. When bindings are shown _alt-gr_
+is replaced by _⇑_ and "_shift+alt-gr_ is replaced by  _⇈_; as well as the key
+the combination would generate that makes it easier to search by name or by
+binding. 
 
 Available symbolic names (depending on your OS bindings and terminal) :
 
@@ -415,7 +417,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gfi»              go to image using sxiv
 
-        «gfi»              go to image using sxiv, including sub directories
+        «gfI»              go to image using sxiv, including sub directories
 
         «gfu»              Fzfi, use fzf and ueberzurg to find and display images
 
@@ -805,7 +807,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «LEADER f t»       Terminal popup                 
 
-        «:url URL|»        open URL in qutebrowser
+        «:url URL»        open URL in qutebrowser
 
 ## External Viewer
 
@@ -833,8 +835,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «aq»               Queue entries in music player. default to cmus.
 
                            You can binding cmus in *tmux* for easy access.
-
-        «E» «⇑e/€»         Open _G_PLAYER_ which is _vlc_ by default.
 
         Creating you own viewer:
 
@@ -901,7 +901,7 @@ From the command prompt
 
                 - ftl shortcut           run the *ftl* command
 
-                - ftl functioni          run the *ftl* command
+                - ftl function           run the *ftl* command
 
                 - user_command [args]    run the user command
 

@@ -43,7 +43,7 @@ READ IT. Follow the instructions.
 
 Artistic License 2.0 or GPL 3.0 at your convenience.
 
-© Nadim Khemir 2020-2022
+© Nadim Khemir 2020-2023
 mailto:nadim.khemir@gmail.com
 CPAN/Github ID: NKH
 
