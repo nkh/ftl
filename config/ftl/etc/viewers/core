@@ -53,7 +53,10 @@ pviewers()
 
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
 
+[[ -s "$n" ]] && [[ "$file_b" =~ "escape sequence" ]] && { ctsplit "$MD_PAGER \"$n\"" ; return ; }
+
 ((! is_bin)) && [[ -s "$n" ]] && [[ "$file_b" =~ ^Unicode || $mtype =~ ^text || $mtype == 'application/x-shellscript' || $mtype == application/x-perl ]] && { ptext && return ; }
+
 [[ "$file_b" =~ ASCII\ text ]] || [[ "$file_b" =~ Unicode\ text ]] && { ctsplit "ansi_show \"$n\" | $MD_PAGER " ; return ; }
 
 ptype

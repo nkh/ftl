@@ -166,8 +166,8 @@ view_mode_next()	{ ((vmode[tab]++)) ; ((vmode[tab] > 2)) && vmode[tab]=0 ; view_
 view_mode()		{ [[ $1 == 0 ]] && view_mode_all ; [[ $1 == 1 ]] && view_mode_image ; [[ $1 == 2 ]] && view_mode_not_image ; }
 selection_flip_down()	{ for ((i=file ; i < file + ${COUNT:-1} && i < nfiles ; i++)) ; do tag_flip "${files[i]}" ; done ; move ${COUNT:-1} ; list ; }
 selection_flip_up()	{ tag_flip "${files[file]}" ; move -1 ; list ; }
-selection_fzf()		{ fzf_tag T "$(fd -H --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
-selection_fzf_all()	{ fzf_tag T "$(fd -H --color=always | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
+selection_fzf()		{ fzf_tag T "$(fd -H -I --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
+selection_fzf_all()	{ fzf_tag T "$(fd -H -I --color=always | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 selection_goto()	{ tag_check && go_loop f fzf "$(printf "%s\n" "${!tags[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 selection_merge()	{ p="$FTL_CFG/etc/core/lib/merge" ; file=$(cd $p 2>&- && fd | fzf-tmux --header 'Merge tags:' $fzf_opt) ; [[ $file ]] && . $p/$file ; cdir ; }
 selection_merge_all()	{ source "$FTL_CFG/etc/core/lib/merge/all" ; list ; }
