@@ -15,6 +15,15 @@ issue: pane splitting
 
 # Later
 
+functionality: git interface
+	checkout repo in tmp
+	one (virtual) directory per commit
+	can search for commit from root
+	can go in commits and preview files
+	can diff files from commits
+	jump from commit to commit on the same file
+		highlight the changes
+
 functionality: quit no clear screen
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
