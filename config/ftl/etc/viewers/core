@@ -46,7 +46,8 @@ pviewers()
 [[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
 [[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
 [[ -p "$n" ]]                     && { ppipe     ; return ; }
-[[ $e =~ ^json|yml$ ]]            && { ptext     ; return ; }
+[[ $e =~ json ]]                  && { pjson     ; return ; }
+[[ $e =~ yml ]]                   && { ptext     ; return ; }
 [[ $e == sc ]]                    && { pscim     ; return ; }
 [[ $e =~ ^asciio$ ]]              && { pasciio   ; return ; }
 [[ -d "$n" ]]                     && { pdir      ; return ; }
@@ -98,6 +99,8 @@ pmlive()    { ((extmode)) && { player_k ; ctsplit "cat $(gen_exift) ; $T_PLAYER_
 pmd()       { ((extmode)) && ctsplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || ctsplit "$MD_RENDER1 \"$n\" | $MD_PAGER" ;  }
 ptext()     { vipreview "$n" ; }
 pansi()     { ((!extmode)) && ctsplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && ctsplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || ctsplit "ansi_show ${n@Q} | $MD_PAGER " ; } ; }
+
+pjson()     { ctsplit "fx \"$n\"" ; }
 
 ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
