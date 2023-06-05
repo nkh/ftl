@@ -12,12 +12,13 @@ ext_viewers()
 [[ $e =~ $mfilter ]]              && { ext_media ; return ; }
 [[ $e == pdf || $e == PDF ]]      && { ext_pdf   ; return ; }
 [[ $e == sc ]]                    && { ext_scim  ; return ; }
+[[ $e =~ ^json|yml$ ]]            && [[ -s "$n" ]] && { ext_json ; return ; }
 
-((emode == 3))       && { open_with ; return ; }
+((emode == 3))                    && { open_with ; return ; }
 
 mime_get
 
-[[ $e =~ ^json|yml$ || $mtype =~ ^text ]] && [[ -s "$n" ]] && { ext_text ; return ; }
+[[ $mtype =~ ^text ]]             && [[ -s "$n" ]] && { ext_text ; return ; }
 
 open_with
 }
@@ -72,6 +73,7 @@ ext_media() { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/nu
 ext_pdf()   { ((emode == 1)) && { ((pdf_prev_image)) && run_maxed mupdf "$n" || ext_pdf_vi ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } || { mupdf "$n" 2>/dev/null & } ; }
 ext_pdf_vi(){ t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
 ext_text()  { tcpreview ; tsplit "$EDITOR -t ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
+ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
 ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
@@ -100,7 +102,7 @@ pmd()       { ((extmode)) && ctsplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || ctsplit
 ptext()     { vipreview "$n" ; }
 pansi()     { ((!extmode)) && ctsplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && ctsplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || ctsplit "ansi_show ${n@Q} | $MD_PAGER " ; } ; }
 
-pjson()     { ctsplit "fx \"$n\"" ; }
+pjson()     { ctsplit "$JSON_VIEWER \"$n\"" ; }
 
 ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }

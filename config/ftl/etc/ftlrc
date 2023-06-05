@@ -96,6 +96,7 @@ MD_RENDER2='vmd'			# markdown renderer #2
 HEXEDIT=hexedit				# hex viewer/editor
 MIMETYPE=mimemagic			# mimetype generator
 NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
+JSON_VIEWER=jless
 
 # Deletion command
 RM="rm -rf"
@@ -199,9 +200,9 @@ bind ftl media		aa		preview_show		"terminal media player in background"
 bind ftl media		aA		preview_show_fzf	"fzf a viewer"
 bind ftl media		ak		player_kill		"kill sound preview"
 bind ftl media		aq		preview_queue		"fzf a viewer"
-bind ftl media		ew		external_mode1		"external viewer, m1"
+bind ftl media		ee		external_mode1		"external viewer m1"
 bind ftl media		er		external_mode2		"external viewer m2, detached"
-bind ftl media		ee		external_mode3		"external viewer m3, detached, fullscreen"
+bind ftl media		ew		external_mode3		"external viewer, m3, detached, fullscreen"
 
 bind ftl move		ENTER		enter			"enter; cd or open file"
 bind ftl move		PGUP		move_page_up		"page down"
