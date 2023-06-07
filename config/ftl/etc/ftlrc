@@ -15,6 +15,9 @@ help_command="man ftl.1"                # command to run to show help, see # Vim
 # Bookmarks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
+# User colors
+# declare -A user_colors=([?]="30;42")  # override LS_COLORS
+
 # Options 
 KEY_TIMEOUT=1.5				# timeout between key presses
 shell_h=40%				# shell pane height

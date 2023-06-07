@@ -65,6 +65,7 @@ The directory listing consists of:
         - entry index
         - optional etag
         - colored entries according to LS_COLORS
+            - override color (See ftlrc)
 
 Example:
 
@@ -1091,6 +1092,9 @@ See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details.
                 [3]=$HOME/downloads/$
                 [$"'"]="$(tail -n1 $ghist)" # last visited directory
                 )
+
+        # User colors
+        declare -A user_colors=([special_entry]="30;42")
 
         # load git etag support 
         . ~/.config/ftl/etags/git
