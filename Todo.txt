@@ -24,6 +24,8 @@ functionality: git interface
 	jump from commit to commit on the same file
 		highlight the changes
 
+	or let gitfs do the work
+
 functionality: quit no clear screen
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all

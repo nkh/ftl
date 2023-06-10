@@ -72,7 +72,8 @@ find_fzf_all()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -HI -E'.git/*' | sed
 find_fzf_dirs()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -td -I -L | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 find_frf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(frf 1000 '' ctrl-t)" ; exec 2>"$fs/log" ; }
 gmark()			{ { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ; }
-gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$(cat $ftl_root/marks | lscolors | fzf-tmux $fzf_opt --cycle -m --expect=ctrl-t --ansi)" ; }
+gmark_fzf_user()	{ : ; }
+gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$({ cat $ftl_root/marks ; gmark_fzf_user ; }| lscolors | fzf-tmux $fzf_opt --cycle -m --expect=ctrl-t --ansi)" ; }
 gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ; }
 go_rg()			{ exec 2>&9 ; tcpreview ; go_loop rg "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/log" ; }
 history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
