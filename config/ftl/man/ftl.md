@@ -725,6 +725,12 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gM»               Fzf to persistent bookmark, open multiple tabs with «ctrl-t»
 
+                           You can inject marks dynamically, for example add
+                           fzf-marks to my persistent marks which let's me jump
+                           to marks in the command line or in *ftl*.
+
+                               gmark_fzf_user() { perl -ape '$_ = "$F[2]/\$\n"' ~/.fzf-marks ; }
+
         «Mc»               Clear persistent bookmarks 
 
 ## History

@@ -2,43 +2,23 @@
 
 issue: numfmt error after moving files
 
-issue: match preview to object and remove zP
-	add hash or timestamp to preview file
-
-issue: space in names when passing env var to shell
-
 issue: pane splitting
 	what do we want?
 		split the current pane
 		keep focus or pass to new split
 		split on the other side of the preview
 
+issue: single preview for the same file name
+	path1/file and path2/file generate file.preview
+
+	if file.preview exists in the cache it will be shown
+
 # Later
-
-functionality: git interface
-	checkout repo in tmp
-	one (virtual) directory per commit
-	can search for commit from root
-	can go in commits and preview files
-	can diff files from commits
-	jump from commit to commit on the same file
-		highlight the changes
-
-	or let gitfs do the work
-
-functionality: quit no clear screen
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 		asciio files are compressed can we grep in them?
 
 functionality: drag drop via dragon
-
-functionality: accept list of virtual files as parameter
-		in a file
-		
-		reasons to display virtual files
-		
-		what to display and how
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...
@@ -62,15 +42,11 @@ arch: asynch list display for very large directories
 	
 	note that ftl already runs process1 in the background 
 
-
 arch: put all options in one array
 	to simplify handling it
 
 arch: filter list instead for specialized filters 
 	filters are run in parallel how do we do that with a list?
-
-arch: filter per directory, inherit from parent
-	is there a common use case for this?
 
 arch: let hidden pane do preview so main pane data isn't overridden by extra pane's
 	this may also make it possible to use fz, rg, etc... as filters and ftl as preview

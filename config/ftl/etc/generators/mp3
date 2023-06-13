@@ -1,7 +1,8 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-t="$2/$1.et"
+n=$(basename "$1")
+t="$2/$n.et"
 
 [[ FORCE == "$3" || ! -f "$t" ]] &&
 	{

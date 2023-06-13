@@ -1,5 +1,34 @@
 # preview and external viewer for ftl
 
+pfzf()
+{
+f="$1"
+n="$(basename "$1")"
+[[ "$n" =~ \. ]] && e="${n##*.}" || e=
+
+# echo "pane_id='$pane_id' '${1}' n='$n' e='$e'"
+
+mtype=$(mimemagic "$f")
+
+echo ${f@Q} | lscolors ; echo "$mtype" ; file -b "$f" ; stat -c %s "$f" | numfmt --to=iec
+
+[[ "$e" =~ ^md|MD$ ]]               && { pfzf_md       ; return ; }
+[[ "$e" =~ json ]]                  && { pfzf_json     ; return ; }
+[[ "$e" == txt ]]                   && { pfzf_txt      ; return ; }
+[[ "$e" == pdf || "$e" == PDF ]]    && { pfzf_pdf      ; return ; }
+}
+
+# text
+# vim
+# images
+# pgen/xxx expect name of file without path
+
+pfzf_md()	{ tmux respawn-pane -k -t $pane_id "vmd ${f@Q} | moar" ;  }
+pfzf_json()	{ tmux respawn-pane -k -t $pane_id "jless ${f@Q}" ; }
+pfzf_txt()	{ tmux respawn-pane -k -t $pane_id "moar ${f@Q}" ;  }
+pfzf_pdf()	{ t="$thumbs/pdf/$n$extmode.txt" ; [[ -e "$t" ]] || $pgen/pdf "$f" $thumbs/pdf $extmode ; tmux respawn-pane -k -t $pane_id "moar ${t@Q} ; read -sn 100" ; }
+
+
 source "$FTL_CFG/etc/commands/open_with"
 
 ext_viewers()
@@ -22,7 +51,6 @@ mime_get
 
 open_with
 }
-
 
 pviewers()
 {
@@ -57,7 +85,7 @@ mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
 
 [[ -s "$n" ]] && [[ "$file_b" =~ "escape sequence" ]] && { pansi ; return ; }
 
-((! is_bin)) && [[ -s "$n" ]] && [[ "$file_b" =~ ^Unicode|ASCII || $mtype =~ ^text ]] && { ptext && return ; }
+((! is_bin)) && [[ -s "$n" ]] && [[ "$file_b" =~ Unicode|ASCII || $mtype =~ ^text ]] && { ptext && return ; }
 
 ptype
 }

@@ -1,10 +1,12 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-[[ FORCE == "$3" || ! -f "$2/$1.jpg" ]] &&
-	{
-	unzip -p "$1"  "$(zipinfo -2  "$1" | perl -ne '! /\d\D\..*$/ and print' | sort | head -n1)" > "$2/$1.large.jpg" && vipsthumbnail --size 600x "$2/$1.large.jpg" -o "$2/$1.jpg" \
-		|| cbconvert thumbnail "$1" --outfile "$2/$1.jpg" &>/dev/null
+n=$(basename "$1")
 
-	rm "$2/$1.large.jpg" 2>&-
+[[ FORCE == "$3" || ! -f "$2/$n.jpg" ]] &&
+	{
+	unzip -p "$1"  "$(zipinfo -2  "$1" | perl -ne '! /\d\D\..*$/ and print' | sort | head -n1)" > "$2/$n.large.jpg" && vipsthumbnail --size 600x "$2/$n.large.jpg" -o "$2/$n.jpg" \
+		|| cbconvert thumbnail "$1" --outfile "$2/$n.jpg" &>/dev/null
+
+	rm "$2/$n.large.jpg" 2>&-
 	}

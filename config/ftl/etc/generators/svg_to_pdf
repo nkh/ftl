@@ -1,8 +1,10 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-[[ FORCE == "$3" || ! -f "$2/$1.pdf" ]] &&
+n=$(basename "$1")
+
+[[ FORCE == "$3" || ! -f "$2/$n.pdf" ]] &&
 	{
-	rsvg-convert -f pdf -o "$2/$1.pdf" "$1" 
+	rsvg-convert -f pdf -o "$2/$n.pdf" "$1" 
 	}
 
