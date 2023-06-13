@@ -1,34 +1,5 @@
 # preview and external viewer for ftl
 
-pfzf()
-{
-f="$1"
-n="$(basename "$1")"
-[[ "$n" =~ \. ]] && e="${n##*.}" || e=
-
-# echo "pane_id='$pane_id' '${1}' n='$n' e='$e'"
-
-mtype=$(mimemagic "$f")
-
-echo ${f@Q} | lscolors ; echo "$mtype" ; file -b "$f" ; stat -c %s "$f" | numfmt --to=iec
-
-[[ "$e" =~ ^md|MD$ ]]               && { pfzf_md       ; return ; }
-[[ "$e" =~ json ]]                  && { pfzf_json     ; return ; }
-[[ "$e" == txt ]]                   && { pfzf_txt      ; return ; }
-[[ "$e" == pdf || "$e" == PDF ]]    && { pfzf_pdf      ; return ; }
-}
-
-# text
-# vim
-# images
-# pgen/xxx expect name of file without path
-
-pfzf_md()	{ tmux respawn-pane -k -t $pane_id "vmd ${f@Q} | moar" ;  }
-pfzf_json()	{ tmux respawn-pane -k -t $pane_id "jless ${f@Q}" ; }
-pfzf_txt()	{ tmux respawn-pane -k -t $pane_id "moar ${f@Q}" ;  }
-pfzf_pdf()	{ t="$thumbs/pdf/$n$extmode.txt" ; [[ -e "$t" ]] || $pgen/pdf "$f" $thumbs/pdf $extmode ; tmux respawn-pane -k -t $pane_id "moar ${t@Q} ; read -sn 100" ; }
-
-
 source "$FTL_CFG/etc/commands/open_with"
 
 ext_viewers()
@@ -104,31 +75,31 @@ ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
-ptype()     { mime_get ; ctsplit "echo ${f@Q} | lscolors ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
+ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
-pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$f" "$thumbs/cbr" ; pw3image "$t" ; }
-pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$f" "$thumbs/cbz" ; pw3image "$t" ; }
+pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$n" "$thumbs/cbr" ; pw3image "$t" ; }
+pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$n" "$thumbs/cbz" ; pw3image "$t" ; }
 
 pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; ctsplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
-pdir_du()   { ctsplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
-pdir_ls()   { ctsplit "ls -lsh --group-directories-first --color=always \"$n\" ; read -sn 1000" ; true ; }
+pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
+pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
+pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 1000" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
 
-ppipe()     { ctsplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
+ppipe()     { psplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 
 phtml()     { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; }
-pimage()    { ((extmode)) && { ctsplit "identify -format 'type: %m\nsize: %wx%h\nbits: %q\ndisk: %b\n' ${n@Q} ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
+pimage()    { ((extmode)) && { psplit "identify -format 'type: %m\nsize: %wx%h\nbits: %q\ndisk: %b\n' ${n@Q} ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
 psvg()      { t="$thumbs/svg/$f.jpg" ; [[ -e $t ]] || $pgen/svg "$f" "$thumbs/svg" ; pw3image "$t" ; }
-pmp3()      { pmlive || { ctsplit "$PAGER_ANSI <$(gen_exift) ; read -sn1" ; } ; }
-pmedia()    { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$f" "$thumbs/$e"; [[ -f "$t" ]] && pw3image "$t" || ptype ; } ; }
-pmlive()    { ((extmode)) && { player_k ; ctsplit "cat $(gen_exift) ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
+pmp3()      { pmlive || { psplit "$PAGER_ANSI <$(gen_exift) ; read -sn1" ; } ; }
+pmedia()    { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$n" "$thumbs/$e"; [[ -f "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
+pmlive()    { ((extmode)) && { player_k ; psplit "cat $(gen_exift) ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
-pmd()       { ((extmode)) && ctsplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || ctsplit "$MD_RENDER1 \"$n\" | $MD_PAGER" ;  }
+pmd()       { ((extmode)) && psplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$n\" | $MD_PAGER" ;  }
 ptext()     { vipreview "$n" ; }
-pansi()     { ((!extmode)) && ctsplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && ctsplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || ctsplit "ansi_show ${n@Q} | $MD_PAGER " ; } ; }
+pansi()     { ((!extmode)) && psplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $MD_PAGER " ; } ; }
 
-pjson()     { ctsplit "$JSON_VIEWER \"$n\"" ; }
+pjson()     { psplit "$JSON_VIEWER \"$n\"" ; }
 
 ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
@@ -136,13 +107,16 @@ ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png
 pepub()     { (( extmode==2 || pdf_prev_image)) && pepubpng || { t="$thumbs/epub/$f$extmode.txt" ; [[ -e $t ]] || $pgen/epub "$f" $thumbs/epub $extmode && vipreview "$t" ; } ; }
 pepubpng()  { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
-pman()      { ctsplit "man \"$n\" ; read -sn 1000" ; true ; }
+pman()      { psplit "man \"$n\" ; read -sn 1000" ; true ; }
 
-pscim()     { ctsplit "scim \"$n\" | $PAGER ; read -sn100" ; }
-pasciio()   { ctsplit "asciio_to_text \"$n\" | $PAGER ; read -sn100" ; }
+pscim()     { psplit "scim \"$n\" | $PAGER ; read -sn100" ; }
+pasciio()   { psplit "asciio_to_text \"$n\" | $PAGER ; read -sn100" ; }
 
 pcomp()     { [[ $e == zip ]] && _pcomp unzip -l || { [[ $e == rar ]] && _pcomp unrar list ; } || { [[ $f =~ \.tar ]] && _pcomp tar --list --verbose -f ; } ; }
 _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@" "$f" >"$fp" ; vipreview "$fp" ; } ; }
+
+# needed when used as an fzf viewer from ftl
+((!FTLRC_LOADED)) && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl_setup ; [[ "$1" ]] &&  pfzf "$1" ; }
 
 # vim: set filetype=bash :
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-n=$(basename "$1")
+f=$(basename "$1")
 extmode=${3:-0}
-p="$2/$n$extmode.txt"
+p="$2/$f$extmode.txt"
 
 [[ FORCE == "$3" || ! -f "$p" ]] &&
 	{

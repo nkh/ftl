@@ -1,11 +1,11 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-n=$(basename "$1")
+f=$(basename "$1")
 
-[[ FORCE == "$3" || ! -f "$2/$n.jpg" ]] &&
+[[ FORCE == "$3" || ! -f "$2/$f.jpg" ]] &&
 	{
-	rsvg-convert --background-color=white "$1" > "$2/$n.jpg"
+	rsvg-convert --background-color=white "$1" > "$2/$f.jpg"
 	}
 
 

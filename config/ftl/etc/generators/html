@@ -1,9 +1,9 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-n=$(basename "$1")
+f=$(basename "$1")
 
-[[ FORCE == "$3" || ! -f "$2/$n.txt" ]] &&
+[[ FORCE == "$3" || ! -f "$2/$f.txt" ]] &&
 	{
-	w3m -dump "$1" > "$2/$n.txt"
+	w3m -dump "$1" > "$2/$f.txt"
 	}

@@ -1,6 +1,9 @@
+FTLRC_LOADED=1
+
 # Directories
 pgen="$FTL_CFG/etc/generators"          # location of preview generators
 ftl_root=$FTL_CFG/var                   # runtime directory, every session gets a directory here
+export ftl_root
 mkdir -p $ftl_root
 
 ftl_cmds=$ftl_root/cmds                 # history of shell commands

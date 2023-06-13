@@ -1,11 +1,11 @@
 #!/bin/bash
 exec 2>>"$2/generators_log"
 
-n=$(basename "$1")
+f=$(basename "$1")
 
-[[ FORCE == "$3" || ! -f "$2/$n.jpg" ]] && 
+[[ FORCE == "$3" || ! -f "$2/$f.jpg" ]] && 
 	{
-	ffmpegthumbnailer -i "$1" -o "$2/$n.jpg" -s 1024 || rm "$2/$n.jpg"
-	exiftool "$1" | piper '^.*?:' blue >"$2/$n.et"
+	ffmpegthumbnailer -i "$1" -o "$2/$f.jpg" -s 1024 || rm "$2/$f.jpg"
+	exiftool "$1" | piper '^.*?:' blue >"$2/$f.et"
 	}
 

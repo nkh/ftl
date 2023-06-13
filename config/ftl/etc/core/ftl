@@ -10,6 +10,7 @@ tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id
 vipreview() { ((in_viprev)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E -e 's/\$/\\$/g' -e 's/#/\\\\#/' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_viprev=1 ; }
 cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 clear_list(){ for(( i=$1 ; i < LINES - 1  ; i++)) ; do echo -ne "\e[K$flip" ; ((i < LINES - 2)) && echo ; done ; }
+psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; }
 ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
 cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == ${C[tag_copy]} ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; }
 cp_do()     { [[ -d "$2" ]] && tscommand "xargs -a $1 -t -- cp -r -t ${2@Q}" || tscommand "xargs -a $1 -t -I{} -- cp {} ${2@Q}" ; }
@@ -31,7 +32,7 @@ files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t
 dirs_virt() { ((${#vdirs[@]}))  && for vd in "${!vdirs[@]}"  ; do printf "0\t0\t$vd\n" ; done ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg ${filters2[tab]} | { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } | filter2 ; }
 filter_d()  { rg ${filters_dir[tab]} | filter2 ; }
-filter_c()  { while read cfile ; do ((${#user_colors[$cfile]})) && echo -e "\e[${user_colors[$cfile]}m$cfile\e[m" || echo "$cfile" ; done ; }
+filter_c()  { ((${#user_colors[@]})) && { while read cfile ; do ((${#user_colors[$cfile]})) && echo -e "\e[${user_colors[$cfile]}m$cfile\e[m" || echo "$cfile" ; done ; } || cat ; }
 filter2()   { ftl_sort | tee >(cat >&4) | vfiles_clr | filter_c | lscolors >&5 ; }
 filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
@@ -41,7 +42,7 @@ fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 tag_go()    { ti=0 ; for tag_path in "${!tags[@]}" ; do ((ti == $1)) && nn="$tag_path" && break ; ((ti++)) ; done ; cdir "$(dirname "$nn")" "$(basename "$nn")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
-gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $pgen/$e "$f" "$thumbs/$e" ; echo "${t@Q}" ; }
+gen_exift() { t="$thumbs/$e/$f.et" ; [[ -e "$t" ]] || $pgen/$e "$n" "$thumbs/$e" ; echo "${t@Q}" ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
 geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }

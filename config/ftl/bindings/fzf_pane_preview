@@ -1,0 +1,59 @@
+
+# an experimental fzf search with preview in a ftl pane
+
+fzf_pane_preview()
+{
+# { fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | lscolors | \
+
+exec 2>&9
+
+# find all files and pass then to fzf, and declare a previewr
+
+# the previewer sets a few variable and sources 'viewers/core' which
+# detects that it was sourced directly and calls ftl_setup and then calls
+# pfzf which is defined below
+
+go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | \
+	fd -HI -E'.git/*' | sed 's/^.\///' | lscolors | \
+		fzf \
+			--ansi \
+			-m \
+			--expect=ctrl-t \
+			--preview 'my_pane='$my_pane' ; extmode='$extmode' ; pane_id='$pane_id' ; source '$FTL_CFG'/viewers/core {} ; read -sn 100' \
+			--preview-window='right:0%' \
+			--cycle --reverse --info=inline
+	)"
+
+exec 2>"$fs/log"
+
+cdir
+}
+
+pfzf()
+{
+# fzf preview in ftl preview pane, reusing the normal previewer
+
+# replace ctsplit with psplit
+fzf_viewer=1
+
+n="$(realpath "$1")" ; f="$(basename "$1")" ; [[ "$f" =~ \. ]] && e="${f##*.}" || e=
+
+# set pfs
+fzf_viewer_fs=/tmp/fzf_viewer ; mkdir -p "$fzf_viewer_fs" ; pfs="$fzf_viewer_fs"
+
+# handle tmux "not cleaning" pane
+tmux respawn-pane -k -t $pane_id "for i in \$(seq 100) ; do echo -e '\e[30m.' ; done ; read -sn1" 
+sleep .02
+
+# use pdir_ls for directory
+[[ -d "$n" ]] && { pdir_ls ; return ; }
+
+# call the default previewers
+pviewers
+}
+
+bind ftl file	gz	fzf_pane_preview	"fzf with preview in preview pane"
+
+
+# vim: set filetype=bash :
+

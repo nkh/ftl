@@ -3,8 +3,8 @@ exec 2>> "$2/generators_log"
 
 extmode=${3:-0}
 
-n=$(basename "$1")
-p="$2/$n$extmode.txt"
+f=$(basename "$1")
+p="$2/$f$extmode.txt"
 
 [[ FORCE == "$3" || ! -f "$p" ]] &&
 	{

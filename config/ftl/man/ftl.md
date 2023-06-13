@@ -635,9 +635,13 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gfr»              Ripgreg with preview           
 
+        «gz»               Experimental fzf search with preview in a ftl pane
+
         Opening search results in tabs:
                 If you use one of the above you can pick multiple entries.
                 Entries can be opened in a new tab with 'ctrl+t'.
+
+        not_assigned       Merge selection from all panes, see option auto_select
 
 ## Selection
 

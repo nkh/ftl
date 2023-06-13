@@ -1,18 +1,17 @@
 #!/bin/env bash
 
+
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2022, Artistic licence 2.0
 {
-declare -Ag C bindings kbd_trie key_map vfiles vdirs time_event_handlers ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
-my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
+source $FTL_CFG/etc/core/ftl_setup
+echo -en '\e[?1049h' ; stty -echo
+
 [[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
-
-tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ; [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
-
-echo -en '\e[?1049h' ; stty -echo ; filter_rst ; vfiles_rst ; sort_filters=('-k3 -V' '-n' '-k2 -V') ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
+[[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
-[[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; touch $ghist ; echo $my_pane >$fs/pane ; }
-fsp=$pfs/prev ; PPWD="$dir" ; export ftl_root
+[[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; echo $my_pane >$fs/pane ; }
+fsp=$pfs/prev ; PPWD="$dir" 
 
 [[ "$3" ]] && { gpreview=1 ; prev_all=0 ; emode=0 ; cd "$dir" ; prev_synch ; true ; } || { tag_synch ; cdir "$dir" "$search" ; }
 
@@ -25,7 +24,14 @@ cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : n
 
 get_dir() # dir, search
 {
-cd "${1:-$PWD}" || return ; [[ "$PPWD" != "$PWD" ]] && { marks["'"]="$n" ; PPWD="$PWD" ; ((gpreview)) || echo "$n" | tee -a $fs/history >> $ghist ; }
+cd "${1:-$PWD}" || return
+[[ "$PPWD" != "$PWD" ]] &&
+	{
+	marks["'"]="$n"
+	PPWD="$PWD"
+	((gpreview)) || echo "$n" | tee -a $fs/history >> $ghist
+	}
+
 tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
 
 ((gpreview)) || nice -15 $pgen/generator $thumbs &
@@ -34,7 +40,6 @@ files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[$
 [[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
 declare -A uniq_file ; shopt -s dotglob ; pad=(* ? ?) ; shopt -u dotglob ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; v_entries ; dir &
-
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	[[ $pnc == $dir_done ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1
 	[[ "$pnc" =~ '.' ]] && { e=${pnc##*.} ; ((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue ; } ; pl=${#pnc}
@@ -96,5 +101,5 @@ ftl_env+=([ftl_info_file]=$ftl_info_file) ;
 { FTL_PID=$$ ; FTL_FS=$fs ; FTL_PWD=${PWD@Q} ; declare -p FTL_PID FTL_FS FTL_PWD n selection ; } >$ftl_info_file
 }
 
-[[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; export FTL_CFG ; source $FTL_CFG/etc/core/ftl ; ftl "$@" ; } || echo 'ftl: run me in tmux'
+[[ $TMUX ]] && { : ${FTL_CFG:=$HOME/.config/ftl} ; ftl "$@" ; } || echo 'ftl: run me in tmux'
 

@@ -1,0 +1,13 @@
+export FTL_CFG
+
+source $FTL_CFG/etc/core/ftl
+
+declare -Ag C bindings kbd_trie key_map vfiles vdirs time_event_handlers marks ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
+my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore tail tags ntags ftl_env du_size ; mkapipe 4 5 6
+
+selection=() ; n= ; fs=$ftl_root/$$ ; pfs=$fs ; ofs=$fs ; tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ;
+
+filter_rst ; vfiles_rst ; sort_filters=('-k3 -V' '-n' '-k2 -V') ; flips=(' ' ' ') ; dir_done=56fbb22f2967 
+
+# vim: set filetype=bash:
+
