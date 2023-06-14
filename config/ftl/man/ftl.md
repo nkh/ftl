@@ -688,6 +688,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «yN»               Go to previous selected entry.
 
+        «xup»              Select files via up (the ultimate plumber) TUI
+
         not_assigned       Merge selection from all panes, see option auto_select
 
         not_assigned       Fzf merge selection from panes 
@@ -1145,6 +1147,8 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
         Close the shell then runf this commnd in *ftl*: load_sel.
 
         You an move from selection to selection with «yn» or via fzf with «gy».
+
+        See «xup», selection via the ultimate plumber TUI.
 
 ## Virtual Entry Injection
 

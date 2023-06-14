@@ -1,0 +1,10 @@
+bind ftl file	xup	up_select	"create a pipeline to select files"
+
+up_select()
+{
+tmux popup -E -h 95% -w 70% -d "$PWD" "TERM=xterm ; find -type f | up -o $fs/ups && { chmod a+x $fs/ups ; find -type f | $fs/ups | xargs realpath >$fs/load_sel ; }"
+load_sel 0 ; cdir
+}
+
+# vim: set filetype=bash :
+

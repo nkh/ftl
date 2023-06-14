@@ -92,11 +92,14 @@ cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party
 
 # optional pager, you need brew installed and change MD_PAGER in rc file
 # see https://docs.brew.sh/Homebrew-on-Linux
-# brew install moar
+brew install moar
 
 # json viewers
 brew install fx
 brew install jless
+
+# ultimate plumber pipeline TUI
+brew install up 
 
 # optional markdown previewer
 #https://kristaps.bsd.lv/lowdown/
