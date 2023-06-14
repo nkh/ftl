@@ -23,9 +23,13 @@ mime_get
 open_with
 }
 
+user_pviewers() { false ; }
+
 pviewers()
 {
 ((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_prev && return ; } 
+
+user_pviewers && return ;
 
 [[ $e ]] && ((pignore["${e@Q}"])) && { pignore   ; return ; }
 [[ -e "$fs/lock_preview/$n" ]]    && { plock     ; return ; }

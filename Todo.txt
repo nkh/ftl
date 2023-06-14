@@ -13,6 +13,8 @@ issue: single preview for the same file name
 
 	if file.preview exists in the cache it will be shown
 
+functionality: make command out of fzf previewer
+
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all

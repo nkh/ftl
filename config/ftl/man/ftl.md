@@ -1135,6 +1135,27 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
         # bind shortcut «LEADER s» 
         bind leader file "LEADER s" shred_command "overrides selection, bypasses \$RM"
 
+## user defined preview
+
+Code for generating a preview is in '$FTL_CFG/viewers/core', you can also
+define code for preview in your *ftlrc*. Below is an example from my config.
+
+I have files with extensions "pbs_log" and "pbs_log_failed", those files
+contain ANSI escape code. Files with ANSI escpe code have three different
+previews, one of them uses vim plus the AnsiEsc plugin; I also handle the
+above files in my vimrc. The problem is that both vim and ftl try to set
+AnsiEsc resulting in AnsiEsc not being set at all! 
+
+I check the file extension, if they match I bypass ftl's default viewer.
+
+        user_pviewers() 
+        {
+        [[ $e == pbs_log || $e == pbs_log_fail ]] && ((extmode==1)) && { ptext ; return 0 ; }
+        
+        # you can define multiple hanlers in this function
+        # return false for the default ftl handlers to run
+        }
+
 ## Select Files With Bash Commands
 
         During an ftl session you decide that you want to select all the images under
