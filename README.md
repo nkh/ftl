@@ -2,8 +2,18 @@
 
 ftl - file manager using tmux panes and live previews
 
+## Screenshots
+
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/ftl.png)
 ![Screenshot](https://raw.github.com/nkh/ftl/master/screenshots/image_preview.png)
+
+## Introduction Video
+
+[![Introduction video](https://raw.github.com/nkh/ftl/master/screenshots/introduction_video.png)](https://www.youtube.com/watch?v=nvSDmhXymVA)
+
+I speak slowly, for everyone gets a chance to understand, youtube allows you to accelerate it
+to a speed of your liking. Some bindings have changed since the video was made, check the man page or 
+the built-in "bindings to commands" table, shortcut is «c».
 
 # DOCUMENTATION
 

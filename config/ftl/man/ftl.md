@@ -6,7 +6,7 @@ ftl - terminal file manager, hyperorthodox, with live previews
 
 ftl
 
-ftl [ [-s file] [-T file] ] [directory[/file]]
+ftl [ [-s file] [-t file] ] [directory[/file]]
 
 # OPTIONS
 
