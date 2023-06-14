@@ -682,7 +682,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                            changes directory to where the selection is.
 
                            This is handy when selections are read from a file with option
-                           -t on the command line or via the 'load_selection'
+                           -t on the command line or via the 'load_sel'
 
         «yn»               Go to next selected entry.
 
@@ -906,7 +906,7 @@ From the command prompt
 
                 - ^etags                 Chose tagging method
 
-                - "load_selection"       Load selection from a file
+                - "load_sel"       Load selection from a file
 
                 - ^tree                  display a tree in a popup pane
 
@@ -1132,6 +1132,19 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
 
         # bind shortcut «LEADER s» 
         bind leader file "LEADER s" shred_command "overrides selection, bypasses \$RM"
+
+## Select Files With Bash Commands
+
+        During an ftl session you decide that you want to select all the images under
+        the current directory that have a size under 5 KB.
+
+        Open a shell with «s» and run the following command: 
+
+            find -name '*.png' | filter-on-file-size -5000 | xargs realpath >$ftl_fs/load_sel
+
+        Close the shell then runf this commnd in *ftl*: load_sel.
+
+        You an move from selection to selection with «yn» or via fzf with «gy».
 
 ## Virtual Entry Injection
 

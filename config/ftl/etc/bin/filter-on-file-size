@@ -1,0 +1,6 @@
+#!/bin/env perl
+
+my ($less, $size) = $ARGV[0] =~ /(-?)([0-9]+)/ ;
+
+do { chomp ; print $less ? (-s $_ <= $size && "$_\n") : (-s $_ > $size && "$_\n") } for <STDIN>
+

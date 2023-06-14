@@ -6,9 +6,9 @@ shell_command()
 # commands can be implemented here or in files found in "user_commands"
 [[ "$1" == "load_sel" ]] && \
 	{
-	# eg: select all files in a directory: fd -a . > $ftl_root/load_sel
+	# eg: select all files in a directory: fd -a . > $ftl_fs/load_sel
 	[[ -s "$fs/load_sel" ]] \
-		&& { <"$fs/load_sel" readarray -t new_tags && tags=() && for p in "${new_tags[@]}" ; do tags["$p"]='▪' ; done ; } \
+		&& { <"$fs/load_sel" readarray -t new_tags && tags_clear && for p in "${new_tags[@]}" ; do tag_flip "$p" ; done ; } \
 		|| tmux popup "echo -n ftl: no such file '$fs/load_sel'"
 
 	return
