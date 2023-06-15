@@ -15,6 +15,11 @@ issue: single preview for the same file name
 
 functionality: make command out of fzf previewer
 
+functionality: select files by mode, owner, date modified, ...
+		select files per regexp
+		select all in fzf
+		select files with same extension as current file
+
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all

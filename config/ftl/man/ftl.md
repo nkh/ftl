@@ -619,23 +619,34 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
 ## Searching
 
-        «/»                Incremental search, «ENTER» or «ESCAPE» to end.
+        Incremental search:
+               
+        «/»                Start the incremental search.
 
+                You can move around in drectories while in incremental search.
+                The search is reset when you change directory. The last part
+                of the search can be delete with the BACKSPACE key. To end the
+                incremental search press the ESCAPE key.
+ 
         «n»                Find next                      
 
         «N»                Find previous                  
+
+        Fzf searches:
 
         «gff» «b»          Fzf find in current directory  
 
         «gfa» «B»          Fzf find                       
 
-        «gfA»              Fzf find regexp/fuzzy          
-
         «gfd»              Fzf find only directories      
+
+        «gfA»              Fzf find regexp/fuzzy          
 
         «gfr»              Ripgreg with preview           
 
-        «gz»               Experimental fzf search with preview in a ftl pane
+        «gfp»              ftl pane preview, files in the directory
+
+        «gfP»              ftl pane preview, directory and sub directories
 
         Opening search results in tabs:
                 If you use one of the above you can pick multiple entries.

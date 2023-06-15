@@ -26,13 +26,13 @@ C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$ma
 
 key_command()
 {
-[[ "$REPLY" == ESCAPE ]]                  && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
 (( keys_in > 3 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
 [[ "$REPLY" == ERROR_142     ]]           && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
 [[ "$REPLY" == "?"           ]]           && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]]           && REPLY=LEADER 
 
 [[ -n "$key_map"             ]]           && { $key_map ; return ; }
+[[ "$REPLY" == ESCAPE ]]                  && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 

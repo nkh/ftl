@@ -1,10 +1,10 @@
 
 # an experimental fzf search with preview in a ftl pane
 
-fzf_pane_preview()
-{
-# { fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | lscolors | \
+fzf_pane_preview() { fzf_pane_preview_all 1 ; }
 
+fzf_pane_preview_all()
+{
 exec 2>&9
 
 # find all files and pass then to fzf, and declare a previewr
@@ -13,8 +13,10 @@ exec 2>&9
 # detects that it was sourced directly and calls ftl_setup and then calls
 # pfzf which is defined below
 
-go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | \
-	fd -HI -E'.git/*' | sed 's/^.\///' | lscolors | \
+go_loop fzf "$( \
+	{ (( "$1" )) && { { fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' ; } \
+		|| { fd -HI -E'.git/*' | sed 's/^.\///' ; } ; } | \
+	lscolors | \
 		fzf \
 			--ansi \
 			-m \
@@ -25,8 +27,6 @@ go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/
 	)"
 
 exec 2>"$fs/log"
-
-cdir
 }
 
 pfzf()
@@ -52,7 +52,8 @@ sleep .02
 pviewers
 }
 
-bind ftl file	gz	fzf_pane_preview	"fzf with preview in preview pane"
+bind ftl search 	gfp	fzf_pane_preview	"fzf with preview in preview pane"
+bind ftl search 	gfP	fzf_pane_preview_all	"fzf with preview in preview pane, sub directories"
 
 
 # vim: set filetype=bash :

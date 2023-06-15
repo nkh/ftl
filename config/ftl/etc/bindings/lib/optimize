@@ -9,7 +9,7 @@ true
 
 pdf_optimize()
 {
-[[ $e == jpg ]] || return
+[[ $e == pdf ]] || return
 
 cp "$f" "$b.original.$e"
 ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$f "$b.original.$e"

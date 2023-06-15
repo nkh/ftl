@@ -1,15 +1,21 @@
 
-incremental_search() { key_map=incremental_find ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
+incremental_search() { key_map=incremental_find ; goto_first_directory ; to_search= ; cursor_color="$cursor_color_search" ; list ; }
 
 incremental_find()
 {
 case "$REPLY" in 
-	ENTER|ESCAPE ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map= ;;
-	ERROR_142    ) : ;;
-	*            ) to_search="$to_search$REPLY" ; find_next
+	ERROR_142   ) : ;;
+	ESCAPE      ) cursor_color="$cursor_color0" ; to_search= ; list ; key_map= ;;
+	RIGHT|ENTER ) [[ -d "$n" ]] &&  { to_search= ; dir_file[${tab}_$PWD/$f]=0 ; move_right ; } ;;
+	LEFT        ) to_search= ; move_left ;;
+	UP          ) move_up ;;
+	DOWN        ) move_down ;;
+	LEADER      ) to_search="$to_search " ; find_next ;;
+	BACKSPACE   ) [[ "$to_search" ]] && { goto_first_directory ; to_search="${to_search::-1}" ; find_next ; } ;;
+	*           ) to_search="$to_search$REPLY" ; find_next
 esac
 }
 
-bind override find	"/"	incremental_search	"start incremental search, press 'enter' to end"
+bind ftl	find	"/"	incremental_search	"start incremental search, press 'escape' to end"
 
 # vim: set filetype=bash :
