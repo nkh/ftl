@@ -653,7 +653,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «[COUNT] yy»       Select current entry in "normal" class and move down
 
-        «[COUNT] YY»       Select current entry in "normal" class and move up
+        «[COUNT] Y»        Select current entry in "normal" class and move down
+
+        «[COUNT] yu»       Select current entry in "normal" class and move up
 
         «[COUNT] y1/2/3/4» Select current entry in given class and move down, the
                            glyph used for each class is defined in _ftlrc_ tglyph. 
@@ -661,22 +663,24 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 
         «yf»               Select all the files in the current directory
 
+        «yd»               Select all directories
+
         «ya»               Select all files and subdirs in the current directory
 
-        «yi»               Select image via sxiv
+        «yii»              Select image via sxiv
 
-        «yI»               Select image via sxiv, including sub directories
+        «yiI»              Select image via sxiv, including sub directories
 
-        «yF»               Open fzf to select files, multiple selection is possible.
+        «yif»              Open fzf to select files, multiple selection is possible.
 
-        «yA»               Open fzf to select files and sub directories.
+        «yiF»              Open fzf to select files and sub directories.
 
-        «yu»               Deselect all files and directories, including those in other
+        «yc»               Deselect all files and directories, including those in other
                            directories.
 
-        «yU»               Opens fzf to let you choose which entries to deselect.
+        «yC»               Opens fzf to let you choose which entries to deselect.
 
-        «yc»               Copy selection to clipboard, full path, separated by a space.
+        «ytc»              Copy selection to clipboard, full path, separated by a space.
 
         «gy»               Opens fzf to choose an entry in the selection, then
                            changes directory to where the selection is.
