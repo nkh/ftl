@@ -1313,7 +1313,7 @@ Contributions are best done via pull requests on github. Keep code to a bare min
 
 #AUTHOR
 
-© Nadim Khemir 2020-2022
+© Nadim Khemir 2020-2023
 
 mailto:nadim.khemir@gmail.com
 

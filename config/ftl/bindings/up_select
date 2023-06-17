@@ -1,9 +1,41 @@
-bind ftl file	xup	up_select	"create a pipeline to select files"
+bind ftl file	xuP	up_select	"create a pipeline to select files"
+bind ftl file	xup	T_select	"create a pipeline to select files"
 
 up_select()
 {
-tmux popup -E -h 95% -w 70% -d "$PWD" "TERM=xterm ; find -type f | up -o $fs/ups && { chmod a+x $fs/ups ; find -type f | $fs/ups | xargs realpath >$fs/load_sel ; }"
+tmux popup -E -h 95% -w 70% -d "$PWD" "TERM=xterm ; { fd -d1 -td -I ; fd -d1 -tf -I ; } | up -o $fs/ups && { chmod a+x $fs/ups ; find -type f | $fs/ups | xargs realpath >$fs/load_sel ; }"
 load_sel 0 ; cdir
+}
+
+T_select()
+{
+# { fd -d1 -td -I ; fd -d1 -tf -I ; }
+
+tcpreview
+
+exec 2>&9
+tmp_ftl_files="$(mktemp ftl_files_XXXXXXX)"
+echo 'fd -d1 -td -I ; fd -d1 -tf -I' > $tmp_ftl_files ; chmod a+x $tmp_ftl_files
+
+stty echo
+echo -ne '\e[H\e[K\e[33m\e[?25h' 
+clear
+
+bash -i 
+
+echo -en '\e[?1049h'
+stty -echo
+tput civis
+
+exec 2>"$fs/log" 
+
+rm $tmp_ftl_files
+[[ -f "${tmp_ftl_files}_done" ]] && { echo found filtered files ; rm -f "${tmp_ftl_files}_done" ; } 
+
+cdir
+
+# >$fs/load_sel
+# load_sel 0 ; cdir
 }
 
 # vim: set filetype=bash :

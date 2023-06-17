@@ -20,6 +20,8 @@ functionality: select files by mode, owner, date modified, ...
 		select all in fzf
 		select files with same extension as current file
 
+		specialized filters and up (or another interface)
+
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
