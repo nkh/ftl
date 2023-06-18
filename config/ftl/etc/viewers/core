@@ -84,11 +84,12 @@ ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo '$mtype' ; file -
 pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$n" "$thumbs/cbr" ; pw3image "$t" ; }
 pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$n" "$thumbs/cbz" ; pw3image "$t" ; }
 
-pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
+pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || pdir_readme || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
-pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 1000" ; true ; }
+pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 10" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
+pdir_readme() { ((extmode == 3)) && { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; } ; }
+pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 
 ppipe()     { psplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 
@@ -99,7 +100,7 @@ pmp3()      { pmlive || { psplit "$PAGER_ANSI <$(gen_exift) ; read -sn1" ; } ; }
 pmedia()    { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$n" "$thumbs/$e"; [[ -f "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
 pmlive()    { ((extmode)) && { player_k ; psplit "cat $(gen_exift) ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
-pmd()       { ((extmode)) && psplit "$MD_RENDER2 \"$n\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$n\" | $MD_PAGER" ;  }
+pmd()       { md="${1:-$n}" ; ((extmode)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" ;  }
 ptext()     { vipreview "$n" ; }
 pansi()     { ((!extmode)) && psplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $MD_PAGER " ; } ; }
 
