@@ -38,7 +38,7 @@ filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ so
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read p ; do fzf_in_tab "$p" && continue ; ${1}_go $in_tab "$P" "$p" ; done<<<"$2" ; }
 fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }
-fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d" || nd="$d" ; cdir "$nd" "$(basename "$3")" ; }
+fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d" || nd="$d" ; dst="$(basename "$3")" ; [[ -d "$nd/$dst" ]] && cdir "$nd"/"$dst" || cdir "$nd" "$dst" ; }
 rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 tag_go()    { ti=0 ; for tag_path in "${!tags[@]}" ; do ((ti == $1)) && nn="$tag_path" && break ; ((ti++)) ; done ; cdir "$(dirname "$nn")" "$(basename "$nn")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
