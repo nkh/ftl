@@ -13,14 +13,18 @@ issue: single preview for the same file name
 
 	if file.preview exists in the cache it will be shown
 
-functionality: make command out of fzf previewer
+functionality: make command out of fzf-ftl previewer
 
-functionality: select files by mode, owner, date modified, ...
-		select files per regexp
-		select all in fzf
-		select files with same extension as current file
+functionality: select files
+		by mode
+		owner
+		group
+		date modified
 
 		specialized filters and up (or another interface)
+		specialized filters can be used directly
+			chose filter
+			interactively input args, show results
 
 # Later
 

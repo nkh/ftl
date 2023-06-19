@@ -72,7 +72,8 @@ find_previous()		{ for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" 
 find_fzf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$({ fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 find_fzf_all()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -HI -E'.git/*' | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
 find_fzf_dirs()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(fd -td -I -L | sed 's/^.\///' | fzf_vvip -m $fzfp_opt)" ; exec 2>"$fs/log" ; }
-find_frf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(frf 1000 '' ctrl-t)" ; exec 2>"$fs/log" ; }
+find_frf()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(frf 1 '' ctrl-t)" ; exec 2>"$fs/log" ; }
+find_frf_all()		{ exec 2>&9 ; tcpreview ; go_loop fzf "$(frf 1000 '' ctrl-t)" ; exec 2>"$fs/log" ; }
 gmark()			{ { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "$n" ; } | awk '!seen[$0]++' | sponge $ftl_root/marks ; }
 gmark_fzf_user()	{ : ; }
 gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$({ cat $ftl_root/marks ; gmark_fzf_user ; }| lscolors | fzf-tmux $fzf_opt --cycle -m --expect=ctrl-t --ansi)" ; }
@@ -167,6 +168,10 @@ view_mode_image()	{ vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; 
 view_mode_not_image()	{ vmode[tab]=2 ; tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; cdir '' "$f"; }
 view_mode_next()	{ ((vmode[tab]++)) ; ((vmode[tab] > 2)) && vmode[tab]=0 ; view_mode ${vmode[tab]} ; }
 view_mode()		{ [[ $1 == 0 ]] && view_mode_all ; [[ $1 == 1 ]] && view_mode_image ; [[ $1 == 2 ]] && view_mode_not_image ; }
+selection_ext()		{ OIFS="$IFS" ; IFS=$'\n' ; for p in $(fd -H -I -d1 | sed 's/^.\///' | rg "\.$e$") ; do tag_set "$PWD/$p" ; done ; IFS="$OIFS" ;list ; }
+selection_ext_fzf()	{ fzf_tag T "$(fd -H -I -d1 | rg "\.$e$" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
+selection_ext_all()	{ OIFS="$IFS" ; IFS=$'\n' ; for p in $(fd -H -I | sed 's/^.\///' | rg "\.$e$") ; do tag_set "$PWD/$p" ; done ; IFS="$OIFS" ;list ; }
+selection_ext_all_fzf()	{ fzf_tag T "$(fd -H -I | rg "\.$e$" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }
 selection_flip_down()	{ for ((i=file ; i < file + ${COUNT:-1} && i < nfiles ; i++)) ; do tag_flip "${files[i]}" ; done ; move ${COUNT:-1} ; list ; }
 selection_flip_up()	{ tag_flip "${files[file]}" ; move -1 ; list ; }
 selection_fzf()		{ fzf_tag T "$(fd -H -I --color=always -d1 | fzf-tmux $fzf_opt -m --ansi --marker '▪')" ; list ; }

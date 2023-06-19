@@ -636,11 +636,13 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gff» «b»          Fzf find in current directory  
 
-        «gfa» «B»          Fzf find                       
+        «gfF» «B»          Fzf find                       
 
         «gfd»              Fzf find only directories      
 
-        «gfA»              Fzf find regexp/fuzzy          
+        «gfa»              Fzf find regexp/fuzzy          
+
+        «gfA»              Fzf find, filrs and subdirs, regexp/fuzzy          
 
         «gfr»              Ripgreg with preview           
 
@@ -677,6 +679,14 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «yd»               Select all directories
 
         «ya»               Select all files and subdirs in the current directory
+
+        «ye»               Select files with same extension
+
+        «yie»              Fzf select files with same extension
+
+        «yE»               Select files ext, with subdirs
+
+        «yiE»              Fzf select files ext, with subdirs
 
         «yii»              Select image via sxiv
 

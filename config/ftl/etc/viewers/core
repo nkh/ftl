@@ -11,6 +11,7 @@ ext_viewers()
 [[ $e == mp3 ]]                   && { ext_mp3   ; return ; }
 [[ $e =~ $mfilter ]]              && { ext_media ; return ; }
 [[ $e == pdf || $e == PDF ]]      && { ext_pdf   ; return ; }
+[[ $e == epub ]]                  && { return ; }
 [[ $e == sc ]]                    && { ext_scim  ; return ; }
 [[ $e =~ ^json|yml$ ]]            && [[ -s "$n" ]] && { ext_json ; return ; }
 

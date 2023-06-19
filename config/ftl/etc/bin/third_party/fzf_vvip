@@ -15,8 +15,9 @@ cat | plc --values | \
 	--bind 'ctrl-s:select-all,ctrl-d:deselect-all,ctrl-t:toggle-all' \
 	--bind 'ctrl-p:change-preview-window(75%|right,up|50%,hidden|right)' \
 	--preview-window='right:60%' \
- 	"${@}" \
+	"${@}" \
 	--preview '\
-		[[ -d {} ]] && ls -AgGh --group-directories-first --color=always {} || \
-		{ perl -le "exit -B \$ARGV[0]" -- {} && tvcat {} 100 -1 || { file {} | piper "[^,]+" "grey20" ",.*" "grey10" ; } ; } '
+		entry={} 
+		[[ -d $entry ]] && ls -AgGh --group-directories-first --color=always $entry || \
+		{ perl -le "exit -B \$ARGV[0]" -- $entry && tvcat $entry 100 -1 || { file $entry | piper "[^,]+" "grey20" ",.*" "grey10" ; } ; } '
 
