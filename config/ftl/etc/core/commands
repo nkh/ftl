@@ -123,6 +123,7 @@ preview_image()		{ ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilt
 extension_hide_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
 extension_hide()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
 extension_clear()	{ lignore=() ; cdir ; }
+extension_sort()	{ source "$FTL_CFG/filters/sort_by_extension" ; cdir '' "$f"; }
 view_mode_pdf()		{ ((pdf_prev_image ^= 1)) ; list ; }
 preview_lock_clr()	{ rm "$fs/lock_preview/$n" 2>&- ; list ; }
 preview_lock()		{ p="$FTL_CFG/etc/core/lib/lock_preview" ; file=$(cd $p ; fd | fzf-tmux $fzf_opt) ; [[ $file ]] && . $p/$file ; list ; }

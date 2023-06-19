@@ -330,6 +330,7 @@ bind ftl view		zep		preview_ext_ign		"show/hide extension preview"
 bind ftl view		zeh		extension_hide_tab	"hide extension from listing, per tab"
 bind ftl view		zeH		extension_hide		"hide extension from listing"
 bind ftl view		zec		extension_clear		"enable all extensions"
+bind ftl view		zes		extension_sort		"sort by extensions"
 bind ftl view		z.		show_hidden		"show/hide dot-files"
 
 # bind ftl view		not_assigned	preview_tail		"file preview at end"
