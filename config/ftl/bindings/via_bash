@@ -1,0 +1,35 @@
+bash_select()
+{
+tcpreview
+
+tmp_ftl_files="$(mktemp ftl_to_select_XXXXXXX)" ; : >$tmp_ftl_file
+
+run_bash
+
+[[ -s "${tmp_ftl_files}" ]] && load_sel "${tmp_ftl_files}"
+
+rm -f "${tmp_ftl_files}"  
+
+cdir
+}
+
+up_select()
+{
+tmux popup -E -h 95% -w 70% -d "$PWD" \
+	"TERM=xterm ; { fd -d1 -td -I ; fd -d1 -tf -I ; } | up -o $fs/ups && { chmod a+x $fs/ups ; find -type f | $fs/ups | xargs realpath >$fs/load_sel ; }"
+
+load_sel ; cdir
+}
+
+# filter are best as external filter to allow synch with preview
+# and we can chose them via fzf
+bash_filter_keep() { filter_ext="by_bash_keep" ; source "$FTL_CFG/filters/$filter_ext" || filter_ext= ; cdir ; }
+bash_filter_hide() { filter_ext="by_bash_hide" ; source "$FTL_CFG/filters/$filter_ext" || filter_ext= ; cdir ; }
+
+bind ftl file	yx	bash_select		"select files via bash"
+bind ftl file	yX	up_select		"select file via the ultimate plumber"
+bind ftl file	fx	bash_filter_keep	"select files to keep via bash"
+bind ftl file	fX	bash_filter_hide	"select files to hide via bash"
+
+# vim: set filetype=bash :
+

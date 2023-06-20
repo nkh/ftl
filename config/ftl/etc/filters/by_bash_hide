@@ -1,0 +1,64 @@
+bash_filter_hide_imp()
+{
+got_filter=1
+
+tcpreview
+
+tmp_ftl_files="$(mktemp ftl_to_hide_XXXXXXX)"
+: >$tmp_ftl_file
+
+run_bash
+
+[[ -s "${tmp_ftl_files}" ]] &&
+	{
+	got_filter=0
+	
+	OIFS=$IFS ; IFS=$'\n'
+	<"${tmp_ftl_files}" readarray -t hide_files
+	IFS=$OIFS
+	
+	tags_clear
+	
+	for p in "${hide_files[@]}" 
+		do 
+			ftag="~"
+			real_path="$(realpath "$p")"
+			
+			hide["$tab-$real_path"]=1
+			
+			real_path="$(dirname "$real_path")/"
+			
+			while [[ "$real_path" ]]
+				do
+					PWDS[$tab-$real_path]=1
+					
+					[[ "$real_path" == "$PWD" ]] && break
+					real_path=${real_path%/*}
+				done
+		done
+	
+	declare -p hide PWDS >"$pfs/by_bash_hide"
+	}
+
+rm -f "${tmp_ftl_files}"  
+
+return $got_filter
+}
+
+ftl_filter()
+{
+[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
+	{
+	while read -r file_data
+		do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${hide["$tab-$PWD/$fn"]} == 1 ]] || echo "$file_data"
+		done
+	} || cat 
+}
+
+declare -g -A hide PWDS
+
+[[ "$1" == load ]] && { [[ -e "$pfs/by_bash_hide" ]] && source "$pfs/by_bash_hide" ; true ; } || bash_filter_hide_imp
+
+# vim: set filetype=sh :

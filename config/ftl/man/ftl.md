@@ -614,6 +614,14 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                         
         «fy»               filter out non selection
  
+        «fx»               Select files to keep via bash commands
+                             
+                           Put the files you want selected in "ftl_to_keep_XXXXXXX"
+
+        «fX»               Select files to hide via bash command
+
+                           Put the files you want selected in "ftl_to_hide_XXXXXXX"
+
         «fc»               Clear all filters 
 
 
@@ -713,7 +721,12 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «yN»               Go to previous selected entry.
 
-        «xup»              Select files via up (the ultimate plumber) TUI
+        «yx»               Select files via bash commands
+                             
+                           Put the files you want selected in "ftl_to_select_XXXXXXX", if you
+                           do it often write a script.
+
+        «yX»               Select files via up (the ultimate plumber) TUI
 
         not_assigned       Merge selection from all panes, see option auto_select
 
@@ -1194,7 +1207,7 @@ I check the file extension, if they match I bypass ftl's default viewer.
 
         You an move from selection to selection with «yn» or via fzf with «gy».
 
-        See «xup», selection via the ultimate plumber TUI.
+        See «yx» and «fx»
 
 ## Virtual Entry Injection
 

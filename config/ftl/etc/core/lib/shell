@@ -3,9 +3,11 @@
 load_sel()
 {
 # eg: select all files in a directory: fd -a . > $ftl_fs/load_sel
-[[ -s "$fs/load_sel" ]] \
-	&& { <"$fs/load_sel" readarray -t new_tags && tags_clear && for p in "${new_tags[@]}" ; do tag_flip "$p" ; done ; true ; } \
-	|| { [[ "$1" ]] || tmux popup "echo -n ftl: no such file '$fs/load_sel'" ; }
+sel_file=${1:-$fs/load_sel}
+
+[[ -s "$sel_file" ]] \
+	&& { <"$sel_file" readarray -t new_tags && tags_clear && for p in "${new_tags[@]}" ; do tag_flip "$(realpath "$p")" ; done ; true ; } \
+	|| { [[ "$1" ]] || tmux popup "echo -n ftl: no such file '$sel_file'" ; }
 
 return
 }

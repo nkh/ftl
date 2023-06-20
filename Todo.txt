@@ -15,17 +15,6 @@ issue: single preview for the same file name
 
 functionality: make command out of fzf-ftl previewer
 
-functionality: select files
-		by mode
-		owner
-		group
-		date modified
-
-		specialized filters and up (or another interface)
-		specialized filters can be used directly
-			chose filter
-			interactively input args, show results
-
 # Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
