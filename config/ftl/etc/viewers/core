@@ -2,6 +2,8 @@
 
 source "$FTL_CFG/etc/commands/open_with"
 
+user_pviewers() { false ; }
+
 ext_viewers()
 {
 [[ -d "$n" ]]                     && { ext_dir   ; return ; }
@@ -23,8 +25,6 @@ mime_get
 
 open_with
 }
-
-user_pviewers() { false ; }
 
 pviewers()
 {
@@ -68,37 +68,38 @@ ptype
 
 ext_dir()   {  $G_PLAYER "$n" &>/dev/null & }
 ext_html()  { ((emode == 1)) && { tcpreview ; w3m -o confirm_qq=0 "$n" ; } || { (qutebrowser "$n" 2>&- &) ; } ; }
-ext_svg()   { t="$thumbs/svg/$f.pdf" ; [[ -e $t ]] || $pgen/svg_to_pdf "$f" "$thumbs/svg" ; run_maxed mupdf "$t" ; }
+ext_svg()   { t="$(thumb svg pdf)" ; [[ -e $t ]] || $pgen/svg_to_pdf "$n" "$thumbs/svg" ; run_maxed mupdf "$t" ; }
 ext_image() { images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]] && images+=("$img") ; done ; $SXIV -b -q -o -f "$n" $(printf "%q " "${images[@]}") ; }
 ext_mp3()   { ((emode == 1)) && { player_k ; tcpreview ; $TE_PLAYER "${selection[@]}" ; true ; } || ($G_PLAYER "${selection[@]}" &>/dev/null &) ; mplayer=$! ; }
 ext_media() { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "${selection[@]}" &>/dev/null &) ; mplayer=$! ; }
 ext_pdf()   { ((emode == 1)) && { ((pdf_prev_image)) && run_maxed mupdf "$n" || ext_pdf_vi ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } || { mupdf "$n" 2>/dev/null & } ; }
-ext_pdf_vi(){ t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf 1 && edit "$t" ; }
+ext_pdf_vi(){ t="$thumbs/pdf/${f}1.txt" ; [[ -e $t ]] || $pgen/pdf "$n" $thumbs/pdf 1 && edit "$t" ; }
 ext_text()  { tcpreview ; tsplit "$EDITOR -t ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
 ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
 ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
+
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
-pcbr()      { t="$thumbs/cbr/$f.jpg" ; [[ -e $t ]] || $pgen/cbr "$n" "$thumbs/cbr" ; pw3image "$t" ; }
-pcbz()      { t="$thumbs/cbz/$f.jpg" ; [[ -e $t ]] || $pgen/cbz "$n" "$thumbs/cbz" ; pw3image "$t" ; }
+pcbr()      { t="$(thumb cbr jpg)" ; [[ -e $t ]] || $pgen/cbr "$n" "$thumbs/cbr" ; pw3image "$t" ; }
+pcbz()      { t="$(thumb cbz jpg)" ; [[ -e $t ]] || $pgen/cbz "$n" "$thumbs/cbz" ; pw3image "$t" ; }
 
-pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || pdir_readme || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
+pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || pdir_rmd || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 10" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
-pdir_readme() { ((extmode == 3)) && { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; } ; }
+pdir_rmd()  { ((extmode == 3)) && { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; } ; }
 pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 
 ppipe()     { psplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 
-phtml()     { t="$thumbs/html/$f.txt" ; [[ -e $t ]] || $pgen/html "$f" "$thumbs/html" ; vipreview "$t" ; }
+phtml()     { t="$(thumb html txt)" ; [[ -e $t ]] || $pgen/html "$n" "$thumbs/html" ; vipreview "$t" ; }
 pimage()    { ((extmode)) && { psplit "exiftool ${n@Q} | piper '^.*?:' blue | $MD_PAGER ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
-psvg()      { t="$thumbs/svg/$f.jpg" ; [[ -e $t ]] || $pgen/svg "$f" "$thumbs/svg" ; pw3image "$t" ; }
+psvg()      { t="$(thumb svg jpg)" ; [[ -e $t ]] || $pgen/svg "$n" "$thumbs/svg" ; pw3image "$t" ; }
 pmp3()      { pmlive || { psplit "$PAGER_ANSI <$(gen_exift) ; read -sn1" ; } ; }
-pmedia()    { pmlive || { t="$thumbs/$e/$f.jpg" ; [[ -f "$t" ]] || $pgen/$e "$n" "$thumbs/$e"; [[ -f "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
+pmedia()    { pmlive || { t="$(thumb "$e" jpg)" ; [[ -f "$t" ]] || $pgen/$e "$n" "$thumbs/$e" ; [[ -f "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
 pmlive()    { ((extmode)) && { player_k ; psplit "cat $(gen_exift) ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
 pmd()       { md="${1:-$n}" ; ((extmode)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" ;  }
@@ -107,10 +108,10 @@ pansi()     { ((!extmode)) && psplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && p
 
 pjson()     { psplit "$JSON_VIEWER \"$n\"" ; }
 
-ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$thumbs/pdf/$f$extmode.txt" ; [[ -e $t ]] || $pgen/pdf "$f" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
+ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$(thumb pdf "$extmode.txt")" ; [[ -e $t ]] || $pgen/pdf "$n" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
-pepub()     { (( extmode==2 || pdf_prev_image)) && pepubpng || { t="$thumbs/epub/$f$extmode.txt" ; [[ -e $t ]] || $pgen/epub "$f" $thumbs/epub $extmode && vipreview "$t" ; } ; }
+pepub()     { (( extmode==2 || pdf_prev_image)) && pepubpng || { t="$(thumb epub "$extmode.txt")" ; [[ -e $t ]] || $pgen/epub "$n" $thumbs/epub $extmode && vipreview "$t" ; } ; }
 pepubpng()  { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
 pman()      { psplit "man \"$n\" ; read -sn 1000" ; true ; }

@@ -8,14 +8,9 @@ issue: pane splitting
 		keep focus or pass to new split
 		split on the other side of the preview
 
-issue: single preview for the same file name
-	path1/file and path2/file generate file.preview
-
-	if file.preview exists in the cache it will be shown
+# Later
 
 functionality: make command out of fzf-ftl previewer
-
-# Later
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 		asciio files are compressed can we grep in them?

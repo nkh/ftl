@@ -1,7 +1,7 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-f=$(basename "$1")
+f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
 
 [[ FORCE == "$3" || ! -f "$2/$f.jpg" ]] &&
 	{

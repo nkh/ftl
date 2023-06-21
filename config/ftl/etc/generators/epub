@@ -1,9 +1,10 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-f=$(basename "$1")
+f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
+
 extmode=${3:-0}
-p="$2/$f$extmode.txt"
+p="$2/$f.$extmode.txt"
 
 [[ FORCE == "$3" || ! -f "$p" ]] &&
 	{
