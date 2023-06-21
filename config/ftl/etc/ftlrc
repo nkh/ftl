@@ -188,7 +188,7 @@ bind ftl history	Hh		history_go		"fzf current session history"
 bind ftl history	HH		ghistory		"fzf all sessions history"
 bind ftl history	"¨"		ghistory		"fzf all sessions history"
 bind ftl history	He		ghistory_edit		"edit all sessions history"
-bind ftl history	Hd		ghistory_delete		"delete all sessions history"
+bind ftl history	Hc		ghistory_clear		"clear all sessions history"
 
 bind ftl marks		m		mark			"mark directory/file"
 bind ftl marks		QUOTE		mark_go			"go to mark"

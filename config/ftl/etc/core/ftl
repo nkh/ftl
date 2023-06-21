@@ -48,6 +48,7 @@ geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COL
 geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
 header()    { h="${@:2}$(sort_glyph)$s_reversed$(tags_head)$(tsc_head) " ; header_pos "$h" ; echo -e "\e[H\e[K\e[${1:-94}m${PWD:hpl} \e[${1:-95}m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
+hist_save() { ((!gpreview)) && { [[ "$n" ]] && echo "$n" | tee -a $fs/history >> $ghist ; } ; }
 inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
 inotify_()  { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete -e move "$PWD/" 2>&- | { read a b f ; [[ "$f" ]] && tmux send -t "$my_pane" ${C[refresh_pane]} 2>&- ; } ; }
 inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
@@ -75,10 +76,9 @@ pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] &
 pdhn()      { pdh "$*\n" ; }
 pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm $pfs/pdh ; } || { tcpreview; tsplit "$FTL_CFG/etc/bin/fpdh $pfs" 30% -v $my_pane ; pane_id= ; } ; cdir ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
-
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
 quit()      { qshell && return ; tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane å ; } ; rm -rf $fs ; exit ; }
-quit2()     { inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
+quit2()     { hist_save ; inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
 {
 qshell_c=0
 qshell()    { ((qshell_c++, qshell_c > 2)) && return 1 ; (( $(tmux lsw -t ftl$$ 2>&- | wc -l) > 2 )) && { tmux popup -h 5 "echo Shells open! «session: ctl-w !». " ; true ; } || false ; }

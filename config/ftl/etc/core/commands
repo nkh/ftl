@@ -81,7 +81,7 @@ gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y 
 go_rg()			{ exec 2>&9 ; tcpreview ; go_loop rg "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/log" ; }
 history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
-ghistory_delete()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
+ghistory_clear()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
 ghistory_edit()		{ dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ; }
 image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
 image_go_sxiv()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(q_files | $SXIV -i -b -q -o -f -t | fzf-tmux $fzf_opt $fzf_sxiv_opt)" ; exec 2>"$fs/log" ; }

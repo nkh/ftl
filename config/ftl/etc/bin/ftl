@@ -24,13 +24,7 @@ cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : n
 
 get_dir() # dir, search
 {
-cd "${1:-$PWD}" || return
-[[ "$PPWD" != "$PWD" ]] &&
-	{
-	marks["'"]="$n"
-	PPWD="$PWD"
-	((gpreview)) || echo "$n" | tee -a $fs/history >> $ghist
-	}
+cd "${1:-$PWD}" || return ; [[ "$PPWD" != "$PWD" ]] && { hist_save ; marks["'"]="$n" ; PPWD="$PWD" ; }
 
 tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
 
