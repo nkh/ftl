@@ -1,6 +1,6 @@
 # NAME
 
-ftl - file manager using tmux panes and live previews
+ftl - terminal file manager, with live previews, hyperorthodox
 
 ## Screenshots
 

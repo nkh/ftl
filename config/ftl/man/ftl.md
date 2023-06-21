@@ -1,6 +1,6 @@
 % FTL(1) | General Commands Manual
 # NAME
-ftl - terminal file manager, hyperorthodox, with live previews
+ftl - terminal file manager, with live previews, hyperorthodox
 
 # SYNOPSIS
 
@@ -416,12 +416,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zmD»              Preview directory only/all. 
 
-        «gfi»              go to image using sxiv
-
-        «gfI»              go to image using sxiv, including sub directories
-
-        «gfu»              Fzfi, use fzf and ueberzurg to find and display images
-
         «zeh»              Hide files having the same extention as the current file, per tab
 
         «zeH»              Hide files having the same extention as the current file, global 
@@ -640,6 +634,12 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «N»                Find previous                  
 
+        «gfi»              go to image using sxiv
+
+        «gfI»              go to image using sxiv, including sub directories
+
+        «gfu»              Fzfi, use fzf and ueberzurg to find and display images
+
         Fzf searches:
 
         «gff» «b»          Fzf find in current directory  
@@ -657,6 +657,22 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «gfp»              ftl pane preview, files in the directory
 
         «gfP»              ftl pane preview, directory and sub directories
+
+        «gy»               Opens fzf to choose an entry in the selection, then
+                           changes directory to where the selection is.
+
+                           This is handy when selections are read from a file with option
+                           -t on the command line or via the 'load_sel'
+
+        «gm»               Fzf go to bookmark, open multiple tabs with «ctrl-t»
+
+        «gM»               Fzf to persistent bookmark, open multiple tabs with «ctrl-t»
+
+                           You can inject marks dynamically, for example add
+                           fzf-marks to my persistent marks which let's me jump
+                           to marks in the command line or in *ftl*.
+
+                               gmark_fzf_user() { perl -ape '$_ = "$F[2]/\$\n"' ~/.fzf-marks ; }
 
         Opening search results in tabs:
                 If you use one of the above you can pick multiple entries.
@@ -714,9 +730,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         «gy»               Opens fzf to choose an entry in the selection, then
                            changes directory to where the selection is.
 
-                           This is handy when selections are read from a file with option
-                           -t on the command line or via the 'load_sel'
-
         «yn»               Go to next selected entry.
 
         «yN»               Go to previous selected entry.
@@ -769,12 +782,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «gM»               Fzf to persistent bookmark, open multiple tabs with «ctrl-t»
 
-                           You can inject marks dynamically, for example add
-                           fzf-marks to my persistent marks which let's me jump
-                           to marks in the command line or in *ftl*.
-
-                               gmark_fzf_user() { perl -ape '$_ = "$F[2]/\$\n"' ~/.fzf-marks ; }
-
         «Mc»               Clear persistent bookmarks 
 
 ## History
@@ -788,7 +795,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «He»               Uses fzf to mark entries that will be removed from the history
 
-        «Hd»               Delete all sessions history 
+        «Hc»               Clear all sessions history 
 
 ## File and directory operations
 
@@ -1194,20 +1201,54 @@ I check the file extension, if they match I bypass ftl's default viewer.
         # return false for the default ftl handlers to run
         }
 
-## Select Files With Bash Commands
+## Using Bash to select and filter
 
-        During an ftl session you decide that you want to select all the images under
-        the current directory that have a size under 5 KB.
+        During an ftl session you decide that you want to select:
 
-        Open a shell with «s» and run the following command: 
+            - all the files under the current directory
+            - not in the backup directory 
+            - with size under 5 MB
+            - accessed this week
+            - belonging to group nadim
+            - which is a mp4 video
+            - that's not rotated
+            - that's does have matching sha256 signature file
+
+        Supporting this kind of query is easier done by a set of commands in a bash
+        pipeline.
+
+            find -size +5M -mtime -7 -not -path "*/video_backup/*" -group nadim
+
+        The file needs to be an mp4
+
+            mimemagic | grep mp4
+
+        Not rotated
+
+            exiftool | grep -i rotation | grep 0
+
+        With a sha256 signature file
+
+            perl -ne 'chomp ; -e "$_.sha256" && print "$_\n"'
+
+        Put together: 
+
+            find -size +5M -mtime -700 -not -path "*/video_backup/*" -group nadim | \
+            perl 'chomp ; -e "$_.sha256" && print "$_\n"' | \
+            while read -r f ; do mimemagic "$f" | grep -q mp4 && echo "$f" ; done | \
+            while read -r f ; do exiftool "$f" | grep -i rotation | grep -q 0 && echo "$f" ; done
+
+        «yx», «fx», and «fX», open a shell after creating a temporary file where you
+        can put the results of your selection/search.
+
+        You couls also open a shell with «s» and run the following command: 
 
             find -name '*.png' | filter-on-file-size -5000 | xargs realpath >$ftl_fs/load_sel
 
         Close the shell then runf this commnd in *ftl*: load_sel.
 
-        You an move from selection to selection with «yn» or via fzf with «gy».
+        You can move from selection to selection with «yn» or via fzf with «gy».
 
-        See «yx» and «fx»
 
 ## Virtual Entry Injection
 
