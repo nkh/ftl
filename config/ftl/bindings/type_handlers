@@ -1,6 +1,6 @@
 
-move_left() { { [[ "$PWD" =~ _#$ ]] && exit_archive || { [[ "$PWD" != / ]] && nd="${PWD%/*}" && cdir "${nd:-/}" "$(basename "$p")" ; } ; } ; }
-
+move_left() { [[ "$PWD" =~ _#$ ]] && exit_archive || { [[ "$PWD" != / ]] && nd="${PWD%/*}" && cdir "${nd:-/}" "$(basename "$p")" ; } ; }
+ 
 # move_right() { enter ; } # default move right only changes directory, uncomment to open files
 
 enter()
