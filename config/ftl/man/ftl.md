@@ -909,9 +909,11 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «CTL-W sg» «gS»    Cd shell pane to ftl directory
 
-        «CTL-W sp» «Sp»    Send selection to shell pane 
+        «CTL-W sf» «Sp»    Send selection to shell pane 
 
         «CTL-W !»  «S!»    Switch to session-shell pane 
+
+        «CTL-W sp» «Sp»    Run shell command in pane
 
 # Command Mode
 

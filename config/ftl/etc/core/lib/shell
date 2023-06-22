@@ -61,5 +61,7 @@ echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
 
 }
 
+shell_cmd_in_pane() { prompt "ftl> " ; qd=1 list ; [[ "$REPLY" ]] && psplit "$REPLY ; read -sn10" ; sleep 0.05 ; }
+
 # vim: set filetype=bash :
 
