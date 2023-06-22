@@ -300,7 +300,7 @@ bind ftl selection	"COUNT y3"	selection_class_3	"class 3 selection"
 bind ftl selection	y3		selection_class_3	"class 3 selection"
 bind ftl selection	"COUNT y4"	selection_class_4	"class 4 selection"
 bind ftl selection	y4		selection_class_4	"class 4 selection"
-bind ftl selection	yc		selection_untag_all	"deselect all all"
+bind ftl selection	yc		selection_untag_all	"deselect all"
 bind ftl selection	yC		selection_untag_fzf	"deselect fzf"
 bind ftl selection	ytc		copy_clipboard		"copy selection to clipboard"
 

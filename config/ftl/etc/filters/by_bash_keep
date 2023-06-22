@@ -2,10 +2,9 @@ bash_filter_keep_imp()
 {
 got_filter=1
 
-tcpreview
+tcpreview ; inotify_k
 
-tmp_ftl_files="$(mktemp ftl_to_keep_XXXXXXX)"
-: >$tmp_ftl_file
+tmp_ftl_files="$(mktemp ftl_to_keep_XXXXXXX)" ; : >$tmp_ftl_file
 
 run_bash
 

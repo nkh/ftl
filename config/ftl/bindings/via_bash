@@ -2,6 +2,9 @@ bash_select()
 {
 tcpreview
 
+# inotify send refresh message (via stdin) we don't want to see in
+# in the pane when running bash
+inotify_k
 tmp_ftl_files="$(mktemp ftl_to_select_XXXXXXX)" ; : >$tmp_ftl_file
 
 run_bash
@@ -15,10 +18,12 @@ cdir
 
 up_select()
 {
+rm -f "$fs/load_sel"
+
 tmux popup -E -h 95% -w 70% -d "$PWD" \
 	"TERM=xterm ; { fd -d1 -td -I ; fd -d1 -tf -I ; } | up -o $fs/ups && { chmod a+x $fs/ups ; find -type f | $fs/ups | xargs realpath >$fs/load_sel ; }"
 
-load_sel ; cdir
+[[ -s "$fs/load_sel" ]] && load_sel ; cdir
 }
 
 # filter are best as external filter to allow synch with preview
