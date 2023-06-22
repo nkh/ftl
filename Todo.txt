@@ -13,10 +13,15 @@ issue: sometimes the width of pane is wrong
 	we're using the right width otherwise cdir
 
 functionality: run command in preview pane
-		one time or constantly
-		reset
+		one
 
-		bit like running it in the shell but in the pane
+		constantly
+		reset
+			same as zv + shell vertical split
+
+		shell vertical split
+
+		shell close
 
 # Later
 

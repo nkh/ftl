@@ -6,7 +6,7 @@ error_cmds(){ echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
 pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; } ; }
 select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
-tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id= ; in_pdir= ; in_viprev= ; in_ftli= ; sleep 0.01 ; } ; }
+tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id= ; in_pdir= ; in_viprev= ; in_ftli= ; sleep 0.01 ; } ; [[ $1 ]] && prev_all=$1 ; }
 vipreview() { ((in_viprev)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E -e 's/\$/\\$/g' -e 's/#/\\\\#/' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_viprev=1 ; }
 cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 clear_list(){ for(( i=$1 ; i < LINES - 1  ; i++)) ; do echo -ne "\e[K$flip" ; ((i < LINES - 2)) && echo ; done ; }
@@ -92,10 +92,13 @@ cdfl()      { true 2>&- >&3 && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3
 quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=${2:-1} ; list ; qd=0 ; }
 refresh()   { echo -ne "\e[?25l$1" ; } 
-run_bash() { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; echo -en '\e[?1049h' ;stty -echo ; tput civis ; exec 2>"$fs/log" ; }
+run_bash()  { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; echo -en '\e[?1049h' ;stty -echo ; tput civis ; exec 2>"$fs/log" ; }
 run_maxed() { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; "$@" 2>/dev/null ;  wmctrl -ia $aw ; true ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_pane(){ tcpreview ; P=$pane_id ; tsplit bash $shell_h -v -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
+
+shell_vpane(){ tcpreview 0 ; P=$pane_id ; tsplit bash $shell_v -h -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
+
 shell_send(){ { (( $1 )) && [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "${@:2}" ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }

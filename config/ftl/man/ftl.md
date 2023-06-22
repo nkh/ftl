@@ -903,6 +903,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 ## Shell Pane
         «CTL-W ss» «s»     Shell pane
 
+        «CTL-W sv» «Sv»    Vertical shell pane, closes the preview
+
         «CTL-W sS» «SS»    Shell pane with selected files 
 
         «CTL-W sz» «Sz»    Shell pane, zoomed out 

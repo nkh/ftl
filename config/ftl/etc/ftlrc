@@ -24,6 +24,7 @@ declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_M
 # Options 
 KEY_TIMEOUT=1				# timeout between key presses
 shell_h=40%				# shell pane height
+shell_v=60%				# vertical shell pane width
 auto_selection=1			# automatically synch tags between panes
 time_event=0				# set to positive integer to trigger time events
 pdhl=					# log pdh message in file too
@@ -255,6 +256,8 @@ bind ftl shell		"CTL-W sS"	shell_files		"shell pane with selected files"
 bind ftl shell		SS		shell_files		"shell pane with selected files"
 bind ftl shell		"CTL-W ss"	shell			"shell pane"
 bind ftl shell		s		shell			"shell pane"
+bind ftl shell		"CTL-W sv"	shell_vertical		"shell vertical pane"
+bind ftl shell		Sv		shell_vertical		"shell vertical pane"
 bind ftl shell		"CTL-W sz"	shell_zoomed		"shell pane, zoomed out"
 bind ftl shell		Sz		shell_zoomed		"shell pane, zoomed out"
 bind ftl shell		"CTL-W sf"	shell_send_files	"send selection to shell pane"
