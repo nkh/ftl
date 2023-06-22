@@ -8,6 +8,16 @@ issue: pane splitting
 		keep focus or pass to new split
 		split on the other side of the preview
 
+issue: sometimes the width of pane is wrong
+	remember the width used to generate the list, when checking the key also check that 
+	we're using the right width otherwise cdir
+
+functionality: run command in preview pane
+		one time or constantly
+		reset
+
+		bit like running it in the shell but in the pane
+
 # Later
 
 functionality: make command out of fzf-ftl previewer

@@ -22,7 +22,7 @@ declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_M
 # declare -A user_colors=([?]="30;42")  # override LS_COLORS
 
 # Options 
-KEY_TIMEOUT=1.5				# timeout between key presses
+KEY_TIMEOUT=1				# timeout between key presses
 shell_h=40%				# shell pane height
 auto_selection=1			# automatically synch tags between panes
 time_event=0				# set to positive integer to trigger time events

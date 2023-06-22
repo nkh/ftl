@@ -378,7 +378,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                                   - no size
                                   - only files
                                   - file size and directory entries
-                                  - file size and directory sizes
+                                  - file size and directory sizes (computed once)
 
         «z.»               Show/hide dot-files.
         
