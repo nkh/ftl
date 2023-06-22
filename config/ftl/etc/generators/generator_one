@@ -3,6 +3,6 @@ for g in $(fd . $FTL_CFG/etc/generators/ -t f -d 1 -E generator -E generator_one
 	do 
 		ext=$(basename $g)
 		mkdir -p "$1/$ext"
-		[[ "$3" == "$ext" ]] && "$g" "$(basename "$2")" "$1/$ext" FORCE
+		[[ "$3" == "$ext" ]] && "$g" "$(basename "$2")" "$1/$ext" "" FORCE
 	done
 

@@ -4,7 +4,7 @@ exec 2>> "$2/generators_log"
 f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
 t="$2/$f.et"
 
-[[ FORCE == "$3" || ! -f "$t" ]] &&
+[[ FORCE == "$4" || ! -f "$t" ]] &&
 	{
 	exiftool "$1" | piper '^.*?:' blue >"$t"
 	}

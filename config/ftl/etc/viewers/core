@@ -111,7 +111,7 @@ pjson()     { psplit "$JSON_VIEWER \"$n\"" ; }
 ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { t="$(thumb pdf "$extmode.txt")" ; [[ -e $t ]] || $pgen/pdf "$n" $thumbs/pdf $extmode && vipreview "$t" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
-pepub()     { (( extmode==2 || pdf_prev_image)) && pepubpng || { t="$(thumb epub "$extmode.txt")" ; [[ -e $t ]] || $pgen/epub "$n" $thumbs/epub $extmode && vipreview "$t" ; } ; }
+pepub()     { (( extmode==2 || pdf_prev_image)) && pepubpng || { t="$(thumb epub "${extmode:-0}.txt")" ; [[ -e $t ]] || $pgen/epub "$n" $thumbs/epub $extmode && vipreview "$t" ; } ; }
 pepubpng()  { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
 
 pman()      { psplit "man \"$n\" ; read -sn 1000" ; true ; }
