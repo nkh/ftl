@@ -917,6 +917,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «CTL-W sp» «Sp»    Run shell command in pane
 
+        «CTL-W sq» «Sq»    Close shell pane
+
 # Command Mode
 
 You can run commands in different ways
