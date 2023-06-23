@@ -827,7 +827,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «xmx»              Flip selection execute bit 
 
-        «xmm»              Set permissions interactively 
+        «xmm»              Set permissions for one entry interactively 
+
+        «xmM»              Set permissions interactively 
 
         «xh»               Hexadecimal preview    
 

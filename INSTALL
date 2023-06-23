@@ -50,6 +50,7 @@ sudo apt install -y 	ack \
 			vlc \
 			w3m \
 			w3m-img \
+			whiptail \
 			wmctrl \
 			xdotool \
 			zathura \

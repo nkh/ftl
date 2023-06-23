@@ -145,7 +145,7 @@ bind ftl entry		P		tag_move_to		"move selection to predefine location using fzf_
 bind ftl entry		xmr		chmod_ar		"chmod a+r selection"
 bind ftl entry		xmw		chmod_aw		"chmod a+w selection"
 bind ftl entry		xmx		chmod_ax		"chmod a+x selection"
-bind ftl entry		xmm		chmod_dialog		"chmod selection via sc-im"
+bind ftl entry		xmM		chmod_dialog		"chmod selection via sc-im"
 bind ftl entry		xh		hexedit			"hexedit"
 bind ftl entry		xv		vim_edit		"vim"
 bind ftl entry		xl		link			"symlink selection in current directory"

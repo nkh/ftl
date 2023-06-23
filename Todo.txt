@@ -14,8 +14,12 @@ functionality: make command out of fzf-ftl previewer
 
 functionality: grep in binary files https://github.com/phiresky/ripgrep-all
 		asciio files are compressed can we grep in them?
+		
+		only interesting if we're going to select and filter them
+		it's probably better to let user generate a selection/filter list
+		and instead for adding it to ftl, let the user handle it
 
-functionality: drag drop via dragon
+functionality: drag drop via dragon, what's the use case?
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...

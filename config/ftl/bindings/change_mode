@@ -1,0 +1,55 @@
+
+bind ftl entry	xmm	chmod_dialog_one	"chmod entry via whiptail"
+
+chmod_dialog_one()
+{
+[[ 1 == ${#selection[@]} ]] || return ;
+
+local stats=$(stat -c "%A" "$n")
+[ "${stats:1:1}" = "r" ] && owner_read=on  || owner_read=off
+[ "${stats:2:1}" = "w" ] && owner_write=on || owner_write=off
+[ "${stats:3:1}" = "x" ] && owner_exec=on  || owner_exec=off
+[ "${stats:4:1}" = "r" ] && group_read=on  || group_read=off
+[ "${stats:5:1}" = "w" ] && group_write=on || group_write=off
+[ "${stats:6:1}" = "x" ] && group_exec=on  || group_exec=off
+[ "${stats:7:1}" = "r" ] && other_read=on  || other_read=off
+[ "${stats:8:1}" = "w" ] && other_write=on || other_write=off
+[ "${stats:9:1}" = "x" ] && other_exec=on  || other_exec=off
+
+tmux popup -E -x 7 -y 17 -h16 -w 30 \
+	" \
+	whiptail --separate-output --checklist "permissions" 16 30 9 \
+		owner-read '' $owner_read owner-write '' $owner_write owner-exec '' $owner_exec \
+		group-read '' $group_read group-write '' $group_write group-exec '' $group_exec \
+		other-read '' $other_read other-write '' $other_write other-exec '' $other_exec \
+		2>$fs/permissions
+	"
+
+[[ -s $fs/permissions ]] && 
+	{
+	local mode_owner=0 mode_group=0 mode_other=0
+	
+	while read set 
+		do
+			[[ $set == owner-read  ]] && (( mode_owner += 4 )) 
+			[[ $set == owner-write ]] && (( mode_owner += 2 ))
+			[[ $set == owner-exec  ]] && (( mode_owner += 1 ))
+			
+			[[ $set == group-read  ]] && pdhn gr && (( mode_group += 4 ))
+			[[ $set == group-write ]] && pdhn gw && (( mode_group += 2 ))
+			[[ $set == group-exec  ]] && pdhn ge && (( mode_group += 1 ))
+			
+			[[ $set == other-read  ]] && (( mode_other += 4 ))
+			[[ $set == other-write ]] && (( mode_other += 2 ))
+			[[ $set == other-exec  ]] && (( mode_other += 1 ))
+		
+		done <$fs/permissions
+	
+	chmod "$mode_owner$mode_group$mode_other" "$n"
+	
+	cdir
+	} || list
+}
+
+# vim: set filetype=bash :
+
