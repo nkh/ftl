@@ -420,6 +420,10 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «zeH»              Hide files having the same extention as the current file, global 
                         
+        «zeo»              Only show files having the same extention as the current file, per tab
+
+        «zeO»              Only show files having the same extention as the current file, global 
+                        
         «zec»              Show all hidden extensions 
 
         «z*»               Set maximum listing depth

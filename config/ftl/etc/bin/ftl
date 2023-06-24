@@ -35,24 +35,37 @@ files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[$
 ftl_cols=$COLS
 
 declare -A uniq_file ; shopt -s dotglob ; pad=(* ? ?) ; shopt -u dotglob ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; v_entries ; dir &
+
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
-	[[ $pnc == $dir_done ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1
-	[[ "$pnc" =~ '.' ]] && { e=${pnc##*.} ; ((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue ; } ; pl=${#pnc}
-	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { refresh ; qd=1 ; list $found ; }
-
-	# special case for directory not accessible
+	[[ $pnc == $dir_done ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ; pl=${#pnc}
+	
+	[[ -f "$pnc" ]] && # extension filtering
+		{
+		if [[ "$pnc" =~ '.' ]]
+		then
+			e=${pnc##*.}
+			((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue
+			((${#lkeep_tab[$tab]})) && { ((lkeep_tab[${tab}_${e@Q}])) || continue ; }
+			((${#lkeep[@]})) && { ((lkeep[${e@Q}])) || continue ; }
+		else
+			((${#lkeep[@]} || ${#lkeep_tab[$tab]})) && continue
+		fi
+		}
+	
+	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { echo -e "\e[H\e[31m$nfiles\e[0m" ; qd=1 ; }
+	
+	# color directory not accessible
 	[[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
-
+	
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
 	((sum += size)) ; ((show_size)) && { ((pl += 5)) ; [[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="     $pc" ; true ; } \
 			 || { for u in '' K M G T ; do ((size < 1024)) && printf -v pc "\e[94m%4s\e[m $pc" $size$u && break ; ((size/=1024)) ; done  ; } ; }
 	((show_line)) && { ((line++)) ; printf -v pc "$line_color%${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += $pad + 1)) ; }
-
+	
 	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
 	((pl > (COLS - 1))) && { [[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }
-
 	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc"
-
+	
 	[[ -f "$pnc" ]] && [[ -z $first_file ]] && first_file=$nfiles
 	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" == "$search" ]] && found=$nfiles ; ((nfiles++))
 done

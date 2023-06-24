@@ -122,7 +122,9 @@ preview_ext_ign()	{ [[ $e ]] && { ((pignore[${e}] ^= 1)) ; cdir ; } ; }
 preview_image()		{ ((no_image_preview ^= 1)) ; for e in $(tr '|' ' ' <<< "$ifilter") ; do pignore[${e}]=$no_image_preview ; done ; cdir ; } 
 extension_hide_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
 extension_hide()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
-extension_clear()	{ lignore=() ; cdir ; }
+extension_only()	{ for i in "${selection[@]}" ; do [[ "${i##*.}" ]] && ((lkeep[${i##*.}]= 1)) ; done ; tags_clear ; cdir ; }
+extension_only_tab()	{ for i in "${selection[@]}" ; do [[ "${i##*.}" ]] && ((lkeep_tab[${tab}]= 1, lkeep_tab[${tab}_"${i##*.}"]= 1)) ; done ; tags_clear ; cdir ; }
+extension_clear()	{ lignore=() ; lkeep=() ; lkeep_tab=() ; cdir ; }
 extension_sort()	{ source "$FTL_CFG/filters/sort_by_extension" ; cdir '' "$f"; }
 view_mode_pdf()		{ ((pdf_prev_image ^= 1)) ; list ; }
 preview_lock_clr()	{ rm "$fs/lock_preview/$n" 2>&- ; list ; }
@@ -165,11 +167,11 @@ select_all()		{ for p in "${files[@]}" ; do [[ ! ${tags[$p]} ]] && tags["$p"]='â
 tag_copy()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
 tag_move_to()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; fzf_mv "${!ltags[@]}" ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
 tag_move()		{ tag_check && cp_mv_tags $REPLY "$PWD" ; cdir '' "$f"; }
-view_mode_all()		{ vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; cdir '' "$f"; }
-view_mode_image()	{ vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; cdir '' "$f"; }
-view_mode_not_image()	{ vmode[tab]=2 ; tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; cdir '' "$f"; }
+view_mode_all()		{ no_redraw=$1 ; vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; (($no_redraw)) || cdir '' "$f"; }
+view_mode_image()	{ no_redraw=$1 ; vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; (($no_redraw)) || cdir '' "$f"; }
+view_mode_not_image()	{ no_redraw=$1 ; vmode[tab]=2 ; tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; (($no_redraw)) || cdir '' "$f"; }
 view_mode_next()	{ ((vmode[tab]++)) ; ((vmode[tab] > 2)) && vmode[tab]=0 ; view_mode ${vmode[tab]} ; }
-view_mode()		{ [[ $1 == 0 ]] && view_mode_all ; [[ $1 == 1 ]] && view_mode_image ; [[ $1 == 2 ]] && view_mode_not_image ; }
+view_mode()		{ no_redraw=$2 ; [[ $1 == 0 ]] && view_mode_all $no_redraw ; [[ $1 == 1 ]] && view_mode_image $no_redraw ; [[ $1 == 2 ]] && view_mode_not_image $no_redraw ; }
 selection_ext()		{ OIFS="$IFS" ; IFS=$'\n' ; for p in $(fd -H -I -d1 | sed 's/^.\///' | rg "\.$e$") ; do tag_set "$PWD/$p" ; done ; IFS="$OIFS" ;list ; }
 selection_ext_fzf()	{ fzf_tag T "$(fd -H -I -d1 | rg "\.$e$" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker 'â–ª')" ; list ; }
 selection_ext_all()	{ OIFS="$IFS" ; IFS=$'\n' ; for p in $(fd -H -I | sed 's/^.\///' | rg "\.$e$") ; do tag_set "$PWD/$p" ; done ; IFS="$OIFS" ;list ; }

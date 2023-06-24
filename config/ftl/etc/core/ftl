@@ -99,26 +99,36 @@ shell_vpane(){ tcpreview 0 ; P=$pane_id ; tsplit bash $shell_v -h -U ; shell_id=
 shell_send(){ { (( $1 )) && [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "${@:2}" ; }
 sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }
-save_state(){ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
-		((!nfiles)) && : >${1:-$fs}/ftl \
-			    || >${1:-$fs}/ftl echo "sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
-							ftag=$ftag		; show_size=$show_size				; prev_cb=\"$prev_cb\"
-							etag=$etag		; etag_s=\"$etag_s\"				; etag_cb=\"$etag_cb\"
-							filter_ext=\"$filter_ext\"
-							vmode[tab]=\"${vmode[tab]}\"
-							sort_type[tab]=${sort_type[tab]}
-							filters[tab]=\"${filters[tab]}\"
-							filters2[tab]=\"${filters2[tab]}\" 
-							lmode[tab]=\"${lmode[tab]}\"
-							show_hidden[tab]=\"${show_hidden[tab]}\"
-							rfilters[tab]=\"${rfilters[tab]}\"
-							ntfilter[tab]=\"${ntfilter[tab]}\" "; }
+
+save_state()
+{
+declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
+
+((!nfiles)) && : >${1:-$fs}/ftl \
+	    || {
+		>${1:-$fs}/ftl echo "sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
+					ftag=$ftag		; show_size=$show_size				; prev_cb=\"$prev_cb\"
+					etag=$etag		; etag_s=\"$etag_s\"				; etag_cb=\"$etag_cb\"
+					filter_ext=\"$filter_ext\"
+					vmode[tab]=\"${vmode[tab]}\"
+					sort_type[tab]=${sort_type[tab]}
+					filters[tab]=\"${filters[tab]}\"
+					filters2[tab]=\"${filters2[tab]}\" 
+					lmode[tab]=\"${lmode[tab]}\"
+					show_hidden[tab]=\"${show_hidden[tab]}\"
+					rfilters[tab]=\"${rfilters[tab]}\"
+					ntfilter[tab]=\"${ntfilter[tab]}\" "
+		
+		>>${1:-$fs}/ftl declare -p lignore lkeep
+		}
+}
 prev_synch(){ tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
 		((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
 		((gpreview)) && { [[ "$prev_cb" ]] && eval "$prev_cb" ; }
 		((gpreview)) && { [[ "$etag_s" ]] && { source "$FTL_CFG/etags/$etag_s" ; [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
-		((gpreview)) && { view_mode "${vmode[tab]}" ; }
-		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs= ; }
+		((gpreview)) && { view_mode "${vmode[tab]}" 1 ; }
+		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs=
+}
 thumb()     { echo "$thumbs/$1/$(md5sum <<<"$n" | cut -d' ' -f1)_$f.$2" ; }
 q_files()   { printf "%q\n" "${files[@]}" | perl -lne '-d || print' ; }
 q_dirs()    { printf "%q\n" "${files[@]}" | perl -lne '-d && print' ; }
@@ -147,7 +157,7 @@ time_event(){ ((time_event)) && (($SECONDS - $time_event0 >= $time_event)) && { 
 sel_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
 tags_size() { [[ $1 == + ]] && { ((tags_size+=$(stat --printf="%s" "$2"))) ; true ; } || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
 tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" $tags_size ; } ; }
-tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_selection && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags && rdir ; ofs= ; false ; }
+tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_selection && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags ; ofs= ; false ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
 tsnew()     { tmux has-session -t ftl$$ &>/dev/null || { tmux new -A -d -s ftl$$ ; sleep 0.2 ; } ; }
