@@ -75,7 +75,7 @@ shopt -u nocasematch ; qd=0 ; ((show_size || gpreview)) && hsum=$(numfmt --to=ie
 
 list() # select_index
 {
-[[ $ftl_cols != $COLS ]] && { tmux popup 'echo width missmatch' ; cdir ; return ; }
+# [[ $ftl_cols != $COLS ]] && { echo width missmatch ; cdir ; return ; }
 
 [[ "$1" ]] && dir_file[${tab}_$PWD]="$1" ; file=${dir_file[${tab}_$PWD]:-0}
 ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none ; ((gpreview)) || save_state $fs ; selection ; geo_winch

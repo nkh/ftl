@@ -8,6 +8,10 @@ issue: pane splitting
 		keep focus or pass to new split
 		split on the other side of the preview
 
+issue: zP broken?
+
+functionality: open files found by gfr instead for going to them
+
 # Later
 
 functionality: make command out of fzf-ftl previewer
