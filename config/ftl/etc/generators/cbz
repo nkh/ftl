@@ -2,11 +2,14 @@
 exec 2>> "$2/generators_log"
 
 f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
+t="$2/$f.jpg"
 
-[[ FORCE == "$4" || ! -f "$2/$f.jpg" ]] &&
+[[ FORCE == "$4" || "$t" -ot "$1" ]] &&
 	{
-	unzip -p "$1"  "$(zipinfo -2  "$1" | perl -ne '! /\d\D\..*$/ and print' | sort | head -n1)" > "$2/$f.large.jpg" && vipsthumbnail --size 600x "$2/$f.large.jpg" -o "$2/$f.jpg" \
-		|| cbconvert thumbnail "$1" --outfile "$2/$f.jpg" &>/dev/null
+	unzip -p "$1"  "$(zipinfo -2  "$1" | perl -ne '! /\d\D\..*$/ and print' | sort | head -n1)" > "$2/$f.large.jpg" && vipsthumbnail --size 600x "$2/$f.large.jpg" -o "$t" \
+		|| cbconvert thumbnail "$1" --outfile "$t" &>/dev/null
 
 	rm "$2/$f.large.jpg" 2>&-
 	}
+
+echo "$t"

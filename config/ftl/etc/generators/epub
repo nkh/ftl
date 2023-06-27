@@ -1,16 +1,14 @@
 #!/bin/bash
 exec 2>> "$2/generators_log"
 
-f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
-
 extmode=${3:-0}
-p="$2/$f.$extmode.txt"
 
-printf "%s\n" "$@" >&2
-echo generating "$p" >&2
+f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
+t="$2/$f.$extmode.txt"
 
-[[ FORCE == "$4" || ! -f "$p" ]] &&
+[[ FORCE == "$4" || "$t" -ot "$1" ]] &&
 	{
-	mutool convert -o "$p" "$1" 2>/dev/null
+	mutool convert -o "$t" "$1" 2>/dev/null
 	}
 
+echo "$t"

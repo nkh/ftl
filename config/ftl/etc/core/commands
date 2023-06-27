@@ -95,7 +95,7 @@ mark()			{ read -sn1 ; [[ -n $REPLY ]] && { [[ -d  "${files[file]}" ]] && marks[
 mark_fzf()		{ go_loop f fzf "$({ gmark_fzf_user ; printf "%s\n" "${marks[@]}" ; } | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)" ; }
 mark_go()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
 mark_go_tab()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
-preview_refresh()	{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&- ; true ; } || { $pgen/generator_one "$thumbs" "$n" "$e" ; } ; pw3image FTL_RESTART_W3M ; list ; }
+preview_refresh()	{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&- ; true ; } || { $pgen/generator_one "$thumbs" "$n" "$e" 1 ; } ; pw3image FTL_RESTART_W3M ; list ; }
 montage_preview()	{ [[ "$montage" ]] && montage= || montage="⠶" ; list ; }
 player_kill()		{ player_k ; }
 pane_down()		{ pane_extra "-v" "" ; }

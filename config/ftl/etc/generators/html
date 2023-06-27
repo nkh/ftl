@@ -2,8 +2,11 @@
 exec 2>> "$2/generators_log"
 
 f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
+t="$2/$f.txt"
 
-[[ FORCE == "$4" || ! -f "$2/$f.txt" ]] &&
+[[ FORCE == "$4" || "$t" -ot "$1" ]] &&
 	{
-	w3m -dump "$1" > "$2/$f.txt"
+	w3m -dump "$1" > "$t.txt"
 	}
+
+echo "$t"
