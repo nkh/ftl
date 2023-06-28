@@ -12,9 +12,9 @@ cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo
 clear_list(){ for(( i=$1 ; i < LINES - 1  ; i++)) ; do echo -ne "\e[K$flip" ; ((i < LINES - 2)) && echo ; done ; }
 psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; }
 ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
-cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == ${C[tag_copy]} ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; }
+cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == copy ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; }
 cp_do()     { [[ -d "$2" ]] && tscommand "xargs -a $1 -t -- cp -r -t ${2@Q}" || tscommand "xargs -a $1 -t -I{} -- cp {} ${2@Q}" ; }
-cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv $1 "$2" "${!ltags[@]}" ; } ; true ; }
+cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv "$1" "$2" "${!ltags[@]}" ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
 delete()    { [[ $1 ]] && { [[ $REPLY =~ y|d ]] && delete_tag || { [[ $REPLY =~ c ]] && delete_cur ; } ; } || { [[ $REPLY =~ y|d ]] && delete_cur ; } ; } 
 delete_cur(){ [[ "${tags[$n]}" ]] && { unset -v 'tags[$n]' ; tags_size - "$n" ; ((stagsi++)) ; } ; $RM "$n" ; mime=() ; true ; } 
