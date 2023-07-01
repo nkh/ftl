@@ -1,0 +1,21 @@
+#!/bin/bash
+# exec 2>> "$2/generators_log"
+
+# images=$(identify -format %n "$1")
+# echo "$1, images: $images">>png_log 
+
+# [[ $images == 1 ]] && echo "$1" && return
+ 
+# f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
+# t="$2/$f_animated_preview.png"
+
+# [[ FORCE == "$4" || "$t" -ot "$1" ]] &&
+# 	{
+# 	convert "$n[0]" "t"
+# 	convert -pointsize 20 -undercolor lightblue -fill blue -draw 'text 10,30 " Animated Gif"' "$n" "$t"
+# 	}
+
+# echo "$t"
+
+# vim: set filetype=bash :
+

@@ -40,6 +40,7 @@ user_pviewers && return ;
 [[ $e == cbz ]]                   && { pcbz      ; return ; }
 [[ $e == html ]]                  && { phtml     ; return ; }
 [[ $e == svg ]]                   && { psvg      ; return ; }
+[[ $e == gif ]]                   && { pgif      ; return ; }
 [[ $e =~ $ifilter ]]              && { pimage    ; return ; }
 [[ $e == mp3 ]]                   && { pmp3      ; return ; }
 [[ $e =~ $mfilter ]]              && { pmedia    ; return ; }
@@ -98,6 +99,7 @@ ppipe()     { psplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 phtml()     { vipreview "$($pgen/html "$n" "$thumbs/html")" ; }
 pimage()    { ((extmode)) && { psplit "exiftool ${n@Q} | piper '^.*?:' blue | $MD_PAGER ; read -sn1" ; geo_winch ; } || pw3image "$n" ; }
 psvg()      { pw3image "$($pgen/svg "$n" "$thumbs/svg")" ; }
+pgif()      { pw3image "$($pgen/gif "$n" "$thumbs/gif")" ; }
 
 pmp3()      { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "$PAGER_ANSI ${t@Q} ; read -sn1" ; } ; }
 pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; [[ -f "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
