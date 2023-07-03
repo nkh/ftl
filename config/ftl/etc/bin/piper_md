@@ -1,0 +1,17 @@
+#!/bin/bash
+
+columns=$(tput cols)
+
+cat "$@" | \
+piper  '^###.*' rgb025 \
+	'^##.*' rgb035 \
+	'^#.*' rgb045 \
+	'\!?\[.*?].*' rgb012 \
+	'\*.*?\*' rgb430 \
+	'^\|.*' 'black on_rgb024' \
+	'^\s*-\s+.*' rgb443 \
+	'.*' grey22 \
+	'' '' | \
+ansifold --boundary word -w $columns
+
+

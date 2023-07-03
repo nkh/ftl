@@ -11,9 +11,7 @@ ftl - terminal file manager, with live previews, hyperorthodox
 
 [![Introduction video](https://raw.github.com/nkh/ftl/master/screenshots/introduction_video.png)](https://www.youtube.com/watch?v=nvSDmhXymVA)
 
-I speak slowly, for everyone gets a chance to understand, youtube allows you to accelerate it
-to a speed of your liking. Some bindings have changed since the video was made, check the man page or 
-the built-in "bindings to commands" table, shortcut is «c».
+I speak slowly, for everyone gets a chance to understand, youtube allows you to accelerate it to a speed of your liking. Some bindings have changed since the video was made, check the man page or the built-in "bindings to commands" table, shortcut is «c».
 
 # DOCUMENTATION
 
@@ -33,15 +31,11 @@ I wanted a file manager that would use tmux and give me "live" preview and works
 
 ## Installation
 
-There's a very simple installer that mirrors my environment. I run
-Ubuntu (KUbuntu) and install a few dependencies from source.
+There's a very simple installer that mirrors my environment. I run Ubuntu (KUbuntu) and install a few dependencies from source.
 
-Since some dependencies get build during the install, multiple development
-environment are also installed.
+Since some dependencies get build during the install, multiple development environment are also installed.
 
-*ftl* uses full apllications which need to be installed so the disk usage
-may be high depending on what options you chose to install. On the other hand
-the applications are great and worth having installed even when not using *ftl*.
+*ftl* uses full apllications which need to be installed so the disk usage may be high depending on what options you chose to install. On the other hand the applications are great and worth having installed even when not using *ftl*.
 
 To install *ftl* you need download the bash INSTALL file
 

@@ -60,8 +60,12 @@ user_pviewers && return ;
 
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
 
+[[ $mtype =~ ^application/x-perl$ ]] && { ptext  ; return ; }
+
 [[ -s "$n" ]] && [[ "$file_b" =~ "escape sequence" ]] && { pansi ; return ; }
 
+# application/x-perl
+# Perl script text executable
 ((! is_bin)) && [[ -s "$n" ]] && [[ "$file_b" =~ Unicode|ASCII || $mtype =~ ^text ]] && { ptext && return ; }
 
 ptype
@@ -82,7 +86,7 @@ ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
-ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo '$mtype' ; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
+ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtype' ; echo -n 'file type: '; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
 pcbr()      { pw3image "$($pgen/cbr "$n" "$thumbs/cbr")" ; }
 pcbz()      { pw3image "$($pgen/cbz "$n" "$thumbs/cbz")" ; }

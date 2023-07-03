@@ -74,6 +74,7 @@ sudo cpanm		File::MimeInfo \
 			Getopt::Long \
 			FileHandle \
 			IPC::Open2 \
+			App::ansifold \
 
 sudo ln -s /usr/bin/fdfind /usr/bin/fd # old fdfind name is used
 cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party
