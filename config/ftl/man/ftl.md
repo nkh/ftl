@@ -835,6 +835,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «xmM»              Set permissions interactively 
 
+        «xc»               cat in terminal
+
         «xh»               Hexadecimal preview    
 
         «xv»               open in vim    
@@ -871,7 +873,15 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         «LEADER f t»       Terminal popup                 
 
-        «:url URL»        open URL in qutebrowser
+        «:url URL»         open URL in qutebrowser
+
+        «LEADER g g»       git, display etags             
+
+        «LEADER g a»       git add selection              
+
+        «LEADER g f»       git, fzf go to changed files       
+
+        «LEADER g d»       git diff                       
 
 ## External Viewer
 
