@@ -1,5 +1,18 @@
 #!/bin/env bash
 
+function stacktrace { 
+   local i=1 line file func
+   while read -r line func file < <(caller $i); do
+      echo "[$i] $file:$line $func(): $(sed -n ${line}p $file)"
+      ((i++))
+   done
+}
+
+numfmt()
+{
+/usr/bin/numfmt "$@" || { echo "$@" >>nmfmt_log ; echo -e "------------------\n\n" >>nmfmt_log ; stacktrace >>nmfmt_log ; echo nmfmt: error "$@" >&2 ; }
+}
+
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2023, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup

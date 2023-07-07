@@ -2,15 +2,20 @@
 
 issue: numfmt error after moving files
 
+issue: no update when file size changes
+
 issue: pane splitting
 	what do we want?
 		split the current pane
 		keep focus or pass to new split
 		split on the other side of the preview
 
-issue: mp3 player not working
-
 functionality: open files found by gfr instead for going to them
+		could select them, then open them with xv
+
+functionality: copy line in gfr
+
+functionality: start ftl with shell zoomed out
 
 # Later
 
