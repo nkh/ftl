@@ -2,8 +2,6 @@
 
 issue: numfmt error after moving files
 
-issue: no update when file size changes
-
 issue: pane splitting
 	what do we want?
 		split the current pane
