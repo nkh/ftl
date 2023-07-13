@@ -114,6 +114,13 @@ git clone --depth=1 https://github.com/nkh/ftl.git ftl_repo
 cp -r $FTL_CFG/ftl_repo/config/ftl/* .
 cp $FTL_CFG/ftl_repo/config/ftl/etc/bin/third_party/.vimkatrc ~
 
+# directories to add own                 "plugins"
+ln -s ftl_repo/config/ftl/etc/commands/   commands
+ln -s ftl_repo/confi/ftl/etc/etags/       etags      
+ln -s ftl_repo/confi/ftl/etc/filters/     filters    
+ln -s ftl_repo/confi/ftl/etc/generators/  generators 
+ln -s ftl_repo/confi/ftl/etc/viewers/     viewers    
+
 # generate man pages
 ( cd $FTL_CFG/man ; ./gen_man_pages )
 
