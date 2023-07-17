@@ -8,11 +8,6 @@ issue: pane splitting
 		keep focus or pass to new split
 		split on the other side of the preview
 
-functionality: open files found by gfr instead for going to them
-		could select them, then open them with xv
-
-functionality: copy line in gfr
-
 functionality: start ftl with shell zoomed out
 
 # Later
