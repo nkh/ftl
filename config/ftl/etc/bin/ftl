@@ -50,7 +50,7 @@ ftl_cols=$COLS
 declare -A uniq_file ; shopt -s dotglob ; pad=(* ? ?) ; shopt -u dotglob ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; v_entries ; dir &
 
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
-	[[ $pnc == $dir_done ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ; pl=${#pnc}
+	[[ "$pnc" == "$dir_done" ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ; pl=${#pnc}
 	
 	[[ -f "$pnc" ]] && # extension filtering
 		{

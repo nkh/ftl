@@ -1,1 +1,14 @@
-ftll() { P=$(mktemp -u) ; tmux new-window -n ftll "ftl 3>$P ; tmux wait -S ftll_$$" ; tmux wait ftll_$$ ; while read -r d ; do [[ -n "$d" ]] && printf "%q\n" "$d" ; done < $P ; rm $P ; } 
+#!/bin/bash
+
+P=$(mktemp -u) 
+
+tmux new-window -n ftll "ftl 3>$P ; tmux wait -S ftll_$$" 
+
+tmux wait ftll_$$
+while read -r d
+	do
+		[[ -n "$d" ]] && printf "%q\n" "$d"
+	done < $P
+
+rm $P
+
