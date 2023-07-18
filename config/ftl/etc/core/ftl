@@ -32,7 +32,7 @@ files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t
 dirs_virt() { ((${#vdirs[@]}))  && for vd in "${!vdirs[@]}"  ; do printf "0\t0\t$vd\n" ; done ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg ${filters2[tab]} | { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } | filter2 ; }
 filter_d()  { rg ${filters_dir[tab]} | filter2 ; }
-filter_c()  { ((${#user_colors[@]})) && { while read cfile ; do ((${#user_colors[$cfile]})) && echo -e "\e[${user_colors[$cfile]}m$cfile\e[m" || printf -- "$cfile\n" ; done ; } || cat ; }
+filter_c()  { ((${#user_colors[@]})) && { while read cfile ; do ((${#user_colors[$cfile]})) && echo -e "\e[${user_colors[$cfile]}m$cfile\e[m" || printf "%s\n" "$cfile" ; done ; } || cat ; }
 filter2()   { ftl_sort | tee >(cat >&4) | vfiles_clr | filter_c | lscolors >&5 ; }
 filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
