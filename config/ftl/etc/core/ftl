@@ -149,7 +149,7 @@ tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags
 tag_flip()  { ((stagsi++)) ; [[ "${tags[$1]}" ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; true ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_set()   { ((stagsi++)) ; [[ ! ${tags[$1]} ]] && { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
-tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$t" ; ((stagsi++)) ; } ; done ; }
+tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$tag" ; ((stagsi++)) ; } ; done ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
 {
 time_event0=$SECONDS
@@ -157,7 +157,7 @@ time_event(){ ((time_event)) && (($SECONDS - $time_event0 >= $time_event)) && { 
 }
 sel_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
 tags_size() { [[ $1 == + ]] && { ((tags_size+=$(stat --printf="%s" "$2"))) ; true ; } || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
-tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" $tags_size ; } ; }
+tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" -- "$tags_size" ; } ; }
 tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_selection && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags ; ofs= ; false ; }
 tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
 tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
