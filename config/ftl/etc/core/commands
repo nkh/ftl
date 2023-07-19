@@ -6,6 +6,7 @@ goto_entry()		{ line_color="$line_color_hi" ; cdir ; line_color="$line_color0" ;
 terminal_cat()		{ tcpreview ; ctsplit "cat ${n@Q} ; read -sn 100" ; }
 hexedit()		{ tcpreview ; ctsplit "$HEXEDIT ${n@Q}" ; }
 vim_edit()		{ tcpreview ; $EDITOR "${selection[@]}" ; }
+vim_edit_window()	{ tmux new-window "$EDITOR ${selection[@]@Q}" ; }
 ftl_help()		{ ((help_pop)) && { tmux popup -h90% -w90% -E "$help_command" ; } || { tcpreview ; exec 2>&9 ; $help_command ; exec 2>"$fs/log" ; } ; cdir ; }
 move_left()		{ [[ "$PWD" != / ]] && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
