@@ -100,7 +100,9 @@ MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-
 MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
 MD_RENDER2='vmd'			# markdown renderer #2
 
-HEXEDIT=hexedit				# hex viewer/editor
+HEXVIEW=hexdump				# hex viewer
+HEXEDIT=hexedit				# hex editor
+
 MIMETYPE=mimemagic			# mimetype generator
 NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 JSON_VIEWER=jless
@@ -146,7 +148,8 @@ bind ftl entry		xmr		chmod_ar		"chmod a+r selection"
 bind ftl entry		xmw		chmod_aw		"chmod a+w selection"
 bind ftl entry		xmx		chmod_ax		"chmod a+x selection"
 bind ftl entry		xmM		chmod_dialog		"chmod selection via sc-im"
-bind ftl entry		xh		hexedit			"hexedit"
+bind ftl entry		xh		hexview			"hex view"
+bind ftl entry		xH		hexedit			"hexedit"
 bind ftl entry		xv		vim_edit		"vim"
 bind ftl entry		xV		vim_edit_window		"vim in sparate window"
 bind ftl entry		xc		terminal_cat		"cat"
