@@ -1,14 +1,10 @@
 # Current
 
-issue: numfmt error after moving files
-
 issue: pane splitting
 	what do we want?
 		split the current pane
 		keep focus or pass to new split
 		split on the other side of the preview
-
-functionality: start ftl with shell zoomed out
 
 # Later
 

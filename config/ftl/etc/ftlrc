@@ -362,5 +362,5 @@ bind ftl SIG		'Ä'		SIG_REMOTE		"handle pane preview"
 for b in $(fd  . "$FTL_CFG/etc/bindings" --type f | sort -u) ; do source "$b" ; done
 for b in $(fd  . "$FTL_CFG/bindings" --type f | sort -u) ; do source "$b" ; done
 
-# vim: set filetype=bash :
+# vim: set filetype=bash:
 

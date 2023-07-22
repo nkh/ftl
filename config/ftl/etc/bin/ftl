@@ -1,11 +1,20 @@
 #!/bin/env bash
 
-function stacktrace { 
-   local i=1 line file func
-   while read -r line func file < <(caller $i); do
-      echo "[$i] $file:$line $func(): $(sed -n ${line}p $file)"
-      ((i++))
-   done
+function stacktrace
+{ 
+local i=1 line file func
+while read -r line func file < <(caller $i); do
+	echo "[$i] $file:$line $func(): $(sed -n ${line}p $file)"
+	((i++))
+	done
+}
+
+function log()
+{
+echo "[$( caller )] $*" >&2
+echo "BASH_SOURCE: ${BASH_SOURCE[*]}"
+echo "BASH_LINENO: ${BASH_LINENO[*]}"
+echo "FUNCNAME: ${FUNCNAME[*]}"
 }
 
 numfmt()

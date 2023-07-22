@@ -1,0 +1,15 @@
+#!/bin/bash
+
+arg_n() { perl -e 'print [split /(?<!:):(?!:)/, $ARGV[1]]->[$ARGV[0] - 1]' $1 "$2" ; }
+export -f arg_n
+
+minus_limit(){ number=$1 ; minus=$2 ; limit=$3 ; test $(($number - $minus)) -le $limit && echo $limit || echo $(($number - $minus)) ; }
+export -f minus_limit
+
+# todo: if the search is contained in file names, we get a lot of hits that are of no interest
+# replace the file name by a hash entry or something that can be reversed, the preview can decrypt it
+# we need to decrypt it when return is hit in fzf, do that by piping the result into the decrypt sub
+
+for a in "$@" ; do [[ $a =~ ^fzf ]] && fzf_args+=("${a#fzf}") || rg_args+=("$a") ; done
+
+rg --no-heading -n --color=always --colors 'match:style:nobold' --colors 'match:fg:white' "${rg_args[@]}" . | plc --values | fzf_preview "${fzf_args[@]}" 
