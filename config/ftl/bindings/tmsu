@@ -115,5 +115,5 @@ bind tmsu tag	"LEADER t r"		tmsu_filter		"tmsu tag filter via fzf"
 bind tmsu tag	"LEADER t s"		tmsu_tag_scim		"tmsu tag selection via scim"
 bind tmsu tag	"LEADER t t"		tmsu_tag		"tmsu tag selection"
 
-# vim: set filetype=bash :
+# vim: set filetype=bash:
 

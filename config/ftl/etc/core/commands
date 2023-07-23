@@ -83,6 +83,7 @@ gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$({ cat $ftl_root/mark
 gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ; }
 open_rg()		{ exec 2>&9 ; tcpreview ; rg_entry="$(fzfr fzf+m)" ; exec 2>"$fs/log" ; [[ "$rg_entry" ]] && $EDITOR $(<<<"$rg_entry" awk -F: '{printf "%s +%s", $1, $2}'); }
 go_rg()			{ exec 2>&9 ; tcpreview ; go_loop rg "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/log" ; }
+go_rg_one_match()	{ exec 2>&9 ; tcpreview ; go_loop rg "$(frf 1000 '' ctrl-t frg)" ; exec 2>"$fs/log" ; }
 history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory_clear()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }

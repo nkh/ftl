@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+frl_max_depth="${2:-1000}"
+
+# | perl -0ne '-B | # filer out binaries
+
+find . -maxdepth $frl_max_depth -type f,l -xtype f,l -print0 | sed -z -e '/^\.$/d' -e 's~^\.\/~~' | xargs -0 rg -l --no-heading --smart-case "$1" --color=always --colors 'match:fg:51' 
+

@@ -656,9 +656,11 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <gfA>              Fzf find, filrs and subdirs, regexp/fuzzy          
 
-        <gfr>              Ripgreg, open file           
+        <grr>              Ripgreg, open file           
 
-        <gfR>              Ripgreg, goto file
+        <grf>              Ripgreg file one match, goto file
+
+        <grt>              Ripgreg file names, goto file
 
         <gfp>              ftl pane preview, files in the directory
 
