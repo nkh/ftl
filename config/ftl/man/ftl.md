@@ -887,9 +887,13 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <LEADER g a>       git add selection              
 
+        <LEADER g A>       git add via forgit              
+
         <LEADER g f>       git, fzf go to changed files       
 
         <LEADER g d>       git diff                       
+
+        <LEADER g t>       git tree status                       
 
 ## External Viewer
 

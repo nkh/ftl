@@ -18,6 +18,7 @@ cd $FTL_CFG
 sudo apt install -y 	ack \
 			python3-pip \
 			libimage-exiftool-perl \
+			libdata-treedumper-perl \
 			cpanminus \
 			curl \
 			exiftool \

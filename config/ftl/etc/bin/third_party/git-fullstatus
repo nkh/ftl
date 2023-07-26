@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+declare -A git_status
+
+while IFS= read -r -d $'\0' line ; do git_status[${line:3}]="${line:0:2}" ; done < <(git status $@ --porcelain -z)
+while IFS= read line ; do [ ! "${git_status[$line]}" ] && git_status[$line]="  " ; done
+
+for file in "${!git_status[@]}" ; do
+    echo "$file" >&3
+    echo "${git_status[$file]}" >&4
+done

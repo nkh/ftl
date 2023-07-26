@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+mkdir -p /tmp/$USER
+git_tree_status_status=$(mktemp -p /tmp/$USER/ git_tree_status_status_XXXXXXXX)
+git_tree_status_entries=$(mktemp -p /tmp/$USER/ git_tree_status_entries_XXXXXXXX)
+
+[[ "$1" == '-h' ]] && { echo -e "git-tree-status [-u|-a]:\n\t-u      show untracked\n\t-a      show ignored and untracked" ; exit 0 ; }
+
+extra_options=" -uno"
+[[ "$1" == '-u' ]] && { shift ; extra_options= ; }
+[[ "$1" == '-a' ]] && { shift ; extra_options=" --ignored" ; }
+
+git status $extra_options --porcelain -z | tr '\0' '\n' | cut -c4- | git-fullstatus "$extra_options" 3>$git_tree_status_entries 4>$git_tree_status_status
+
+paste -d' ' \
+	<(<$git_tree_status_entries lscolors) \
+	<(<$git_tree_status_status piper \
+		'A' green \
+		'C' blue \
+		'D' red \
+		'M' cyan \
+		'R' yellow \
+		'T' yellow \
+		'U' on_yellow \
+		'!!' yellow \
+		'\?\?' magenta \
+		) | tw -a -t git-tree-status
+

@@ -1,0 +1,157 @@
+#!/usr/bin/env perl 
+
+use strict ;
+use warnings ;
+
+use File::Spec ;
+use Data::TreeDumper ;
+use Term::ANSIColor ;
+
+use Getopt::Long ;
+
+die 'Error parsing options!'unless
+        GetOptions
+                (
+                't|title=s' => \my $title,
+                'a|ansi_lines' => \my $lines,
+                'v|values' => \my $values,
+                'd|directories_first' => \my $directories_first,
+                'no_tab' => \my $no_tab,
+                'no_color' => \my $no_color,
+                'h|help' => \&display_help,
+                ) ;
+
+sub display_help
+{
+print <<'EOH' ;
+Options:
+	't|title=s' 	Set the tree title
+	'v|values'	keep and display values, the input is in the form
+				path/path/path: value
+
+			multiple values can be associated with the same path
+
+	'no_color'	remove color from input
+
+examples:
+	grep -n -r --color=always regex path | plc -v | tw -v -t matches 
+
+	find path | grep -v '.git' | tw -t tree
+
+	printf "1/2/3:v1\n1/2/4:v2\n2\n" | tw -t test -v
+EOH
+
+exit ;
+}
+
+my (%tree, $tree_position, %tree_directories) ;
+
+my $ansi = qr/\e\[(?:[0-9;]*)[mK]/ ;
+
+while (<>)
+	{
+	chomp ;
+
+	s/$ansi//g if $no_color ;
+
+	my ($path, $rest) ;
+
+	#separate path from rest of line
+	($path, $rest, my @rest) = split( /(?<!:) : (?!:)/x ) ; ;
+	$rest .= ':' . join(':', @rest) if @rest ;
+
+	(my $color_path) = $path =~ /^($ansi)*/ ;
+
+	$color_path //= '' ;
+	$rest //= '' ;
+
+	my (undef, $directories, $file_name) = File::Spec->splitpath($path) ;
+		
+	if(defined $tree_directories{$directories} && 'HASH' eq ref $tree_directories{$directories})
+		{
+		$tree_position = $tree_directories{$directories} ;
+		}
+	else
+		{
+		$tree_position = \%tree ;
+
+		my @dirs = File::Spec->splitdir($directories) ;
+		delete $dirs[-1] ;
+
+		for (@dirs)
+			{
+			next if $_ eq '' ;
+
+			$_ = $color_path.$_.color('reset') ;
+
+			$tree_position->{$_} = {} unless exists $tree_position->{$_} ;
+			$tree_position->{$_} = {} if('HASH' ne ref $tree_position->{$_}) ;
+			$tree_position = $tree_position->{$_} ;
+			}
+		}
+
+	$tree_directories{$directories} = $tree_position ;
+
+	$file_name =~ s/($ansi)+$// ; 
+	
+	if ($file_name ne '') 
+		{
+		my $element_name = $color_path.$file_name.color('reset') ;
+
+		if (exists $tree_position->{$element_name} && $values)
+			{
+			# keep list of values
+			if ( '' eq ref($tree_position->{$element_name}) )
+				{
+				$tree_position->{$element_name}
+					= [ $tree_position->{$element_name} ] ;
+				}
+			
+			push @{ $tree_position->{$element_name} }, $rest.color('reset') ;
+			}
+		else
+			{
+			$tree_position->{$element_name} = $rest.color('reset')
+			}
+		}
+	}
+
+sub directories_first 
+{
+my $tree = shift ;
+
+if('HASH' eq ref $tree) 
+	{
+	my @keys = sort 
+			{
+			(my $xa = $a) =~ s/$ansi//g ; 
+			(my $xb = $b) =~ s/$ansi//g ; 
+
+			if('HASH' eq ref($tree->{$a}) && 'HASH' eq ref($tree->{$b})) 
+				{ $xa cmp $xb }
+			elsif('HASH' eq ref($tree->{$a}))
+				{ 0 }
+			elsif('HASH' eq ref($tree->{$b}))
+				{ 1 }
+			else
+				{ $xa cmp $xb }
+			} keys %$tree ;
+
+	return ('HASH', undef, @keys) ;
+	}
+ 
+return (Data::TreeDumper::DefaultNodesToDisplay($tree)) ;
+}
+
+my @options ;
+push @options, (FILTER => \&directories_first) if $directories_first ;
+push @options, (REPLACEMENT_LIST => [ ["\n" => ''], ["\r" => ''], ["\t" => ''] ]) if $no_tab ;
+
+print DumpTree \%tree, $title || 'tw: use -t to set title',
+	DISPLAY_ADDRESS => 0,
+	DISPLAY_NO_VALUE => !$values,
+	USE_ASCII => !$lines,
+	NO_NO_ELEMENTS => 1,
+	@options ;
+
+
