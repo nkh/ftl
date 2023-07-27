@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+mkdir -p /tmp/$USER
+git_tree_status_status=$(mktemp -p /tmp/$USER/ git_tree_status_status_XXXXXXXX)
+git_tree_status_entries=$(mktemp -p /tmp/$USER/ git_tree_status_entries_XXXXXXXX)
+
+[[ "$1" == '-h' ]] && { echo -e "git-tree-status [-u|-a]:\n\t-u      show untracked\n\t-a      show ignored and untracked" ; exit 0 ; }
+
+extra_options=" -uno"
+[[ "$1" == '-u' ]] && { shift ; extra_options= ; }
+[[ "$1" == '-a' ]] && { shift ; extra_options=" --ignored" ; }
+[[ "$1" == '-f' ]] && { shift ; flat=1 ; }
+
+git status $extra_options --porcelain -z | tr '\0' '\n' | cut -c4- | git-fullstatus "$extra_options" 3>$git_tree_status_entries 4>$git_tree_status_status
+
+title="$({ echo -n "$PWD " | lscolors ; git rev-parse - HEAD  | cut -c -8 | piper '.+' grey5 ; } | tr -d '\n')"
+
+[[ ! -s $git_tree_status_entries ]] && exit 0 ||
+	paste -d' ' \
+		<(<$git_tree_status_status piper \
+			'A' green \
+			'C' blue \
+			'D' red \
+			'M' cyan \
+			'R' yellow \
+			'T' yellow \
+			'U' on_yellow \
+			'!!' yellow \
+			'\?\?' magenta \
+			) \
+		<(<$git_tree_status_entries lscolors)
+
+

@@ -6,7 +6,7 @@ git_add() { git add "${selection[@]}" ; etag_dir ; cdir ; }
 git_find() 
 {
 git_root="$(git rev-parse --show-toplevel)"
-go_loop f fzf "$(cd "$git_root" ; git -c color.status=always status -s | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi | sed 's#...#'$git_root'/#')"
+go_loop f fzf "$(cd "$git_root" ; git-color-status -u | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi | sed 's#...#'$git_root'/#')"
 }
 
 git_diff() { tcpreview ; git diff "$n" ; cdir ; }
