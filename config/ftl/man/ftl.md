@@ -266,6 +266,10 @@ sequences of keys to perform a command. The default is '\\'
 
         leader_key=SPACE # set LEADER to SPACE
 
+## Redo Key
+
+The “Redo key” re-runs the latest command (with some exceptions), it's set to '.'.
+
 ## User Defined Bindings
 
         bind function arguments, all mendatory:

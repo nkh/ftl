@@ -126,6 +126,8 @@ remote_preview() { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane 
 
 setup_finfo()
 {
+# serialize ftl information
+
 [[ -n "$1" ]] && ftl_info_file="$1" || ftl_info_file="$(mktemp -p $fs ftl_info_XXXXXXX)"
 
 export ftl_info_file

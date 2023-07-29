@@ -24,15 +24,29 @@ for key in "${keysa[@]}"
 C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$map	$section	$dscut	$command	$help"
 }
 
+reset_exclude_command_from_redo() { declare -g -A exclude_from_redo=() ; }
+exclude_command_from_redo() { exclude_from_redo[$1]=1 ; }
+
+reset_exclude_command_from_redo
+
+exclude_command_from_redo "move_up"
+exclude_command_from_redo "move_up_arrow"
+exclude_command_from_redo "move_down"
+exclude_command_from_redo "move_down_arrow"
+exclude_command_from_redo "move_left"
+exclude_command_from_redo "move_left_arrow"
+exclude_command_from_redo "move_right"
+exclude_command_from_redo "move_right_arrow"
+
 key_command()
 {
-(( keys_in > 3 ))                         && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
-[[ "$REPLY" == ERROR_142     ]]           && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
-[[ "$REPLY" == "?"           ]]           && REPLY=QUESTION_MARK
-[[ "$REPLY" == "$leader_key" ]]           && REPLY=LEADER 
+(( keys_in > 3 ))               && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
+[[ "$REPLY" == ERROR_142     ]] && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
+[[ "$REPLY" == "?"           ]] && REPLY=QUESTION_MARK
+[[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 
 
-[[ -n "$key_map"             ]]           && { $key_map ; return ; }
-[[ "$REPLY" == ESCAPE ]]                  && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
+[[ -n "$key_map"             ]] && { $key_map ; return ; }
+[[ "$REPLY" == ESCAPE ]]        && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
 
@@ -41,7 +55,22 @@ keys_command="$keys_command$REPLY" ; (( keys_in++)) #; pdhn "[$COUNT] <$keys_com
 ((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
 
 [[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && 
-	{ ${kbd_trie[$HAS_COUNT$keys_command]} ; setup_finfo "$ftl_main_info_file" ; keys_in= keys_command= HAS_COUNT= COUNT= REPLY= ; }
+	{
+	setup_finfo "$ftl_main_info_file"
+	
+	keys_function=${kbd_trie[$HAS_COUNT$keys_command]}
+	$keys_function
+	
+	[[ "${exclude_from_redo[$keys_function]}" ]] || keys_latest_command="$keys_function"
+	
+	keys_in= keys_command= HAS_COUNT= COUNT= REPLY=
+	}
+
+[[ "$HAS_COUNT$keys_command" == "$redo_key" && "$keys_latest_command" ]] &&
+	{
+	$keys_latest_command
+	keys_in= keys_command= HAS_COUNT= COUNT= REPLY=
+	}
 }
 
 get_key()
