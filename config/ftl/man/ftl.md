@@ -887,17 +887,19 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <:url URL>         open URL in qutebrowser
 
+### Git integration
+
         <LEADER g g>       git, display etags             
 
-        <LEADER g a>       git add selection              
-
-        <LEADER g A>       git add via forgit              
+        <LEADER g t>       git status as a tree                      
 
         <LEADER g f>       git, fzf go to changed files       
 
         <LEADER g d>       git diff                       
 
-        <LEADER g t>       git tree status                       
+        <LEADER g a>       git add selection              
+
+        <LEADER g A>       git add via forgit              
 
 ## External Viewer
 

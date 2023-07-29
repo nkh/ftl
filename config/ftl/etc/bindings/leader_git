@@ -9,19 +9,16 @@ git_root="$(git rev-parse --show-toplevel)"
 go_loop f fzf "$(cd "$git_root" ; git-color-status -u | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi | sed 's#...#'$git_root'/#')"
 }
 
-git_diff() { tcpreview ; git diff "$n" ; cdir ; }
+git_diff() { tcpreview ; git diff --color=always "$n" | diff-so-fancy | moar --no-statusbar --no-linenumbers ; cdir ; }
 
 git_tree() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "git-tree-status -u | less -r" ; cdir ; }
 git_fga() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "bash -ic fga" ; cdir ; }
 
 bind leader_ftl extra	"LEADER g g"	git_etags	"git display status"
-bind leader_ftl extra	"LEADER g a"	git_add		"git add selection"
-bind leader_ftl extra	"LEADER g A"	git_fga		"git add selection in forgit"
+bind leader_ftl extra	"LEADER g t"	git_tree	"git tree status"
 bind leader_ftl extra	"LEADER g f"	git_find	"git go to git file"
 bind leader_ftl extra	"LEADER g d"	git_diff	"git diff"
-bind leader_ftl extra	"LEADER g t"	git_tree	"git tree status"
+bind leader_ftl extra	"LEADER g a"	git_add		"git add selection"
+bind leader_ftl extra	"LEADER g A"	git_fga		"git add selection in forgit"
 
-#todo
-# etags in preview
-
-# vim: set filetype=bash :
+# vim: set filetype=bash:

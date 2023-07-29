@@ -129,7 +129,7 @@ extension_hide_tab()	{ [[ $e ]] && ((lignore[${tab}_${e}]= 1)) ; cdir ; }
 extension_hide()	{ [[ $e ]] && ((lignore[${e}]= 1)) ; cdir ; }
 extension_only()	{ for i in "${selection[@]}" ; do [[ "${i##*.}" ]] && ((lkeep[${i##*.}]= 1)) ; done ; tags_clear ; cdir ; }
 extension_only_tab()	{ for i in "${selection[@]}" ; do [[ "${i##*.}" ]] && ((lkeep_tab[${tab}]= 1, lkeep_tab[${tab}_"${i##*.}"]= 1)) ; done ; tags_clear ; cdir ; }
-extension_clear()	{ lignore=() ; lkeep=() ; lkeep_tab=() ; cdir ; }
+extension_clear()	{ lignore=() ; lkeep=() ; lkeep_tab=() ; ftl_sort() { sort_by ; } ; cdir ; }
 extension_sort()	{ source "$FTL_CFG/filters/sort_by_extension" ; cdir '' "$f"; }
 view_mode_pdf()		{ ((pdf_prev_image ^= 1)) ; list ; }
 preview_lock_clr()	{ rm "$fs/lock_preview/$n" 2>&- ; list ; }
