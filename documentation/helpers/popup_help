@@ -1,0 +1,9 @@
+FTL_LCT_SETUP="FTL_LTC_INDEX=17 FTL_LTC_OPT='-x 4 -y 22 -h 13 -w 100'"
+
+# FTL_LCT_SHELL="sed -n -e \"s/^/    /\" -e \"\$leader_help_index p\" /home/nadim/nadim/devel/repositories/ftl/config/ftl/etc/bindings/leader_git | tr -d \"\n\""
+FTL_LCT_SHELL="sed -n -e \"s/^/    /\" -e \"\$leader_help_index p\" /home/nadim/nadim/devel/repositories/ftl/test_colors | tr -d \"\n\""
+
+alias run_pop="$FTL_LCT_SETUP FTL_LTC='tput civis ; printf \"\033[48;5;234m\033[2J\" ; printf \"\n\n\n\n\n\" ; $FTL_LCT_SHELL' ftl"
+
+# vim: set ft=bash:
+

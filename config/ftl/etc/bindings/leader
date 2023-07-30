@@ -1,12 +1,23 @@
+
+leader_help_index=${FTL_LTC_INDEX:-1}
+
 leader_help()
 {
 [[ "$FTL_LTC" ]] && test_cmd="$FTL_LTC" || test_cmd='echo -n ftl: leader_help: variable FTL_LTC not set'
-tmux popup -h 80% -w 80% -d "$PWD" "p='$p' ; n='$n'; $test_cmd"
+tmux popup ${FTL_LTC_OPT:- -h 40% -w 80%} -d "$PWD" "leader_help_index='${1:-$leader_help_index}' ; p='$p' ; n='$n' ; $test_cmd"
 }
+
+leader_help_reset()    { leader_help_index=${1:-${FTL_LTC_INDEX:-1}} ; }
+leader_help_next()     { ((leader_help_index++)) ; leader_help $leader_help_index ; }
+leader_help_previous() { ((leader_help_index > 1 && leader_help_index--)) ; leader_help $leader_help_index ; }
 
 leader_space_test() { tmux popup "echo -n ftl: leader + space + space" ; }
 
-bind leader test	"LEADER h"		leader_help		"leader help"
+bind leader test	"LEADER h h"		leader_help		"leader help"
+bind leader test	"LEADER h r"		leader_help_reset	"leader help reset"
+bind leader test	"LEADER h n"		leader_help_next	"leader help next"
+bind leader test	"LEADER h p"		leader_help_previous	"leader help previous"
+
 bind leader selection	"LEADER ${A[t]}"	add_selection_to_file	"add selection to file"
 bind leader test	"LEADER LEADER LEADER"	leader_space_test	"test leader + leader + leader"
 
