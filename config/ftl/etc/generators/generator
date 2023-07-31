@@ -8,12 +8,21 @@
 # echo 0 >"$1/generator_time"
 # { echo -n "s: " ; date +%c ; } >>"$1/generator_time_all"
 
-for g in $(fd . $FTL_CFG/etc/generators/ -t f -d 1 -E generator -E generator_one)
-	do 
+[[ "$(shopt -s nullglob dotglob; echo *)" ]] || exit 0
+
+ext_regexp='å'
+
+for g in $FTL_CFG/etc/generators/*
+	do
 		ext=$(basename $g)
+		[[ "$ext" == generator || "$ext" == generator_one || "$ext" == montage || "$ext" == 'svg_to_pdf' ]] && continue
+
 		mkdir -p "$1/$ext"
-		fd "\.$ext$" -t f -d 1 --exec "$g" "$PWD/"{/} "$1/$ext" >/dev/null
+		ext_regexp+="|$ext"
 	done
+
+find * -maxdepth 0 -type f | grep -P "($ext_regexp)$" | parallel --plus "$FTL_CFG/etc/generators/{/.*\\./}" "'$PWD/{/}'" "'$1/{/.*\\./}'" &>/dev/null
+
 
 # date +%s%N >"$1/generator_time"
 # { echo -n "e: " ; date +%c ; } >>"$1/generator_time_all"

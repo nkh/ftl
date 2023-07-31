@@ -88,8 +88,8 @@ pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtype' ; echo -n 'file type: '; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
-pcbr()      { pw3image "$($pgen/cbr "$n" "$thumbs/cbr")" ; }
-pcbz()      { pw3image "$($pgen/cbz "$n" "$thumbs/cbz")" ; }
+pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
+pcbz()      { t="$($pgen/cbz "$n" "$thumbs/cbz" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 
 pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || pdir_rmd || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
@@ -106,7 +106,7 @@ psvg()      { pw3image "$($pgen/svg "$n" "$thumbs/svg")" ; }
 pgif()      { pw3image "$($pgen/gif "$n" "$thumbs/gif")" ; }
 
 pmp3()      { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "$PAGER_ANSI ${t@Q} ; read -sn1" ; } ; }
-pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; [[ -f "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
+pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
 pmlive()    { ((extmode)) && { player_k ; t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "cat ${t@Q} ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
 pmd()       { md="${1:-$n}" ; ((extmode)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" ;  }
