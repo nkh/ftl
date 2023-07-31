@@ -1,8 +1,10 @@
 source "$FTL_CFG/etc/core/keyboard"
 source "$FTL_CFG/etc/core/commands"
 
-try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && eval "$(error_cmds)" || tmux popup -w 80% "$(error_cmds)" ; } ; }
-error_cmds(){ echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors_log && rm $fs/log" ; }
+try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && $(try_error) || try_errorp ; } ; }
+try_error() { echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors_log && rm $fs/log" ; }
+try_errorp(){ pdhn  "$(cat $fs/log)" ; tmux popup -w 80% "$(try_error)" ; }
+
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
 pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; } ; }
 select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
@@ -48,11 +50,11 @@ geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
 header()    { h="${@:2}$(sort_glyph)$s_reversed$(tags_head)$(tsc_head) " ; header_pos "$h" ; echo -e "\e[H\e[K\e[${1:-94}m${PWD:hpl} \e[${1:-95}m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 hist_save() { ((!gpreview)) && { [[ "$n" ]] && echo "$n" | tee -a $fs/history >> $ghist ; } ; }
-inotify_s() { inotify_ & : ; ino1=$! ; ino2=$(ps --ppid $! | grep inotifywait | awk '{print $1}') ; }
+inotify_s() { inotify_k ; inotify_ & : ; ino1=$! ; ino_processes=($ino1 $(pchild $ino1 0)) ; pdhn "\n$(declare -p ino_processes)\n$(pstree -lap $ino1)" ; }
 inotify_()  { inotify_w | { read a b f ; [[ "$f" ]] && tmux send -t "$my_pane" ${C[refresh_pane]} 2>&- ; } ; }
 inotify_w() { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete -e move -e modify "$PWD/" 2>&- ; }
-inotify_k() { [[ $ino1 ]] && { kill $ino1 $ino2 2>&- ; ino1= ; ino2= ; } ; }
-is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$?  ; }
+inotify_k() { [[ $ino1 ]] && { for p in "${ino_processes[@]}" ; do disown $p 2>&- ; kill $p 2>&- ; done ; ino1= ; } ; }
+is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$? ; }
 kbdf()      { while read -t 0.01 ; do : ; done ; }
 k_bindings(){ ((pop_kbindings)) && k_bpop || k_bfull ; list ; }
 k_bfull()   { tcpreview ; exec 2>&9 ; k_bgen | fzf ; exec 2>"$fs/log" ; true ; }

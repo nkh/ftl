@@ -1,0 +1,12 @@
+#!/bin/bash
+
+pchild()
+{
+for c in $(find /proc/$1/task | rg '/children' | xargs cat | tr ' ' '\n')
+	do 
+		echo -n "$c " ; (($2)) && { cat /proc/$c/cmdline | tr '\0' ' ' ; } ; echo ; pchild $c $2
+	done
+}
+
+pchild $1 ${2:-1}
+
