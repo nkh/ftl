@@ -56,7 +56,7 @@ create_bulk()		{ B=$fs/BULK ; >$B ; $EDITOR $B && [[ -s $B ]] && { grep '/$' "$B
 create_bulk_files()	{ grep -v '/$' "$1" | tr '\n' '\0' | xargs -r -0 dirname -z | xargs -0 mkdir -p ; grep -v '/$' "$1" | grep -v '^$' | tr '\n' '\0' | xargs -r -0 touch ; }
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }
-delete_selection()	{ PC= PT= ; tag_check && { PC="|c" ; PT="*tags* " ; } ; prompt "delete $PT[y|d|N$PC] ? " -n1 && delete "$PT" ; REPLY= ; cdir ; }
+delete_selection()	{ (($nfiles)) && { PC= PT= ; tag_check && { PC="|c" ; PT="*tags* " ; } ; prompt "delete $PT[y|d|N$PC] ? " -n1 && delete "$PT" ; REPLY= ; cdir ; } ; }
 depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && { max_depth[tab]=$REPLY && cdir '' "$f" ; } || list ; }
 editor_detach()		{ ((in_viprev)) && in_viprev= && pane_id= && cdir ; }
 external_mode1()	{ emode=1 ; preview ; }
