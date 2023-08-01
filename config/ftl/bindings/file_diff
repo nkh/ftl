@@ -1,5 +1,26 @@
-file_diff() { (( ${#selection[@]} == 2 )) && { tcpreview ; $FILE_DIFF "${selection[@]}" ; } ; }
+file_diff()
+{
+(( ${#selection[@]} == 2 )) && 
+	{
+	local files=0 directories=0
+	
+	for entry in ${selection[@]}
+		do
+			[[ -f "$entry" ]] && ((files++))
+			[[ -d "$entry" ]] && ((directories++))
+		done
+	
+	((files == 2)) && { tcpreview ; $FILE_DIFF "${selection[@]}" ; }
+	((directories == 2)) &&
+		{
+		tcpreview
+		exec 2>&9
+		tdiff "${selection[@]}"
+		exec 2>"$fs/log"
+		}
+	}
+}
 
-bind leader_ftl extra	"LEADER f d"	file_diff		"diff two selected files"
+bind leader_ftl extra	"LEADER f d"	file_diff	"diff two selected files or directories"
 
 # vim: set filetype=bash :

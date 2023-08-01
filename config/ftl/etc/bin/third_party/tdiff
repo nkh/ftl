@@ -1,0 +1,41 @@
+#!/bin/bash
+
+: ${1:?need two director to diff} ; : ${2:?need two director to diff}
+
+spinner()
+{
+watched_pid=$1 i=1 sp='▖▘▝▗'
+
+reset_cursor() { tput cnorm ; }
+trap reset_cursor EXIT
+
+tput civis
+
+while [ -d /proc/$watched_pid ]
+	do
+		printf "\b${sp:i++%${#sp}:1}"
+		sleep .1
+	done
+
+printf "\b \b" ; tput cnorm
+}
+
+diff_file=$(mktemp -p /tmp/$USER/ diff_synch_XXXXXXXX)
+
+[[ "$1" == -p ]] && { shift ; echo_paths=1 ; }
+d1=$1 d2=$2
+
+diff -r -q "$d1" "$d2" >$diff_file & : ; spinner $! >&2
+
+[[ "$1" == -p ]] && { d1="$2" d2="$3" ; echo -e "$d1\n$d2" ; } || { d1="$1" d2="$2" ; }
+
+(($echo_paths)) && echo -e "$d1\n$d2"
+
+cat $diff_file |
+	sed -e 's/Only in //' -e 's~/: ~/~' -e 's~: ~/~' -e 's/ and /<diff>/' -e 's/ differ$//' | 
+	sort | 
+	sed -e 's/^Files /<diff>/' |
+	piper  '<diff>' yellow "$d1" cyan '<diff>' yellow "$d2" magenta | lscolors |
+	fzf -m --ansi --header "$CYAN$d1 $RESET<> $MAGENTA$d2" --header-first 
+
+# vim: set ft=bash:

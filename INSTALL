@@ -21,6 +21,7 @@ sudo apt install -y 	ack \
 			libdata-treedumper-perl \
 			cpanminus \
 			curl \
+			diffutils \
 			exiftool \
 			expect \
 			fd-find \

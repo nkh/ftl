@@ -4,17 +4,17 @@ declare -g -A keep PWDS
 	{
 	exec 2>&9
 	OIFS=$IFS ; IFS=$'\n'
-
+	
 	for file in $(frf 1 "-tmux -p 80%" ctrl-t)
 		do 
 			keep["$tab-$PWD/$file"]=1
 			PWDS[$tab-$PWD]=1
 			ftag="~"
 		done
-
+	
 	IFS=$OIFS
 	exec 2>"$fs/log"
-
+	
 	declare -p keep PWDS >"$pfs/by_regexp"
 	}
 
