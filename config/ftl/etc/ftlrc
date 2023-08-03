@@ -297,6 +297,7 @@ bind ftl selection	yiE		selection_ext_all_fzf	"fzf select files ext, with subdir
 bind ftl selection	Y		selection_flip_down	"select down"
 bind ftl selection	"COUNT Y"	selection_flip_down	"select down"
 bind ftl selection	yy		selection_flip_down	"select down"
+bind ftl selection	"LEADER LEADER"	selection_flip_down	"select down"
 bind ftl selection	"COUNT yy"	selection_flip_down	"select down"
 bind ftl selection	yu		selection_flip_up	"select up"
 bind ftl selection	"COUNT yu"	selection_flip_up	"select up"

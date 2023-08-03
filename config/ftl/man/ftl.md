@@ -700,6 +700,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         Multiple selection classes are available, *ftl* will ask which class
         to use. The number of entries is displayed in the header.
 
+        <LEADER LEADER>    Select current entry in "normal" class and move down
+
         <[COUNT] yy>       Select current entry in "normal" class and move down
 
         <[COUNT] Y>        Select current entry in "normal" class and move down
@@ -896,6 +898,8 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         <LEADER g f>       git, fzf go to changed files       
 
         <LEADER g d>       git diff                       
+
+        <LEADER g D>       git diff2                      
 
         <LEADER g a>       git add selection              
 

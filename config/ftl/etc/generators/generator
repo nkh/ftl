@@ -17,9 +17,10 @@ for g in $FTL_CFG/etc/generators/*
 		ext=$(basename "$g")
 		[[ "$ext" == generator || "$ext" == generator_one || "$ext" == montage || "$ext" == 'svg_to_pdf' ]] && continue
 		
-		mkdir -p "$1/$ext"
 		ext_regexp+="|$ext"
 	done
+
+# dir_hash=$(md5sum <<<"$PWD" | cut -d' ' -f1)
 
 find * -maxdepth 0 -type f | grep -P "($ext_regexp)$" | parallel --plus "$FTL_CFG/etc/generators/{/.*\\./}" "\"$PWD/{/}\"" "\"$1/{/.*\\./}\"" &>/dev/null
 
