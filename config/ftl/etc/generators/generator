@@ -14,15 +14,14 @@ ext_regexp='å'
 
 for g in $FTL_CFG/etc/generators/*
 	do
-		ext=$(basename $g)
+		ext=$(basename "$g")
 		[[ "$ext" == generator || "$ext" == generator_one || "$ext" == montage || "$ext" == 'svg_to_pdf' ]] && continue
-
+		
 		mkdir -p "$1/$ext"
 		ext_regexp+="|$ext"
 	done
 
-find * -maxdepth 0 -type f | grep -P "($ext_regexp)$" | parallel --plus "$FTL_CFG/etc/generators/{/.*\\./}" "'$PWD/{/}'" "'$1/{/.*\\./}'" &>/dev/null
-
+find * -maxdepth 0 -type f | grep -P "($ext_regexp)$" | parallel --plus "$FTL_CFG/etc/generators/{/.*\\./}" "\"$PWD/{/}\"" "\"$1/{/.*\\./}\"" &>/dev/null
 
 # date +%s%N >"$1/generator_time"
 # { echo -n "e: " ; date +%c ; } >>"$1/generator_time_all"
