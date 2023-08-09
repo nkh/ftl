@@ -22,6 +22,7 @@ sudo apt install -y 	ack \
 			cpanminus \
 			curl \
 			diffutils \
+			exa \
 			exiftool \
 			expect \
 			fd-find \

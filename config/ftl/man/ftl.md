@@ -897,9 +897,9 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <LEADER g f>       git, fzf go to changed files       
 
-        <LEADER g d>       git diff                       
+        <LEADER g d>       git diff | less
 
-        <LEADER g D>       git diff2                      
+        <LEADER g D>       git diff in fgd, go to files                      
 
         <LEADER g a>       git add selection              
 

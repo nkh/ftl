@@ -83,7 +83,6 @@ ext_text()  { tcpreview ; tsplit "$EDITOR -t ${selection[@]@Q}" "33%" '-h -b' -R
 ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
 ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
 
-
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtype' ; echo -n 'file type: '; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
@@ -91,12 +90,16 @@ ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtyp
 pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 pcbz()      { t="$($pgen/cbz "$n" "$thumbs/cbz" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 
-pdir()      { ((extmode == 1)) && pdir_du || { ((extmode == 2)) && pdir_ls ; } || { [[ "$montage" ]] && pdir_image ; } || pdir_rmd || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_dir ; } ; }
+pdir()      { pdirv=(pdir_def pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; [[ "${pdirv[$extmode]}" ]] && ${pdirv[$extmode]} || pdir_def ; }
+
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 10" ; true ; }
+pdir_rmd()  { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; true ; }
+pdir_exa()  { psplit "EXA_COLORS='$EXA_COLORS' exa $EXA_OPTIONS | $PAGER" ; true ; }
+
+pdir_def()  { [[ "$montage" ]] && pdir_image || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_ftl ; } ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
-pdir_rmd()  { ((extmode == 3)) && { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; } ; }
-pdir_dir()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
+pdir_ftl()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 
 ppipe()     { psplit "echo \"fifo (named pipe)\"; read -sn 100" ; }
 

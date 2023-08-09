@@ -137,6 +137,7 @@ preview_lock()		{ p="$FTL_CFG/etc/core/lib/lock_preview" ; file=$(cd $p ; fd | f
 preview_m1()		{ extmode=1 ; list ; }
 preview_m2()		{ extmode=2 ; list ; }
 preview_m3()		{ extmode=3 ; list ; }
+preview_m4()		{ extmode=4 ; list ; }
 preview_queue()		{ [[ $e =~ $mfilter ]] && { ($Q_PLAYER "${selection[@]}" & ) ; tags_clear ; list ; } ; }
 preview_show()		{ [[ $e =~ $mfilter ]] && { source $B_PLAYER "${selection[@]}" ; list ; } ; }
 preview_show_fzf()	{ p="$FTL_CFG/viewers" ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && source $p/$viewer ; list ; }

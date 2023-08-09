@@ -107,6 +107,9 @@ MIMETYPE=mimemagic			# mimetype generator
 NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 JSON_VIEWER=jless
 
+EXA_COLORS="ur=1;34:uw=1;34:ux=1;34:gr=1;34:gw=1;34:gx=1;34:tr=1;34:tw=1;34:tx=1;34:sn=1;30:sb=1;30:uu=1;30:da=1;30:hd=1;30"
+EXA_OPTIONS="-l --tree -L 3 --header --color=always"
+
 # Deletion command
 RM="rm -rf"
 
@@ -339,6 +342,7 @@ bind ftl view		zv		preview_pane		"preview show/hide"
 bind ftl view		z1		preview_m1		"alternative preview mode 1"
 bind ftl view		z2		preview_m2		"alternative preview mode 2"
 bind ftl view		z3		preview_m3		"alternative preview mode 3"
+bind ftl view		z4		preview_m4		"alternative preview mode 4"
 bind ftl view		"z STAR"	depth			"maximum listing depth"
 bind ftl view		zt		etag_show		"show/hide etags"
 bind ftl view		zT		etag_select		"select etag type"
