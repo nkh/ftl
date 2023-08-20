@@ -64,6 +64,7 @@ tmsu_tag_scim()
 tcpreview
 # ctsplit "$FTL_CFG/etc/bin/scim_tmsu" ; tmux selectp -t $pane_id 
 exec 2>&9 ; "$FTL_CFG/etc/bin/scim_tmsu" "${selection[@]}" ; exec 2>"$fs/log"
+alt_screen
 }
 
 tmsu_mount()

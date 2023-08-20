@@ -17,6 +17,7 @@ file_diff()
 		exec 2>&9
 		tdiff "${selection[@]}"
 		exec 2>"$fs/log"
+		alt_screen
 		}
 	}
 }

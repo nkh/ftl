@@ -14,7 +14,7 @@ open_with()
 	{
 	{ IFS= read m ; IFS= read p ; } < <(echo "$players" | fzf-tmux -0 -1 -p 80% -m --expect=ctrl-t --info=inline | cut -f 2-)
 
-	[[ "$p" ]] && { tcpreview ; [[ $m ]] && { ($p "$n" &) ; sleep 0.4 ; } || { exec 2>&9 ; run_maxed $p "$n" ; exec 2>"$fs/log" ; header "$head" ; } ; }
+	[[ "$p" ]] && { tcpreview ; [[ $m ]] && { ($p "$n" &) ; sleep 0.4 ; } || { exec 2>&9 ; run_maxed $p "$n" ; exec 2>"$fs/log" ; alt_screen ; header "$head" ; } ; }
 	} ||
 	{
 	tmux split-window -l 50% "mimeopen - '$n'"

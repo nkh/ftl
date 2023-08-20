@@ -25,7 +25,7 @@ numfmt()
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2023, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup
-echo -en '\e[?1049h' ; stty -echo
+alt_screen
 
 [[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
 [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }

@@ -2,9 +2,9 @@ source "$FTL_CFG/etc/core/keyboard"
 source "$FTL_CFG/etc/core/commands"
 
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && $(try_error) || try_errorp ; } ; }
+alt_screen(){ echo -en '\e[?1049h' ; stty -echo ; tput civis ; }
 try_error() { echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors_log && rm $fs/log" ; }
 try_errorp(){ pdhn  "$(cat $fs/log)" ; tmux popup -w 80% "$(try_error)" ; }
-
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
 pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; } ; }
 select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
@@ -27,7 +27,7 @@ dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m%4s\e[m" "${
 dir_esize() { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
 dir_dusize(){ reset="$(printf '\e[0m')" ; declare -Ag du_size ; while IFS=$'\t' read color size file ; do du_size[$PWD/$file]="$color$size$reset" ; done < <(get_dusize) ; }
 get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(.*?)\e\[0m\t.\/(.*)/ ; printf "$c\t%4s\t$f\n", $s' ; }
-edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; echo -en '\e[?1049h\e[?25h' ; emode=0 ; cdir ; }
+edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; alt_screen ; emode=0 ; cdir ; }
 files()     { { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1 -printf '%s\t%T@\t%P\n' 2>&- ; virt_inj $3 ; } | ftl_filter | $2 ; }
 virt_inj()  { [[ $1 == vf ]] && files_virt ; [[ $1 == vd ]] && dirs_virt ; }
 files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t$vf\n" ; done ; }
@@ -56,8 +56,8 @@ inotify_w() { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete 
 inotify_k() { [[ $ino1 ]] && { for p in "${ino_processes[@]}" ; do disown $p 2>&- ; kill $p 2>&- ; done ; ino1= ; } ; }
 is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$? ; }
 kbdf()      { while read -t 0.01 ; do : ; done ; }
-k_bindings(){ ((pop_kbindings)) && k_bpop || k_bfull ; list ; }
-k_bfull()   { tcpreview ; exec 2>&9 ; k_bgen | fzf ; exec 2>"$fs/log" ; true ; }
+k_bindings(){ ((pop_kbindings)) && k_bpop || k_bfull ; alt_screen ; list ; }
+k_bfull()   { tcpreview ; exec 2>&9 ; k_bgen | fzf ; exec 2>"$fs/log" ; alt_screen ; true ; }
 k_bpop()    { k_bgen | fzf-tmux $fzf_opt ; true ; }
 k_bgen()    { printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "____map____,____section____, ____key____,____command____,____does____" -s $'\t' -c $CMD_COLS ; }
 mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
@@ -94,7 +94,7 @@ cdfl()      { true 2>&- >&3 && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3
 quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 rdir()      { get_dir "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=${2:-1} ; list ; qd=0 ; }
 refresh()   { echo -ne "\e[?25l$1" ; } 
-run_bash()  { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; echo -en '\e[?1049h' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
+run_bash()  { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; alt_screen ; exec 2>"$fs/log" ; }
 run_maxed() { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; "$@" 2>/dev/null ;  wmctrl -ia $aw ; true ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
 shell_pane(){ tcpreview ; P=$pane_id ; tsplit bash $shell_h -v -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }

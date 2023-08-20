@@ -8,7 +8,7 @@ hexview()		{ ctsplit "$HEXVIEW ${n@Q} ; read -sn 100" ; }
 hexedit()		{ ctsplit "$HEXEDIT ${n@Q}" ; }
 vim_edit()		{ tcpreview ; $EDITOR "${selection[@]}" ; }
 vim_edit_window()	{ tmux new-window "$EDITOR ${selection[@]@Q}" ; }
-ftl_help()		{ ((help_pop)) && { tmux popup -h90% -w90% -E "$help_command" ; } || { tcpreview ; exec 2>&9 ; $help_command ; exec 2>"$fs/log" ; } ; cdir ; }
+ftl_help()		{ ((help_pop)) && { tmux popup -h90% -w90% -E "$help_command" ; } || { tcpreview ; exec 2>&9 ; $help_command ; exec 2>"$fs/log" ; alt_screen ; } ; cdir ; }
 move_left()		{ [[ "$PWD" != / ]] && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
 move_down()		{ ((nfiles)) && { move 1 && list ; } ; }
@@ -45,7 +45,7 @@ change_dir()		{ prompt 'cd: ' ; [[ -n $REPLY ]] && cdir "${REPLY/\~/$HOME}" || l
 chmod_ar()		{ for i in "${selection[@]}" ; do [[ -r "$i" ]] && mode=a-r || mode=a+r ; chmod $mode "$i" ; done ; cdir ; }
 chmod_aw()		{ for i in "${selection[@]}" ; do [[ -w "$i" ]] && mode=a-w || mode=a+w ; chmod $mode "$i" ; done ; cdir ; }
 chmod_ax()		{ for i in "${selection[@]}" ; do [[ -x "$i" ]] && mode=a-x || mode=a+x ; chmod $mode "$i" ; done ; cdir ; }
-chmod_dialog()		{ tcpreview ; exec 2>&9 ; "$FTL_CFG/etc/bin/scim_permission" "${selection[@]}" ; exec 2>"$fs/log" ; }
+chmod_dialog()		{ tcpreview ; exec 2>&9 ; "$FTL_CFG/etc/bin/scim_permission" "${selection[@]}" ; exec 2>"$fs/log" ; alt_screen ; }
 clear_filters()		{ filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; ntfilter[tab]= ; filter_rst ; ftag= ; cdir ; }
 command_prompt()	{ gcn ; echo -ne "\e[H" ; tput cnorm ; stty echo ; C="$(cmd_prompt)" ; stty -echo ; tput civis ; [[ "$C" ]] && header '' "$head" && shell_command "$C" ; list ; }
 gcn()			{ { find "$FTL_CFG/commands" -type f -printf "%f\n" ; printf "%s\n" "${!C[@]}" fsh finfo show_cmd_log ; } >$fs/command_names ; }
@@ -81,7 +81,7 @@ gmark()			{ { cat $ftl_root/marks 2>&- ; [[ -d "$n" ]] && echo "$n/\$" || echo "
 gmark_fzf_user()	{ : ; }
 gmark_fzf()		{ [[ -e $ftl_root/marks ]] && go_loop f fzf "$({ cat $ftl_root/marks ; gmark_fzf_user ; } | lscolors | fzf-tmux $fzf_opt --cycle -m --expect=ctrl-t --ansi)" ; }
 gmarks_clear()		{ prompt 'clear persistent marks? [y|N]' -sn1 && [[ $REPLY == y ]] && :>$ftl_root/marks ; list ; }
-open_rg()		{ exec 2>&9 ; tcpreview ; rg_entry="$(fzfr fzf+m)" ; exec 2>"$fs/log" ; [[ "$rg_entry" ]] && $EDITOR $(<<<"$rg_entry" awk -F: '{printf "%s +%s", $1, $2}'); }
+open_rg()		{ exec 2>&9 ; tcpreview ; rg_e="$(fzfr fzf+m)" ; exec 2>"$fs/log" ; alt_screen ; [[ "$rg_e" ]] && $EDITOR $(<<<"$rg_e" awk -F: '{printf "%s +%s", $1, $2}'); }
 go_rg()			{ exec 2>&9 ; tcpreview ; go_loop rg "$(fzfr "fzf--expect=ctrl-t")" ; exec 2>"$fs/log" ; }
 go_rg_one_match()	{ exec 2>&9 ; tcpreview ; go_loop rg "$(frf 1000 '' ctrl-t frg)" ; exec 2>"$fs/log" ; }
 history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }

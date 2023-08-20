@@ -9,7 +9,7 @@ git_root="$(git rev-parse --show-toplevel)"
 go_loop f fzf "$(cd "$git_root" ; git-color-status -u | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi | sed 's#...#'$git_root'/#')"
 }
 
-git_diff() { tcpreview ; exec 2>&9 ; picked=$(fgd) ; [[ "$picked" ]] && { pdir=$(dirname $picked) ; pfile=$(basename $picked) ; } ; exec 2>"$fs/log" ; cdir $pdir $pfile ; }
+git_diff() { tcpreview ; exec 2>&9 ; picked=$(fgd) ; [[ "$picked" ]] && { pdir=$(dirname $picked) ; pfile=$(basename $picked) ; } ; exec 2>"$fs/log" ; alt_screen ; cdir $pdir $pfile ; }
 git_diff2() { tcpreview ; git diff --color=always "$n" | diff-so-fancy | moar --no-statusbar --no-linenumbers ; cdir ; }
 
 git_fga() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "bash -ic fga" ; cdir ; }

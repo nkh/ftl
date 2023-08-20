@@ -24,6 +24,7 @@ declare -g -A keep=() PWDS=()
 		done  
 	
 	exec 2>"$fs/log"
+	alt_screen
 
 	declare -p keep PWDS >"$pfs/by_tag"
 	}

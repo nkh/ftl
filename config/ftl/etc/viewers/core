@@ -81,7 +81,7 @@ ext_pdf()   { ((emode == 1)) && { ((pdf_prev_image)) && run_maxed mupdf "$n" || 
 ext_pdf_vi(){ edit "$($pgen/pdf "$n" $thumbs/pdf 1)" ; }
 ext_text()  { tcpreview ; tsplit "$EDITOR -t ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
 ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
-ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ;  }
+ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ; alt_screen ; }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }

@@ -1,5 +1,20 @@
 # Current
 
+shortcut to start f in the current pane
+	always in cd mode
+
+tar files and directories
+
+
+git 
+	show if file is under git
+		add to .gitignore
+
+	filter only file not under git control
+
+given a list of files
+	show only those files
+
 issue: pchild when files are changed in tdiff
 
 issue: pane splitting
