@@ -114,7 +114,7 @@ pmlive()    { ((extmode)) && { player_k ; t="$($pgen/$e "$n" "$thumbs/$e")" ; ps
 
 pmd()       { md="${1:-$n}" ; ((extmode)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" ;  }
 ptext()     { vipreview "$n" ; }
-pansi()     { ((!extmode)) && psplit "$MD_PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $MD_PAGER " ; } ; }
+pansi()     { ((!extmode)) && psplit "$PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $PAGER " ; } ; }
 
 pjson()     { psplit "$JSON_VIEWER \"$n\"" ; }
 

@@ -1,9 +1,5 @@
 # Current
 
-issue: open vim  with noswap
-
-issue: size for hexdump based on full preview size
-
 issue: pchild when files are changed in tdiff
 
 issue: pane splitting
