@@ -72,7 +72,7 @@ pane_next() { pane_read ; pf=0 ; tp=("${panes[@]}" $main_pane "${panes[@]}") ; f
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 pane_send() { pane_read && for p in "${panes[@]}" ; do tmux send -t $p "$1" &>/dev/null ; done ; }
 path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
-path_full() { FP="${1/\.\//$PWD\/}" ; FP="${FP%/}" ; echo "$FP" ; }
+path_full() { FP="${1/^\.\//$PWD\/}" ; FP="${FP%/}" ; echo "$FP" ; }
 path_none() { n= ; p= ; f= ; b= ; e= ; }
 pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
 pdhn()      { pdh "$*\n" ; }
@@ -141,8 +141,9 @@ tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "$
 _tab_new()  { [[ "$1" == '.' ]] && dir= || dir="$1" ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; tab_setup ; }
 _tab_next() { ((tab++)) ; I=(${!tabs[@]}) ; for i in "${I[@]:$tab}" "${I[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
 _tab_prev() { I=(${!tabs[@]}) ; RI=($(echo "${I[@]}" "${I[@]:0:tab}" | rev | tr ' ' '\n')) ; for i in "${RI[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
-tab_read()  { tabs=() ; ntabs=0 ; while read P ; do P="$(path_full "$P")" ; [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; }
-_tab_read() { _tab_new "$1" ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && dir_file[${tab}_$1]=$index ; ((index++)) ; done ; }
+tab_read()  { tabs=() ; ntabs=0 ; while read -r P ; do P="$(path_full "$P")" ; [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; }
+_tab_read() { _tab_new "$1" ; [[ -d "$1" ]] && { findex="$(_tab_index "$@")" ;  [[ "$findex" ]] && dir_file[${tab}_$1]=$index ; } ; true ; }
+_tab_index() { findex= ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && findex=$index ; ((index++)) ; done ; echo $findex ; }
 tab_setup() { pdir_only[tab]= ; max_depth[tab]=1 ; vmode[tab]=0 ; lmode[tab]=0 ; filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }

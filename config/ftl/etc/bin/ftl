@@ -25,12 +25,14 @@ numfmt()
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2023, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup
-alt_screen
 
 [[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
 [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
+
+alt_screen
+
 [[ "$2" ]] && { fs=$2/$$ ; pfs=$2 ; mkdir -p $fs ; touch $fs/history ; } || { fs=$ftl_root/$$ ; pfs=$fs ; main=1 ; mkdir -p $fs/prev ; echo $my_pane >$fs/pane ; }
 fsp=$pfs/prev ; PPWD="$dir" 
 
