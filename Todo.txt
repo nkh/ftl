@@ -1,19 +1,33 @@
 # Current
 
-shortcut to start f in the current pane
+functionality: copy/move to other pane
+	Pm Pc PP
+	if only one pane just copy/move
+
+	more than one pane let user chose pane base on panes' directory
+
+	no pane, move -> use fzf_mv
+
+	no pane, copy -> create pane
+
+
+functionality: shortcut to start f in the current pane
 	always in cd mode
 
-tar files and directories
+functionality: command tar files and directories
 
+functionality: show nuber of lines for non binary file
 
-git 
-	show if file is under git
-		add to .gitignore
+functionality: git 
+		show if file is under git
+			add to .gitignore
 
-	filter only file not under git control
+		filter only file not under git control
 
-given a list of files
-	show only those files
+functionality: given a list of files
+		show only those files
+
+functionality: copy directory to, w shortcut doesn't do that and says nothing  when used on directory
 
 issue: pchild when files are changed in tdiff
 

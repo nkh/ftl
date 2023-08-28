@@ -827,7 +827,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <pm>               Move selection    
 
-        <P>                Move selection to, Uses _fzf_mv_.
+        <PP>               Move selection to, Uses _fzf_mv_.
 
         <R>                Rename selection
 
