@@ -1,5 +1,13 @@
 # Current
 
+functionality: README mode for directories
+	show readme instead for directory contents
+	is there a way to show some directory contents too?
+
+issue: html preview shows blank page
+
+issue: select via fzf doesn't display selection glyph
+
 functionality: copy/move to other pane
 	Pm Pc PP
 	if only one pane just copy/move
@@ -11,12 +19,10 @@ functionality: copy/move to other pane
 	no pane, copy -> create pane
 
 
-functionality: shortcut to start f in the current pane
+functionality: shortcut to start ftl in the current pane
 	always in cd mode
 
 functionality: command tar files and directories
-
-functionality: show nuber of lines for non binary file
 
 functionality: git 
 		show if file is under git
@@ -28,8 +34,6 @@ functionality: given a list of files
 		show only those files
 
 functionality: copy directory to, w shortcut doesn't do that and says nothing  when used on directory
-
-issue: pchild when files are changed in tdiff
 
 issue: pane splitting
 	what do we want?

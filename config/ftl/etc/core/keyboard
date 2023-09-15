@@ -117,6 +117,8 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\e['21~                       ) REPLY=F10 ;;
 	$'\e['23~                       ) REPLY=F11 ;;
 	$'\e['24~                       ) REPLY=F12 ;;
+	# more F keys
+	# https://aperiodic.net/phil/archives/Geekery/term-function-keys/
 
 	$'\001'                         ) REPLY=CTL-A ;;
 	$'\002'                         ) REPLY=CTL-B ;;

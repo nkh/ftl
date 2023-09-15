@@ -1,0 +1,15 @@
+etag_dir()
+{
+declare -g -A ext_lines=()
+
+while read ext_file_lines ext_file ; do
+	
+	[[ "$ext_file_lines" == 0 ]] && ext_file_lines=
+	[[ "$ext_file" ]] && ext_lines[$ext_file]="$(printf "\e[2;37m%5s \e[m" "$ext_file_lines")"
+	
+done < <(find "$PWD/" -mindepth 1 -maxdepth 1 -type f,l -printf '%P\n' | xargs grep -I -H -l . 2>&- | xargs wc -l)
+}
+
+etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; r2="${ext_lines[$1]}" ; [[ "$r2" ]] || r2='      ' ; r3=6 ; }
+
+# vim: set filetype=sh :

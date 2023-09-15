@@ -15,7 +15,7 @@ file_diff()
 		{
 		tcpreview
 		exec 2>&9
-		tdiff "${selection[@]}"
+		TDD=pdiff tdiff "${selection[@]}"
 		exec 2>"$fs/log"
 		alt_screen
 		}
