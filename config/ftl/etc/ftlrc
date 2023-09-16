@@ -28,6 +28,8 @@ shell_v=60%				# vertical shell pane width
 auto_selection=1			# automatically synch tags between panes
 time_event=0				# set to positive integer to trigger time events
 pdhl=					# log pdh message in file too
+dirmode=0				# default directory mode
+extmode=0				# default preview mode
 : ${prev_all:=1}			# open preview window
 zooms=(85 70 50 30)			# sizes of preview pane in percent
 zoom=1					# start zoom level
@@ -328,8 +330,6 @@ bind ftl view		zmm		view_mode_next		"view mode: not image/image/all"
 bind ftl view		zmp		view_mode_pdf		"show pdf preview as text or image"
 bind ftl view		zmI		preview_image		"show/hide image preview"
 bind ftl view		zmD		preview_dir_only	"preview directory only"
-bind ftl view		zp		montage_preview		"montage mode"
-bind ftl view		zP		preview_refresh		"refresh file preview/montage"
 bind ftl view		zz		image_zoom		"zoom image preview"
 bind ftl view		z+		preview_size		"change preview size"
 bind ftl view		+		preview_size		"change preview size"
@@ -339,10 +339,6 @@ bind ftl view		zS		hide_size		"hide size"
 bind ftl view		zo		sort_entries		"sort type"
 bind ftl view		zO		sort_entries_reversed	"sort reversed"
 bind ftl view		zv		preview_pane		"preview show/hide"
-bind ftl view		z1		preview_m1		"alternative preview mode 1"
-bind ftl view		z2		preview_m2		"alternative preview mode 2"
-bind ftl view		z3		preview_m3		"alternative preview mode 3"
-bind ftl view		z4		preview_m4		"alternative preview mode 4"
 bind ftl view		"z STAR"	depth			"maximum listing depth"
 bind ftl view		zt		etag_show		"show/hide etags"
 bind ftl view		zT		etag_select		"select etag type"
@@ -354,6 +350,17 @@ bind ftl view		zeO		extension_only		"show only this extension in listing"
 bind ftl view		zec		extension_clear		"enable all extensions"
 bind ftl view		zes		extension_sort		"sort by extensions"
 bind ftl view		z.		show_hidden		"show/hide dot-files"
+bind ftl view		z1		preview_m1		"alternative preview mode 1"
+bind ftl view		z2		preview_m2		"alternative preview mode 2"
+bind ftl view		z3		preview_m3		"alternative preview mode 3"
+bind ftl view		z4		preview_m4		"alternative preview mode 4"
+bind ftl view		Z0		set_directory_mode0	"directory default mode"
+bind ftl view		Z1		set_directory_mode1	"directory du mode"
+bind ftl view		Z2		set_directory_mode2	"directory ls mode"
+bind ftl view		Z3		set_directory_mode3	"directory readme mode"
+bind ftl view		Z4		set_directory_mode4	"directory exa mode"
+bind ftl view		Z5		set_directory_mode5	"directory image mode"
+bind ftl view		zM		preview_refresh		"refresh file preview/montage"
 
 # bind ftl view		not_assigned	preview_tail		"file preview at end"
 # bind ftl view		not_assigned	preview_lock		"preview lock, using external script"

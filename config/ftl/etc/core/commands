@@ -100,8 +100,6 @@ mark()			{ read -sn1 ; [[ -n $REPLY ]] && { [[ -d  "${files[file]}" ]] && marks[
 mark_fzf()		{ go_loop f fzf "$({ gmark_fzf_user ; printf "%s\n" "${marks[@]}" ; } | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)" ; }
 mark_go()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
 mark_go_tab()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
-preview_refresh()	{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&- ; true ; } || { $pgen/generator_one "$thumbs" "$n" "$e" 1 ; } ; pw3image FTL_RESTART_W3M ; list ; }
-montage_preview()	{ [[ "$montage" ]] && montage= || montage="⠶" ; list ; }
 player_kill()		{ player_k ; }
 pane_down()		{ pane_extra "-v" "" ; }
 
@@ -138,6 +136,13 @@ preview_m1()		{ extmode=1 ; list ; }
 preview_m2()		{ extmode=2 ; list ; }
 preview_m3()		{ extmode=3 ; list ; }
 preview_m4()		{ extmode=4 ; list ; }
+set_directory_mode0()	{ dirmode=0 ; list ; }
+set_directory_mode1()	{ dirmode=1 ; list ; }
+set_directory_mode2()	{ dirmode=2 ; list ; }
+set_directory_mode3()	{ dirmode=3 ; list ; }
+set_directory_mode4()	{ dirmode=4 ; list ; }
+set_directory_mode5()	{ dirmode=5 ; list ; }
+preview_refresh()	{ [[ -d "$n" ]] && { rm "$ftl_root/montage/$n/montage.jpg" 2>&- ; true ; } || { $pgen/generator_one "$thumbs" "$n" "$e" 1 ; } ; pw3image FTL_RESTART_W3M ; list ; }
 preview_queue()		{ [[ $e =~ $mfilter ]] && { ($Q_PLAYER "${selection[@]}" & ) ; tags_clear ; list ; } ; }
 preview_show()		{ [[ $e =~ $mfilter ]] && { source $B_PLAYER "${selection[@]}" ; list ; } ; }
 preview_show_fzf()	{ p="$FTL_CFG/viewers" ; viewer=$(cd $p 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline) ; [[ $viewer ]] && source $p/$viewer ; list ; }

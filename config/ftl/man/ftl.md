@@ -390,8 +390,6 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <zt>               Show/hide etags, see "Select etag type" below.
 
-        <zp>               Montage mode, directory preview is a montage of the images.
-
         <zP>               Refresh preview or montage.
 
         <zep>              Show/hide current extension preview.
@@ -542,9 +540,19 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 - markdown
                 ...
 
-        <z1>                  Alternative preview #1 
+        <z1-4>                Alternative preview #1-4
 
-        <z2>                  Alternative preview #2 
+        <Z0>                  Default directory preview mode: ftl
+
+        <Z1>                  Default directory preview mode: du
+
+        <Z2>                  Default directory preview mode: ls
+
+        <Z3>                  Default directory preview mode: README
+
+        <Z4>                  Default directory preview mode: exa
+
+        <Z5>                  Default directory preview mode: montage
 
         not assigned          Preview file's end (text files in vim)
 
@@ -865,7 +873,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <LEADER f P>       Convert pdf to text file       
 
-        <CTL-G>            Display stat in preview pane   
+        <LEADER f g>       Display stat in preview pane   
 
         <LEADER f z>       Encrypt/decrypt using password 
 

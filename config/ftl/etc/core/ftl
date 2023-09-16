@@ -112,6 +112,7 @@ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; e
 		>${1:-$fs}/ftl echo "sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
 					ftag=$ftag		; show_size=$show_size				; prev_cb=\"$prev_cb\"
 					etag=$etag		; etag_s=\"$etag_s\"				; etag_cb=\"$etag_cb\"
+					dirmode=\"$dirmode\"
 					filter_ext=\"$filter_ext\"
 					vmode[tab]=\"${vmode[tab]}\"
 					sort_type[tab]=${sort_type[tab]}

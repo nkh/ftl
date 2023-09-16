@@ -90,14 +90,13 @@ ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtyp
 pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 pcbz()      { t="$($pgen/cbz "$n" "$thumbs/cbz" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 
-pdir()      { pdirv=(pdir_def pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; [[ "${pdirv[$extmode]}" ]] && ${pdirv[$extmode]} || pdir_def ; }
+pdir()      { pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; (( extmode != 0 )) && { [[ "${pdirv[$extmode]}" ]] && ${pdirv[$extmode]} ; } || pdir_def ; }
+pdir_def()  { echo "${ofs:-$fs}" >$fsp/fs ; [[ "${pdirv[$dirmode]}" ]] && ${pdirv[$dirmode]} || pdir_ftl ; }
 
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 10" ; true ; }
-pdir_rmd()  { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; true ; }
-pdir_exa()  { psplit "EXA_COLORS='$EXA_COLORS' exa $EXA_OPTIONS | $PAGER" ; true ; }
-
-pdir_def()  { [[ "$montage" ]] && pdir_image || { echo "${ofs:-$fs}" >$fsp/fs ; pdir_ftl ; } ; }
+pdir_rmd()  { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; }
+pdir_exa()  { psplit "EXA_COLORS='$EXA_COLORS' exa "$n" $EXA_OPTIONS | $PAGER" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
 pdir_ftl()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'Å' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 
