@@ -1,13 +1,5 @@
 # Current
 
-functionality: README mode for directories
-	show readme instead for directory contents
-	is there a way to show some directory contents too?
-
-issue: html preview shows blank page
-
-issue: select via fzf doesn't display selection glyph
-
 functionality: copy/move to other pane
 	Pm Pc PP
 	if only one pane just copy/move

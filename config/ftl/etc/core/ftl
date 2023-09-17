@@ -72,7 +72,7 @@ pane_next() { pane_read ; pf=0 ; tp=("${panes[@]}" $main_pane "${panes[@]}") ; f
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
 pane_send() { pane_read && for p in "${panes[@]}" ; do tmux send -t $p "$1" &>/dev/null ; done ; }
 path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
-path_full() { FP="${1/^\.\//$PWD\/}" ; FP="${FP%/}" ; echo "$FP" ; }
+path_full() { PF="${1/\.\//$PWD\/}" ; PF="${PF%/}" ; echo "$PF" ; }
 path_none() { n= ; p= ; f= ; b= ; e= ; }
 pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
 pdhn()      { pdh "$*\n" ; }
@@ -151,7 +151,7 @@ tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntag
 tags_clear(){ ((stagsi++)) ; tags=() ; tags_size=0 ; true ; }
 tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; }
 tag_flip()  { ((stagsi++)) ; [[ "${tags[$1]}" ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; true ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
-tag_set()   { ((stagsi++)) ; [[ ! ${tags[$1]} ]] && { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
+tag_set()   { ((stagsi++)) ; [[ "${tags[$1]}" ]] || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
 tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$tag" ; ((stagsi++)) ; } ; done ; }
 tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
