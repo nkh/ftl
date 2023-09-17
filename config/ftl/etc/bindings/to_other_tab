@@ -1,0 +1,33 @@
+
+# these command let you copy or move the selection another *tab*'s directory
+# this is more practical than an orthodox 2 panes view because there's IMO
+# little interest to see the other view updated, all we need is the files
+# to be moved or copied
+
+# if there is just one tab, a new tab is created
+#
+# if there are just two tabs, copy/move to the other tab
+#	this lets you quickly select in a tab and send to another one
+#
+# if there are more than two tabs, you can chose which directory in fzf
+#	if you don't chose a directory, a new one is created
+#		the logic is that you want to copy/move but you don't have
+#		a destination
+#
+#		if you wanted to quit in the middle of the copy/move, after
+#		the new tab  is created, close it.
+
+# configuration variable in these commands 
+tag_new_tab= # in default new tab location if no other tab exists
+
+# function you can bind
+tag_copy_to_tab()	{ tag_check && { other_dir="$(other_tab_dir)" && { cp_mv_tags copy "$other_dir" ; cdir '' "$f"; } || tag_new_tab ; } ; }
+tag_move_to_tab()	{ tag_check && { other_dir="$(other_tab_dir)" && { cp_mv_tags move "$other_dir" ; cdir '' "$f"; } || tag_new_tab ; } ; }
+
+# support functions
+tag_new_tab()		{ warn "copy/move to tab:\n\tcreating new tab" ; tab_new "${tag_new_tab:-$HOME}" ; }
+other_tab_dir()		{ (( ntabs > 2)) && { pick_tab_dir ; return $? ; } || pick_other_tab_dir ; }
+pick_tab_dir()		{ ptd="$(printf "%s\n" "${tabs[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --tac --ansi)" && echo $ptd ; }
+pick_other_tab_dir()	{ ctab=$tab ; _tab_next ; other_tab=$tab ; tab=$ctab ; [[ $other_tab != $tab ]] && echo "${tabs[$other_tab]}" ; }
+
+# vim: ft=bash:

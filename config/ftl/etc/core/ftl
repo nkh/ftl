@@ -5,6 +5,7 @@ try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { (
 alt_screen(){ echo -en '\e[?1049h' ; stty -echo ; tput civis ; }
 try_error() { echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors_log && rm $fs/log" ; }
 try_errorp(){ pdhn  "$(cat $fs/log)" ; tmux popup -w 80% "$(try_error)" ; }
+warn()      { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[33m$*'" ; }
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
 pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; } ; }
 select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }

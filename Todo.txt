@@ -1,31 +1,20 @@
 # Current
 
-functionality: copy/move to other pane
-	Pm Pc PP
-	if only one pane just copy/move
+functionality: copy directory to, w shortcut doesn't do that and says nothing  when used on directory
 
-	more than one pane let user chose pane base on panes' directory
+functionality: git 
+	show if file is under git
+	add to .gitignore
 
-	no pane, move -> use fzf_mv
-
-	no pane, copy -> create pane
-
+	filter only file not under git control
 
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 
 functionality: command tar files and directories
 
-functionality: git 
-		show if file is under git
-			add to .gitignore
-
-		filter only file not under git control
-
 functionality: given a list of files
 		show only those files
-
-functionality: copy directory to, w shortcut doesn't do that and says nothing  when used on directory
 
 issue: pane splitting
 	what do we want?

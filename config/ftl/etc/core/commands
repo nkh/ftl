@@ -168,7 +168,7 @@ show_size()		{ ((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((sh
 show_stat()		{ ((show_stat ^= 1)) ; refresh ; list ; }
 sort_entries()		{ ((sort_type[tab] = sort_type[tab] + 1 >= ${#sort_filters[@]} ? 0 : sort_type[tab] + 1)) ; cdir '' "$f" ; }
 sort_entries_reversed()	{ [[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; cdir '' "$f"; }
-tab_new()		{ [[ -d "$f" ]] && _tab_new "$n" || _tab_new "$PWD" ; cdir "${tabs[tab]}" ; }
+tab_new()		{ [[ -d "$f" ]] && _tab_new "$n" || _tab_new "${1:-$PWD}" ; cdir "${tabs[tab]}" ; }
 tab_next()		{ ctab=$tab ; _tab_next ; ((tab != ctab)) && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
 tab_prev()		{ ctab=$tab ; _tab_prev ; ((tab != ctab)) && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
 tab_goto()		{ ((ntab = $COUNT - 1)) ; ((ntab != tab)) && [[ -n "${tabs[ntab]}" ]] && tab=ntab && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
@@ -176,8 +176,8 @@ select_all_directories(){ for p in "${files[@]}" ; do [[ -d "$p" ]] && [[ ! ${ta
 select_all_files()	{ for p in "${files[@]}" ; do [[ -f "$p" ]] && [[ ! ${tags[$p ]} ]] && tags["$p"]='▪' && tags_size + "$p" ; done ; list ; }
 select_all()		{ for p in "${files[@]}" ; do [[ ! ${tags[$p]} ]] && tags["$p"]='▪' &&  tags_size + "$p" ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags copy "$PWD" ; cdir '' "$f"; }
-tag_move_to()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; fzf_mv "${!ltags[@]}" ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
 tag_move()		{ tag_check && cp_mv_tags move "$PWD" ; cdir '' "$f"; }
+tag_move_fzf()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; fzf_mv "${!ltags[@]}" ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
 view_mode_all()		{ no_redraw=$1 ; vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; (($no_redraw)) || cdir '' "$f"; }
 view_mode_image()	{ no_redraw=$1 ; vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; (($no_redraw)) || cdir '' "$f"; }
 view_mode_not_image()	{ no_redraw=$1 ; vmode[tab]=2 ; tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; (($no_redraw)) || cdir '' "$f"; }

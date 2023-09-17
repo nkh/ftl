@@ -831,11 +831,15 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <w>                Copy entry        
 
-        <pp>               Copy selection    
+        <pp>               Copy selection to current directory
 
-        <pm>               Move selection    
+        <pm>               Move selection to current directory
 
-        <PP>               Move selection to, Uses _fzf_mv_.
+        <pop>              Copy selection to other tab
+
+        <pom>              Move selection to other tab
+
+        <pz>               Move selection to preefined directory, Uses _fzf_mv_.
 
         <R>                Rename selection
 
