@@ -6,22 +6,22 @@ user_pviewers() { false ; }
 
 ext_viewers()
 {
-[[ -d "$n" ]]                     && { ext_dir   ; return ; }
-[[ $e =~ html ]]                  && { ext_html  ; return ; }
-[[ $e =~ svg     ]]               && { ext_svg   ; return ; }
-[[ $e =~ $ifilter ]]              && { ext_image ; return ; }
-[[ $e == mp3 ]]                   && { ext_mp3   ; return ; }
-[[ $e =~ $mfilter ]]              && { ext_media ; return ; }
-[[ $e == pdf || $e == PDF ]]      && { ext_pdf   ; return ; }
-[[ $e == epub ]]                  && { return ; }
-[[ $e == sc ]]                    && { ext_scim  ; return ; }
-[[ $e =~ ^json|yml$ ]]            && [[ -s "$n" ]] && { ext_json ; return ; }
+[[ -d "$n"                ]] && { ext_dir   ; return ; }
+[[ $e =~ html             ]] && { ext_html  ; return ; }
+[[ $e =~ svg              ]] && { ext_svg   ; return ; }
+[[ $e =~ $ifilter         ]] && { ext_image ; return ; }
+[[ $e == mp3              ]] && { ext_mp3   ; return ; }
+[[ $e =~ $mfilter         ]] && { ext_media ; return ; }
+[[ $e == pdf || $e == PDF ]] && { ext_pdf   ; return ; }
+[[ $e == epub             ]] && { return ; }
+[[ $e == sc               ]] && { ext_scim  ; return ; }
+[[ $e =~ ^json|yml$       ]] && [[ -s "$n" ]] && { ext_json ; return ; }
 
-((emode == 3))                    && { open_with ; return ; }
+((emode == 3)) && { open_with ; return ; }
 
 mime_get
 
-[[ $mtype =~ ^text ]]             && [[ -s "$n" ]] && { ext_text ; return ; }
+[[ $mtype =~ ^text ]] && [[ -s "$n" ]] && { ext_text ; return ; }
 
 open_with
 }
@@ -32,31 +32,33 @@ pviewers()
 
 user_pviewers && return ;
 
-[[ $e ]] && ((pignore["${e@Q}"])) && { pignore   ; return ; }
-[[ -e "$fs/lock_preview/$n" ]]    && { plock     ; return ; }
-[[ "${pdir_only[tab]}" ]]         && { [[ -d "$n" ]] || { tcpreview ; return ; } ; }
+[[ $e                       ]] && ((pignore["${e@Q}"])) && { pignore   ; return ; }
+[[ -e "$fs/lock_preview/$n" ]] && { plock     ; return ; }
+[[ "${pdir_only[tab]}"      ]] && { [[ -d "$n" ]] || { tcpreview ; return ; } ; }
 
-[[ $e == cbr ]]                   && { pcbr      ; return ; }
-[[ $e == cbz ]]                   && { pcbz      ; return ; }
-[[ $e == html ]]                  && { phtml     ; return ; }
-[[ $e == svg ]]                   && { psvg      ; return ; }
-[[ $e == gif ]]                   && { pgif      ; return ; }
-[[ $e =~ $ifilter ]]              && { pimage    ; return ; }
-[[ $e == mp3 ]]                   && { pmp3      ; return ; }
-[[ $e =~ $mfilter ]]              && { pmedia    ; return ; }
-[[ $e =~ ^md|MD$ ]]               && { pmd       ; return ; }
-[[ $e == pdf || $e == PDF ]]      && { ppdf      ; return ; }
-[[ $e == epub ]]                  && { pepub     ; return ; }
-[[ $e == 1   ]]                   && { pman      ; return ; }
-[[ $e == zip ]]   && ((extmode))  && { pcomp     ; return ; }
-[[ $e == rar ]]   && ((extmode))  && { pcomp     ; return ; }
-[[ $f =~ \.tar ]] && ((extmode))  && { pcomp     ; return ; }
-[[ -p "$n" ]]                     && { ppipe     ; return ; }
-[[ $e =~ json ]]                  && { pjson     ; return ; }
-[[ $e =~ yml ]]                   && { ptext     ; return ; }
-[[ $e == sc ]]                    && { pscim     ; return ; }
-[[ $e =~ ^asciio$ ]]              && { pasciio   ; return ; }
-[[ -d "$n" ]]                     && { pdir      ; return ; }
+[[ $e == cbr                ]]                && { pcbr      ; return ; }
+[[ $e == cbz                ]]                && { pcbz      ; return ; }
+[[ $e == html               ]]                && { phtml     ; return ; }
+[[ $e == svg                ]]                && { psvg      ; return ; }
+[[ $e == gif                ]]                && { pgif      ; return ; }
+[[ $e =~ $ifilter           ]]                && { pimage    ; return ; }
+[[ $e == mp3                ]]                && { pmp3      ; return ; }
+[[ $e =~ $mfilter           ]]                && { pmedia    ; return ; }
+[[ $e =~ ^md|MD$            ]]                && { pmd       ; return ; }
+[[ $e == pdf || $e == PDF   ]]                && { ppdf      ; return ; }
+[[ $e == epub               ]]                && { pepub     ; return ; }
+[[ $e == 1                  ]]                && { pman      ; return ; }
+[[ $e == zip                ]] && ((extmode)) && { pcomp     ; return ; }
+[[ $e == rar                ]] && ((extmode)) && { pcomp     ; return ; }
+[[ $f =~ \.tar$             ]] && ((extmode)) && { pcomp     ; return ; }
+[[ $f =~ \.tar\.gz$         ]] && ((extmode)) && { pcomp     ; return ; }
+[[ $f =~ \.tar\.bz2$        ]] && ((extmode)) && { pcomp     ; return ; }
+[[ -p "$n"                  ]]                && { ppipe     ; return ; }
+[[ $e =~ json               ]]                && { pjson     ; return ; }
+[[ $e =~ yml                ]]                && { ptext     ; return ; }
+[[ $e == sc                 ]]                && { pscim     ; return ; }
+[[ $e =~ ^asciio$           ]]                && { pasciio   ; return ; }
+[[ -d "$n"                  ]]                && { pdir      ; return ; }
 
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
 
@@ -115,7 +117,7 @@ pmd()       { md="${1:-$n}" ; ((extmode)) && psplit "$MD_RENDER2 \"$md\" | $MD_P
 ptext()     { vipreview "$n" ; }
 pansi()     { ((!extmode)) && psplit "$PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $PAGER " ; } ; }
 
-pjson()     { psplit "$JSON_VIEWER \"$n\"" ; }
+pjson()     { psplit "$JSON_VIEWER \"$n\" ; read -sn100" ; }
 
 ppdf()      { (( extmode==2 || pdf_prev_image)) && ppdfpng || { vipreview "$($pgen/pdf "$n" $thumbs/pdf "$extmode")" ; } ; }
 ppdfpng()   { t="$thumbs/$e/et_$(head -c50000 "$n" | md5sum | cut -f1 -d' ').png" ; [[ -f "$t" ]] || { mutool draw -o "$t" "$n" 1 2>/dev/null ; } ; pw3image "$t" ; true ; }
@@ -128,11 +130,19 @@ pman()      { psplit "man \"$n\" ; read -sn 1000" ; true ; }
 pscim()     { psplit "scim \"$n\" | $PAGER ; read -sn100" ; }
 pasciio()   { psplit "asciio_to_text \"$n\" | $PAGER ; read -sn100" ; }
 
-pcomp()     { [[ $e == zip ]] && _pcomp unzip -l || { [[ $e == rar ]] && _pcomp unrar list ; } || { [[ $f =~ \.tar ]] && _pcomp tar --list --verbose -f ; } ; }
+pcomp()     
+{
+  [[ $e == zip         ]] && _pcomp unzip -l                            || 
+{ [[ $e == rar         ]] && _pcomp unrar list ;                      } || 
+{ [[ $f =~ \.tar$      ]] && _pcomp tar --list         --verbose -f ; } ||
+{ [[ $f =~ \.tar\.gz$  ]] && _pcomp tar --gzip  --list --verbose -f ; } ||
+{ [[ $f =~ \.tar\.bz2$ ]] && _pcomp tar --bzip2 --list --verbose -f ; }
+}
+
 _pcomp()    { ((extmode)) && { fp="$fs/$f.txt" ; [[ -e "$fp" ]] || timeout 1 "$@" "$f" >"$fp" ; vipreview "$fp" ; } ; }
 
 # needed when used as an fzf viewer from ftl
-((!FTLRC_LOADED)) && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl_setup ; [[ "$1" ]] &&  pfzf "$1" ; }
+((!FTLRC_LOADED)) && { : ${FTL_CFG:=$HOME/.config/ftl} ; source $FTL_CFG/etc/core/ftl_setup ; [[ "$1" ]] && pfzf "$1" ; }
 
 # vim: set filetype=bash :
 

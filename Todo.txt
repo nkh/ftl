@@ -1,12 +1,16 @@
 # Current
 
+issue: show error message when copy can't be done
+	directory in file
+	files in file
+
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 
-functionality: command tar files and directories
-
 functionality: given a list of files
 		show only those files
+		
+		better done with file system
 
 issue: pane splitting
 	what do we want?

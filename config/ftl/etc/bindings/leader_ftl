@@ -2,15 +2,17 @@
 . $FTL_CFG/etc/bindings/lib/optimize
 . $FTL_CFG/etc/bindings/lib/extra
 
+bind leader_ftl extra	"LEADER f c"	compress		"compress in tar.bz2"
+bind leader_ftl extra	"LEADER f d"	decompress		"decompress"
+bind leader_ftl extra	"LEADER f D"	decompress_in_dir	"decompress directory"
+bind leader_ftl extra	"LEADER f g"	stat_file		"display stat information in preview pane"
 bind leader_ftl extra	"LEADER f h"	ftl_help		"display help"
-bind leader_ftl extra	"LEADER f c"	compress		"compress/decompress"
 bind leader_ftl extra	"LEADER f i"	image_optimize		"reduce jpg image size, converts png to jpg"
 bind leader_ftl extra	"LEADER f l"	lint			"run rmlint in current_directory"
 bind leader_ftl extra	"LEADER f m"	run_mutt		"send selection in mail"
-bind leader_ftl extra	"LEADER f p"	pdf_optimize		"reduce pdf size"
 bind leader_ftl extra	"LEADER f P"	pdf2txt			"convert current pdf to text file"
-bind leader_ftl extra	"LEADER f g"	stat_file		"display stat information in preview pane"
-bind leader_ftl extra	"LEADER f t"	shell_popup		"terminal popup"
+bind leader_ftl extra	"LEADER f p"	pdf_optimize		"reduce pdf size"
+bind leader_ftl extra	"LEADER f s"	shell_popup		"terminal popup"
 bind leader_ftl extra	"LEADER f v"	video_optimize		"reduce video size"
 bind leader_ftl extra	"LEADER f x"	gpg_encrypt		"GPG encrypt/decrypt"
 bind leader_ftl extra	"LEADER f z"	pass_encrypt		"password encrypt/decrypt"

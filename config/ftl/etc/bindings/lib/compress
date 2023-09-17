@@ -1,10 +1,50 @@
 
+# tar compressed formats
+#
+# Long			Short		Archive format
+# ‘--gzip’		‘-z’		gzip
+# ‘--bzip2’		‘-j’		bzip2
+# ‘--xz’		‘-J’		xz
+# ‘--lzip’				lzip
+# ‘--lzma’				lzma
+# ‘--lzop’				lzop
+# ‘--zstd’				zstd
+# ‘--compress’		‘-Z’		compress
+
+decompress()
+{
+[[ $e =~ rar ]]       && unrar e "$f" || \
+[[ $e =~ zip ]]       && unzip "$f"   || \
+[[ $e =~ tar ]]       && tar -xf "$f" || \
+[[ $n =~ tar\.gz$  ]] && tar --gzip  -xf "$f" || \
+[[ $n =~ tar\.bz2$ ]] && tar --bzip2 -xf "$f" || \
+[[ $n =~ tar\.xz$  ]] && tar --bzip2 -xf "$f" 
+
+cdir
+}
+
+decompress_in_dir()
+{
+new_file=
+
+prompt 'directory to extract to: ' ; [[ -n $REPLY ]] || return
+
+mkdir -p "$REPLY"
+
+[[ $e =~ rar ]]       && unrar e         "$f"             "$REPLY" || \
+[[ $e =~ zip ]]       && unzip           "$f" -d          "$REPLY" || \
+[[ $e =~ tar ]]       && tar         -xf "$f" --directory="$REPLY" || \
+[[ $n =~ tar\.gz$  ]] && tar --gzip  -xf "$f" --directory="$REPLY" || \
+[[ $n =~ tar\.bz2$ ]] && tar --bzip2 -xf "$f" --directory="$REPLY" || \
+[[ $n =~ tar\.xz$  ]] && tar --bzip2 -xf "$f" --directory="$REPLY"  
+
+cdir "$REPLY"
+}
+
 compress()
 {
 new_file=
-[[ $e =~ rar ]] && unrar e "$f" || \
-[[ $e =~ tar ]] && tar -xf "$f" || \
-[[ $e =~ zip ]] && unzip "$f" || \
+
 { prompt 'tar.bz2 file: ' ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" && new_file="$REPLY" ; }
 
 tags=() ; cdir '' "$new_file" ; true
