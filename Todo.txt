@@ -2,12 +2,6 @@
 
 functionality: copy directory to, w shortcut doesn't do that and says nothing  when used on directory
 
-functionality: git 
-	show if file is under git
-	add to .gitignore
-
-	filter only file not under git control
-
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 
