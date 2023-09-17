@@ -16,7 +16,7 @@ clear_list(){ for(( i=$1 ; i < LINES - 1  ; i++)) ; do echo -ne "\e[K$flip" ; ((
 psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; }
 ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
 cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == copy ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; }
-cp_do()     { [[ -d "$2" ]] && tscommand "xargs -a $1 -t -- cp -r -t ${2@Q}" || tscommand "xargs -a $1 -t -I{} -- cp {} ${2@Q}" ; }
+cp_do()     { tscommand "xargs -a $1 -t -I{} -- cp -r {} ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv "$1" "$2" "${!ltags[@]}" ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
 delete()    { [[ $1 ]] && { [[ $REPLY =~ y|d ]] && delete_tag || { [[ $REPLY =~ c ]] && delete_cur ; } ; } || { [[ $REPLY =~ y|d ]] && delete_cur ; } ; } 
@@ -35,7 +35,7 @@ files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t
 dirs_virt() { ((${#vdirs[@]}))  && for vd in "${!vdirs[@]}"  ; do printf "0\t0\t$vd\n" ; done ; }
 filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg ${filters2[tab]} | { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } | filter2 ; }
 filter_d()  { rg ${filters_dir[tab]} | filter2 ; }
-filter_c()  { ((${#user_colors[@]})) && { while read cfile ; do ((${#user_colors[$cfile]})) && echo -e "\e[${user_colors[$cfile]}m$cfile\e[m" || printf "%s\n" "$cfile" ; done ; } || cat ; }
+filter_c()  { ((${#user_colors[@]})) && { while read cf ; do ((${#user_colors[$cf]})) && echo -e "\e[${user_colors[$cf]}m$cf\e[m" || printf "%s\n" "$cf" ; done ; } || cat ; }
 filter2()   { ftl_sort | tee >(cat >&4) | vfiles_clr | filter_c | lscolors >&5 ; }
 filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
@@ -51,7 +51,7 @@ geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
 header()    { h="${@:2}$(sort_glyph)$s_reversed$(tags_head)$(tsc_head) " ; header_pos "$h" ; echo -e "\e[H\e[K\e[${1:-94}m${PWD:hpl} \e[${1:-95}m${h:hal}\e[m" ; }
 header_pos(){ hal=$((${#1} - ($COLS - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
 hist_save() { ((!gpreview)) && { [[ "$n" ]] && echo "$n" | tee -a $fs/history >> $ghist ; } ; }
-inotify_s() { inotify_k ; inotify_ & : ; ino1=$! ; ino_processes=($ino1 $(pchild $ino1 0)) ; }
+inotify_s() { inotify_k ; (inotify_ ) & : ; ino1=$! ; ino_processes=($ino1 $(pchild $ino1 0)) ; }
 inotify_()  { inotify_w | { read a b f ; [[ "$f" ]] && tmux send -t "$my_pane" ${C[refresh_pane]} 2>&- ; } ; }
 inotify_w() { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete -e move -e modify "$PWD/" 2>&- ; }
 inotify_k() { [[ $ino1 ]] && { for p in "${ino_processes[@]}" ; do disown $p 2>&- ; kill $p 2>&- ; done ; ino1= ; } ; }

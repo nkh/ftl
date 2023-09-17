@@ -1,7 +1,5 @@
 # Current
 
-functionality: copy directory to, w shortcut doesn't do that and says nothing  when used on directory
-
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 
