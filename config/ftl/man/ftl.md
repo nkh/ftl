@@ -871,34 +871,36 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         Example of command integration, see 'etc/bindings/leader_ftl'.
 
-        <LEADER f c>       Compress/decompress            
+        <LEADER f c>       Compress
 
-        <LEADER f t>       vim diff two selected files                 
-
-        <LEADER f P>       Convert pdf to text file       
-
+        <LEADER f d>       Decompress            
+        
+        <LEADER f D>       Decompress in directory
+        
+        <LEADER f e>       Encrypt/decrypt using _gpg_    
+        
+        <LEADER f E>       Encrypt/decrypt using password 
+        
         <LEADER f g>       Display stat in preview pane   
-
-        <LEADER f z>       Encrypt/decrypt using password 
-
-        <LEADER f x>       Encrypt/decrypt using _gpg_    
-
-        <LEADER s >        Shred selection using _shred_  
-
-        <LEADER f i>       Reduce jpg image size          
-
-        <LEADER f i>       Reduce png to jpg              
-
-        <LEADER f p>       Reduce pdf size                
-
-        <LEADER f v>       Reduce video size              
-
+        
+        <LEADER f i>       Reduce jpg/png image size          
+        
         <LEADER f l>       Lint current directory         
-
+        
         <LEADER f m>       Send mail                      
-
-        <LEADER f t>       Terminal popup                 
-
+        
+        <LEADER f P>       Convert pdf to text file       
+        
+        <LEADER f p>       Reduce pdf size                
+        
+        <LEADER f s>       Terminal popup                 
+        
+        <LEADER f t>       vim diff two selected files                 
+        
+        <LEADER f v>       Reduce video size              
+        
+        <LEADER s >        Shred selection using _shred_  
+        
         <:url URL>         open URL in qutebrowser
 
 ### Git integration

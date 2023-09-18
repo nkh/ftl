@@ -1,9 +1,5 @@
 # Current
 
-issue: show error message when copy can't be done
-	directory in file
-	files in file
-
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 
@@ -12,11 +8,11 @@ functionality: given a list of files
 		
 		better done with file system
 
-issue: pane splitting
-	what do we want?
-		split the current pane
-		keep focus or pass to new split
-		split on the other side of the preview
+functionality: pane splitting
+		what do we want?
+			split the current pane
+			keep focus or pass to new split
+			split on the other side of the preview
 
 # Later
 

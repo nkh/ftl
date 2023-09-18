@@ -22,6 +22,6 @@ file_diff()
 	}
 }
 
-bind leader_ftl extra	"LEADER f d"	file_diff	"diff two selected files or directories"
+bind leader_ftl extra	"LEADER v d"	file_diff	"diff two selected files or directories"
 
 # vim: set filetype=bash :
