@@ -1,4 +1,6 @@
-[[ "$1" == load ]] && [[ -e "$pfs/by_size" ]] && source "$pfs/by_size" || \
+[[ "$1" == reset ]] && : ||
+{
+[[ "$1" == load ]] && [[ -e "$pfs/by_size" ]] && source "$pfs/by_size" ||
 	{
 	prompt 'ftl filter file min size: ' ; ftl_min_size="${REPLY:-0}" ; [[ "$ftl_min_size" =~ [0-9]+ ]] || ftl_min_size=0
 
@@ -6,6 +8,7 @@
 	}
 
 ftag="~"
+}
 
 ftl_filter() 
 {

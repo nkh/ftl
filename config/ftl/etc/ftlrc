@@ -164,7 +164,7 @@ bind ftl entry		xV		vim_edit_window		"vim in sparate window"
 bind ftl entry		xc		terminal_cat		"cat"
 bind ftl entry		xl		link			"symlink selection in current directory"
 
-bind ftl filter		fE		set_filter_ext		"select external filter"
+bind ftl filter		fe		set_filter_ext		"select external filter"
 bind ftl filter		fy		set_filter_only_tagged	"show only tagged files"
 bind ftl filter		fd		set_filter_dir		"set directories filter"
 bind ftl filter		ff		set_filter		"set filter 1"

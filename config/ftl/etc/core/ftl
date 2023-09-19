@@ -38,7 +38,8 @@ filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg $
 filter_d()  { rg ${filters_dir[tab]} | filter2 ; }
 filter_c()  { ((${#user_colors[@]})) && { while read cf ; do ((${#user_colors[$cf]})) && echo -e "\e[${user_colors[$cf]}m$cf\e[m" || printf "%s\n" "$cf" ; done ; } || cat ; }
 filter2()   { ftl_sort | tee >(cat >&4) | vfiles_clr | filter_c | lscolors >&5 ; }
-filter_rst(){ ftag= ; filter_ext= ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
+filter_rst(){ ftag= ; filter_rxt ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
+filter_rxt(){ [[ $filter_ext ]] && . "$FTL_CFG/filters/$filter_ext" "reset" ; filter_ext= ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read dst ; do fzf_in_tab "$dst" && continue ; ${1}_go $in_tab "$P" "$dst" ; done<<<"$2" ; }
 fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }

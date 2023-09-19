@@ -1,6 +1,8 @@
 declare -g -A keep PWDS
 
-[[ "$1" == load ]] && [[ -e "$pfs/by_file_global" ]] && source "$pfs/by_file_global" || \
+[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+{
+[[ "$1" == load ]] && [[ -e "$pfs/by_file_global" ]] && source "$pfs/by_file_global" ||
 	{
 	OIFS=$IFS ; IFS=$'\n'
 	for file in $(\
@@ -16,6 +18,8 @@ declare -g -A keep PWDS
 
 	declare -p keep PWDS >"$pfs/by_file_global"
 	}
+}
+
 ftl_filter()
 {
 [[ ${PWDS["$PWD"]} == 1 ]] && 

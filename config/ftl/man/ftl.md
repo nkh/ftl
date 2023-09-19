@@ -565,7 +565,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         <zO>               Reverse sort order 
 
-        <fE>               Choose sort order from external sorts 
+        <fe>               Choose sort order from external sorts 
 
 ## Filtering
 

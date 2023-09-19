@@ -1,6 +1,8 @@
 declare -g -A fexts=()
 
-[[ "$1" == load ]] && [[ -e "$2/by_extension" ]] && source "$2/by_extension" || \
+[[ "$1" == reset ]] && { unset -v fexts ; } ||
+{
+[[ "$1" == load ]] && [[ -e "$2/by_extension" ]] && source "$2/by_extension" ||
 	{
 	shopt -s dotglob
 
@@ -13,6 +15,7 @@ declare -g -A fexts=()
 	
 	declare -p fexts >"$fs/by_extension"
 	}
+}
 
 ftl_filter()
 {

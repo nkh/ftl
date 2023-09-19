@@ -1,6 +1,8 @@
 declare -g -A keep=() PWDS=()
 
-[[ "$1" == load ]] && [[ -e "$pfs/by_tag_query" ]] && source "$pfs/by_tag_query" || \
+[[ "$1" == reset ]] && { unset keep PWDS ; } ||
+{
+[[ "$1" == load ]] && [[ -e "$pfs/by_tag_query" ]] && source "$pfs/by_tag_query" ||
 	{
 	tcpreview
 	query_file="$(mktemp -p $fs ftl_tmsu_tag_query_XXXXXXX)"
@@ -42,6 +44,7 @@ declare -g -A keep=() PWDS=()
 	
 	declare -p keep PWDS >"$pfs/by_tag_query"
 	}
+}
 
 ftl_filter()
 {

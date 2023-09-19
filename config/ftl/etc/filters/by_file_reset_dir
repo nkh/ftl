@@ -1,6 +1,8 @@
 declare -g -A keep PWDS
 
-[[ "$1" == load ]] && [[ -e "$pfs/by_file_reset_dir" ]] && source "$pfs/by_file_reset_dir" || \
+[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+{
+[[ "$1" == load ]] && [[ -e "$pfs/by_file_reset_dir" ]] && source "$pfs/by_file_reset_dir" ||
 	{
 	for f in "${!keep[@]}" ; do [[ "$f" =~ "$tab-$PWD/" ]] && unset 'keep[$f]' ; done
 
@@ -18,6 +20,7 @@ declare -g -A keep PWDS
 
 	declare -p keep PWDS >"$pfs/by_file_reset_dir"
 	}
+}
 
 ftl_filter()
 {

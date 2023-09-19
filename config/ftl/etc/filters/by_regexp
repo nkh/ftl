@@ -1,6 +1,10 @@
 declare -g -A keep PWDS
 
-[[ "$1" == load ]] && [[ -e "$pfs/by_regexp" ]] && source "$pfs/by_regexp" || \
+pdhn "by regex: $1"
+
+[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+{
+[[ "$1" == load ]] && [[ -e "$pfs/by_regexp" ]] && source "$pfs/by_regexp" ||
 	{
 	exec 2>&9
 	OIFS=$IFS ; IFS=$'\n'
@@ -18,17 +22,18 @@ declare -g -A keep PWDS
 	
 	declare -p keep PWDS >"$pfs/by_regexp"
 	}
+}
 
 ftl_filter()
 {
-[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
+[[ "${PWDS["$tab-$PWD"]}" == 1 ]] && 
 	{
 	while read -r file_data
 		do
 			fn="${file_data#$'*\t'*$'\t'}"
-			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+			[[ "${keep["$tab-$PWD/$fn"]}" == 1 ]] && echo "$file_data"
 		done
 	} || cat 
 }
 
-# vim: set filetype=sh :
+# vim: set filetype=bash :

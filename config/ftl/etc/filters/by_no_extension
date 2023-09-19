@@ -1,7 +1,9 @@
 declare -g -A fnexts=()
 shopt -s dotglob
 
-[[ "$1" == load ]] && [[ -e "$pfs/by_no_extension" ]] && source "$pfs/by_no_extension" || \
+[[ "$1" == reset ]] && { unset -v fnexts ; } ||
+{
+[[ "$1" == load ]] && { [[ -e "$pfs/by_no_extension" ]] && source "$pfs/by_no_extension" ; } ||
 	{
 	remove_no_ext=0
 
@@ -15,6 +17,7 @@ shopt -s dotglob
 
 	declare -p remove_no_ext fnexts >"$pfs/by_no_extension"
 	}
+}
 
 ftl_filter()
 {

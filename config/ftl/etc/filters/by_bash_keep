@@ -61,7 +61,11 @@ ftl_filter()
 
 declare -g -A keep PWDS
 
-[[ "$1" == load ]] && { [[ -e "$pfs/by_bash_keep" ]] && source "$pfs/by_bash_keep" ; true ; } || bash_filter_keep_imp
+[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+	{
+	[[ "$1" == load ]] && { [[ -e "$pfs/by_bash_keep" ]] && source "$pfs/by_bash_keep" ; true ; } ||
+	bash_filter_keep_imp
+	}
 
 # vim: set filetype=sh :
 

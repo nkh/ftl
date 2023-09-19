@@ -58,6 +58,10 @@ ftl_filter()
 
 declare -g -A hide PWDS
 
-[[ "$1" == load ]] && { [[ -e "$pfs/by_bash_hide" ]] && source "$pfs/by_bash_hide" ; true ; } || bash_filter_hide_imp
+[[ "$1" == reset ]] && { unset keep PWDS ; } ||
+	{
+	[[ "$1" == load ]] && { [[ -e "$pfs/by_bash_hide" ]] && source "$pfs/by_bash_hide" ; true ; } ||
+	bash_filter_hide_imp
+	}
 
 # vim: set filetype=sh :
