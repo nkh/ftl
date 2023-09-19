@@ -1,0 +1,48 @@
+
+# filter API
+filter_add() { filter_list+=("$@") ; IFS=$'|' ; echo "${filter_list[*]}" ; }
+filter_clr() { filter_list=() ; }
+filter_rmv() { filter_list2=() ; for f_entry in "${filter_list[@]}" ; do [[ "$f_entry" != "$1" ]] && filter_list2+=("$f_entry") ; done ; filter_list=("${filter_list2[@]}") ; }
+
+filter_rst() { ftag= ; filter_rxt ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
+filter_rxt() { [[ $filter_ext ]] && . "$FTL_CFG/filters/$filter_ext" "reset" ; filter_ext= ; }
+
+# filters
+filter_not() { rg ${ntfilter[tab]} "${tfilters[tab]}"; } 
+filter_1()   { rg ${filters[tab]} ; }
+filter_2()   { rg ${filters2[tab]}  ; }
+filter_rev() { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } 
+
+user_color() { ((${#user_colors[@]})) && { while read cf ; do ((${#user_colors[$cf]})) && echo -e "\e[${user_colors[$cf]}m$cf\e[m" || printf "%s\n" "$cf" ; done ; } || cat ; }
+
+# default filters pipe
+filter_pipe="$(filter_add filter_not filter_1 filter_2 filter_rev)"
+
+# default sort, called in by ft_sort
+sort_by()    { sort $s_reversed ${sort_filters[s_type]} ; }
+
+# find directory entries, filter, sorts, color them andd split data in name, colored, size fifos
+
+# test() { tee >(cat >&2) ; }
+# test() { cat ; }
+
+dir() 
+{
+((lmode[tab]<2)) &&  { files "-type  d,l -xtype d" ; dirs_virt ; }  | ftl_filter | rg ${filters_dir[tab]} | ftl_sort | output_size | output_path
+                       files "-xtype p,l"                           | ftl_filter | eval "$filter_pipe"    | ftl_sort | output_size | output_path   
+((lmode[tab]!=1)) && { files "-type  f,l -xtype f" ; files_virt ; } | ftl_filter | eval "$filter_pipe"    | ftl_sort | output_size | output_path
+                       dir_done
+}
+
+files()      { find "$PWD/" -mindepth 1 -maxdepth ${depth[tab]:-1} ${hidden[tab]:+\( ! -path "*/.*" \)} $1 -printf '%s\t%T@\t%P\n' 2>&- ; }
+files_virt() { ((${#vfiles[@]})) && printf "0\t0\t%s\n" "${!vfiles[@]}" ; }
+dirs_virt()  { ((${#vdirs[@]}))  && printf "0\t0\t%s\n" "${!vdirs[@]}" ; }
+
+# output data to right fifo
+output_size(){ tee >(cut -f 1 >&6) | cut -f 3- ; }
+output_path(){ tee >(cat >&4) | vfiles_clr | user_color | lscolors >&5 ; }
+
+dir_done()   { echo "$ftl_dir_don" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
+
+# vim: set ft=bash:
+

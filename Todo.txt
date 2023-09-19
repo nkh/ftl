@@ -6,14 +6,15 @@ functionality: give commands to be executed after start
 
 		which options hand how to do pass them to sub process?
 	
+functionality: given a list of files, show only those files
+
+		use normal filter
+
+		via command list
+			-c 'load_filter ....'
 
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
-
-functionality: given a list of files
-		show only those files
-		
-		better done with file system
 
 functionality: pane splitting
 		what do we want?
@@ -58,9 +59,6 @@ arch: asynch list display for very large directories
 
 arch: put all options in one array
 	to simplify handling it
-
-arch: filter list instead for specialized filters 
-	filters are run in parallel how do we do that with a list?
 
 arch: let hidden pane do preview so main pane data isn't overridden by extra pane's
 	this may also make it possible to use fz, rg, etc... as filters and ftl as preview

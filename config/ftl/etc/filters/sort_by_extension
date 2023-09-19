@@ -4,14 +4,14 @@ ftl_sort()
 entry=0
 while IFS=$'\t' read -a file_data
 	do
-		names+=("${file_data[2]}")
-		sizes+=(${file_data[0]})
+		files_data+=("${file_data[0]}	${file_data[1]}	${file_data[2]}")
+		
 		ext= ; [[ "${file_data[2]}" =~ '.' ]] && ext=".${file_data[2]##*.}"
 		sort_data+=("$entry	${file_data[2]}	$ext")
 		((entry++))
 	done
 
-for i in $(printf "%s\n" "${sort_data[@]}" | sort -s -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo ${sizes[i]} >&6 ; echo "${names[i]}" ; done
+for i in $(printf "%s\n" "${sort_data[@]}" | sort -s -t $'\t' ${reversed[tab]} -k3 -k2 | cut -f1) ; do echo "${files_data[i]}" ; done
 }
 
 # vim: set filetype=sh :

@@ -1,5 +1,6 @@
 source "$FTL_CFG/etc/core/keyboard"
 source "$FTL_CFG/etc/core/commands"
+source "$FTL_CFG/etc/core/dir_file_filter"
 
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && $(try_error) || try_errorp ; } ; }
 alt_screen(){ echo -en '\e[?1049h' ; stty -echo ; tput civis ; }
@@ -23,23 +24,11 @@ dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1
 delete()    { [[ $1 ]] && { [[ $REPLY =~ y|d ]] && delete_tag || { [[ $REPLY =~ c ]] && delete_cur ; } ; } || { [[ $REPLY =~ y|d ]] && delete_cur ; } ; } 
 delete_cur(){ [[ "${tags[$n]}" ]] && { unset -v 'tags[$n]' ; tags_size - "$n" ; ((stagsi++)) ; } ; $RM "$n" ; mime=() ; true ; } 
 delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && tags_unset $class && { $RM "${!ltags[@]}" ; mime=() ; } ; true ; }
-dir()       { ((lmode[tab]<2)) && files "-type d,l -xtype d" filter_d vd ; files "-xtype p,l" filter ; ((lmode[tab]!=1)) && files "-type f,l -xtype f" filter vf ; dir_done ; }
-dir_done()  { echo "$dir_done" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
 dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m%4s\e[m" "${du_size[$PWD/$1]}" ; }
-dir_esize() { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${show_hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
+dir_esize() { printf "\e[94m%4s\e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
 dir_dusize(){ reset="$(printf '\e[0m')" ; declare -Ag du_size ; while IFS=$'\t' read color size file ; do du_size[$PWD/$file]="$color$size$reset" ; done < <(get_dusize) ; }
 get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(.*?)\e\[0m\t.\/(.*)/ ; printf "$c\t%4s\t$f\n", $s' ; }
 edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; alt_screen ; emode=0 ; cdir ; }
-files()     { { find "$PWD/" -mindepth 1 -maxdepth ${max_depth[tab]:-1} ${show_hidden[tab]:+\( ! -path "*/.*" \)} $1 -printf '%s\t%T@\t%P\n' 2>&- ; virt_inj $3 ; } | ftl_filter | $2 ; }
-virt_inj()  { [[ $1 == vf ]] && files_virt ; [[ $1 == vd ]] && dirs_virt ; }
-files_virt(){ ((${#vfiles[@]})) && for vf in "${!vfiles[@]}" ; do printf "0\t0\t$vf\n" ; done ; }
-dirs_virt() { ((${#vdirs[@]}))  && for vd in "${!vdirs[@]}"  ; do printf "0\t0\t$vd\n" ; done ; }
-filter()    { rg ${ntfilter[tab]} "${tfilters[tab]}" | rg ${filters[tab]} | rg ${filters2[tab]} | { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } | filter2 ; }
-filter_d()  { rg ${filters_dir[tab]} | filter2 ; }
-filter_c()  { ((${#user_colors[@]})) && { while read cf ; do ((${#user_colors[$cf]})) && echo -e "\e[${user_colors[$cf]}m$cf\e[m" || printf "%s\n" "$cf" ; done ; } || cat ; }
-filter2()   { ftl_sort | tee >(cat >&4) | vfiles_clr | filter_c | lscolors >&5 ; }
-filter_rst(){ ftag= ; filter_rxt ; eval 'ftl_filter(){ cat ; } ; ftl_sort(){ sort_by ; } ; sort_glyph(){ echo ${sglyph[s_type]} ; }' ; }
-filter_rxt(){ [[ $filter_ext ]] && . "$FTL_CFG/filters/$filter_ext" "reset" ; filter_ext= ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read dst ; do fzf_in_tab "$dst" && continue ; ${1}_go $in_tab "$P" "$dst" ; done<<<"$2" ; }
 fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }
@@ -103,9 +92,7 @@ selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { 
 shell_pane(){ tcpreview ; P=$pane_id ; tsplit bash $shell_h -v -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
 shell_vpane(){ tcpreview 0 ; P=$pane_id ; tsplit bash $shell_v -h -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
 shell_send(){ { (( $1 )) && [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "${@:2}" ; }
-sort_by()   { sort $s_reversed ${sort_filters[s_type]} | tee >(cut -f 1 >&6) | cut -f 3- ; }
 sort_glyph(){ echo ${sglyph[s_type]} ; }
-
 save_state()
 {
 declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
@@ -122,7 +109,7 @@ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; e
 					filters[tab]=\"${filters[tab]}\"
 					filters2[tab]=\"${filters2[tab]}\" 
 					lmode[tab]=\"${lmode[tab]}\"
-					show_hidden[tab]=\"${show_hidden[tab]}\"
+					hidden[tab]=\"${hidden[tab]}\"
 					rfilters[tab]=\"${rfilters[tab]}\"
 					ntfilter[tab]=\"${ntfilter[tab]}\" "
 		
@@ -148,7 +135,7 @@ _tab_prev() { I=(${!tabs[@]}) ; RI=($(echo "${I[@]}" "${I[@]:0:tab}" | rev | tr 
 tab_read()  { tabs=() ; ntabs=0 ; while read -r P ; do P="$(path_full "$P")" ; [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; }
 _tab_read() { _tab_new "$1" ; [[ -d "$1" ]] && { findex="$(_tab_index "$@")" ;  [[ "$findex" ]] && dir_file[${tab}_$1]=$index ; } ; true ; }
 _tab_index() { findex= ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && findex=$index ; ((index++)) ; done ; echo $findex ; }
-tab_setup() { pdir_only[tab]= ; max_depth[tab]=1 ; vmode[tab]=0 ; lmode[tab]=0 ; filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; }
+tab_setup() { pdir_only[tab]= ; depth[tab]=1 ; vmode[tab]=0 ; lmode[tab]=0 ; filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }
 tags_clear(){ ((stagsi++)) ; tags=() ; tags_size=0 ; true ; }
