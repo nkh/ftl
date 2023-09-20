@@ -1,0 +1,31 @@
+declare -g -A keep 
+
+[[ "$1" == reset ]] && { unset -v keep ; } ||
+{
+[[ "$1" == load ]] && [[ -e "$pfs/by_visible_entries" ]] && source "$pfs/by_visible_entries" ||
+	{
+	ftag="~"
+	
+	for file in $(cat $ftl_visible_entries)
+		do
+			keep["$file"]=1
+		done
+	
+	declare -p keep >"$pfs/by_visible_entries"
+	}
+}
+
+ftl_filter()
+{
+while read -r file_data
+	do
+		fn="${file_data#$'*\t'*$'\t'}"
+		[[ "$PWD" == '/' ]] && pfn="/$fn" || pfn="$PWD/$fn"
+		
+		[[ "${keep[$pfn]}" == 1 ]] && echo "$file_data"
+		
+		[[ "$fn" == virtual_file ]] && echo "$file_data"
+	done
+}
+
+# vim: set filetype=sh :

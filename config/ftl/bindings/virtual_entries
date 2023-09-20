@@ -16,7 +16,7 @@ virt_files_get()
 {
 # return list of virtual files
 
-echo "a virtual file.txt"
+echo "virtual_file"
 }
 
 virt_color()
@@ -61,7 +61,7 @@ ventries_off()
 # turn injection off
 vfiles_rst
 
-# set virtual entries in preview  off
+# don't show virtual entries in preview pane
 prev_cb="ventries_off"
 
 cdir
@@ -77,7 +77,7 @@ vfiles_set virt_dirs_get virt_files_get virt_color virt_prev virt_key
 # turn injection on
 vfiles_on 1
 
-# set virtual entries in preview 
+# also show virtual entries in preview pane
 prev_cb="ventries_on"
 
 cdir
@@ -85,9 +85,9 @@ cdir
 
 ventries_etag(){ etag_s="virtual" ; source "$FTL_CFG/etags/$etag_s" ; etag=1 ; cdir '' "$f" ; } # etag_s synchs source with preview
 
-# bind leader_ftl extra	"LEADER v v"	ventries_on	"insert virtual entries"
-# bind leader_ftl extra	"LEADER v V"	ventries_off	"removes virtual entries"
-# bind leader_ftl extra	"LEADER v e"	ventries_etag	"show virtual entries etag"
+bind leader_ftl extra	"LEADER v v"	ventries_on	"insert virtual entries"
+bind leader_ftl extra	"LEADER v V"	ventries_off	"removes virtual entries"
+bind leader_ftl extra	"LEADER v e"	ventries_etag	"show virtual entries etag"
 
 #--------------------------------------------------------------------------------
 

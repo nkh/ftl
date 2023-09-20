@@ -1,6 +1,6 @@
 declare -g -A keep PWDR
 
-[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+[[ "$1" == reset ]] && { unset -v keep PWDR ; } ||
 {
 [[ "$1" == load ]] && [[ -e "$pfs/by_all_files" ]] && source "$pfs/by_all_files" ||
 	{

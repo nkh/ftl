@@ -66,9 +66,10 @@ file_dir_mode()		{ ((lmode[tab]++)) ; ((lmode[tab] > 2)) && lmode[tab]=0 ; cdir 
 set_filter()		{ prompt "filter: " -i "${filters[tab]}" ; filters[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
 set_filter_dir()	{ prompt "filter dir: " -i "${filters_dir[tab]}" ; filters_dir[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
 set_filter2()		{ prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
-set_filter_ext()	{ p="$FTL_CFG/filters" ; filter_ext=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle) ; [[ $filter_ext ]] && . "$p/$filter_ext" ; cdir '' "$f"; }
-set_filter_only_tagged(){ p="$FTL_CFG/filters" ; filter_ext=by_only_tagged ; . "$p/$filter_ext" ; cdir '' "$f" ; }
+set_filter_ext()	{ filter_name=$(cd "$FTL_CFG/filters" ; fd | fzf-tmux -p 50% --cycle) ; load_filter "$filter_name" ; cdir '' "$f"; }
+set_filter_only_tagged(){ load_filter by_only_tagged ; cdir '' "$f" ; }
 set_filter_reverse()	{ prompt "rfilter: " -i "${rfilters[tab]}" ; rfilters[tab]="$REPLY" ; ftag="~" ; cdir '' "$f" ; }
+load_filter()		{ p="$FTL_CFG/filters" ; [[ -f "$p/$1" ]] && { source "$p/$1" && filter_ext="$1" ; } || { filter_ext= ; echo "ftl: load_filter error" >&2 ; false ; } ; }
 find_entry()		{ prompt "find: " -i to_search ; R="${C[find_next]}" ; }
 find_next()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }
 find_previous()		{ for ((i=file - 1 ; i != -1 ; i--)) ; do [[ "${files[i]##*/}" =~ "$to_search" ]] && { list $i ; return ; } ; done ; list ; }

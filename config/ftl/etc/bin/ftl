@@ -12,20 +12,18 @@ while read -r line func file < <(caller $i); do
 function log()
 {
 echo "[$( caller )] $*" >&2
-echo "BASH_SOURCE: ${BASH_SOURCE[*]}"
-echo "BASH_LINENO: ${BASH_LINENO[*]}"
-echo "FUNCNAME: ${FUNCNAME[*]}"
+echo "BASH_SOURCE: ${BASH_SOURCE[*]}" >&2
+echo "BASH_LINENO: ${BASH_LINENO[*]}" >&2 
+echo "FUNCNAME: ${FUNCNAME[*]}" >&2
 }
 
-numfmt()
-{
-/usr/bin/numfmt "$@" || { echo "$@" >>nmfmt_log ; echo -e "------------------\n\n" >>nmfmt_log ; stacktrace >>nmfmt_log ; echo nmfmt: error "$@" >&2 ; }
-}
+numfmt() { /usr/bin/numfmt "$@" || { echo "$@" >>nmfmt_log ; echo -e "------------------\n\n" >>nmfmt_log ; stacktrace >>nmfmt_log ; error nmfmt: error "$@" ; } ; }
 
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2023, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup
 
+[[ "$1" == '-f' ]] && { pfs=$ftl_root/$$ ; mkdir -p $pfs ; try load_filter "$2" ; shift 2 ; }
 [[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
 [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
@@ -79,7 +77,7 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { echo -e "\e[H\e[31m$nfiles\e[0m" ; qd=1 ; }
 	
-	# color directory not accessible
+	# color directory that are not accessible
 	[[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
 	
 	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }

@@ -162,9 +162,9 @@ tselectp()  { [[ "$1" =~ ^% ]] && tmux selectp -t $1 || tmux selectp -t $pane_id
 winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh_pane]}$R" ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 
+vfiles_set(){ etag_cb="vdirs_get(){ $1 ; } ; vfiles_get(){ $2 ; } ; vfiles_clr(){ $3 ; }  ; vfile_prev(){ $4 ; } ; vfile_key(){ $5 \"\$@\"; }" ; eval "$etag_cb" ; }
 vfiles_on() { etag_cb+="; vfiles_on $1" ; vfiles_on=$1 ; declare -Ag vfiles=() vdirs=() ; }
 vfiles_rst(){    eval 'vdirs_get(){ : ; }  ; vfiles_get(){ : ; }  ; vfiles_clr(){ cat ; } ; vfile_prev(){ : ; }  ; vfile_key(){ : ; }' ;         etag_cb= ; vfiles_on=0 ; } 
-vfiles_set(){ etag_cb="vdirs_get(){ $1 ; } ; vfiles_get(){ $2 ; } ; vfiles_clr(){ $3 ; }  ; vfile_prev(){ $4 ; } ; vfile_key(){ $5 \"\$@\"; }" ; eval "$etag_cb" ; }
 v_entries() { vfiles=() vdirs=() ; ((vfiles_on)) && { while read -r v ; do vdirs[$v]=1 ; done < <(vdirs_get "$@")  ; while read -r v ; do vfiles[$v]=1 ; done < <(vfiles_get "$@") ; } ; }
 
 # temporal functions

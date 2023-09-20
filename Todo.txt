@@ -4,15 +4,8 @@ functionality: give commands to be executed after start
 		source them ala ftlrc
 			user's ftlrc can implement that
 
-		which options hand how to do pass them to sub process?
+		which options and how to do pass them to sub process?
 	
-functionality: given a list of files, show only those files
-
-		use normal filter
-
-		via command list
-			-c 'load_filter ....'
-
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 

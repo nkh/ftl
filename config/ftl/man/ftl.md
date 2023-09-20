@@ -10,6 +10,8 @@ ftl [ [-s file] [-t file] ] [directory[/file]]
 
 # OPTIONS
 
+-f filter       load filter
+
 -s file         file contains paths to files to select
 
                 eg: ftl -s <(find -name 'ftl*') 
@@ -169,8 +171,8 @@ own tabs, filters, ...
 
 ## Filtering 
 
-*ftl* can filter the entries in many ways, even using external filters you
-define, to list only the entries you want to see.
+*ftl* can filter the entries in many ways, including via external filters you
+create, to list only the entries you want to see.
 
 See "## Filtering" in commands.
 
@@ -590,7 +592,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                         just the entry name.
                         
                         *ftl* passes a string which contains the size, the date, and the name
-                        to rg, separated with a '\t'; here's an example:
+                        to filters, separated with a '\t'; here's an example:
                         
                                 62[\t]1663067416.1648839110[\t].gitignore
                         
@@ -602,7 +604,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                         It's also possible to define a filter in a function, instead for using
                         filter #1/#2/reverse. The filters directory contains extra filters. 
                         
-        <fE>               Choose filter from external filters 
+        <fe>               Choose filter from external filters list ; see *External Filters* 
                         
         <fd>               Set filter #d
                         
@@ -1259,6 +1261,89 @@ I check the file extension, if they match I bypass ftl's default viewer.
         # return false for the default ftl handlers to run
         }
 
+## External Filters
+
+You can write code that *ftl* will use to filter directory listings.
+
+A *ftl* external filter is a bash script, that get *sourced*, which defines
+a ***ftl_filter*** function.
+
+*ftl_filter* is:
+- called each time *ftl* changes directory.
+- is passed entry information on stdin
+- returns entry information on stdout
+
+Each entry is a string with the size, the date, and the name of a file, separated with a '\t'.
+
+        62[\t]1663067416.1648839110[\t].gitignore
+                        
+We'll be using *by_visible_entries*, found in the distribution, to explain the details
+of an external filter; there many other examples.
+
+*by_visible_entries* uses a file which contents is a list of entries that will be visible. The file
+name is passed via environment variable *ftl_visible_entries*.
+
+        # filter filter variables
+        declare -g -A keep 
+
+        # cleanup if is mode is 'reset'
+        [[ "$1" == reset ]] && { unset -v keep ; } ||
+        {
+        # mode is 'load', load cache if it exists
+        [[ "$1" == load ]] && [[ -e "$pfs/by_visible_entries" ]] && source "$pfs/by_visible_entries" ||
+        	# no cache, compute *keep* and save it as cache
+        	{
+        	# ftag is the filter glyph *ftl* displays in the status
+        	ftag="~"
+        	
+        	# this filter expects $ftl_visible_entries to point to a file  
+        	for file in $(cat $ftl_visible_entries)
+        		do
+        			keep["$file"]=1
+        		done
+        	
+        	# save cache, pfs is set by ftl to a temporary directory
+        	declare -p keep >"$pfs/by_visible_entries"
+        	}
+        }
+        
+        ftl_filter()
+        {
+        # read entries on stdin
+        while read -r file_data
+        	do
+        		# separate filename from size and date
+        		fn="${file_data#$'*\t'*$'\t'}"
+        		
+        		# compute full path for entry
+        		[[ "$PWD" == '/' ]] && pfn="/$fn" || pfn="$PWD/$fn"
+        		
+        		# send entry data on stdout if the file is to be kept
+        		[[ "${keep[$pfn]}" == 1 ]] && echo "$file_data"
+        	done
+        }
+
+### loading modes
+
+There are two different modes, passed in *$1*:
+- load, called when the filter is being loaded
+
+    The filter can be loaded multiple times by different instances of *ftl*, if the
+    filter performs a time consumming action, it can cache its results
+
+- reset, called when filters are rest, the filter should unset its variables
+
+### loading external filters
+
+You can load the filter manually with <fe> or from the command line.
+
+        ftl_visible_entries=/tmp/visible_entries f -f by_visible_entries
+
+### Externa filters examples
+
+Filters can be found in *$HOME/.config/ftl/filters*, there's a short README describing
+the filters.
+
 ## Using Bash to select and filter
 
         During an ftl session you decide that you want to select:
@@ -1267,7 +1352,7 @@ I check the file extension, if they match I bypass ftl's default viewer.
             - not in the backup directory 
             - with size under 5 MB
             - accessed this week
-            - belonging to group nadim
+            - belonging to group 'nadim'
             - which is a mp4 video
             - that's not rotated
             - that's does have matching sha256 signature file

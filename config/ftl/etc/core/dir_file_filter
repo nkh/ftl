@@ -21,11 +21,7 @@ filter_pipe="$(filter_add filter_not filter_1 filter_2 filter_rev)"
 # default sort, called in by ft_sort
 sort_by()    { sort $s_reversed ${sort_filters[s_type]} ; }
 
-# find directory entries, filter, sorts, color them andd split data in name, colored, size fifos
-
-# test() { tee >(cat >&2) ; }
-# test() { cat ; }
-
+# find directory entries, filter, sorts, color them add split data in name, colored, size fifos
 dir() 
 {
 ((lmode[tab]<2)) &&  { files "-type  d,l -xtype d" ; dirs_virt ; }  | ftl_filter | rg ${filters_dir[tab]} | ftl_sort | output_size | output_path
