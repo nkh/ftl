@@ -5,7 +5,10 @@ functionality: give commands to be executed after start
 			user's ftlrc can implement that
 
 		which options and how to do pass them to sub process?
-	
+			env variables
+			commands running in another process
+				ftl -c <(command option option)
+
 functionality: shortcut to start ftl in the current pane
 	always in cd mode
 

@@ -24,6 +24,24 @@ for key in "${keysa[@]}"
 C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$map	$section	$dscut	$command	$help"
 }
 
+unbind()
+{
+local keys="$1" shortcut= dscut=
+local keysa=( $keys )
+
+for key in "${keysa[@]}"
+	do
+	shortcut="$shortcut$key" 
+	{ [[ -n "${LA[$key]}"  ]] && dscut="$dscut ⇑${LA[$key]}/$key" ; } || { [[ -n "${LSA[$key]}" ]] && dscut="$dscut ⇈${LSA[$key]}/$key" ; } || dscut="$dscut $key"
+	done
+
+command="{$kbd_trie[$shortcut]}"
+
+unset C[$command]
+unset kbd_trie[$shortcut]
+unset bindings[$dscut]
+}
+
 reset_exclude_command_from_redo() { declare -g -A exclude_from_redo=() ; }
 exclude_command_from_redo() { exclude_from_redo[$1]=1 ; }
 
