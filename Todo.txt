@@ -1,5 +1,7 @@
 # Current
 
+issue: external preview not available if preview is not shown
+
 functionality: give commands to be executed after start
 		source them ala ftlrc
 			user's ftlrc can implement that

@@ -96,29 +96,57 @@ done
 shopt -u nocasematch ; qd=0 ; ((show_size || gpreview)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
 }
 
+average_s=0
+average_n=0
+
 list() # select_index
 {
-# [[ $ftl_cols != $COLS ]] && { echo width missmatch ; cdir ; return ; }
-
 [[ "$1" ]] && dir_file[${tab}_$PWD]="$1" ; file=${dir_file[${tab}_$PWD]:-0}
-((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none ; ((gpreview)) || save_state $fs ; selection ; geo_winch
-((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center, bottom = top + lines - 1, bottom = bottom < 0 ? 0 : bottom)) ; l=0
+((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none
+((gpreview)) || save_state $fsi
+selection ; geo_winch
 
+((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center, bottom = top + lines - 1, bottom = bottom < 0 ? 0 : bottom))
+
+show_header &
+show_header_pid=$!
+
+((nfiles)) &&
+	{
+	show_list
+	clear_list $bottom 
+	
+	wait $show_header_pid
+
+	((qd || gpreview)) || { preview ; geo_winch ; }
+	} || 
+	{
+	tcpreview
+	clear_list 0
+	}
+}
+
+show_list()
+{
+for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
+	cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
+	echo -ne "\e[${tline};0H\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo ; ((l++))
+done
+}
+
+show_header()
+{
 head="${lglyph[lmode[tab]]}${iglyph[vmode[tab]]}${pdir_only[tab]}${montage}" ; head=${head:+$head }
+
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
-((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { head="\e[33m∅  $head$ftag$tabsd" ; header '' "$head" ; tcpreview ; clear_list 0 ; return ; }
+((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { header '' "\e[33m∅  $head$ftag$tabsd" ; return ; }
 ((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
 ((s_type == 2 && show_date)) && date=$(find "${files[file]}" -maxdepth 0 -printf ' %Tx-%TH:%TM') || date=
 [[ "$to_search" ]] && search_h="S:$to_search " || search_h=
-head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$flip$search_h" ; header '' "$head"
 
-for((i=$top ; i <= bottom ; i++))
-	do
-		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
-		echo -ne "\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo ; ((l++))
-	done
+head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$flip$search_h"
 
-((l < LINES - 1)) && echo ; clear_list $i ; ((qd || gpreview)) || { preview ; geo_winch ; }
+header '' "$head"
 }
 
 preview() { ((prev_all)) && local_preview || { ((! main)) && remote_preview ; } ; }
