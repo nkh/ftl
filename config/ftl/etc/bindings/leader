@@ -4,7 +4,7 @@ leader_help_index=${FTL_LTC_INDEX:-1}
 leader_help()
 {
 [[ "$FTL_LTC" ]] && test_cmd="$FTL_LTC" || test_cmd='echo -n ftl: leader_help: variable FTL_LTC not set'
-tmux popup ${FTL_LTC_OPT:- -h 40% -w 80%} -d "$PWD" "leader_help_index='${1:-$leader_help_index}' ; p='$p' ; n='$n' ; $test_cmd"
+tmux popup ${FTL_LTC_OPT:- -h 40% -w 80%} -d "$PWD" "leader_help_index='${1:-$leader_help_index}' ; ftl_proc=$$ p='$p' n='$n' $test_cmd"
 }
 
 leader_help_reset()    { leader_help_index=${1:-${FTL_LTC_INDEX:-1}} ; }
