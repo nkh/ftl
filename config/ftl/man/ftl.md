@@ -710,9 +710,13 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         Multiple selection classes are available, *ftl* will ask which class
         to use. The number of entries is displayed in the header.
 
+        <[COUNT] a>        Select current entry in "normal" class and move down
+
         <[COUNT] ,>        Select current entry in "normal" class and move down
 
         <[COUNT] yy>       Select current entry in "normal" class and move down
+
+        <[COUNT] s>        Select current entry in "normal" class and move up
 
         <[COUNT] ;>        Select current entry in "normal" class and move up
 
@@ -940,11 +944,11 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
 
         Media types
 
-        <aa>               Background sound preview, stops when *ftl* closes.
+        <ea>               Background sound preview, stops when *ftl* closes.
 
-        <ak>               Kill sound preview 
+        <ek>               Kill sound preview 
 
-        <aq>               Queue entries in music player. default to cmus.
+        <eq>               Queue entries in music player. default to cmus.
 
                            You can binding cmus in *tmux* for easy access.
 
@@ -955,7 +959,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 default viewers are in file '$FTL_CFG/viewers/core'
 
 ## Shell Pane
-        <CTL-W ss> <s>     Shell pane
+        <CTL-W ss> < s >   Shell pane
 
         <CTL-W sv> <Sv>    Vertical shell pane, closes the preview
 

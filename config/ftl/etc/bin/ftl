@@ -149,8 +149,8 @@ head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$
 header '' "$head"
 }
 
-preview() { ((prev_all)) && local_preview || { ((! main)) && remote_preview ; } ; }
-local_preview() { ((emode)) && { ext_viewers ; emode=0 ; } || { pviewers ; extmode=0 ; } ; true ; }
+preview() {((! main)) && remote_preview  || local_preview ; }
+local_preview() { ((emode)) && { ext_viewers ; emode=0 ; } || { ((prev_all)) && pviewers ; extmode=0 ; } ; true ; }
 remote_preview() { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; true ; }
 
 setup_finfo()

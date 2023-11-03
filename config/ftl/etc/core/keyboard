@@ -97,7 +97,7 @@ OIFS="$IFS" ; IFS=
 
 [[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; } ; OREPLY="$REPLY"
 
-read -rsn 4 -t 0.002 E1 E2 E3 E4
+read -rsn 4 -t 0.001 E1 E2 E3 E4
 
 case "$REPLY$E1$E2$E3$E4" in 
 	$'\e'                           ) REPLY=ESCAPE ;;
@@ -110,12 +110,12 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'"'                            ) REPLY=DQUOTE ;;
 	$'\t'                           ) REPLY=TAB ;;
 	$''                             ) REPLY=ENTER ;;
-
+	
 	$'\e[A' | $'\e[OA' | $'\e[A\e[' ) REPLY=UP ;;
 	$'\e[B' | $'\e[0B' | $'\e[B\e[' ) REPLY=DOWN ;;
 	$'\e[C' | $'\e[OC' | $'\e[C\e[' ) REPLY=RIGHT ;;
 	$'\e[D' | $'\e[OD' | $'\e[D\e[' ) REPLY=LEFT ;;
-
+	
 	$'\e[2~'                        ) REPLY=INS ;;
 	$'\e[3~'                        ) REPLY=DEL ;;
 	$'\e[1~' | $'\e[H'              ) REPLY=HOME ;;
@@ -137,7 +137,7 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\e['24~                       ) REPLY=F12 ;;
 	# more F keys
 	# https://aperiodic.net/phil/archives/Geekery/term-function-keys/
-
+	
 	$'\001'                         ) REPLY=CTL-A ;;
 	$'\002'                         ) REPLY=CTL-B ;;
 	#$'\0??'                        ) REPLY=CTL-C ;;
@@ -164,6 +164,9 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\030'                         ) REPLY=CTL-X ;;
 	$'\031'                         ) REPLY=CTL-Y ;;
 	#$'\0??'                        ) REPLY=CTL-Z ;;
+	
+	$'\ej'                          ) REPLY="ALT-J" ;;
+	$'\ek'                          ) REPLY="ALT-K" ;;
 esac
 
 # [[ "$2" ]] && printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$REPLY" "${OREPLY}" "$E1" "$E2" "$E3" "$E4"

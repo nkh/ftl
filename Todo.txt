@@ -1,5 +1,13 @@
 # Current
 
+in Zs mode show disk free size
+
+functionality: integrate fzf server searches
+
+functionality: chose possible preview types for entry
+
+functionality: run application for entry and remember association
+
 issue: external preview not available if preview is not shown
 
 functionality: give commands to be executed after start
