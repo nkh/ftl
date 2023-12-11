@@ -1,0 +1,118 @@
+
+bind nkh test	V	show_fzf_view	"fzf view"
+
+show_fzf_view() 
+{ 
+tcpreview
+
+fzf_to_search=
+
+tsucommand _FZF_LISTEN "FZF_DEFAULT_COMMAND='$FZF_LISTEN_COMMAND' fzf --listen $FZF_LISTEN"
+sleep .1
+
+fzf_answer="$(xh :$FZF_LISTEN limit=="$((LINES * 3))")"
+fzf_total_count="$(<<<"$fzf_answer" jq -r '.totalCount')"
+fzf_entries="$(<<<"$fzf_answer" jq -r '.matches[].text')"
+
+nfiles_h=$fzf_total_count
+to_search="$fzf_to_search/0"
+cview get_custom_entries ; 
+
+key_map=fzf_client
+}
+
+fzf_entries=()
+fzf_client()
+{
+fzf_rq=
+
+case "$REPLY" in 
+	ERROR_142   ) : ;;
+
+	RIGHT       ) ;;
+	LEFT        ) ;;
+
+	+           ) preview_size ;;
+	PGDN        ) move_page_down ;;
+	PGUP        ) move_page_up ;;
+	DOWN        ) move_down ;;
+	UP          ) move_up ;;
+
+	,           ) selection_flip_down ;; 
+	';'         ) selection_flip_up ;; 
+
+	ENTER       ) fzf_rq=accept ; key_map= ; to_search= ; [[ -d "$p/$n" ]] && cdir "$p/$n" || cdir "$p" "$b" ;;
+
+	DEL| ESCAPE ) fzf_rq=abort ; key_map= ; to_search= ; nfiles_h= ; cdir ;; # ((FZF_LISTEN++))
+	BACKSPACE   ) [[ -n "$fzf_to_search" ]] && { fzf_rq=backward-delete-char ; fzf_to_search="${fzf_to_search::-1}" ; } ;;
+	TAB         ) fzf_rq=toggle ;;
+	BACKSLASH   ) : ;;
+	QUOTE       ) fzf_rq="put(')" ; fzf_to_search="$fzf_to_search'" ;;
+	*           ) fzf_rq="put($REPLY)" ; fzf_to_search="$fzf_to_search$REPLY" ;;
+esac
+
+[[ -n "$fzf_rq" ]] && 
+	{
+	xh :$FZF_LISTEN --raw "$fzf_rq" >/dev/null
+	
+	[[ "$fzf_rq" == abort || "$fzf_rq" == accept ]] ||
+		{
+		# fzf_answer="$(xh :$FZF_LISTEN limit=="$((LINES - 1))")"
+		fzf_answer="$(xh :$FZF_LISTEN limit=="$((3 * LINES))")"
+		fzf_total_count="$(<<<"$fzf_answer" jq -r '.totalCount')"
+		fzf_match_count="$(<<<"$fzf_answer" jq -r '.matchCount')"
+		fzf_entries="$(<<<"$fzf_answer" jq -r '.matches[].text')"
+		
+		nfiles_h=$fzf_total_count
+		to_search="$fzf_to_search/${fzf_match_count:-?}"
+		
+		cview get_custom_entries ; 
+		}
+	}
+}
+
+get_custom_entries()
+{
+dir_entries_list=()
+dir_entries_file=()
+dir_entries_path=()
+dir_entries_relative_path_length=()
+dir_entries_size=()
+dir_entries_color=()
+
+lscolors_args=()
+
+[[ -z "$fzf_entries" ]] && return
+
+while read dst ; do
+	[[ "$dst" =~ / ]] && dst_path="${dst%/*}" || dst_path= ; [[ ${dst_path:0:1} != "/" ]] && dst_path="$PWD/$dst_path" ;
+	dst_file="${dst##*/}"
+	
+	dir_entries_list+=("$dst")
+	dir_entries_file[$dst]="$dst_file"
+	dir_entries_path[$dst]="$dst_path"
+
+	[[ $PWD/ == "$dst_path" ]] && dir_entries_relative_path_length[$dst]=0 ||
+		{
+		relative_path="${dst_path:((${#PWD}+1))}/"
+		dir_entries_relative_path_length[$dst]=${#relative_path}
+		}
+done<<<"$fzf_entries"
+
+for entry in "${dir_entries_list[@]}" ; do
+	[[ $PWD/ == ${dir_entries_path[$entry]} ]] && 
+		lscolors_args+=("${dir_entries_file[$entry]}") || 
+		lscolors_args+=("${dir_entries_path[$entry]:((${#PWD}+1))}/${dir_entries_file[$entry]}")
+	
+	dir_entries_size[$entry]=10
+done
+
+entry_index=0
+while read colored_entry ; do
+	dir_entries_color[${dir_entries_list[$entry_index]}]="$colored_entry"
+	((entry_index++))
+done < <(lscolors "${lscolors_args[@]}")
+}
+
+# vim: set ft=bash:
+

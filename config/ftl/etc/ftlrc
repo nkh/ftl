@@ -78,6 +78,8 @@ pdf_prev_image=0				# show pdf as images if set
 fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
 fzfp_opt="--cycle --expect=ctrl-t --reverse"
 fzf_sxiv_opt="-0 -1 -m --expect=ctrl-t --bind alt-a:select-all"
+FZF_LISTEN=4466
+FZF_LISTEN_COMMAND='fd -H -I' # -E '*.git'
 
 # External Commands
 SXIV=sxiv
@@ -226,10 +228,10 @@ bind ftl media		er		external_mode2		"external viewer m2, detached"
 bind ftl media		ew		external_mode3		"external viewer, m3, detached, fullscreen"
 
 bind ftl move		ENTER		enter			"enter; cd or open file"
-bind ftl move		PGUP		move_page_up		"page down"
-bind ftl move		CTL-B		move_page_up		"page down"
-bind ftl move		PGDN		move_page_down		"page up"
-bind ftl move		CTL-F		move_page_down		"page up"
+bind ftl move		PGUP		move_page_up		"page up"
+bind ftl move		CTL-B		move_page_up		"page up"
+bind ftl move		PGDN		move_page_down		"page down"
+bind ftl move		CTL-F		move_page_down		"page down"
 bind ftl move		UP		move_up_arrow		"up to previous entry"
 bind ftl move		DOWN		move_down_arrow		"down to next entry"
 bind ftl move		RIGHT		move_right_arrow	"right; cd into directory"

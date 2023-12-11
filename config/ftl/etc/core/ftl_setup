@@ -1,9 +1,13 @@
 export FTL_CFG
 
 source $FTL_CFG/etc/core/ftl
+source $FTL_CFG/etc/core/debug
 
 declare -Ag C bindings kbd_trie key_map vfiles vdirs time_event_handlers marks ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
 my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore lkeep lkeep_tab tail tags ntags ftl_env du_size ; mkapipe 4 5 6
+
+declare -g  dir_entries_list
+declare -Ag dir_entries_path dir_entries_file dir_entries_color dir_entries_size dir_entries_relative_path_length
 
 selection=() ; n= ; fs=$ftl_root/$$ ; pfs=$fs ; ofs=$fs ; tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ;
 

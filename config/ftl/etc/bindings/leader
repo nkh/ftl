@@ -11,10 +11,10 @@ leader_help_reset()    { leader_help_index=${1:-${FTL_LTC_INDEX:-1}} ; }
 leader_help_next()     { ((leader_help_index++)) ; leader_help $leader_help_index ; }
 leader_help_previous() { ((leader_help_index > 1 && leader_help_index--)) ; leader_help $leader_help_index ; }
 
-bind leader test	"LEADER h h"		leader_help		"leader help"
-bind leader test	"LEADER h r"		leader_help_reset	"leader help reset"
-bind leader test	"LEADER h n"		leader_help_next	"leader help next"
-bind leader test	"LEADER h p"		leader_help_previous	"leader help previous"
+bind leader help	"LEADER h h"		leader_help		"leader help"
+bind leader help	"LEADER h r"		leader_help_reset	"leader help reset"
+bind leader help	"LEADER h n"		leader_help_next	"leader help next"
+bind leader help	"LEADER h p"		leader_help_previous	"leader help previous"
 
 bind leader selection	"LEADER ${A[t]}"	add_selection_to_file	"add selection to file"
 

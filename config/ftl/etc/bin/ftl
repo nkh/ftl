@@ -1,24 +1,5 @@
 #!/bin/env bash
 
-function stacktrace
-{ 
-local i=1 line file func
-while read -r line func file < <(caller $i); do
-	echo "[$i] $file:$line $func(): $(sed -n ${line}p $file)"
-	((i++))
-	done
-}
-
-function log()
-{
-echo "[$( caller )] $*" >&2
-echo "BASH_SOURCE: ${BASH_SOURCE[*]}" >&2
-echo "BASH_LINENO: ${BASH_LINENO[*]}" >&2 
-echo "FUNCNAME: ${FUNCNAME[*]}" >&2
-}
-
-numfmt() { /usr/bin/numfmt "$@" || { echo "$@" >>nmfmt_log ; echo -e "------------------\n\n" >>nmfmt_log ; stacktrace >>nmfmt_log ; error nmfmt: error "$@" ; } ; }
-
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2023, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup
@@ -41,9 +22,24 @@ ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_
 while : ; do tag_synch ; winch ; time_event ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key $KEY_TIMEOUT ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
-cdir() { inotify_k ; get_dir "$@" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; sleep 0.02 ; ((qd)) || refresh ; list "${3:-$found}" ; true ; }
+cdir() { cview get_dir_entries "$@" ; }
 
-get_dir() # dir, search
+cview() 
+{
+inotify_k
+
+get_entries="$1" ; shift
+
+get_entries_setup "$@"
+$get_entries "$@"
+prepare_entries "$@"
+
+((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; sleep 0.02 ; ((qd)) || refresh
+list "${3:-$found}"
+true
+}
+
+get_entries_setup()
 {
 [[ -d "${1:-$PWD}" ]] && cd "${1:-$PWD}" || return
 
@@ -55,17 +51,47 @@ tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep=
 files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
-ftl_cols=$COLS
+line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C
+}
 
-declare -A uniq_file ; shopt -s dotglob ; pad=(* ? ?) ; shopt -u dotglob ; pad=${#pad[@]} ; pad=${#pad} ; line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C ; v_entries ; dir &
+get_dir_entries()
+{
+dir_entries_list=() ; dir_entries_path=() ; dir_entries_relative_path_length=() ; dir_entries_file=() ; dir_entries_color=() ; dir_entries_size=()
+declare -A uniq_file
 
+v_entries ; dir &
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
-	[[ "$pnc" == "$dir_done" ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ; pl=${#pnc}
+	
+	[[ "$pnc" == "$dir_done" ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ;
+	
+	dir_entries_list+=("$pnc")
+	dir_entries_path[$pnc]="$PWD"
+	dir_entries_relative_path_length[$pnc]=0
+	dir_entries_file[$pnc]="$pnc"
+	dir_entries_color[$pnc]="$pc"
+	dir_entries_size[$pnc]=$size
+	
+	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { echo -e "\e[H\e[31m$nfiles\e[0m" ; qd=1 ; }
+done
+}
+
+prepare_entries()
+{
+printf -v pad "%d" ${#dir_entries_list[@]} ; pad=${#pad}
+
+for p_index in "${dir_entries_list[@]}" ; do
+	pc="${dir_entries_color[$p_index]}"
+	pnc="${dir_entries_file[$p_index]}"
+	ppath="${dir_entries_path[$p_index]}"
+	rpath_l=${dir_entries_relative_path_length[$p_index]}
+	
+	size=${dir_entries_size[$p_index]} ; ((sum += size))
+	pnc_l=${#pnc}
+	ppath_l=${#ppath}
 	
 	[[ -f "$pnc" ]] && # extension filtering
 		{
-		if [[ "$pnc" =~ '.' ]]
-		then
+		if [[ "$pnc" =~ '.' ]] ; then
 			e=${pnc##*.}
 			((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue
 			((${#lkeep_tab[$tab]})) && { ((lkeep_tab[${tab}_${e@Q}])) || continue ; }
@@ -80,24 +106,35 @@ while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read
 	# color directory that are not accessible
 	[[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
 	
-	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pl+=external_tag_length)) ; }
-	((sum += size)) ; ((show_size)) && { ((pl += 5)) ; [[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="     $pc" ; true ; } \
-			 || { for u in '' K M G T ; do ((size < 1024)) && printf -v pc "\e[94m%4s\e[m $pc" $size$u && break ; ((size/=1024)) ; done  ; } ; }
-	((show_line)) && { ((line++)) ; printf -v pc "$line_color%${pad}d\e[m¿${pc/\%/%%}" $line ; ((pl += $pad + 1)) ; }
+	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pnc_l+=external_tag_length)) ; }
 	
-	pcl=${pc:0:(( ${#pc} == $pl ? ($COLS - 1) : ( (${#pc} - 4) - $pl ) + ($COLS - 1) )) }
-	((pl > (COLS - 1))) && { [[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= ; pcl=${pcl:0:((${#pcl}-(${#e}+1)))}…${e} ; }
-	files_color[$nfiles]="$pcl" ; files[$nfiles]="$PWD$sep$pnc"
+	((show_size)) && 
+		{
+		[[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="      $pc" ; true ; } || pc="\e[94m$(file_size $size)\e[m $pc"
+		((pnc_l += 6))
+		}
 	
-	[[ -f "$pnc" ]] && [[ -z $first_file ]] && first_file=$nfiles
-	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" == "$search" ]] && found=$nfiles ; ((nfiles++))
+	((show_line)) && { ((line++)) ; printf -v pc "$line_color%${pad}d\e[m¿${pc/\%/%%}" $line ; ((pnc_l += pad + 1)) ; }
+	
+	[[ ${#pc} == $pnc_l ]] || pc="${pc:0:-4}" # remove color reset if entry is colored
+	
+	((rpath_l + pnc_l > COLS - 1)) && { 
+		[[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= 
+		ext_l=$((${#e}+1))
+		
+		pc="${pc:0:((- (((rpath_l + pnc_l) - (COLS - 1)) + ext_l) ))}…${e}"
+		}
+	
+	files_color[$nfiles]="$pc" ; files[$nfiles]="$ppath$sep$pnc"
+	
+	[[ -z $first_file ]] && [[ -f "$pnc" ]] && first_file=$nfiles
+	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" == "$search" ]] && found=$nfiles
+	
+	((nfiles++))
 done
 
 shopt -u nocasematch ; qd=0 ; ((show_size || gpreview)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
 }
-
-average_s=0
-average_n=0
 
 list() # select_index
 {
@@ -115,38 +152,35 @@ show_header_pid=$!
 
 ((nfiles)) &&
 	{
-	show_list
-	clear_list $bottom 
+	for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
+		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
+		echo -ne "\e[${tline};0H\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo ; ((l++))
+	done
 	
-	wait $show_header_pid
-
+	clear_list $tline 
+	
 	((qd || gpreview)) || { preview ; geo_winch ; }
 	} || 
 	{
 	tcpreview
 	clear_list 0
 	}
-}
 
-show_list()
-{
-for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
-	cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
-	echo -ne "\e[${tline};0H\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo ; ((l++))
-done
+wait $show_header_pid
 }
 
 show_header()
 {
 head="${lglyph[lmode[tab]]}${iglyph[vmode[tab]]}${pdir_only[tab]}${montage}" ; head=${head:+$head }
 
-((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
-((nfiles)) && { ((qd)) || ((flipi^=1)) ; flip="${flips[$flipi]}" ; } || { header '' "\e[33m∅  $head$ftag$tabsd" ; return ; }
-((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
-((s_type == 2 && show_date)) && date=$(find "${files[file]}" -maxdepth 0 -printf ' %Tx-%TH:%TM') || date=
 [[ "$to_search" ]] && search_h="S:$to_search " || search_h=
 
-head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles}$hsum$stat$date$tabsd$flip$search_h"
+((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
+((nfiles)) || { header '' "\e[33m∅  $head$ftag$tabsd$search_h" ; return ; }
+((show_stat)) && stat="$(stat -c ' %A %U' "${files[file]}") $(stat -c %s "${files[file]}" | numfmt --to=iec --format '%4f')" || stat= ;
+((s_type == 2 && show_date)) && date=$(find "${files[file]}" -maxdepth 0 -printf ' %Tx-%TH:%TM') || date=
+
+head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles_h:-$nfiles}$hsum$stat$date$tabsd$flip$search_h"
 
 header '' "$head"
 }
