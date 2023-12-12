@@ -108,6 +108,8 @@ selection ; geo_winch
 
 ((top = nfiles < lines || file <= center ? 0 : file >= nfiles - center ? nfiles - lines : file - center, bottom = top + lines - 1, bottom = bottom < 0 ? 0 : bottom))
 
+((flipi^=1)) ; flip="${flips[$flipi]}"
+
 show_header &
 show_header_pid=$!
 
