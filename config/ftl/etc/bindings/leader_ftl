@@ -14,7 +14,7 @@ bind leader_ftl extra	"LEADER f l"	lint			"run rmlint in current_directory"
 bind leader_ftl extra	"LEADER f m"	run_mutt		"send selection in mail"
 bind leader_ftl extra	"LEADER f P"	pdf2txt			"convert current pdf to text file"
 bind leader_ftl extra	"LEADER f p"	pdf_optimize		"reduce pdf size"
-bind leader_ftl extra	"LEADER f s"	shell_popup		"terminal popup"
+bind leader_ftl extra	"LEADER s"	shell_popup		"terminal popup"
 bind leader_ftl extra	"LEADER f v"	video_optimize		"reduce video size"
 
 # vim: set filetype=bash :

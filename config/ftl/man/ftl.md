@@ -899,13 +899,13 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         
         <LEADER f p>       Reduce pdf size                
         
-        <LEADER f s>       Terminal popup                 
+        <LEADER s>         Terminal popup                 
         
         <LEADER f t>       vim diff two selected files                 
         
         <LEADER f v>       Reduce video size              
         
-        <LEADER s >        Shred selection using _shred_  
+        <LEADER f s >      Shred selection using _shred_  
         
         <:url URL>         open URL in qutebrowser
 
@@ -959,7 +959,7 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
                 default viewers are in file '$FTL_CFG/viewers/core'
 
 ## Shell Pane
-        <CTL-W ss> < s >   Shell pane
+        <CTL-W ss> <Ss >   Shell pane
 
         <CTL-W sv> <Sv>    Vertical shell pane, closes the preview
 
@@ -1241,8 +1241,8 @@ This example can be found in $FTL_CONFIG/user_bindings/01_shred
                 list
         }
 
-        # bind shortcut <LEADER s> 
-        bind leader file "LEADER s" shred_command "overrides selection, bypasses \$RM"
+        # bind shortcut <LEADER f s> 
+        bind leader file "LEADER f s" shred_command "overrides selection, bypasses \$RM"
 
 ## user defined preview
 
@@ -1263,6 +1263,15 @@ I check the file extension, if they match I bypass ftl's default viewer.
         
         # you can define multiple hanlers in this function
         # return false for the default ftl handlers to run
+        }
+
+## user defined external viewer
+
+You can also define custom external viewers in your *ftlrc*.
+
+        user_eviewers() 
+        {
+        ...
         }
 
 ## External Filters

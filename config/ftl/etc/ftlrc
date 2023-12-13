@@ -99,7 +99,9 @@ B_PLAYER="$FTL_CFG/etc/viewers/mplayer_local" # background player
 Q_PLAYER="$FTL_CFG/etc/viewers/cmus"    # music player to queue to
 
 PAGER_ANSI='/usr/bin/less -R'		# default pager
+
 MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
+MD_RENDER0='ptext'			# default markdown renderer 
 MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
 MD_RENDER2='vmd'			# markdown renderer #2
 
@@ -276,7 +278,7 @@ bind ftl shell		"S!"		shell_view		"view shell"
 bind ftl shell		"CTL-W sS"	shell_files		"shell pane with selected files"
 bind ftl shell		SS		shell_files		"shell pane with selected files"
 bind ftl shell		"CTL-W ss"	shell			"shell pane"
-bind ftl shell		s		shell			"shell pane"
+bind ftl shell		Ss		shell			"shell pane"
 bind ftl shell		"CTL-W sq"	quit_shell		"close shell pane"
 bind ftl shell		Sq		quit_shell		"close shell pane"
 bind ftl shell		"CTL-W sv"	shell_vertical		"shell vertical pane"
@@ -370,6 +372,7 @@ bind ftl view		z1		preview_m1		"alternative preview mode 1"
 bind ftl view		z2		preview_m2		"alternative preview mode 2"
 bind ftl view		z3		preview_m3		"alternative preview mode 3"
 bind ftl view		z4		preview_m4		"alternative preview mode 4"
+bind ftl view		z5		preview_m5		"alternative preview mode 5"
 bind ftl view		Z0		set_directory_mode0	"directory default mode"
 bind ftl view		Z1		set_directory_mode1	"directory du mode"
 bind ftl view		Z2		set_directory_mode2	"directory ls mode"

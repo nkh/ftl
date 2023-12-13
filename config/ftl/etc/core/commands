@@ -137,6 +137,7 @@ preview_m1()		{ extmode=1 ; list ; }
 preview_m2()		{ extmode=2 ; list ; }
 preview_m3()		{ extmode=3 ; list ; }
 preview_m4()		{ extmode=4 ; list ; }
+preview_m5()		{ extmode=5 ; list ; }
 set_directory_mode0()	{ dirmode=0 ; list ; }
 set_directory_mode1()	{ dirmode=1 ; list ; }
 set_directory_mode2()	{ dirmode=2 ; list ; }

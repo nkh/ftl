@@ -1,26 +1,19 @@
 # Current
 
-in Zs mode show disk free size
+arch: entries in the view have their own path
+	current: the view shows the contents of the current directory
+
+	allowing any content in the view (and preview) lets us show the result of searches
+		filtering should apply on the contents of the view not the current directory
+		extra tags are passed a directory but should be passed the contents of the view
+
+	we can also create a virtual file system if the entries point to directories anywhere in the real FS
+
+	we can create file content from scripts or even before running ftl.
+
+	places impacted by change: filters, tree command, etags, TMSU, path_full?, cp/mv?, dir_size, git bindings, inotify, tag add/remove
 
 functionality: integrate fzf server searches
-
-functionality: chose possible preview types for entry
-
-functionality: run application for entry and remember association
-
-issue: external preview not available if preview is not shown
-
-functionality: give commands to be executed after start
-		source them ala ftlrc
-			user's ftlrc can implement that
-
-		which options and how to do pass them to sub process?
-			env variables
-			commands running in another process
-				ftl -c <(command option option)
-
-functionality: shortcut to start ftl in the current pane
-	always in cd mode
 
 functionality: pane splitting
 		what do we want?

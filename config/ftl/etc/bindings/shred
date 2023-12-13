@@ -15,7 +15,7 @@ prompt "shred: ${#selection[@]} entr${plural} [yes|N]? "
 }
 
 # bind shortcut
-bind leader file	"LEADER s"	shred_command	"override selection multiple times and deletes it, *** bypasses RM ***"
+bind leader file	"LEADER f s"	shred_command	"override selection multiple times and deletes it, *** bypasses RM ***"
 
 # vim: set filetype=bash :
 

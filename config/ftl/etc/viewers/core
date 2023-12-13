@@ -2,20 +2,24 @@
 
 source "$FTL_CFG/etc/commands/open_with"
 
+user_eviewers() { false ; }
 user_pviewers() { false ; }
 
 ext_viewers()
 {
-[[ -d "$n"                ]] && { ext_dir   ; return ; }
-[[ $e =~ html             ]] && { ext_html  ; return ; }
-[[ $e =~ svg              ]] && { ext_svg   ; return ; }
-[[ $e =~ $ifilter         ]] && { ext_image ; return ; }
-[[ $e == mp3              ]] && { ext_mp3   ; return ; }
-[[ $e =~ $mfilter         ]] && { ext_media ; return ; }
-[[ $e == pdf || $e == PDF ]] && { ext_pdf   ; return ; }
-[[ $e == epub             ]] && { return ; }
-[[ $e == sc               ]] && { ext_scim  ; return ; }
-[[ $e =~ ^json|yml$       ]] && [[ -s "$n" ]] && { ext_json ; return ; }
+user_eviewers && return ;
+
+[[ -d "$n"                  ]] && { ext_dir   ; return ; }
+[[ $e =~ html               ]] && { ext_html  ; return ; }
+[[ $e =~ svg                ]] && { ext_svg   ; return ; }
+[[ $e =~ $ifilter           ]] && { ext_image ; return ; }
+[[ $e == mp3                ]] && { ext_mp3   ; return ; }
+[[ $e =~ $mfilter           ]] && { ext_media ; return ; }
+[[ $e == pdf || $e == PDF   ]] && { ext_pdf   ; return ; }
+[[ $e == sc                 ]] && { ext_scim  ; return ; }
+[[ $e =~ ^md|MD$            ]] && { pmd    ; return ; }
+[[ $e == epub               ]] && { return ; }
+[[ $e =~ ^json|yml$         ]] && [[ -s "$n" ]] && { ext_json ; return ; }
 
 ((emode == 3)) && { open_with ; return ; }
 
@@ -81,7 +85,7 @@ ext_mp3()   { ((emode == 1)) && { player_k ; tcpreview ; $TE_PLAYER "${selection
 ext_media() { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "${selection[@]}" &>/dev/null &) ; mplayer=$! ; }
 ext_pdf()   { ((emode == 1)) && { ((pdf_prev_image)) && run_maxed mupdf "$n" || ext_pdf_vi ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } || { mupdf "$n" 2>/dev/null & } ; }
 ext_pdf_vi(){ edit "$($pgen/pdf "$n" $thumbs/pdf 1)" ; }
-ext_text()  { tcpreview ; tsplit "$EDITOR -t ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
+ext_text()  { tcpreview ; tsplit "$EDITOR ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
 ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
 ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ; alt_screen ; }
 
@@ -113,7 +117,7 @@ pmp3()      { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "$PAGER_ANS
 pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
 pmlive()    { ((extmode)) && { player_k ; t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "cat ${t@Q} ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
-pmd()       { md="${1:-$n}" ; ((extmode)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" || psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" ;  }
+pmd()       { md="${1:-$n}" ; ((extmode==1)) && psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" || { ((extmode==2)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" ; } || $MD_RENDER0 \"$md\" ;  }
 ptext()     { vipreview "$n" ; }
 pansi()     { ((!extmode)) && psplit "$PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $PAGER " ; } ; }
 
