@@ -18,6 +18,7 @@ nfiles_h=$fzf_total_count
 to_search="$fzf_to_search/0"
 cview get_custom_entries ; 
 
+custom_list=1
 key_map=fzf_client
 }
 
@@ -33,6 +34,8 @@ case "$REPLY" in
 	LEFT        ) ;;
 
 	+           ) preview_size ;;
+	CTL-E       ) emode=2 ; preview ;;
+	CTL-V       ) preview_pane ;;
 	PGDN        ) move_page_down ;;
 	PGUP        ) move_page_up ;;
 	DOWN        ) move_down ;;
@@ -41,12 +44,12 @@ case "$REPLY" in
 	,           ) selection_flip_down ;; 
 	';'         ) selection_flip_up ;; 
 
-	ENTER       ) fzf_rq=accept ; key_map= ; to_search= ; [[ -d "$p/$n" ]] && cdir "$p/$n" || cdir "$p" "$b" ;;
+	ENTER       ) fzf_rq=accept ; key_map= ; to_search= ; custom_list= ; [[ -d "$p/$n" ]] && cdir "$p/$n" || cdir "$p" "$b" ;;
 
-	DEL| ESCAPE ) fzf_rq=abort ; key_map= ; to_search= ; nfiles_h= ; cdir ;; # ((FZF_LISTEN++))
+	DEL| ESCAPE ) fzf_rq=abort ; key_map= ; to_search= ; nfiles_h= ; custom_list= ; cdir ;; # ((FZF_LISTEN++))
 	BACKSPACE   ) [[ -n "$fzf_to_search" ]] && { fzf_rq=backward-delete-char ; fzf_to_search="${fzf_to_search::-1}" ; } ;;
-	TAB         ) fzf_rq=toggle ;;
 	BACKSLASH   ) : ;;
+	LEADER      ) fzf_rq="put( )" ; fzf_to_search="$fzf_to_search "  ;;
 	QUOTE       ) fzf_rq="put(')" ; fzf_to_search="$fzf_to_search'" ;;
 	*           ) fzf_rq="put($REPLY)" ; fzf_to_search="$fzf_to_search$REPLY" ;;
 esac

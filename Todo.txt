@@ -5,11 +5,6 @@ functionality: extra header line with full path for entry
 functionality: multi character binding in custom key handler
 		add existing shortcuts to custome key handler by name
 
-functionality: fzf view
-		external preview
-		handle '\'
-
-
 functionality: pane splitting
 		what do we want?
 			split the current pane

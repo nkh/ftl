@@ -22,7 +22,7 @@ ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_
 while : ; do tag_synch ; winch ; time_event ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key $KEY_TIMEOUT ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
-cdir() { cview get_dir_entries "$@" ; }
+cdir() { [[ -n $custom_list ]] && view_list || cview get_dir_entries "$@" ; }
 
 cview() 
 {
@@ -33,7 +33,11 @@ get_entries="$1" ; shift
 get_entries_setup "$@"
 $get_entries "$@"
 prepare_entries "$@"
+view_list
+}
 
+view_list()
+{
 ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; sleep 0.02 ; ((qd)) || refresh
 list "${3:-$found}"
 true
