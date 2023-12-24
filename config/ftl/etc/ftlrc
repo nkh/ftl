@@ -1,4 +1,5 @@
 FTLRC_LOADED=1
+LANG=C LC_ALL=C
 
 # Directories
 pgen="$FTL_CFG/etc/generators"          # location of preview generators

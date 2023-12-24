@@ -23,6 +23,7 @@ while : ; do tag_synch ; winch ; time_event ; { [[ "$R" ]] && { REPLY="${R:0:1}"
 }
 
 cdir() { [[ -n $custom_list ]] && view_list || cview get_dir_entries "$@" ; }
+rdir() { geometry ; prepare_entries "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=${2:-1} ; list ; qd=0 ; }
 
 cview() 
 {
@@ -30,38 +31,27 @@ inotify_k
 
 get_entries="$1" ; shift
 
-get_entries_setup "$@"
-$get_entries "$@"
-prepare_entries "$@"
-view_list
-}
-
-view_list()
-{
-((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; sleep 0.02 ; ((qd)) || refresh
-list "${3:-$found}"
-true
-}
-
-get_entries_setup()
-{
 [[ -d "${1:-$PWD}" ]] && cd "${1:-$PWD}" || return
 
 [[ "$PPWD" != "$PWD" ]] && { hist_save ; marks["'"]="$n" ; PPWD="$PWD" ; }
-tabs[$tab]="$PWD" ; inotify_s ; ((etag)) && etag_dir ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
+tabs[$tab]="$PWD" ; inotify_s ; [[ "$PWD" == / ]] && sep= || sep=/ ; shopt -s nocasematch ; geo_prev
 
-((gpreview)) || nice -10 $pgen/generator $thumbs &
-
-files=() ; files_color=() ; mime=() ; nfiles=0 ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; found= ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
+mime=() ; search="${2:-$([[ "${dir_file[${tab}_$PPWD]}" ]] || echo "$find_auto")}" ; s_type=$sort_type0 ; s_reversed=$sort_reversed0
 [[ -f .ftlrc_dir ]] && source .ftlrc_dir ; s_type=${sort_type[tab]:-$s_type} ; [[ "${reversed[tab]}" == "-r" ]] && s_reversed=-r || { [[ "${reversed[tab]}" == "0" ]] && s_reversed= ; }
 
-line=0 ; sum=0 ; first_file= ; local LANG=C LC_ALL=C
+$get_entries "$@"
+prepare_entries "$@"
+view_list
 }
 
 get_dir_entries()
 {
 dir_entries_list=() ; dir_entries_path=() ; dir_entries_relative_path_length=() ; dir_entries_file=() ; dir_entries_color=() ; dir_entries_size=()
 declare -A uniq_file
+
+((etag)) && etag_dir 
+
+((gpreview)) || nice -10 $pgen/generator $thumbs &
 
 v_entries ; dir &
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
@@ -81,6 +71,8 @@ done
 
 prepare_entries()
 {
+files=() ; nfiles=0 ; files_color=() ; line=0 ; sum=0 ; first_file= ; found=
+
 printf -v pad "%d" ${#dir_entries_list[@]} ; pad=${#pad}
 
 for p_index in "${dir_entries_list[@]}" ; do
@@ -138,6 +130,13 @@ for p_index in "${dir_entries_list[@]}" ; do
 done
 
 shopt -u nocasematch ; qd=0 ; ((show_size || gpreview)) && hsum=$(numfmt --to=iec --format ' %4f' "$sum") || hsum=
+}
+
+view_list()
+{
+((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; sleep 0.02 ; ((qd)) || refresh
+list "${3:-$found}"
+true
 }
 
 list() # select_index
