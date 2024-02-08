@@ -158,7 +158,7 @@ show_header_pid=$!
 	{
 	for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
 		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
-		echo -ne "\e[${tline};0H\e[m\e[K$cursor${files_color[i]/¿/$flip}" ; ((i != bottom)) && echo ; ((l++))
+		echo -ne "\e[${tline};0H\e[m\e[K$cursor${files_color[i]/¿/$flip}\e[0m" ; ((i != bottom)) && echo ; ((l++))
 	done
 	
 	clear_list $tline 
