@@ -142,6 +142,7 @@ true
 list() # select_index
 {
 [[ "$1" ]] && dir_file[${tab}_$PWD]="$1" ; file=${dir_file[${tab}_$PWD]:-0}
+
 ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none
 ((gpreview)) || save_state $fsi
 selection ; geo_winch
@@ -188,9 +189,11 @@ head="$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles_h:-$nfiles}$hsum$stat$
 header '' "$head"
 }
 
-preview() {((! main)) && remote_preview  || local_preview ; }
-local_preview() { ((emode)) && { ext_viewers ; emode=0 ; } || { ((prev_all)) && pviewers ; extmode=0 ; } ; true ; }
-remote_preview() { pane_read ; save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ; true ; }
+preview()
+{
+((main)) && { ((emode)) && { ext_viewers ; emode=0 ; } || { ((prev_all)) && pviewers ; extmode=0 ; } ; } \
+	 || { save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ;}
+}
 
 setup_finfo()
 {

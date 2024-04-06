@@ -203,7 +203,8 @@ bind ftl ftl		ZP		quit_keep_preview	"quit, keep preview zoomed"
 bind ftl ftl		c		k_bindings		"show command bindings"
 bind ftl ftl		"$"		editor_detach		"detach editor preview"
 bind ftl ftl		":"		command_prompt		"run commands: q, etags, load_sel, ..."
-bind ftl ftl		r		refresh_pane		"refresh"
+# bind ftl ftl		r		refresh_pane		"refresh"
+bind ftl SIG		r		SIG_REFRESH		"preview pane signal"
 bind ftl ftl		¿		pdh_show		"pdh pane"
 
 bind ftl history	Hh		history_go		"fzf current session history"
@@ -388,9 +389,8 @@ bind ftl view		zM		preview_refresh		"refresh file preview/montage"
 # bind ftl view		not_assigned	preview_lock		"preview lock, using external script"
 # bind ftl view		not_assigned	preview_lock_clr	"preview lock clear"
 
-# don't change, reserved for *ftl*: [ÅåÄ]
+# don't change, reserved for *ftl*: [ÅåÄä]
 bind ftl SIG		'å'		SIG_PANE		"handle pane event"
-bind ftl SIG		'Å'		SIG_REFRESH		"preview pane signal"
 bind ftl SIG		'Ä'		SIG_REMOTE		"handle pane preview"
 # bind ftl SIG		not assigned	SIG_SYNCH_SHELL		"cd to shell pane"
 

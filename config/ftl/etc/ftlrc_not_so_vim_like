@@ -144,7 +144,6 @@ bind ftl view		"${SA[v]}"	preview_m2		"alternative preview for : dir, media, pdf
 
 # don't change, reserved for *ftl*: [ÅåÄ]
 bind ftl SIG		'å'		SIG_PANE		"handle pane event"
-bind ftl SIG		'Å'		SIG_REFRESH		"preview pane signal"
 bind ftl SIG		'Ä'		SIG_REMOTE		"handle pane preview"
 # bind ftl SIG		not assigned		SIG_SYNCH_SHELL		"cd to shell pane"
 

@@ -116,12 +116,15 @@ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; e
 		>>${1:-$fs}/ftl declare -p lignore lkeep
 		}
 }
-prev_synch(){ tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
-		((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
-		((gpreview)) && { [[ "$prev_cb" ]] && eval "$prev_cb" ; }
-		((gpreview)) && { [[ "$etag_s" ]] && { source "$FTL_CFG/etags/$etag_s" ; [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
-		((gpreview)) && { view_mode "${vmode[tab]}" 1 ; }
-		[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs=
+prev_synch()
+{
+tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
+
+((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
+((gpreview)) && { [[ "$prev_cb" ]] && eval "$prev_cb" ; }
+((gpreview)) && { [[ "$etag_s" ]] && { source "$FTL_CFG/etags/$etag_s" ; [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
+((gpreview)) && { view_mode "${vmode[tab]}" 1 ; }
+[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs=
 }
 thumb()     { echo "$thumbs/$1/$(md5sum <<<"$n" | cut -d' ' -f1)_$f.$2" ; }
 q_files()   { printf "%q\n" "${files[@]}" | perl -lne '-d || print' ; }
