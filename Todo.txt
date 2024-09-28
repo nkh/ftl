@@ -3,7 +3,7 @@
 functionality: extra header line with full path for entry
 
 functionality: multi character binding in custom key handler
-		add existing shortcuts to custome key handler by name
+		add existing shortcuts to custom key handler by name
 
 functionality: pane splitting
 		what do we want?

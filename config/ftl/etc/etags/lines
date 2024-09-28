@@ -4,8 +4,7 @@ declare -g -A ext_lines=()
 
 while read ext_file_lines ext_file ; do
 	
-	[[ "$ext_file_lines" == 0 ]] && ext_file_lines=
-	[[ "$ext_file" ]] && ext_lines[$ext_file]="$(printf "\e[2;37m%5s \e[m" "$ext_file_lines")"
+	ext_lines[$ext_file]="$(printf "\e[2;37m%5s \e[m" "$ext_file_lines")"
 	
 done < <(find "$PWD/" -mindepth 1 -maxdepth 1 -type f,l -printf '%P\n' | xargs grep -I -H -l . 2>&- | xargs wc -l)
 }
