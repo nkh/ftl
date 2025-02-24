@@ -107,6 +107,7 @@ MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-
 MD_RENDER0='ptext'			# default markdown renderer 
 MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
 MD_RENDER2='vmd'			# markdown renderer #2
+$MD_DIR_RENDER="vmd"			# markdown renderer for mode "show README in directory"
 
 HEXVIEW=hexdump				# hex viewer
 HEXEDIT=hexedit				# hex editor
@@ -205,11 +206,12 @@ bind ftl ftl		"$"		editor_detach		"detach editor preview"
 bind ftl ftl		":"		command_prompt		"run commands: q, etags, load_sel, ..."
 # bind ftl ftl		r		refresh_pane		"refresh"
 bind ftl SIG		r		SIG_REFRESH		"preview pane signal"
-bind ftl ftl		¿		pdh_show		"pdh pane"
+
+bind ftl ftl		INVERSED_QUESTION_MARK	pdh_show		"pdh pane"
 
 bind ftl history	Hh		history_go		"fzf current session history"
 bind ftl history	HH		ghistory		"fzf all sessions history"
-bind ftl history	"¨"		ghistory		"fzf all sessions history"
+bind ftl history	DIAERESIS	ghistory		"fzf all sessions history"
 bind ftl history	He		ghistory_edit		"edit all sessions history"
 bind ftl history	Hc		ghistory_clear		"clear all sessions history"
 
@@ -261,11 +263,9 @@ bind ftl move		j		move_down		"down to next entry"
 bind ftl move		k		move_up			"up to previous entry"
 bind ftl move		l		move_right		"right; cd into entry"
 bind ftl move		"COUNT %"	move_percent		"move by percent"
-bind ftl move		"("		goto_alt1		"next entry of same extension"
-bind ftl move		"{"		goto_alt2		"next entry of different extension"
+bind ftl move		"-"		goto_alt1		"next entry of same extension"
+bind ftl move		"_"		goto_alt2		"next entry of different extension"
 bind ftl move		"#"		goto_entry		"goto entry by index"
-bind ftl move		ö		goto_alt1		"next entry of same extension"
-bind ftl move		Ö		goto_alt2		"next entry of different extension"
 bind ftl move		yN		goto_prev_tag		"goto previous tag"
 bind ftl move		yn		goto_next_tag		"goto next tag"
 
@@ -296,7 +296,7 @@ bind ftl shell		gS		shell_synch		"cd to shell pane"
 bind ftl shell		"CTL-Z sp"	shell_cmd_in_pane	"run shell command in pane"
 bind ftl shell		Sp		shell_cmd_in_pane	"run shell command in pane"
 
-bind ftl tabs		"${SA[s]}"	tab_new			"new tab"
+bind ftl tabs		PARAGRAPH	tab_new			"new tab"
 bind ftl tabs		TAB		tab_next		"next tab"
 bind ftl tabs		"COUNT gt"	tab_goto		"go to tab"
 bind ftl tabs		gt		tab_next		"next tab"
@@ -316,15 +316,11 @@ bind ftl selection	yiE		selection_ext_all_fzf	"fzf select files ext, with subdir
 
 bind ftl selection	a		selection_flip_down	"select down"
 bind ftl selection	"COUNT a"	selection_flip_down	"select down"
-bind ftl selection	,		selection_flip_down	"select down"
-bind ftl selection	"COUNT ,"	selection_flip_down	"select down"
 bind ftl selection	yy		selection_flip_down	"select down"
 bind ftl selection	"COUNT yy"	selection_flip_down	"select down"
 
 bind ftl selection	s		selection_flip_up	"select up"
 bind ftl selection	"COUNT s"	selection_flip_up	"select up"
-bind ftl selection	";"		selection_flip_up	"select up"
-bind ftl selection	"COUNT ;"	selection_flip_up	"select up"
 bind ftl selection	yu		selection_flip_up	"select up"
 bind ftl selection	"COUNT yu"	selection_flip_up	"select up"
 

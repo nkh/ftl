@@ -105,7 +105,7 @@ pdir_ftl()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'r' ; } |
 
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 10" ; true ; }
-pdir_rmd()  { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmd "$n/$m" && break ; done ; }
+pdir_rmd()  { for m in "README.md" "README" ; do [[ -f "$n/$m" ]] && pmdd "$n/$m" && break ; done ; }
 pdir_exa()  { psplit "EXA_COLORS='$EXA_COLORS' exa "$n" $EXA_OPTIONS | $PAGER" ; true ; }
 pdir_image(){ in_pdir= ; m="$ftl_root/montage/$n/montage.jpg" ; [[ -e "$m" ]] || { header '' "$msg_m" ; "$pgen/montage" "$ftl_root" "$n" ; header '' "$head" ; } ; pw3image "$m" ; true ; }
 
@@ -122,6 +122,8 @@ pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e" '' ONE)" ; [[ -e "$t" 
 pmlive()    { ((extmode)) && { player_k ; t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "cat ${t@Q} ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
 pmd()       { md="${1:-$n}" ; ((extmode==1)) && psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" || { ((extmode==2)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" ; } || $MD_RENDER0 \"$md\" ;  }
+pmdd()      { md="${1:-$n}" ; psplit "$MD_DIR_RENDER \"$md\" " ;  }
+
 ptext()     { vipreview "$n" ; }
 pansi()     { ((!extmode)) && psplit "$PAGER \"$n\"" || { ((extmode==1)) && psplit "$EDITOR -R ${n@Q} -c AnsiEsc -c 'set nospell'" || psplit "ansi_show ${n@Q} | $PAGER " ; } ; }
 

@@ -110,7 +110,10 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'"'                            ) REPLY=DQUOTE ;;
 	$'\t'                           ) REPLY=TAB ;;
 	$''                             ) REPLY=ENTER ;;
-	
+	$'\302\247'                     ) REPLY=PARAGRAPH ;;
+	$'\302\277'                     ) REPLY=INVERSED_QUESTION_MARK ;;
+	$'\302\250'                     ) REPLY=DIAERESIS ;;
+
 	$'\e[A' | $'\e[OA' | $'\e[A\e[' ) REPLY=UP ;;
 	$'\e[B' | $'\e[0B' | $'\e[B\e[' ) REPLY=DOWN ;;
 	$'\e[C' | $'\e[OC' | $'\e[C\e[' ) REPLY=RIGHT ;;
@@ -169,6 +172,7 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\ek'                          ) REPLY="ALT-K" ;;
 esac
 
+# sed -n l
 # [[ "$2" ]] && printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$REPLY" "${OREPLY}" "$E1" "$E2" "$E3" "$E4"
 # pdhn "$(printf "%-10s < %-5q | %-5q | %-5q | %-5q | %-5q >\n" "$REPLY" "${OREPLY}" "$E1" "$E2" "$E3" "$E4")"
 

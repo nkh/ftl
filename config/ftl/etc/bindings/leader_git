@@ -19,8 +19,8 @@ git_tree() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "git-tree-sta
 
 bind git	extra	"LEADER g g"	git_etags	"git display status"
 bind git	extra	"LEADER g t"	git_tree	"git tree status"
-bind git	extra	"LEADER g d"	git_diff	"git diff"
-bind git	extra	"LEADER g D"	git_diff2	"git diff2"
+bind git	extra	"LEADER g d"	git_diff2	"git diff2"
+bind git	extra	"LEADER g D"	git_diff	"git diff"
 bind git	extra	"LEADER g f"	git_find	"git go to git file"
 
 bind git	extra	"LEADER g i"	git_ignore	"git add selection to directory .gitignore"

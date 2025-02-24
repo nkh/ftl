@@ -2,10 +2,10 @@ source "$FTL_CFG/etc/core/keyboard"
 source "$FTL_CFG/etc/core/commands"
 source "$FTL_CFG/etc/core/dir_file_filter"
 
-try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && $(try_error) || try_errorp ; } ; }
+try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && try_error || try_errorp ; } ; }
 alt_screen(){ echo -en '\e[?1049h' ; stty -echo ; tput civis ; }
-try_error() { echo "echo -ne '\e[2J\e[H\e[31m' ; cat $fs/log | tee -a $fs/errors_log && rm $fs/log" ; }
-try_errorp(){ pdhn  "$(cat $fs/log)" ; tmux popup -w 80% "$(try_error)" ; }
+try_error() { echo -en "\e[2J\e[H\e[31m;" ; [[ -s $fs/log ]] && { { cat $fs/log ; } | tee -a $fs/errors_log && rm $fs/log ; } ; }
+try_errorp(){ pdhn  "$(cat $fs/log)" ; read -sn1 ; tmux popup -w 80% "$(try_error)" ; }
 warn()      { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[33m$*'" ; }
 error()     { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[31m$*'" ; }
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
@@ -17,7 +17,8 @@ cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo
 clear_list(){ for(( i=$1 ; i <= LINES  ; i++)) ; do echo -ne "\e[${i};0H\e[K$flip" ; ((i <= LINES - 1)) && echo ; done ; }
 psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; true ; }
 ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
-cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == copy ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; }
+cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == copy ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; sleep 0.01 ; }
+
 cp_do()     { tscommand "xargs -a $1 -t -I{} -- cp -r {} ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv "$1" "$2" "${!ltags[@]}" ; } ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
