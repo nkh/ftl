@@ -63,6 +63,7 @@ user_pviewers && return ;
 [[ $e =~ json               ]]                && { pjson     ; return ; }
 [[ $e =~ yml                ]]                && { ptext     ; return ; }
 [[ $e == sc                 ]]                && { pscim     ; return ; }
+[[ $e =~ ^stl$              ]]                && { pstl      ; return ; }
 [[ $e =~ ^asciio$           ]]                && { pasciio   ; return ; }
 
 mime_get ; is_bin "$n" ; file_b="$(file -b "$n")"
@@ -139,6 +140,8 @@ pman()      { psplit "man \"$n\" ; read -sn 1000" ; true ; }
 
 pscim()     { psplit "scim \"$n\" | $PAGER ; read -sn100" ; }
 pasciio()   { psplit "asciio_to_text \"$n\" | $PAGER ; read -sn100" ; }
+
+pstl()      { i="$($pgen/stl "$n" "$thumbs/stl")" ; pw3image "$i" ; }
 
 pcomp()     
 {
