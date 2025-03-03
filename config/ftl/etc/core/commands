@@ -179,7 +179,7 @@ select_all_files()	{ for p in "${files[@]}" ; do [[ -f "$p" ]] && [[ ! ${tags[$p
 select_all()		{ for p in "${files[@]}" ; do [[ ! ${tags[$p]} ]] && tags["$p"]='▪' &&  tags_size + "$p" ; done ; list ; }
 tag_copy()		{ tag_check && cp_mv_tags copy "$PWD" ; cdir '' "$f"; }
 tag_move()		{ tag_check && cp_mv_tags move "$PWD" ; cdir '' "$f"; }
-tag_move_fzf()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; fzf_mv "${!ltags[@]}" ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
+tag_move_fzf()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { fzf_mv "${!ltags[@]}" && tags_unset $class ; true ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
 view_mode_all()		{ no_redraw=$1 ; vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; (($no_redraw)) || cdir '' "$f"; }
 view_mode_image()	{ no_redraw=$1 ; vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; (($no_redraw)) || cdir '' "$f"; }
 view_mode_not_image()	{ no_redraw=$1 ; vmode[tab]=2 ; tfilters[tab]="$ifilter$" ; ntfilter[tab]='-v' ; (($no_redraw)) || cdir '' "$f"; }
