@@ -2,8 +2,10 @@ source "$FTL_CFG/etc/core/keyboard"
 source "$FTL_CFG/etc/core/commands"
 source "$FTL_CFG/etc/core/dir_file_filter"
 
+alt_screen=0
+alt_screen(){ [[ $alt_screen == 0 ]] && { echo -en '\e[?1049h' ; stty -echo ; tput civis ; alt_screen=1 ; } ; }
+
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && try_error || try_errorp ; } ; }
-alt_screen(){ echo -en '\e[?1049h' ; stty -echo ; tput civis ; }
 try_error() { echo -en "\e[2J\e[H\e[31m;" ; [[ -s $fs/log ]] && { { cat $fs/log ; } | tee -a $fs/errors_log && rm $fs/log ; } ; }
 try_errorp(){ pdhn  "$(cat $fs/log)" ; read -sn1 ; tmux popup -w 80% "$(try_error)" ; }
 warn()      { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[33m$*'" ; }
@@ -29,7 +31,7 @@ dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m %4s\e[m" "$
 dir_esize() { printf "\e[94m%4s \e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
 dir_dusize(){ reset="$(printf '\e[0m')" ; declare -Ag du_size ; while IFS=$'\t' read color size file ; do du_size[$PWD/$file]="$color$size$reset" ; done < <(get_dusize) ; }
 get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(.*?)\e\[0m\t.\/(.*)/ ; printf "$c\t%4s\t$f\n", $s' ; }
-edit()      { tcpreview ; echo -en '\e[?1049h' ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; alt_screen ; emode=0 ; cdir ; }
+edit()      { tcpreview ; alt_screen ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; alt_screen ; emode=0 ; cdir ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read dst ; do fzf_in_tab "$dst" && continue ; ${1}_go $in_tab "$P" "$dst" ; done<<<"$2" ; }
 file_size() { h_size=$1 ; for u in ' ' K M G T ; do ((h_size < 1024)) && printf "%4s$u" $h_size && break ; ((h_size/=1024)) ; done ; }
@@ -84,7 +86,7 @@ qshell()    { ((qshell_c++, qshell_c > 2)) && return 1 ; (( $(tmux lsw -t ftl$$ 
 # reset_qshell_call(){ ((qshell_c)) && { ((rqsc)) && { (($SECONDS - rqsc > 3)) && qshell_c=0 rqsc=0 ; } || ((rqsc)) || rqsc=$SECONDS ; } ; }
 # time_event_handlers[reset_qshell_call]=reset_qshell_call
 }
-cdfl()      { true 2>&- >&3 && ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; }
+cdfl()      { true 2>&- >&3 && { ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
 quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
 refresh()   { echo -ne "\e[?25l$1" ; } 
 run_bash()  { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; alt_screen ; exec 2>"$fs/log" ; }

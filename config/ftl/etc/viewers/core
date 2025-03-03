@@ -141,7 +141,7 @@ pman()      { psplit "man \"$n\" ; read -sn 1000" ; true ; }
 pscim()     { psplit "scim \"$n\" | $PAGER ; read -sn100" ; }
 pasciio()   { psplit "asciio_to_text \"$n\" | $PAGER ; read -sn100" ; }
 
-pstl()      { i="$($pgen/stl "$n" "$thumbs/stl")" ; pw3image "$i" ; }
+pstl()      { pw3image "$($pgen/stl "$n" "$thumbs/stl")" ; }
 
 pcomp()     
 {

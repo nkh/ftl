@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2023, Artistic licence 2.0
+ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2025, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup
 
