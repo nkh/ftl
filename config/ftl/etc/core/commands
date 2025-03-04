@@ -177,8 +177,10 @@ tab_goto()		{ ((ntab = $COUNT - 1)) ; ((ntab != tab)) && [[ -n "${tabs[ntab]}" ]
 select_all_directories(){ for p in "${files[@]}" ; do [[ -d "$p" ]] && [[ ! ${tags[$p]} ]] && tags["$p"]='▪' && tags_size + "$p" ; done ; list ; }
 select_all_files()	{ for p in "${files[@]}" ; do [[ -f "$p" ]] && [[ ! ${tags[$p ]} ]] && tags["$p"]='▪' && tags_size + "$p" ; done ; list ; }
 select_all()		{ for p in "${files[@]}" ; do [[ ! ${tags[$p]} ]] && tags["$p"]='▪' &&  tags_size + "$p" ; done ; list ; }
-tag_copy()		{ tag_check && cp_mv_tags copy "$PWD" ; cdir '' "$f"; }
-tag_move()		{ tag_check && cp_mv_tags move "$PWD" ; cdir '' "$f"; }
+tag_copy()		{ cp_mv_tags copy "${1:-$PWD}" ; cdir '' "$f"; }
+tag_move()		{ cp_mv_tags move "${1:-$PWD}" ; cdir '' "$f"; }
+tag_copy_dest()		{ read -n 1 ; [[ $REPLY && -n ${dir_dest[$REPLY]} ]] && tag_copy "${dir_dest[$REPLY]}" ; }
+tag_move_dest()		{ read -n 1 ; [[ $REPLY && -n ${dir_dest[$REPLY]} ]] && tag_move "${dir_dest[$REPLY]}" ; }
 tag_move_fzf()		{ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { fzf_mv "${!ltags[@]}" && tags_unset $class ; true ; } || fzf_mv "$f" ;  cdir '' "$f" ; }
 view_mode_all()		{ no_redraw=$1 ; vmode[tab]=0 ; tfilters[tab]= ; ntfilter[tab]= ; (($no_redraw)) || cdir '' "$f"; }
 view_mode_image()	{ no_redraw=$1 ; vmode[tab]=1 ; ntfilter[tab]= ; tfilters[tab]="$ifilter$" ; (($no_redraw)) || cdir '' "$f"; }

@@ -19,6 +19,8 @@ help_command="man ftl.1"                # command to run to show help, see # Vim
 # Bookmarks
 declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
 
+declare -A dir_dest=()                  # directory destinations 1 letter alias
+
 # User colors
 # declare -A user_colors=([?]="30;42")  # override LS_COLORS
 
@@ -156,6 +158,8 @@ bind ftl entry		R		rename			"rename selection"
 bind ftl entry		w		copy			"copy file to, prompts inline"
 bind ftl entry		pp		tag_copy		"copy selection to current directory"
 bind ftl entry		pm		tag_move		"move selection to current directory"
+bind ftl entry		PP		tag_copy_dest		"copy selection to preset dir_dest"
+bind ftl entry		PM		tag_move_dest		"move selection to preset dir_dest"
 bind ftl entry		pz		tag_move_fzf		"move selection to predefine location using fzf_mv"
 bind ftl entry		pop		tag_copy_to_tab		"copy selection to other tab"
 bind ftl entry		pom		tag_move_to_tab		"move selection to other tab"
