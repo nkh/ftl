@@ -20,7 +20,6 @@ clear_list(){ for(( i=$1 ; i <= LINES  ; i++)) ; do echo -ne "\e[${i};0H\e[K$fli
 psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; true ; }
 ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
 cp_mv()     { cmvs=$fs/cmv_$SECONDS ; printf '%q\n' "${@:3}" >$cmvs ; [[ $1 == copy ]] && cp_do $cmvs "$2" || tscommand "xargs -a $cmvs -t -- mv -t ${2@Q}" ; sleep 0.01 ; }
-
 cp_do()     { tscommand "xargs -a $1 -t -I{} -- cp -r {} ${2@Q}" ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv "$1" "$2" "${!ltags[@]}" ; } || cp_mv "$1" "$2" "$f" ; true ; }
 dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
@@ -143,9 +142,11 @@ _tab_read() { _tab_new "$1" ; [[ -d "$1" ]] && { findex="$(_tab_index "$@")" ;  
 _tab_index() { findex= ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && findex=$index ; ((index++)) ; done ; echo $findex ; }
 tab_setup() { pdir_only[tab]= ; depth[tab]=1 ; vmode[tab]=0 ; lmode[tab]=0 ; filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
-tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | fzf-tmux -p 80% --cycle --reverse --info=inline )" ; } || echo "${tags[$t]}" ; }
+tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | tag_fzf)" ; } || echo "${tags[$t]}" ; }
+tag_fzf()   { fzf-tmux -1 -p 80% --cycle --reverse --info=inline --preview 'entry={} ; cat "'$fs'/ntags_${entry}"' ; }
+
 tags_clear(){ ((stagsi++)) ; tags=() ; tags_size=0 ; true ; }
-tag_ntags() { ((stagsi++)) ; ntags=() ; for t in "${!tags[@]}" ; do ntags[${tags[$t]}]=1 ; done ; }
+tag_ntags() { ((stagsi++)) ; ntags=() ; rm $fs/ntags* 2>/dev/null ; for t in "${!tags[@]}" ; do echo "$t" | lscolors >>"$fs/ntags_${tags[$t]}" ; ntags[${tags[$t]}]=1 ; done ; }
 tag_flip()  { ((stagsi++)) ; [[ "${tags[$1]}" ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; true ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_set()   { ((stagsi++)) ; [[ "${tags[$1]}" ]] || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
 tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }

@@ -6,7 +6,6 @@ issue: error message fromn inotify
 
 	?fix moved inotify_s down in code
 
-
 issue: file named '773b563d931dd50c1e1b14d6893e0dfa_Lost Atlantide 03 Abel et Caïn [1920].cbr.jpg' is not handled properly
 	preview not shown
 	can't be copied
