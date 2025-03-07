@@ -13,7 +13,5 @@ selection=() ; n= ; fs=$ftl_root/$$ ; pfs=$fs ; ofs=$fs ; tab=0 ; tabs+=("$PWD")
 
 filter_rst ; vfiles_rst ; sort_filters=('-k3 -V' '-n' '-k2 -V') ; flips=(' ' ' ')
 
-ftl_dir_done=e56fbb22f2967
-
 # vim: set filetype=bash:
 

@@ -58,7 +58,7 @@ declare -A uniq_file
 v_entries ; dir &
 while : ; do read -s -u 4 pnc ; [ $? -gt 128 ] && break ; read -s -u 5 pc ; read -s -u 6 size
 	
-	[[ "$pnc" == "$dir_done" ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ;
+	[[ "$pnc" == "" ]] && break ; ((${uniq_file[$pnc]})) && continue ; uniq_file[$pnc]=1 ;
 	
 	dir_entries_list+=("$pnc")
 	dir_entries_path[$pnc]="$PWD"

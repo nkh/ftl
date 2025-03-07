@@ -13,7 +13,7 @@ filter_1()   { rg ${filters[tab]} ; }
 filter_2()   { rg ${filters2[tab]}  ; }
 filter_rev() { [[ "${rfilters[tab]}" ]] && rg -v ${rfilters[tab]} || cat ; } 
 
-user_color() { ((${#user_colors[@]})) && { while read cf ; do ((${#user_colors[$cf]})) && echo -e "\e[${user_colors[$cf]}m$cf\e[m" || printf "%s\n" "$cf" ; done ; } || cat ; }
+user_color() { ((${#user_colors[@]})) && { while read cf ; do ((${#user_colors[$cf]})) && echo -e "\e[${user_colors[$cf]}m$cf\e[m" || echo "$cf" ; done ; } || cat ; }
 
 # default filters pipe
 filter_pipe="$(filter_add filter_not filter_1 filter_2 filter_rev)"
@@ -38,7 +38,7 @@ dirs_virt()  { ((${#vdirs[@]}))  && printf "0\t0\t%s\n" "${!vdirs[@]}" ; }
 output_size(){ tee >(cut -f 1 >&6) | cut -f 3- ; }
 output_path(){ tee >(cat >&4) | vfiles_clr | user_color | lscolors >&5 ; }
 
-dir_done()   { echo "$ftl_dir_don" >&4 ; echo '' >&5 ; echo 0 >&6 ; }
+dir_done()   { echo >&4 ; echo >&5 ; echo 0 >&6 ; }
 
 # vim: set ft=bash:
 
