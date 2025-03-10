@@ -13,7 +13,7 @@ exec 2>&9
 # detects that it was sourced directly and calls ftl_setup and then calls
 # pfzf which is defined below
 
-go_loop fzf "$( \
+fzf_choice="$( \
 	{ (( "$1" )) && { { fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' ; } \
 		|| { fd -HI -E'.git/*' | sed 's/^.\///' ; } ; } | \
 	lscolors | \
@@ -25,6 +25,8 @@ go_loop fzf "$( \
 			--preview-window='right:0%' \
 			--cycle --reverse --info=inline
 	)"
+
+[[ "$fzf_choice" ]] && { go_loop fzf "$fzf_choice" ; true ;  } || { tput civis ; tcpreview ; list  ;}
 
 exec 2>"$fs/log"
 }
