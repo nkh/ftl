@@ -18,7 +18,7 @@ vipreview() { ((in_viprev)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E -e 
 cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 clear_list(){ for(( i=$1 ; i <= LINES  ; i++)) ; do echo -ne "\e[${i};0H\e[K$flip" ; ((i <= LINES - 1)) && echo ; done ; }
 psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; true ; }
-ctsplit()   { { in_pdir= ; in_viprev= ; in_ftli= ; } ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; }
+ctsplit()   { in_pdir= in_viprev= in_ftli= ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; sleep 0.2 ; }
 cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv "$1" "$2" "${!ltags[@]}" ; } || cp_mv "$1" "$2" "$f" ; true ; }
 cp_mv()     { [[ $1 == copy ]] && cp_do "$@" || mv_do "$@" ; sleep 0.01 ; }
 cp_do()     { cmvs=$fs/cmv_$SECONDS ; printf '%s\n' "${@:3}" >$cmvs ; tscommand "xargs -a $cmvs -t -I{} -- cp -r \$'{}' ${2@Q}" ; }
@@ -119,6 +119,7 @@ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; e
 		>>${1:-$fs}/ftl declare -p lignore lkeep
 		}
 }
+
 prev_synch()
 {
 tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"

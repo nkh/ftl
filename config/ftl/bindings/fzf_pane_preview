@@ -1,10 +1,25 @@
 
 # an experimental fzf search with preview in a ftl pane
 
+previewd()
+{
+source '$FTL_CFG'/viewers/core "$f"
+
+while read -r n
+	do
+		[[ "$n" == previewd_shutdown ]] \
+			&& { tcpreview ; exit ;} \
+			|| pfzf "$n"
+	done
+}
+
 fzf_pane_preview() { fzf_pane_preview_all 1 ; }
 
 fzf_pane_preview_all()
 {
+mkapipe 10
+<&10 previewd &
+
 exec 2>&9
 
 # find all files and pass then to fzf, and declare a previewr
@@ -21,12 +36,14 @@ fzf_choice="$( \
 			--ansi \
 			-m \
 			--expect=ctrl-t \
-			--preview 'my_pane='$my_pane' ; extmode='$extmode' ; pane_id='$pane_id' ; source '$FTL_CFG'/viewers/core {} ; read -sn 100' \
+			--preview 'echo {} >&10 ; read -sn 100' \
 			--preview-window='right:0%' \
 			--cycle --reverse --info=inline
 	)"
 
-[[ "$fzf_choice" ]] && { go_loop fzf "$fzf_choice" ; true ;  } || { tput civis ; tcpreview ; list  ;}
+echo previewd_shutdown >&10 ; tcpreview
+
+[[ "$fzf_choice" ]] && { go_loop fzf "$fzf_choice" ; list ; true ;  } || { tput civis ; tcpreview ; list  ; }
 
 exec 2>"$fs/log"
 }
@@ -36,16 +53,16 @@ pfzf()
 # fzf preview in ftl preview pane, reusing the normal previewer
 
 # replace ctsplit with psplit
-fzf_viewer=1
+# fzf_viewer=1
 
 n="$(realpath "$1")" ; f="$(basename "$1")" ; [[ "$f" =~ \. ]] && e="${f##*.}" || e=
 
 # set pfs
-fzf_viewer_fs=/tmp/fzf_viewer ; mkdir -p "$fzf_viewer_fs" ; pfs="$fzf_viewer_fs"
+# fzf_viewer_fs=/tmp/fzf_viewer ; mkdir -p "$fzf_viewer_fs" ; pfs="$fzf_viewer_fs"
 
 # handle tmux "not cleaning" pane
-tmux respawn-pane -k -t $pane_id "for i in \$(seq 100) ; do echo -e '\e[30m.' ; done ; read -sn1" 
-sleep .02
+# tmux respawn-pane -k -t $pane_id "for i in \$(seq 100) ; do echo -e '\e[30m.' ; done ; read -sn1" 
+# sleep .02
 
 # use pdir_ls for directory
 [[ -d "$n" ]] && { pdir_ls ; return ; }
@@ -54,8 +71,9 @@ sleep .02
 pviewers
 }
 
-bind ftl search 	gfp	fzf_pane_preview	"fzf with preview in preview pane"
-bind ftl search 	gfP	fzf_pane_preview_all	"fzf with preview in preview pane, sub directories"
+bind ftl find		"/"	fzf_pane_preview	"find via fzf with pane preview"
+bind ftl search		gfp	fzf_pane_preview	"fzf with preview in preview pane"
+bind ftl search		gfP	fzf_pane_preview_all	"fzf with preview in preview pane, sub directories"
 
 
 # vim: set filetype=bash :

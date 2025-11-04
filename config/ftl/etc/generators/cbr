@@ -3,9 +3,10 @@ mkdir -p "$2"
 exec 2>>"$2/generators_log"
 
 f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
+f=$(perl -e '($f = $ARGV[0]) =~ s/[^a-zA-Z0-9]/_/g ; print $f' "$f")
 t="$2/$f.jpg"
 
-[[ "$4" = ONE ]] && { echo "$t" ; exit ; }
+# [[ "$4" = ONE ]] && { echo "$t" ; exit ; }
 
 [[ FORCE == "$4" || "$t" -ot "$1" ]] &&
 	{
