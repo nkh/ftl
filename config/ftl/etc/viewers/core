@@ -18,7 +18,7 @@ user_eviewers && return ;
 [[ $e == pdf || $e == PDF   ]] && { ext_pdf   ; return ; }
 [[ $e == sc                 ]] && { ext_scim  ; return ; }
 [[ $e =~ ^md|MD$            ]] && { pmd       ; return ; }
-[[ $e == epub               ]] && { return ; }
+[[ $e == epub               ]] && { ext_epub  ; return ; }
 [[ $e =~ ^json|yml$         ]] && [[ -s "$n" ]] && { ext_json ; return ; }
 
 ((emode == 3)) && { open_with ; return ; }
@@ -86,6 +86,7 @@ ext_image() { images=() ; for img in "${files[@]}" ; do [[ "$img" =~ $ifilter ]]
 ext_mp3()   { ((emode == 1)) && { player_k ; tcpreview ; $TE_PLAYER "${selection[@]}" ; true ; } || ($G_PLAYER "${selection[@]}" &>/dev/null &) ; mplayer=$! ; }
 ext_media() { ((emode == 1)) && { player_k ; $T_PLAYER "$n" </dev/null &>/dev/null & } || ($G_PLAYER "${selection[@]}" &>/dev/null &) ; mplayer=$! ; }
 ext_pdf()   { ((emode == 1)) && { ((pdf_prev_image)) && run_maxed mupdf "$n" || ext_pdf_vi ; } || { ((emode == 3)) && run_maxed mupdf "$n" ; } || { mupdf "$n" 2>/dev/null & } ; }
+ext_epub()  { ((emode == 1)) && { run_maxed okular "$n" ; } ; }
 ext_pdf_vi(){ edit "$($pgen/pdf "$n" $thumbs/pdf 1)" ; }
 ext_text()  { tcpreview ; tsplit "$EDITOR ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
 ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
@@ -95,7 +96,7 @@ pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtype' ; echo -n 'file type: '; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
-pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
+pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; pdhn "$t" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 pcbz()      { t="$($pgen/cbz "$n" "$thumbs/cbz" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 
 pdir()      { pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; (( extmode != 0 )) && { [[ "${pdirv[$extmode]}" ]] && ${pdirv[$extmode]} ; } || pdir_def ; }
