@@ -66,6 +66,8 @@ pip3 install		vmd \
 			ueberzug \
 			edir
 
+# install https://github.com/tomas/pixelhopper and set GIF_VIEWER for animated gif viewing
+
 # install cargo (and rust!) see https://www.rust-lang.org/tools/install
 # yes I highly dislike "curl ... | sh"
 curl https://sh.rustup.rs -sSf | sh

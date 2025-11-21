@@ -86,6 +86,7 @@ FZF_LISTEN_COMMAND='fd -H -I' # -E '*.git'
 
 # External Commands
 SXIV=sxiv
+GIF_VIEWER=                             # https://github.com/tomas/pixelhopper works fine
 EDITOR="vim -p"
 FILE_DIFF=vimdiff
 
