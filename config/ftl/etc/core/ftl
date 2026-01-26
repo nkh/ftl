@@ -139,9 +139,12 @@ tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "$
 _tab_new()  { [[ "$1" == '.' ]] && dir= || dir="$1" ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; tab_setup ; }
 _tab_next() { ((tab++)) ; I=(${!tabs[@]}) ; for i in "${I[@]:$tab}" "${I[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
 _tab_prev() { I=(${!tabs[@]}) ; RI=($(echo "${I[@]}" "${I[@]:0:tab}" | rev | tr ' ' '\n')) ; for i in "${RI[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
+
+declare -A icache dcache # tab_read is called once wen ftl is started with -t option
 tab_read()  { tabs=() ; ntabs=0 ; while read -r P ; do P="$(path_full "$P")" ; [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; }
-_tab_read() { _tab_new "$1" ; [[ -d "$1" ]] && { findex="$(_tab_index "$@")" ;  [[ "$findex" ]] && dir_file[${tab}_$1]=$index ; } ; true ; }
-_tab_index() { findex= ; index=0 ; for e in $(cd "$1" ; fd . -t d -d 1 ; fd . -t f -d 1) ; do [[ "$e" == "./$2" ]] && findex=$index ; ((index++)) ; done ; echo $findex ; }
+_tab_read() { _tab_new "$1" ; [[ -d "$1" ]] && { _tab_index "$1" ; dir_file[${tab}_$(realpath "$1")]=${icache[$1/$2]} ; } ; true ; }
+_tab_index(){ [[ -n "${dcache[$1]}" ]] || { dcache[$1]=1 ; index=0 ; while IFS= read -r e; do icache["$1/$e"]=$index ; ((index++)) ; done < <(cd "$1" && as_dir) ; } ; }
+
 tab_setup() { pdir_only[tab]= ; depth[tab]=1 ; vmode[tab]=0 ; lmode[tab]=0 ; filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; }
 tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
 tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | tag_fzf)" ; } || echo "${tags[$t]}" ; }
