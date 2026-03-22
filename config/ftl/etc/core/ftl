@@ -34,10 +34,11 @@ get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(
 edit()      { tcpreview ; alt_screen ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; alt_screen ; emode=0 ; cdir ; }
 ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
 go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read dst ; do fzf_in_tab "$dst" && continue ; ${1}_go $in_tab "$P" "$dst" ; done<<<"$2" ; }
+go_rl_args(){ gls=""; while IFS=: read -r g l _ ; do [[ "$g" ]] || continue; [[ "$gls" ]] && gls+=" -c \"tabe +$l $g\"" || gls+=" +$l $g" ; done <<<"$(fzfr)"; echo "$gls"; }
 file_size() { h_size=$1 ; for u in ' ' K M G T ; do ((h_size < 1024)) && printf "%4s$u" $h_size && break ; ((h_size/=1024)) ; done ; }
 fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }
 fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d" || nd="$d" ; dst="$(basename "$3")" ; [[ -d "$nd/$dst" ]] && cdir "$nd"/"$dst" || cdir "$nd" "$dst" ; }
-rg_go()     { g=${3%%:*} ; d="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
+rg_go()     { g=${3%%:*} ; l=${3#*:} ; l=${l%%:*} ; echo "$3 -> $g => $l" >&3 ; ="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
 tag_go()    { ti=0 ; for tag_path in "${!tags[@]}" ; do ((ti == $1)) && nn="$tag_path" && break ; ((ti++)) ; done ; cdir "$(dirname "$nn")" "$(basename "$nn")" ; }
 fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
 geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
