@@ -173,6 +173,7 @@ tsnew()     { tmux has-session -t ftl${1:-$$} &>/dev/null || { tmux new -A -d -s
 tsc()       { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w-=1)) ; (( w > 0 )) && { [[ "${1:-0}" != "$w" ]] && error Error in background command ; echo $w ; } ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" && { sleep 0.04 ; pane_id=$(tmux display -p '#{pane_id}') && tselectp $4 ; } ; }
 tselectp()  { [[ "$1" =~ ^% ]] && tmux selectp -t $1 || tmux selectp -t $pane_id ${1:--L} ; }
+texists()   { tmux list-windows -F '#{window_name}' | grep -Fxq -- "$1" ; }
 winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh_pane]}$R" ; }
 zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
 

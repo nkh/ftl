@@ -15,56 +15,58 @@ mkdir -p $FTL_CFG
 mkdir -p $FTL_CFG/etc/bin/third_party
 cd $FTL_CFG
 
-sudo apt install -y 	ack \
-			python3-pip \
-			libimage-exiftool-perl \
-			libdata-treedumper-perl \
-			cpanminus \
-			curl \
-			diffutils \
-			exa \
-			exiftool \
-			expect \
-			fd-find \
-			ffmpegthumbnailer \
-			sxiv \
-			fzf \
-			git \
-			imagemagick \
-			jpegoptim \
-			jq
-			libvips-tools \
-			librsvg2-bin \
-			libx11-dev \
-			libxext-dev \
-			mcomix \
-			moreutils \
-			mplayer \
-			mupdf-tools \
-			openscad \
-			perl \
-			pandoc \
-			qutebrowser \
-			ripgrep \
-			rlwrap \
-			rmlint \
-			tmux \
-			tree \
-			unrar \
-			vim \
-			vlc \
-			w3m \
-			w3m-img \
-			whiptail \
-			wmctrl \
-			xdotool \
-			xh \
-			zathura \
-			zathura-cb \
+sudo apt install -y \
+	ack \
+	python3-pip \
+	libimage-exiftool-perl \
+	libdata-treedumper-perl \
+	cpanminus \
+	curl \
+	diffutils \
+	exa \
+	exiftool \
+	expect \
+	fd-find \
+	ffmpegthumbnailer \
+	sxiv \
+	fzf \
+	git \
+	imagemagick \
+	jpegoptim \
+	jq
+	libvips-tools \
+	librsvg2-bin \
+	libx11-dev \
+	libxext-dev \
+	mcomix \
+	moreutils \
+	mplayer \
+	mupdf-tools \
+	openscad \
+	perl \
+	pandoc \
+	qutebrowser \
+	ripgrep \
+	rlwrap \
+	rmlint \
+	tmux \
+	tree \
+	unrar \
+	vim \
+	vlc \
+	w3m \
+	w3m-img \
+	whiptail \
+	wmctrl \
+	xdotool \
+	xh \
+	zathura \
+	zathura-cb \
 
-pip3 install		vmd \
-			ueberzug \
-			edir
+pip3 install \
+	vmd \
+	ueberzug \
+	edir
 
 # install https://github.com/tomas/pixelhopper and set GIF_VIEWER for animated gif viewing
 
@@ -73,16 +75,17 @@ pip3 install		vmd \
 curl https://sh.rustup.rs -sSf | sh
 source ~/.bashrc
 
-cargo install 		lscolors
+cargo install lscolors
 
-sudo cpanm		File::MimeInfo \
-			Term::ANSIColor \
-			File::Spec \
-			Term::ANSIColor \
-			Getopt::Long \
-			FileHandle \
-			IPC::Open2 \
-			App::ansifold \
+sudo cpanm \
+	File::MimeInfo \
+	Term::ANSIColor \
+	File::Spec \
+	Term::ANSIColor \
+	Getopt::Long \
+	FileHandle \
+	IPC::Open2 \
+	App::ansifold \
 
 sudo ln -s /usr/bin/fdfind /usr/bin/fd # old fdfind name is used
 cp /usr/lib/w3m/w3mimgdisplay $FTL_CFG/etc/bin/third_party

@@ -7,7 +7,9 @@ terminal_cat()		{ ctsplit "cat ${n@Q} ; read -sn 100" ; }
 hexview()		{ ctsplit "$HEXVIEW ${n@Q} ; read -sn 100" ; }
 hexedit()		{ ctsplit "$HEXEDIT ${n@Q}" ; }
 vim_edit()		{ tcpreview ; $EDITOR "${selection[@]}" ; }
-vim_edit_window()	{ tmux new-window "$EDITOR ${selection[@]@Q}" ; }
+vim_edit_window()	{ tmux new-window $* "$EDITOR ${selection[*]@Q}" ; }
+vim_edit_shared_window(){ texists v$$ && vim_tabe_shared_window "${selection[@]}" || vim_edit_window -n v$$ ; tmux select-window -t v$$ ; }
+vim_tabe_shared_window(){ for a in "$@" ; do tmux send-keys -t v$$ Escape escape :tabe \ "$(printf '%q\n' "$a")" ENTER ; done ; }
 ftl_help()		{ ((help_pop)) && { tmux popup -h90% -w90% -E "$help_command" ; } || { tcpreview ; exec 2>&9 ; $help_command ; exec 2>"$fs/log" ; alt_screen ; } ; cdir ; }
 move_left()		{ [[ "$PWD" != / ]] && { nd="${PWD%/*}" ; cdir "${nd:-/}" "$(basename "$p")"; } ; }
 move_left_arrow()	{ move_left ; }
