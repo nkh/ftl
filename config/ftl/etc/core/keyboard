@@ -70,6 +70,8 @@ key_command()
 
 keys_command="$keys_command$REPLY" ; (( keys_in++)) #; ((main)) && pdh "(main) " ; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
+# echo "$HAS_COUNT$keys_command -> ${kbd_trie[$HAS_COUNT$keys_command]}" >&3
+
 ((${#vfiles[@]} || ${#vdirs[@]})) && { vfile_key "$keys_command" && return ; } 
 
 [[ $(type -t "${kbd_trie[$HAS_COUNT$keys_command]}") == function ]] && 

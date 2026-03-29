@@ -137,11 +137,19 @@ extension_sort()	{ source "$FTL_CFG/filters/sort_by_extension" ; cdir '' "$f"; }
 view_mode_pdf()		{ ((pdf_prev_image ^= 1)) ; list ; }
 preview_lock_clr()	{ rm "$fs/lock_preview/$n" 2>&- ; list ; }
 preview_lock()		{ p="$FTL_CFG/etc/core/lib/lock_preview" ; file=$(cd $p ; fd | fzf-tmux $fzf_opt) ; [[ $file ]] && . $p/$file ; list ; }
+
 preview_m1()		{ extmode=1 ; list ; }
 preview_m2()		{ extmode=2 ; list ; }
 preview_m3()		{ extmode=3 ; list ; }
 preview_m4()		{ extmode=4 ; list ; }
 preview_m5()		{ extmode=5 ; list ; }
+
+full_preview_m1()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; glow "$f" --pager ; } ; list ; }
+full_preview_m2()	{ extmode=2 ; list ; }
+full_preview_m3()	{ extmode=3 ; list ; }
+full_preview_m4()	{ extmode=4 ; list ; }
+full_preview_m5()	{ extmode=5 ; list ; }
+
 set_directory_mode0()	{ dirmode=0 ; list ; }
 set_directory_mode1()	{ dirmode=1 ; list ; }
 set_directory_mode2()	{ dirmode=2 ; list ; }
