@@ -145,8 +145,14 @@ preview_m4()		{ extmode=4 ; list ; }
 preview_m5()		{ extmode=5 ; list ; }
 
 full_preview_m1()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; glow "$f" --pager ; } ; list ; }
-full_preview_m2()	{ extmode=2 ; list ; }
-full_preview_m3()	{ extmode=3 ; list ; }
+
+full_preview_m2()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; (grip "$f" &) ; vimb http://localhost:6419 ; } ; list ; } 
+
+full_preview_m3()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; mds vimb ; list ; } 
+
+# full_preview_m1()	{ extmode=1 ; list ; }
+# full_preview_m2()	{ extmode=2 ; list ; }
+# full_preview_m3()	{ extmode=3 ; list ; }
 full_preview_m4()	{ extmode=4 ; list ; }
 full_preview_m5()	{ extmode=5 ; list ; }
 
