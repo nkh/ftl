@@ -91,6 +91,7 @@ go_rgl()		{ exec 2>&9 ; tcpreview ; rgls="$(go_rl_args)" ; [[ "$rgls" ]] && /bin
 go_rg_one_match()	{ exec 2>&9 ; tcpreview ; go_loop rg "$(frf 1000 '' ctrl-t frg)" ; exec 2>"$fs/log" ; }
 history_go()		{ h=$fs/history ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory()		{ h=$ghist ; dedup $h && go_loop f fzf "$(<$h lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
+ghistory_subdir()	{ h=$ghist ; dedup $h && go_loop f fzf "$(cat $h | rg "$(pwd)" | lscolors | fzf-tmux $fzf_opt --tac --ansi --expect=ctrl-t)" ; }
 ghistory_clear()	{ prompt 'clear global history? [y|N]' -sn1 && [[ $REPLY == y ]] && rm $ghist 2>&- ; list ; }
 ghistory_edit()		{ dedup $ghist && rg -v -x -F -f <(<$ghist lscolors | fzf-tmux $fzf_opt --tac -m --ansi) $ghist | sponge $ghist ; }
 image_fzf()		{ exec 2>&9 ; tcpreview ; go_loop f fzf "$(fzfi --expect=ctrl-t -q "$(echo "$ifilter" | perl -pe 's/(^|\|)/ $1 ./g')")" ; exec 2>"$fs/log" ; }
@@ -144,15 +145,12 @@ preview_m3()		{ extmode=3 ; list ; }
 preview_m4()		{ extmode=4 ; list ; }
 preview_m5()		{ extmode=5 ; list ; }
 
-full_preview_m1()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; glow "$f" --pager ; } ; list ; }
+full_preview_m1()	{ [[ "$e" == 'md' ]] && { tcpreview ; glow "$f" --pager ; } ; list ; }
+full_preview_m2()	{ [[ "$e" == 'md' ]] && { run_maxed mo_vimb "$f" ; list ; } ; } 
+full_preview_m3()	{ [[ "$e" == 'md' ]] && { run_maxed mo_vimb -R . ; list ; } ; } 
 
-full_preview_m2()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; (grip "$f" &) ; vimb http://localhost:6419 ; } ; list ; } 
+mo_vimb()		{ mo --no-open "$@" &>/dev/null ; vimb "http://localhost:6275" 2>/dev/null ; }
 
-full_preview_m3()	{ extmode=1 ; [[ "$e" == 'md' ]] && { tcpreview ; mds vimb ; list ; } 
-
-# full_preview_m1()	{ extmode=1 ; list ; }
-# full_preview_m2()	{ extmode=2 ; list ; }
-# full_preview_m3()	{ extmode=3 ; list ; }
 full_preview_m4()	{ extmode=4 ; list ; }
 full_preview_m5()	{ extmode=5 ; list ; }
 

@@ -152,9 +152,7 @@ selection ; geo_winch
 
 ((flipi^=1)) ; flip="${flips[$flipi]}"
 
-((qd || gpreview)) || { preview ; geo_winch ; }
-show_header &
-show_header_pid=$!
+# ((qd || gpreview)) || { preview ; geo_winch ; }
 
 ((nfiles)) &&
 	{
@@ -172,7 +170,7 @@ show_header_pid=$!
 	clear_list 0
 	}
 
-wait $show_header_pid
+show_header
 }
 
 show_header()

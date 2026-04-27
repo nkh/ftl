@@ -221,6 +221,7 @@ bind ftl ftl		INVERSED_QUESTION_MARK	pdh_show		"pdh pane"
 bind ftl history	Hh		history_go		"fzf current session history"
 bind ftl history	HH		ghistory		"fzf all sessions history"
 bind ftl history	DIAERESIS	ghistory		"fzf all sessions history"
+bind ftl history	Hs		ghistory_subdir		"fzf all sessions history, subdir"
 bind ftl history	He		ghistory_edit		"edit all sessions history"
 bind ftl history	Hc		ghistory_clear		"clear all sessions history"
 

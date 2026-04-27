@@ -127,7 +127,12 @@ pmp3()      { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "$PAGER_ANS
 pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
 pmlive()    { ((extmode)) && { player_k ; t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "cat ${t@Q} ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
 
-pmd()       { md="${1:-$n}" ; ((extmode==1)) && psplit "$MD_RENDER1 \"$md\" | $MD_PAGER" || { ((extmode==2)) && psplit "$MD_RENDER2 \"$md\" | $MD_PAGER" ; } || $MD_RENDER0 \"$md\" ;  }
+pmd()       { pmd_1 || pmd_2 || pmd_3 || pmd_def ; extmode=0 ; }
+pmd_1()     { ((extmode==1)) && { psplit "$MD_RENDER1 \"$f\" | $MD_PAGER" ; true ; } ; }
+pmd_2()     { ((extmode==2)) && { psplit "$MD_RENDER2 \"$f\" | $MD_PAGER" ; true ; } ; }
+pmd_3()     { ((extmode==3)) && { tcpreview ; <<<"Y" mo --clear >/dev/null 2>&1 ; mo_vimb --no-open "$f" &>/dev/null ; extmode=0 ; list ; true ; } ; }
+pmd_def()   { $MD_RENDER0 \"$f\" ; }
+
 pmdd()      { md="${1:-$n}" ; psplit "$MD_DIR_RENDER \"$md\" " ;  }
 
 ptext()     { vipreview "$n" ; }
