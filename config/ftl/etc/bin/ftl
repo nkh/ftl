@@ -152,7 +152,7 @@ selection ; geo_winch
 
 ((flipi^=1)) ; flip="${flips[$flipi]}"
 
-# ((qd || gpreview)) || { preview ; geo_winch ; }
+show_header
 
 ((nfiles)) &&
 	{
@@ -169,8 +169,6 @@ selection ; geo_winch
 	tcpreview
 	clear_list 0
 	}
-
-show_header
 }
 
 show_header()

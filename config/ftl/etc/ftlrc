@@ -118,6 +118,7 @@ HEXEDIT=hexedit				# hex editor
 MIMETYPE=mimemagic			# mimetype generator
 NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
 JSON_VIEWER=jless
+YAML_VIEWER="yam -i"
 
 EXA_COLORS="ur=1;34:uw=1;34:ux=1;34:gr=1;34:gw=1;34:gx=1;34:tr=1;34:tw=1;34:tx=1;34:sn=1;30:sb=1;30:uu=1;30:da=1;30:hd=1;30"
 EXA_OPTIONS="-l --tree -L 3 --header --color=always"
@@ -177,6 +178,7 @@ bind ftl entry		xV		vim_edit_window		"vim in separate tmux window"
 bind ftl entry		XV		vim_edit_shared_window	"vim in shared tmux window"
 bind ftl entry		xc		terminal_cat		"cat"
 bind ftl entry		xl		link			"symlink selection in current directory"
+bind ftl entry		xp		preview_with		"preview with"
 
 bind ftl filter		fe		set_filter_ext		"select external filter"
 bind ftl filter		fy		set_filter_only_tagged	"show only tagged files"
@@ -250,14 +252,14 @@ bind ftl move		UP		move_up_arrow		"up to previous entry"
 bind ftl move		DOWN		move_down_arrow		"down to next entry"
 bind ftl move		RIGHT		move_right_arrow	"right; cd into directory"
 bind ftl move		LEFT		move_left_arrow		"cd to parent directory"
-# bind ftl move		J		move_down_step		"move down multiple lines"
-# bind ftl move		K		move_up_step		"move up multiple lines"
-
 bind ftl move		ALT-J		preview_down		"scroll preview down"
 bind ftl move		ALT-K		preview_up		"scroll preview up"
 
-bind ftl move		J		preview_down		"scroll preview down"
-bind ftl move		K		preview_up		"scroll preview up"
+bind ftl move		J		preview_down2		"scroll fixed preview down"
+bind ftl move		K		preview_up2		"scroll fixed preview up"
+# bind ftl move		J		move_down_step		"move down multiple lines"
+# bind ftl move		K		move_up_step		"move up multiple lines"
+
 
 bind ftl move		CTL-H		preview_left		"send left to preview"
 bind ftl move		CTL-L		preview_right		"send right to preview"
@@ -367,6 +369,8 @@ bind ftl view		zS		hide_size		"hide size"
 bind ftl view		zo		sort_entries		"sort type"
 bind ftl view		zO		sort_entries_reversed	"sort reversed"
 bind ftl view		zv		preview_pane		"preview show/hide"
+bind ftl view		zff		preview_pane2		"fixed preview show/hide"
+bind ftl view		zfc		tcpreview2		"fixed preview close"
 bind ftl view		"z STAR"	depth			"maximum listing depth"
 bind ftl view		zt		etag_show		"show/hide etags"
 bind ftl view		zT		etag_select		"select etag type"

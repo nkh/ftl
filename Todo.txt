@@ -14,13 +14,6 @@ issue: cbr preview not working for $'/home/nadim/downloads/Lost Atlantide 03 Abe
 
 functionality: git diff glyph for subdirectories
 
-functionality: preview for yaml and toml via otree
-
-functionality: extra header line with full path for entry
-
-functionality: multi character binding in custom key handler
-		add existing shortcuts to custom key handler by name
-
 functionality: pane splitting
 		what do we want?
 			split the current pane
