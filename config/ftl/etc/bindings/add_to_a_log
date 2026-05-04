@@ -1,0 +1,9 @@
+leader_add_to_a_log() { echo "$f" >> a_log ; }
+bind leader add_to_a_log	"LEADER a a"		leader_add_to_a_log		"add filename to a_log"
+
+leader_a_edit_leader_a_log() { tcpreview ; $EDITOR "a_log" ; list ;}
+bind leader add_to_a_log	"LEADER a v"		leader_a_edit_leader_a_log	"edit a_log"
+
+leader_a_add_to_log_and_edit() { echo "$f" >> a_log ; tcpreview ; $EDITOR "a_log" ; list ;}
+bind leader add_to_a_log	"LEADER a e"		leader_a_add_to_log_and_edit	"add filename to a_log and edit"
+
