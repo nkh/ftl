@@ -1,6 +1,7 @@
 # Current
 
-issue: git status display doesn't work with filenames containing space
+functionality: marks per direcory
+	in some directories, dev, we usually jump to sub directories (test, etc ...) create shorcuts, directory specific, to jump to those sub directories, use cdm/fzf style.
 
 issue: inotify not working!
 
