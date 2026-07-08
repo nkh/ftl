@@ -10,9 +10,6 @@ issue: error message fromn inotify
 
 	?fix moved inotify_s down in code
 
-issue: cbr preview not working for $'/home/nadim/downloads/Lost Atlantide 03 Abel et Ca\303\257n [1920].cbr'
-	what does the 'ONE' parameter do?
-
 functionality: git diff glyph for subdirectories
 
 functionality: pane splitting
