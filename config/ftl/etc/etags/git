@@ -1,3 +1,6 @@
+yellow=$'\e[93m'
+reset=$'\e[0m'
+
 etag_dir()
 {
 declare -g -A git_tags=() ; is_git=0
@@ -11,26 +14,29 @@ declare -g -A git_tags=() ; is_git=0
 		do 
 			git_status=
 			
-			for ((i=0; i<2; i++)); do
-				if [[ $line == " "* ]]; then
-					# Plain space cell
-					git_status+=" "
-					line=${line:1}
-				elif [[ $line == $'\e['* ]]; then
-					# ANSI-colored character cell
-					tmp=${line#*$'m'}      # remove opening CSI sequence
-					ch=${tmp:0:1}          # the visible character
-					tmp=${tmp:1}
-					end=${tmp%%m*}         # until the terminating 'm'
-					len=$(( ${#line} - ${#tmp} + ${#end} + 1 ))
-					git_status+=${line:0:len}
-					line=${line:len}
-				fi
-			done
+			if [[ $line == " "* ]]; then
+				# Plain space cell
+				git_status+=" "
+				line=${line:1}
+			elif [[ $line == $'\e['* ]]; then
+				# ANSI-colored character cell
+				tmp=${line#*$'m'}      # remove opening CSI sequence
+				ch=${tmp:0:1}          # the visible character
+				tmp=${tmp:1}
+				end=${tmp%%m*}         # until the terminating 'm'
+				len=$(( ${#line} - ${#tmp} + ${#end} + 1 ))
+				git_status+=${line:0:len}
+				line=${line:len}
+			fi
 			
 			file=${line# }
 			file=${file#\"}
 			file=${file%\"}
+			
+			case $file in
+				# directory
+				*/*) file="${file%%/*}" ; git_status="$yellow**$reset" ;;
+			esac
 			
 			git_tags[$file]="${git_status} "
 		done

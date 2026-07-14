@@ -1,7 +1,10 @@
 # Current
 
+functionality: run on entry in tmux popup pane
+
 functionality: marks per direcory
 	in some directories, dev, we usually jump to sub directories (test, etc ...) create shorcuts, directory specific, to jump to those sub directories, use cdm/fzf style.
+	creation, deletion? stored where? in a file in the directory? in a global file?
 
 issue: inotify not working!
 
@@ -9,8 +12,6 @@ issue: error message fromn inotify
 	? used in empty directory
 
 	?fix moved inotify_s down in code
-
-functionality: git diff glyph for subdirectories
 
 functionality: pane splitting
 		what do we want?
