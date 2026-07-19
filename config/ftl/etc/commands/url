@@ -1,6 +1,3 @@
 qutebrowser "$1" 2>&- &
 
 # vim: set filetype=bash :
-
-
-

@@ -1,23 +1,28 @@
 [[ "$1" == reset ]] && : ||
 {
-[[ "$1" == load ]] && [[ -e "$pfs/by_size" ]] && source "$pfs/by_size" ||
-	{
-	prompt 'ftl filter file min size: ' ; ftl_min_size="${REPLY:-0}" ; [[ "$ftl_min_size" =~ [0-9]+ ]] || ftl_min_size=0
+    [[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_size" ]] && source "$ftl_state_parent_dir/by_size" ||
+    {
+        ftl::cmd::prompt 'ftl filter file min size: '
+        ftl_min_size="${ftl_kbd_current_key:-0}"
+        [[ "$ftl_min_size" =~ [0-9]+ ]] || ftl_min_size=0
 
-	declare -p ftl_min_size >"$pfs/by_size"
-	}
+        declare -p ftl_min_size >"$ftl_state_parent_dir/by_size"
+    }
 
-ftag="~"
+    ftl_filt_active_glyph="~"
 }
 
-ftl_filter() 
+ftl::plugin::by_size::filter()
 {
-while IFS=$'\t' read -a file_data
-	do
-		 { [[ -d "${file_data[2]}" ]] || ((${file_data[0]} > ${ftl_min_size:-0})) ; } && printf "%s\t%s\t%s\n" "${file_data[@]}"
-	done
+    local -a file_data
+
+    while IFS=$'\t' read -a file_data ; do
+        { [[ -d "${file_data[2]}" ]] || ((${file_data[0]} > ${ftl_min_size:-0})) ; } && \
+            printf "%s\t%s\t%s\n" "${file_data[@]}"
+    done
 }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::by_size::filter ; }
 
 # vim: set filetype=sh :
-
-

@@ -1,5 +1,6 @@
-ftl_filter() { /bin/cat ; } 
-filter_ext=
+ftl::plugin::no_filter::filter() { /bin/cat ; }
 
-# vim: set filetype=sh :
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::no_filter::filter ; }
 
+ftl_filt_external_name=

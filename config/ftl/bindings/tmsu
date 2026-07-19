@@ -1,120 +1,151 @@
 tmsu_preview()
 {
-continuation_color="$(echo -en '\e[90m')"
-tags_table=
+    local continuation_color tags_table all_tags files_tags tags_index
+    local i file_name ftags tag file_tags
 
-readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sed -e '/^$/d' | sort -u)
-readarray -t files_tags < <(tmsu tags "${files[@]:$top:$lines}" | sed -e 's/^.*: *//')
+    continuation_color="$(echo -en '\e[90m')"
+    tags_table=
 
-tags_index=0
-for((i=top ; i <= bottom ; i++))
-	do
-		(($i == $file)) && tags_table+="$cursor_color" || tags_table+="$continuation_color"
-		file_name="${files[$i]}"
-		
-		ftags=(${files_tags[$tags_index]}) ; ((tags_index++))
-		declare -A file_tags=() ; for tag in "${ftags[@]}" ; do file_tags[$tag]=1 ; done
-		
-		for tag in "${all_tags[@]}" ; do ((${file_tags[$tag]})) && tags_table+="$tag\t" || tags_table+="⸱\t" ; done
-		
-		tags_table+="\n"
-	done
+    readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sed -e '/^$/d' | sort -u)
+    readarray -t files_tags < <(tmsu tags "${ftl_list_entries[@]:$ftl_list_window_top:$ftl_list_window_height}" | sed -e 's/^.*: *//')
 
-tcpreview ; ctsplit "clear ; { echo ; echo -ne '$tags_table' | column -t -s $'\t' ; } | $MD_PAGER ; read -sn 100"
+    tags_index=0
+    for ((i=ftl_list_window_top ; i <= ftl_list_window_bottom ; i++)) ; do
+        ((i == ftl_state_cursor_index)) && tags_table+="$ftl_cfg_cursor_color_current" || tags_table+="$continuation_color"
+        file_name="${ftl_list_entries[$i]}"
+
+        ftags=(${files_tags[$tags_index]})
+        ((tags_index++))
+        declare -A file_tags=()
+        for tag in "${ftags[@]}" ; do file_tags[$tag]=1 ; done
+
+        for tag in "${all_tags[@]}" ; do
+            ((${file_tags[$tag]})) && tags_table+="$tag\t" || tags_table+="⸱\t"
+        done
+
+        tags_table+="\n"
+    done
+
+    ftl::prev::clear
+    ftl::pane::split_or_respawn "clear ; { echo ; echo -ne '$tags_table' | column -t -s $'\t' ; } | $ftl_cfg_markdown_pager ; read -sn 100"
 }
 
 tmsu_tag()
 {
-tcpreview
+    local tag_file row lines file_to_tag
 
-tag_file="$(mktemp -p $fs ftl_tmsu_tag_XXXXXXX)"
+    ftl::prev::clear
 
-tmsu tags "${selection[@]}" 2>&- > $tag_file
-{ echo ; tmsu tags 2>&- | sort -u | sed 's/^/# /' ; } >> $tag_file
+    tag_file="$(mktemp -p $ftl_state_session_dir ftl_tmsu_tag_XXXXXXX)"
 
-vi +start +"norm! gg$" $tag_file && 
-	{
-	readarray -t lines <$tag_file 
+    tmsu tags "${ftl_selection_current[@]}" 2>&- > "$tag_file"
+    { echo ; tmsu tags 2>&- | sort -u | sed 's/^/# /' ; } >> "$tag_file"
 
-	for row in "${lines[@]}"
-		do
-			[[ $row =~ ^([^:]+):(.*) ]] && 
-				{
-				file_to_tag="${BASH_REMATCH[1]}"
-				tmsu untag "$file_to_tag" $(tmsu tags -n never "$file_to_tag") 2>&-
-				tmsu tag "$file_to_tag" ${BASH_REMATCH[2]} 2>&-
-				}
-		done
-	}
+    vi +start +"norm! gg$" "$tag_file" && {
+        readarray -t lines <"$tag_file"
 
-cdir
+        for row in "${lines[@]}" ; do
+            [[ $row =~ ^([^:]+):(.*) ]] && {
+                file_to_tag="${BASH_REMATCH[1]}"
+                tmsu untag "$file_to_tag" $(tmsu tags -n never "$file_to_tag") 2>&-
+                tmsu tag "$file_to_tag" ${BASH_REMATCH[2]} 2>&-
+            }
+        done
+    }
+
+    ftl::ftl::list::render::change_dir
 }
 
 tmsu_tag_fzf()
 {
-readarray -t new_tags < <(tmsu tags | fzf-tmux $fzf_opt -0 -1 -m -p 30% -h 80%)
+    local new_tags F
 
-for F in "${selection[@]}" ; do tmsu tag "$F" "${new_tags[@]}" 2>&- ; done
+    readarray -t new_tags < <(tmsu tags | fzf-tmux $ftl_cfg_fzf_popup_opts -0 -1 -m -p 30% -h 80%)
 
-cdir
+    for F in "${ftl_selection_current[@]}" ; do tmsu tag "$F" "${new_tags[@]}" 2>&- ; done
+
+    ftl::ftl::list::render::change_dir
 }
 
 tmsu_tag_scim()
 {
-tcpreview
-# ctsplit "$FTL_CFG/etc/bin/scim_tmsu" ; tmux selectp -t $pane_id 
-exec 2>&9 ; "$FTL_CFG/etc/bin/scim_tmsu" "${selection[@]}" ; exec 2>"$fs/log"
-alt_screen
+    ftl::prev::clear
+    # ftl::pane::split_or_respawn "$FTL_CFG/etc/bin/scim_tmsu" ; tmux selectp -t $ftl_pane_preview_id
+    exec 2>&9
+    "$FTL_CFG/etc/bin/scim_tmsu" "${ftl_selection_current[@]}"
+    exec 2>"$ftl_state_session_dir/log"
+    ftl::util::enter_alt_screen
 }
 
 tmsu_mount()
 {
-tmsu_mp="/tmp/ftl/mnt/tmsu_$$"
+    local tmsu_mp
 
-[[ -e "$tmsu_mp" ]] || { mkdir -p "$tmsu_mp" ; tmsu mount "$tmsu_mp" ; }
+    tmsu_mp="/tmp/ftl/mnt/tmsu_$$"
 
-cdir "$tmsu_mp"
+    [[ -e "$tmsu_mp" ]] || {
+        mkdir -p "$tmsu_mp"
+        tmsu mount "$tmsu_mp"
+    }
+
+    ftl::ftl::list::render::change_dir "$tmsu_mp"
 }
 
-tmsu_filter() { source "$FTL_CFG/filters/by_tag" ; cdir '' "$f" ; }
-tmsu_filter_query() { source "$FTL_CFG/filters/by_tag_query" ; cdir '' "$f" ; }
+tmsu_filter()
+{
+    source "$FTL_CFG/filters/by_tag"
+    ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
+}
+
+tmsu_filter_query()
+{
+    source "$FTL_CFG/filters/by_tag_query"
+    ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
+}
 
 tmsu_table2()
 {
-readarray -t all_tags < <(tmsu files 2>&- | xargs tmsu tags --name=never 2>&- | tr ' ' '\n' | sed -e '/^$/d' | sort -u)
+    local all_tags files_and_tags file_and_tag continuation_color
+    local file_tag_array tag
 
-readarray -t files_and_tags < <(tmsu files 2>&- | xargs tmsu tags 2>&-)
+    readarray -t all_tags < <(tmsu files 2>&- | xargs tmsu tags --name=never 2>&- | tr ' ' '\n' | sed -e '/^$/d' | sort -u)
 
-continuation_color="$(echo -en '\e[90m')"
+    readarray -t files_and_tags < <(tmsu files 2>&- | xargs tmsu tags 2>&-)
 
-for file_and_tag in "${files_and_tags[@]}"
-	do
-		declare -A file_tags=()
-		
-		file_tag_array=($file_and_tag)
-		
-		for tag in "${file_tag_array[@]:1}" ; do file_tags[$tag]="$tag" ; done
-		
-		echo -ne "${file_tag_array%%:}:\t" ; 
-		
-		for tag in "${all_tags[@]}" ; do [[ -n "${file_tags[$tag]}" ]] && printf "$continuation_color${file_tags[$tag]}\t" || printf -- "$continuation_color⸱\t" ; done
+    continuation_color="$(echo -en '\e[90m')"
 
-		echo
-	done  | sed 's@^.\/@'"$PWD"/'@' | sed 's@^..\{1,2\}\/@'"${PWD%/*}"/'@' | sort -ru | column -t
+    for file_and_tag in "${files_and_tags[@]}" ; do
+        declare -A file_tags=()
+
+        file_tag_array=($file_and_tag)
+
+        for tag in "${file_tag_array[@]:1}" ; do file_tags[$tag]="$tag" ; done
+
+        echo -ne "${file_tag_array%%:}:\t"
+
+        for tag in "${all_tags[@]}" ; do
+            [[ -n "${file_tags[$tag]}" ]] && printf "$continuation_color${file_tags[$tag]}\t" || \
+                printf -- "$continuation_color⸱\t"
+        done
+
+        echo
+    done | sed 's@^.\/@'"$PWD"/'@' | sed 's@^..\{1,2\}\/@'"${PWD%/*}"/'@' | sort -ru | column -t
 }
 
-tmsu_goto() { go_loop f fzf "$(tmsu_table2 | lscolors | fzf-tmux $fzf_opt -m --ansi --expect=ctrl-t --preview 'lscolors {}' --preview-window noborder:wrap:down:4 | sed 's/:.*//')" ; }
+tmsu_goto()
+{
+    go_loop f fzf "$(tmsu_table2 | lscolors | fzf-tmux $ftl_cfg_fzf_popup_opts -m --ansi --expect=ctrl-t --ftl::prev::dispatch 'lscolors {}' --ftl::prev::dispatch-window noborder:wrap:down:4 | sed 's/:.*//')"
+}
 
 # tmsu_get_queries() { echo "find queries/ -type d" ; }
 
-bind tmsu tag	"LEADER t LEADER"	tmsu_preview		"show tmsu tags"
-bind tmsu tag	"LEADER t f"		tmsu_tag_fzf		"tmsu tag selection via fzf"
-bind tmsu tag	"LEADER t g"		tmsu_goto		"tmsu goto via fzf"
-bind tmsu tag	"LEADER t m"		tmsu_mount		"tmsu mount"
-bind tmsu tag	"LEADER t q"		tmsu_filter_query	"tmsu tag filter via query"
-bind tmsu tag	"LEADER t r"		tmsu_filter		"tmsu tag filter via fzf"
-bind tmsu tag	"LEADER t s"		tmsu_tag_scim		"tmsu tag selection via scim"
-bind tmsu tag	"LEADER t t"		tmsu_tag		"tmsu tag selection"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t LEADER"       tmsu_preview            "show tmsu tags"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t f"            tmsu_tag_fzf            "tmsu tag selection via fzf"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t g"            tmsu_goto               "tmsu goto via fzf"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t m"            tmsu_mount              "tmsu mount"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t q"            tmsu_filter_query       "tmsu tag filter via query"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t r"            tmsu_filter             "tmsu tag filter via fzf"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t s"            tmsu_tag_scim           "tmsu tag selection via scim"
+ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t t"            tmsu_tag                "tmsu tag selection"
 
 # vim: set filetype=bash:
-

@@ -1,61 +1,63 @@
 declare -g -A keep=() PWDS=()
 
-[[ "$1" == reset ]] && { unset keep PWDS ; } ||
+[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
 {
-[[ "$1" == load ]] && [[ -e "$pfs/by_tag_query" ]] && source "$pfs/by_tag_query" ||
-	{
-	tcpreview
-	query_file="$(mktemp -p $fs ftl_tmsu_tag_query_XXXXXXX)"
+    [[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag_query" ]] && source "$ftl_state_parent_dir/by_tag_query" ||
+    {
+        ftl::prev::clear
+        query_file="$(mktemp -p $ftl_state_session_dir ftl_tmsu_tag_query_XXXXXXX)"
 
-	{
-	echo
-	echo
-	tac "$ftl_root/tag_query_history" 2>&- | awk '!seen[$0]++' | head -n 15 2>&-
-	echo "# Available tags:"
-	echo
-	tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | sed 's/^/# /'
-	echo
-	echo  "# Example: (mp3 or flac) and not big-jazz"
-	} > $query_file
+        {
+            echo
+            echo
+            tac "$ftl_state_dir/tag_query_history" 2>&- | awk '!seen[$0]++' | head -n 15 2>&-
+            echo "# Available tags:"
+            echo
+            tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | sed 's/^/# /'
+            echo
+            echo  "# Example: (mp3 or flac) and not big-jazz"
+        } > "$query_file"
 
-	
-	for((i=$top ; i <= $nfiles ; i++)) ; do [[ -d "${files[$i]}" ]] && keep["$tab-${files[$i]}"]=1 && PWDS[$tab-$PWD]=1 ; done
-	
-	vi +start $query_file &&
-		{
-		ftag="~"
-		
-		while read l
-			do
-				[[ "$l" =~ ^$ || "$l" =~ ^# ]] && continue # skip empty_line or comments
-				
-				echo "# $l" >> "$ftl_root/tag_query_history" 2>&-
-				
-				# run query, keep files
-				readarray -t matches < <(tmsu files "$l")
-					
-				for file in "${matches[@]}"
-					do
-						file="${file#./}"
-						[[ ! "$file" =~ / ]] && keep["$tab-$PWD/$file"]=1 && PWDS[$tab-$PWD]=1
-					done
-			done  <$query_file
-		} || return
-	
-	declare -p keep PWDS >"$pfs/by_tag_query"
-	}
+
+        for ((i=ftl_list_window_top ; i <= ftl_list_entry_count ; i++)) ; do
+            [[ -d "${ftl_list_entries[$i]}" ]] && keep["$ftl_state_current_tab_index-${ftl_list_entries[$i]}"]=1 && PWDS[$ftl_state_current_tab_index-$PWD]=1
+        done
+
+        vi +start "$query_file" && {
+            ftl_filt_active_glyph="~"
+
+            while read l ; do
+                [[ "$l" =~ ^$ || "$l" =~ ^# ]] && continue # skip empty_line or comments
+
+                echo "# $l" >> "$ftl_state_dir/tag_query_history" 2>&-
+
+                # run query, keep files
+                readarray -t matches < <(tmsu files "$l")
+
+                for file in "${matches[@]}" ; do
+                    file="${file#./}"
+                    [[ ! "$file" =~ / ]] && keep["$ftl_state_current_tab_index-$PWD/$file"]=1 && PWDS[$ftl_state_current_tab_index-$PWD]=1
+                done
+            done <"$query_file"
+        } || return
+
+        declare -p keep PWDS >"$ftl_state_parent_dir/by_tag_query"
+    }
 }
 
-ftl_filter()
+ftl::plugin::by_tag_query::filter()
 {
-[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
-	{
-	while read -r file_data
-		do
-			fn="${file_data#$'*\t'*$'\t'}"
-			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
-		done
-	} || cat 
+    local file_data fn
+
+    [[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
+        while read -r file_data ; do
+            fn="${file_data#$'*\t'*$'\t'}"
+            [[ ${keep["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+        done
+    } || cat
 }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::by_tag_query::filter ; }
 
 # vim: set filetype=sh :

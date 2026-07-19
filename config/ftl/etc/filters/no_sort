@@ -1,4 +1,9 @@
-sort_glyph(){ echo ${sglyph[s_type]} ; }
-ftl_sort()  { sort_by ; }
+ftl::plugin::no_sort::sort_glyph() { echo "${ftl_cfg_glyph_sort[s_type]}" ; }
+
+ftl::plugin::no_sort::sort() { ftl::filt::sort_by ; }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filt::sort_entries() { ftl::plugin::no_sort::sort ; }
+ftl::filt::get_sort_glyph() { ftl::plugin::no_sort::sort_glyph ; }
 
 # vim: set filetype=sh :

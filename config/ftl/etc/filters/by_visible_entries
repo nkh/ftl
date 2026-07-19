@@ -1,31 +1,34 @@
-declare -g -A keep 
+declare -g -A keep
 
 [[ "$1" == reset ]] && { unset -v keep ; } ||
 {
-[[ "$1" == load ]] && [[ -e "$pfs/by_visible_entries" ]] && source "$pfs/by_visible_entries" ||
-	{
-	ftag="~"
-	
-	for file in $(cat $ftl_visible_entries)
-		do
-			keep["$file"]=1
-		done
-	
-	declare -p keep >"$pfs/by_visible_entries"
-	}
+    [[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_visible_entries" ]] && source "$ftl_state_parent_dir/by_visible_entries" ||
+    {
+        ftl_filt_active_glyph="~"
+
+        for file in $(cat $ftl_visible_entries) ; do
+            keep["$file"]=1
+        done
+
+        declare -p keep >"$ftl_state_parent_dir/by_visible_entries"
+    }
 }
 
-ftl_filter()
+ftl::plugin::by_visible_entries::filter()
 {
-while read -r file_data
-	do
-		fn="${file_data#$'*\t'*$'\t'}"
-		[[ "$PWD" == '/' ]] && pfn="/$fn" || pfn="$PWD/$fn"
-		
-		[[ "${keep[$pfn]}" == 1 ]] && echo "$file_data"
-		
-		[[ "$fn" == virtual_file ]] && echo "$file_data"
-	done
+    local file_data fn pfn
+
+    while read -r file_data ; do
+        fn="${file_data#$'*\t'*$'\t'}"
+        [[ "$PWD" == '/' ]] && pfn="/$fn" || pfn="$PWD/$fn"
+
+        [[ "${keep[$pfn]}" == 1 ]] && echo "$file_data"
+
+        [[ "$fn" == virtual_file ]] && echo "$file_data"
+    done
 }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::by_visible_entries::filter ; }
 
 # vim: set filetype=sh :

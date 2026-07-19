@@ -7,27 +7,72 @@
 # if there is just one tab, a new tab is created
 #
 # if there are just two tabs, copy/move to the other tab
-#	this lets you quickly select in a tab and send to another one
+#       this lets you quickly select in a tab and send to another one
 #
 # if there are more than two tabs, you can chose which directory in fzf
-#	if you don't chose a directory, a new one is created
-#		the logic is that you want to copy/move but you don't have
-#		a destination
+#       if you don't chose a directory, a new one is created
+#               the logic is that you want to copy/move but you don't have
+#               a destination
 #
-#		if you wanted to quit in the middle of the copy/move, after
-#		the new tab  is created, close it.
+#               if you wanted to quit in the middle of the copy/move, after
+#               the new tab  is created, close it.
 
-# configuration variable in these commands 
-tag_new_tab= # in default new tab location if no other tab exists
+# configuration variable in these commands
+ftl_cfg_default_new_tab_dir=  # in default new tab location if no other tab exists
 
-# function you can bind
-tag_copy_to_tab()	{ tag_check && { other_dir="$(other_tab_dir)" && { cp_mv_tags copy "$other_dir" ; cdir '' "$f"; } || tag_new_tab ; } ; }
-tag_move_to_tab()	{ tag_check && { other_dir="$(other_tab_dir)" && { cp_mv_tags move "$other_dir" ; cdir '' "$f"; } || tag_new_tab ; } ; }
+# function you can ftl::kbd::bind
+tag_copy_to_tab()
+{
+    ftl::sel::validate_existence && {
+        other_dir="$(other_tab_dir)" && {
+            cp_mv_tags copy "$other_dir"
+            ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
+        } || ftl_cfg_default_new_tab_dir
+    }
+}
+
+tag_move_to_tab()
+{
+    ftl::sel::validate_existence && {
+        other_dir="$(other_tab_dir)" && {
+            cp_mv_tags move "$other_dir"
+            ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
+        } || ftl_cfg_default_new_tab_dir
+    }
+}
 
 # support functions
-tag_new_tab()		{ warn "copy/move to tab:\n\tcreating new tab" ; tab_new "${tag_new_tab:-$HOME}" ; }
-other_tab_dir()		{ (( ntabs > 2)) && { pick_tab_dir ; return $? ; } || pick_other_tab_dir ; }
-pick_tab_dir()		{ ptd="$(printf "%s\n" "${tabs[@]}" | sort -u | lscolors | fzf-tmux $fzf_opt --tac --ansi)" && echo $ptd ; }
-pick_other_tab_dir()	{ ctab=$tab ; _tab_next ; other_tab=$tab ; tab=$ctab ; [[ $other_tab != $tab ]] && echo "${tabs[$other_tab]}" ; }
+ftl_cfg_default_new_tab_dir()
+{
+    ftl::log::warn "copy/move to tab:\n\tcreating new tab"
+    ftl::tab::create "${ftl_cfg_default_new_tab_dir:-$HOME}"
+}
+
+other_tab_dir()
+{
+    if (( ftl_tab_count > 2 )) ; then
+        pick_tab_dir
+        return $?
+    else
+        pick_other_tab_dir
+    fi
+}
+
+pick_tab_dir()
+{
+    local ptd
+    ptd="$(printf "%s\n" "${ftl_tab_directories[@]}" | sort -u | lscolors | fzf-tmux $ftl_cfg_fzf_popup_opts --tac --ansi)" && \
+        echo "$ptd"
+}
+
+pick_other_tab_dir()
+{
+    local ctab other_tab
+    ctab=$ftl_state_current_tab_index
+    ftl::tab::advance_index
+    other_tab=$ftl_state_current_tab_index
+    ftl_state_current_tab_index=$ctab
+    [[ $other_tab != $ftl_state_current_tab_index ]] && echo "${ftl_tab_directories[$other_tab]}"
+}
 
 # vim: ft=bash:

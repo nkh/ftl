@@ -1,67 +1,72 @@
 bash_filter_hide_imp()
 {
-got_filter=1
+    local OIFS p real_path hide_files
 
-tcpreview ; inotify_k
+    got_filter=1
 
-tmp_ftl_files="$(mktemp ftl_to_hide_XXXXXXX)" ; : >$tmp_ftl_file
+    ftl::prev::clear
+    ftl::pane::stop_file_watcher
 
-run_bash
+    tmp_ftl_files="$(mktemp ftl_to_hide_XXXXXXX)"
+    : >"$tmp_ftl_file"
 
-[[ -s "${tmp_ftl_files}" ]] &&
-	{
-	got_filter=0
-	
-	OIFS=$IFS ; IFS=$'\n'
-	<"${tmp_ftl_files}" readarray -t hide_files
-	IFS=$OIFS
-	
-	tags_clear
-	
-	for p in "${hide_files[@]}" 
-		do 
-			ftag="~"
-			real_path="$(realpath "$p")"
-			
-			hide["$tab-$real_path"]=1
-			
-			real_path="$(dirname "$real_path")/"
-			
-			while [[ "$real_path" ]]
-				do
-					PWDS[$tab-$real_path]=1
-					
-					[[ "$real_path" == "$PWD" ]] && break
-					real_path=${real_path%/*}
-				done
-		done
-	
-	declare -p hide PWDS >"$pfs/by_bash_hide"
-	}
+    ftl::cmd::run_interactive_bash
 
-rm -f "${tmp_ftl_files}"  
+    [[ -s "${tmp_ftl_files}" ]] && {
+        got_filter=0
 
-return $got_filter
+        OIFS=$IFS
+        IFS=$'\n'
+        <"${tmp_ftl_files}" readarray -t hide_files
+        IFS=$OIFS
+
+        ftl::sel::clear_all
+
+        for p in "${hide_files[@]}" ; do
+            ftl_filt_active_glyph="~"
+            real_path="$(realpath "$p")"
+
+            hide["$ftl_state_current_tab_index-$real_path"]=1
+
+            real_path="$(dirname "$real_path")/"
+
+            while [[ "$real_path" ]] ; do
+                PWDS[$ftl_state_current_tab_index-$real_path]=1
+
+                [[ "$real_path" == "$PWD" ]] && break
+                real_path=${real_path%/*}
+            done
+        done
+
+        declare -p hide PWDS >"$ftl_state_parent_dir/by_bash_hide"
+    }
+
+    rm -f "${tmp_ftl_files}"
+
+    return $got_filter
 }
 
-ftl_filter()
+ftl::plugin::by_bash_hide::filter()
 {
-[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
-	{
-	while read -r file_data
-		do
-			fn="${file_data#$'*\t'*$'\t'}"
-			[[ ${hide["$tab-$PWD/$fn"]} == 1 ]] || echo "$file_data"
-		done
-	} || cat 
+    local file_data fn
+
+    [[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
+        while read -r file_data ; do
+            fn="${file_data#$'*\t'*$'\t'}"
+            [[ ${hide["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] || echo "$file_data"
+        done
+    } || cat
 }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::by_bash_hide::filter ; }
 
 declare -g -A hide PWDS
 
 [[ "$1" == reset ]] && { unset keep PWDS ; } ||
-	{
-	[[ "$1" == load ]] && { [[ -e "$pfs/by_bash_hide" ]] && source "$pfs/by_bash_hide" ; true ; } ||
-	bash_filter_hide_imp
-	}
+    {
+        [[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_hide" ]] && source "$ftl_state_parent_dir/by_bash_hide" ; true ; } ||
+        bash_filter_hide_imp
+    }
 
 # vim: set filetype=sh :

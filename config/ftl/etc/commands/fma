@@ -1,4 +1,3 @@
-fzf_mv_add $@
- 
-# vim: set filetype=bash :
+fzf_mv_add "$@"
 
+# vim: set filetype=bash :

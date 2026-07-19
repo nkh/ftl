@@ -1,38 +1,70 @@
 
-pdf2txt()     { [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ; }
-lint()        { rmlint "$PWD" ; cdir '' 'rmlint' ; }
-run_mutt()    { mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ; }
-shell_popup() { tmux popup -E -d "$PWD" -w 80%  -h 80% ; }
+pdf2txt()
+{
+    [[ $ftl_state_current_extension == pdf ]] && [[ ! -e "$ftl_state_current_basename.txt" ]] && {
+        mutool draw -o "$ftl_state_current_basename.txt" "$ftl_state_current_basename" 2>/dev/null
+        ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename.txt"
+    }
+}
+
+lint()
+{
+    rmlint "$PWD"
+    ftl::ftl::list::render::change_dir '' 'rmlint'
+}
+
+run_mutt()
+{
+    mutt $([[ ${#ftl_selection_current[@]} ]] && printf "\055a %s\n" "${ftl_selection_current[@]}" || [[ $ftl_state_current_basename ]] && echo "-a $ftl_state_current_basename") -s 'ftl files' --
+    ftl::util::refresh_screen
+    ftl::ftl::list::render::render
+}
+
+shell_popup()
+{
+    tmux popup -E -d "$PWD" -w 80%  -h 80%
+}
 
 stat_file()
 {
-tcpreview ; mime_get 
+    ftl::prev::clear
+    ftl::ftl::list::render::get_mime_type
 
-tsplit "{ echo -n '  File: ' ; echo ${n@Q} | lscolors ; hsize=\$(echo -n 'H_size: ' ; stat -c %s '$n' | numfmt --to=iec) ; stat '$n' | sed -e '/File:/d' -e \"s/Device:/\$hsize            Device:/\" -e 's/IO Block/IO_Block/' ; echo '  mime: $mtype' ; echo -n '  type: ' ; file -b ${n@Q} ; } | piper --global '[A-Za-z-_]+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn 1"
+    ftl::pane::split "{ echo -n '  File: ' ; echo ${ftl_state_current_path@Q} | lscolors ; \
+        hsize=\$(echo -n 'H_size: ' ; stat -c %s '${ftl_state_current_path}' | numfmt --to=iec) ; \
+        stat '${ftl_state_current_path}' | sed -e '/File:/d' -e \"s/Device:/\$hsize            Device:/\" -e 's/IO Block/IO_Block/' ; \
+        echo '  mime: $ftl_state_current_mime_type' ; \
+        echo -n '  type: ' ; file -b ${ftl_state_current_path@Q} ; } | \
+        piper --global '[A-Za-z-_]+: ' 'blue' '\d+\ ?x\ ?\d+' 'yellow' ; read -sn 1"
 }
 
 gpg_encrypt()
 {
-exec 2>&9
+    exec 2>&9
 
-[[ $e =~ gpg ]] && tmux popup -h90% -w90% "gpg -d $n" ||
-	gpg -e -u "$GPGID" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$f" ||
-	error failed GPG encryption
+    if [[ $ftl_state_current_extension =~ gpg ]] ; then
+        tmux popup -h90% -w90% "gpg -d $ftl_state_current_path"
+    else
+        gpg -e -u "$ftl_cfg_gpg_key_id" -r "$(gpg -K | grep uid | cut -d' ' -f 13- | fzf)" "$ftl_state_current_basename" || \
+            ftl::log::error failed GPG encryption
+    fi
 
-exec 2>"$fs/log"
-alt_screen
+    exec 2>"$ftl_state_session_dir/log"
+    ftl::util::enter_alt_screen
 
-cdir '' "$f.gpg"
+    ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename.gpg"
 }
 
 pass_encrypt()
 {
-[[ $e =~ gpg ]] && \
-	prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d --no-symkey-cache "$n" > "$REPLY" || \
-	{ gpg --no-symkey-cache --symmetric "$f" || read -sn1 ; }
+    if [[ $ftl_state_current_extension =~ gpg ]] ; then
+        ftl::cmd::ftl::cmd::prompt 'file: ' -e
+        [[ -n "$ftl_kbd_current_key" ]] && gpg -d --no-symkey-cache "$ftl_state_current_path" > "$ftl_kbd_current_key"
+    else
+        gpg --no-symkey-cache --symmetric "$ftl_state_current_basename" || read -sn1
+    fi
 
-cdir '' "$REPLY"
+    ftl::ftl::list::render::change_dir '' "$ftl_kbd_current_key"
 }
 
 # vim: set ft=bash:
-

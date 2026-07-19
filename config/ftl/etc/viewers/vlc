@@ -1,4 +1,5 @@
-[[ $e =~ ^(mp3|mp4|flv|mkv)$ ]] && { vlc --started-from-file --playlist-enqueue "$n" &>/dev/null & }
+[[ $ftl_state_current_extension =~ ^(mp3|mp4|flv|mkv)$ ]] && {
+    vlc --started-from-file --playlist-enqueue "$ftl_state_current_path" &>/dev/null &
+}
 
 # vim: set filetype=sh :
-

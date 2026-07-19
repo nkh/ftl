@@ -1,419 +1,559 @@
-FTLRC_LOADED=1
-LANG=C LC_ALL=C
+# ftlrc — ftl configuration file
+#
+# This file is sourced at startup by ftl_setup. It sets configuration
+# variables (all prefixed with ftl_cfg_) and registers keyboard bindings
+# (via ftl::kbd::bind).
+#
+# Users can override any of these by creating their own ~/.config/ftl/ftlrc
+# that sources this default and then changes values.
 
-# Directories
-pgen="$FTL_CFG/etc/generators"          # location of preview generators
-ftl_root=$FTL_CFG/var                   # runtime directory, every session gets a directory here
-export ftl_root
-mkdir -p $ftl_root
+FTL_BOOTSTRAP_DONE=1
+LANG=C
+LC_ALL=C
 
-ftl_cmds=$ftl_root/cmds                 # history of shell commands
-ghist=$ftl_root/history                 # global history file
-touch $ftl_cmds $ghist
+#----------------------------------------------------------------------------
+# Directory layout
+#----------------------------------------------------------------------------
 
-thumbs=$ftl_root/thumbs                 # where preview generators cache the previews
-mkdir -p $thumbs                        # make sure the directory exists
+# Location of preview generator scripts
+ftl_gen_dir="$FTL_CFG/etc/generators"
 
-help_command="man ftl.1"                # command to run to show help, see # Vim in man page
+# Runtime state directory (per-session state, history, marks, thumbnails)
+ftl_state_dir="$FTL_CFG/var"
+export ftl_state_dir
+mkdir -p "$ftl_state_dir"
 
-# Bookmarks
-declare -A marks=([0]=/$ [1]="$HOME/$" [2]=/CHANGE_ME/dir/filename [3]=/CHANGE_ME/dir/filename [$"'"]="$(tail -n1 $ghist)")
+# State sub-paths
+FTL_STATE_DIR="$ftl_state_dir"
+FTL_CACHE_DIR="$ftl_state_dir/thumbs"
+export FTL_STATE_DIR FTL_CACHE_DIR
 
-declare -A dir_dest=()                  # directory destinations 1 letter alias
+# Global directory-visit history (across all sessions)
+ftl_state_global_history_file="$ftl_state_dir/history"
+touch "$ftl_state_global_history_file"
 
-# User colors
-# declare -A user_colors=([?]="30;42")  # override LS_COLORS
+# Thumbnail cache directory
+ftl_cache_thumb_dir="$ftl_state_dir/thumbs"
+mkdir -p "$ftl_cache_thumb_dir"
 
-# Options 
-KEY_TIMEOUT=1				# timeout between key presses
-shell_h=40%				# shell pane height
-shell_v=60%				# vertical shell pane width
-auto_selection=1			# automatically synch tags between panes
-time_event=0				# set to positive integer to trigger time events
-pdhl=					# log pdh message in file too
-dirmode=0				# default directory mode
-extmode=0				# default preview mode
-: ${prev_all:=1}			# open preview window
-zooms=(85 70 50 30)			# sizes of preview pane in percent
-zoom=1					# start zoom level
-move_step=4				# fast movement size
-msg_m='Creating montage ...'		# message displayed when creating image montage for directories
-msg_du='Computing dir sizes ...'	# message displayed when computing directory sizes
-find_auto=README			# file to select by default
-line_color0="\e[2;40;90m"		# default line color
-line_color="$line_color0"		# line color
-line_color_hi="\e[38;5;240m"		# line color highlight
-mount_archive=0				# set if fuse-archive is installed
-cursor_color0='\e[7;34m'		# default cursor color
-cursor_color="$cursor_color0"		# cursor color
-cursor_color_search='\e[7;35m'		# cursor color in interactive search
-pop_help=0				# show help in pop up
-pop_kbindings=1				# show bindings in pop up
-quick_display=512			# display entries during scanning if over this number
-rfilter0=				# default reverse filter, eg: rfilter0='\.sw.$'
-show_line=1				# show line (entry index)
-show_size=0				# 0:none, 1: file sizes, 2: file sized + dir entries, 3: file sizes + dir sized recursive
-show_date=1				# show date in header if sort mode is by date
-show_tar=0				# show extra information about tar file, takes time
-tag_new_tab=				# in copy/move to tab, default new tab location if no other tab exists
-tbcolor 67 67				# set tmux separation line color
-TBCOLORS='236 52'
+# Command to run when the user presses ? for help
+ftl_cfg_help_command="man ftl.1"
 
-# External Tags
-etag=0 					# show etags
-#. $FTL_CFG/etc/etags/git ; etag=1	# if you want to show git tags by default
+#----------------------------------------------------------------------------
+# Bookmarks and destinations
+#----------------------------------------------------------------------------
 
-sort_type0=0				# default sort. 0: alphanumeric, 1: size, 2: date.
-sort_reversed0=				# default reverse sort order
+# Session marks (single-char bookmarks). Keys are characters, values are
+# paths ending in $ for directories or no suffix for files.
+declare -Ag ftl_mark_session_marks=(
+    [0]=/
+    [1]="$HOME/"
+    [2]=/CHANGE_ME/dir/filename
+    [3]=/CHANGE_ME/dir/filename
+    ["'"]="$(tail -n1 "$ftl_state_global_history_file")"
+)
 
-# Glyphs
-sglyph=( ⍺ 🡕 )				# sorting: alphanumeric, size
-iglyph=('' ᴵ ᴺ)				# image mode: all, no-image, image
-lglyph=('' ᵈ ᶠ)				# preview: all, directory-only, file-only
-tglyph=('' ¹ ² ³ D)			# tag classes 
+# Preset destinations for copy/move (PP / PM bindings)
+declare -Ag ftl_cfg_preset_destinations=()
 
-# Media Filters
-ifilter='svg|webp|jpg|jpeg|JPG|png|gif|bmp'	# images
-mfilter='mp3|mp4|flv|mkv|webm'			# video
-pdf_prev_image=0				# show pdf as images if set
+# Color overrides (overrides LS_COLORS for specific filenames)
+# declare -Ag ftl_cfg_color_overrides=([?]="30;42")
 
-# FZF Options
-fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
-fzfp_opt="--cycle --expect=ctrl-t --reverse"
-fzf_sxiv_opt="-0 -1 -m --expect=ctrl-t --bind alt-a:select-all"
-FZF_LISTEN=4466
-FZF_LISTEN_COMMAND='fd -H -I' # -E '*.git'
+#----------------------------------------------------------------------------
+# Behavior options
+#----------------------------------------------------------------------------
 
-# External Commands
-SXIV=sxiv
-GIF_VIEWER=                             # https://github.com/tomas/pixelhopper works fine
-EDITOR="vim -p"
-FILE_DIFF=vimdiff
+# Seconds for key read timeout (controls reactivity of time events)
+ftl_cfg_key_timeout=1
 
-FTLI_CLEAN=1				# set to 0 if using konsole
-FTLI_H=21				# hint FTLI about Character height
-FTLI_W=10				# hint FTLI about Character width
-FTLI_Z=0				# show image zoomed 
+# Shell pane dimensions (tmux size specs)
+ftl_cfg_shell_pane_height=40%
+ftl_cfg_shell_pane_width=60%
 
-GPGID=CHANGE.ME
+# Automatically synchronize selection between panes
+ftl_cfg_auto_sync_selection=1
 
-G_PLAYER="vlc -f"			# gui media player
-T_PLAYER="mplayer -vo null" 		# terminal media player
-TE_PLAYER="vlc -I curses" 		# terminal external media player
-T_PLAYER_STATUS='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null' # terminal live preview media player
-B_PLAYER="$FTL_CFG/etc/viewers/mplayer_local" # background player
-Q_PLAYER="$FTL_CFG/etc/viewers/cmus"    # music player to queue to
+# Interval in seconds for time events (0 = disabled)
+ftl_cfg_time_event_interval=0
 
-PAGER_ANSI='/usr/bin/less -R'		# default pager
+# If set, debug messages are also logged to this file
+ftl_cfg_debug_log_file=
 
-MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-statusbar -no-linenumbers'
-MD_RENDER0='ptext'			# default markdown renderer 
-MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
-MD_RENDER2='vmd'			# markdown renderer #2
-MD_DIR_RENDER="vmd"			# markdown renderer for mode "show README in directory"
+# Default directory preview mode (0=ftl, 1=du, 2=ls, 3=README, 4=exa, 5=image)
+ftl_state_dir_preview_mode=0
 
-HEXVIEW=hexdump				# hex viewer
-HEXEDIT=hexedit				# hex editor
+# Default alternative preview mode (0=default, 1-5=alternatives)
+ftl_state_alt_preview_mode=0
 
-MIMETYPE=mimemagic			# mimetype generator
-NCDU=ncdu 				# ncdu, ncdu2, gdu, tdu, or what you chose as an extended view for directories 
-JSON_VIEWER=jless
-YAML_VIEWER="yam -i"
+# Whether the preview pane is visible by default
+: ${ftl_state_preview_pane_visible:=1}
 
-EXA_COLORS="ur=1;34:uw=1;34:ux=1;34:gr=1;34:gw=1;34:gx=1;34:tr=1;34:tw=1;34:tx=1;34:sn=1;30:sb=1;30:uu=1;30:da=1;30:hd=1;30"
-EXA_OPTIONS="-l --tree -L 3 --header --color=always"
+# Available preview pane sizes (percentages) and starting index
+ftl_cfg_preview_zoom_levels=(85 70 50 30)
+ftl_state_preview_zoom_index=1
+
+# Number of entries to move with step commands
+ftl_cfg_move_step_size=4
+
+# Status messages for long operations
+ftl_cfg_msg_montage='Creating montage ...'
+ftl_cfg_msg_du_size='Computing dir sizes ...'
+
+# File to auto-select when entering a new directory
+ftl_cfg_auto_select_filename=README
+
+# ANSI colors for the entry-index column
+ftl_cfg_line_color_default="\e[2;40;90m"
+ftl_cfg_line_color_current="\e[2;40;90m"
+ftl_cfg_line_color_highlight="\e[38;5;240m"
+
+# Whether to mount archives via fuse-archive
+ftl_cfg_mount_archives=0
+
+# ANSI colors for the cursor (the tag glyph of the current entry)
+ftl_cfg_cursor_color_default='\e[7;34m'
+ftl_cfg_cursor_color_current='\e[7;34m'
+ftl_cfg_cursor_color_search='\e[7;35m'
+
+# Whether to show help and bindings in popups
+ftl_cfg_help_in_popup=0
+ftl_cfg_bindings_in_popup=1
+
+# Threshold for quick-display mode (flash count during scanning)
+ftl_cfg_quick_display_threshold=512
+
+# Default reverse filter (applied to every new tab)
+ftl_cfg_default_reverse_filter=
+
+# Display toggles
+ftl_cfg_show_entry_index=1
+ftl_state_show_size_mode=0
+ftl_cfg_show_date_in_header=1
+ftl_cfg_show_tar_info=0
+
+# Default new-tab location for copy/move-to-tab
+ftl_cfg_default_new_tab_dir=
+
+# Tmux border colors (restored on quit)
+ftl_cfg_tmux_border_colors_default='236 52'
+ftl::pane::set_border_colors 67 67
+
+#----------------------------------------------------------------------------
+# External tags (etags)
+#----------------------------------------------------------------------------
+
+ftl_state_etag_enabled=0
+# To enable git etags by default, uncomment:
+# source "$FTL_CFG/etc/etags/git"
+# ftl_state_etag_enabled=1
+
+#----------------------------------------------------------------------------
+# Sort defaults
+#----------------------------------------------------------------------------
+
+ftl_cfg_default_sort_type=0        # 0=alphanumeric, 1=size, 2=date
+ftl_cfg_default_sort_reversed=
+
+#----------------------------------------------------------------------------
+# Glyph tables
+#----------------------------------------------------------------------------
+
+ftl_cfg_glyph_sort=(⍺ 🡕)                    # 0=alphanumeric, 1=size
+ftl_cfg_glyph_image_mode=('' ᴵ ᴺ)           # 0=all, 1=no-image, 2=image
+ftl_cfg_glyph_listing_mode=('' ᵈ ᶠ)         # 0=all, 1=dir-only, 2=file-only
+ftl_cfg_glyph_tag_classes=('' ¹ ² ³ D)      # 0=unused, 1-4=classes
+
+#----------------------------------------------------------------------------
+# Media filter regexes
+#----------------------------------------------------------------------------
+
+ftl_cfg_image_extensions_regex='svg|webp|jpg|jpeg|JPG|png|gif|bmp'
+ftl_cfg_media_extensions_regex='mp3|mp4|flv|mkv|webm'
+ftl_state_pdf_preview_as_image=0
+
+#----------------------------------------------------------------------------
+# FZF options
+#----------------------------------------------------------------------------
+
+ftl_cfg_fzf_popup_opts="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
+ftl_cfg_fzf_pane_opts="--cycle --expect=ctrl-t --reverse"
+ftl_cfg_fzf_sxiv_opts="-0 -1 -m --expect=ctrl-t --bind alt-a:select-all"
+ftl_cfg_fzf_listen_port=4466
+ftl_cfg_fzf_listen_command='fd -H -I'
+
+#----------------------------------------------------------------------------
+# External commands
+#----------------------------------------------------------------------------
+
+ftl_cfg_image_viewer=sxiv
+ftl_cfg_gif_viewer=                        # https://github.com/tomas/pixelhopper
+ftl_cfg_editor="vim -p"
+ftl_cfg_diff_tool=vimdiff
+
+# Image preview daemon hints
+ftl_cfg_image_clean_borders=1              # set to 0 if using konsole
+ftl_cfg_char_height_px=21
+ftl_cfg_char_width_px=10
+ftl_cfg_image_zoomed=0
+
+ftl_cfg_gpg_key_id=CHANGE.ME
+
+# Media players
+ftl_cfg_gui_media_player="vlc -f"
+ftl_cfg_terminal_media_player="mplayer -vo null"
+ftl_cfg_external_terminal_player="vlc -I curses"
+ftl_cfg_live_preview_player='mplayer -msglevel all=-1 -msglevel statusline=6 -nolirc -msgcolor -novideo -vo null'
+ftl_cfg_background_player="$FTL_CFG/etc/viewers/mplayer_local"
+ftl_cfg_queue_player="$FTL_CFG/etc/viewers/cmus"
+
+# Pagers
+ftl_cfg_ansi_pager='/usr/bin/less -R'
+ftl_cfg_markdown_pager='/usr/bin/less -R'
+
+# Markdown renderers
+ftl_cfg_markdown_renderer_default='ptext'
+ftl_cfg_markdown_renderer_1='vmd'
+ftl_cfg_markdown_renderer_2='vmd'
+ftl_cfg_markdown_dir_renderer="vmd"
+
+# Hex tools
+ftl_cfg_hex_viewer=hexdump
+ftl_cfg_hex_editor=hexedit
+
+# File type detection
+ftl_cfg_mime_detector=mimemagic
+
+# Disk usage tool
+ftl_cfg_disk_usage_tool=ncdu
+
+# JSON/YAML viewers
+ftl_cfg_json_viewer=jless
+ftl_cfg_yaml_viewer="yam -i"
+
+# exa (directory preview)
+ftl_cfg_exa_colors="ur=1;34:uw=1;34:ux=1;34:gr=1;34:gw=1;34:gx=1;34:tr=1;34:tw=1;34:tx=1;34:sn=1;30:sb=1;30:uu=1;30:da=1;30:hd=1;30"
+ftl_cfg_exa_options="-l --tree -L 3 --header --color=always"
 
 # Deletion command
-RM="rm -rf"
+ftl_cfg_delete_command="rm -rf"
 
-# using rm-improved
-# RM="rip --graveyard '$HOME/graveyard'" ; mkdir -p $HOME/graveyard
-# bind ftl file	U	unbury		"undo last deletion in current directory"
-# unbury() { last_bury="$(rip --graveyard $HOME/graveyard -s | tail -n1)" ; [[ -n "$last_bury" ]] && { rip --graveyard $HOME/graveyard -u ; cdir "$PWD" "$(basename "$last_bury")" ; } ; } 
+# Using rm-improved (rip) instead:
+# ftl_cfg_delete_command="rip --graveyard '$HOME/graveyard'"
+# mkdir -p "$HOME/graveyard"
+# ftl::kbd::bind ftl entry U unbury "undo last deletion"
+# unbury() { last_bury="$(rip --graveyard "$HOME/graveyard" -s | tail -n1)" ; [[ -n "$last_bury" ]] && { rip --graveyard "$HOME/graveyard" -u ; ftl::list::change_dir "$PWD" "$(basename "$last_bury")" ; } ; }
 
-# using FreeDesktop.org Trash 
-# RM="trash-put"
+# Using FreeDesktop.org Trash:
+# ftl_cfg_delete_command="trash-put"
 
-# using your own delete function
-# my_delete() { echo my_delete ; printf "%s\n" "$@" ; read -sn1 ; }
-# RM=my_delete
+# Display width for the bindings table
+ftl_cfg_bindings_display_width=150
 
-CMD_COLS=150 				# columns when displaying command mapping in popup
+# Command aliases for the command prompt
+declare -Ag ftl_cfg_command_aliases=(
+    [csx]="split finfo | xargs -0"
+    [cfx]="full finfo | xargs -0"
+)
 
-# Command aliases
-declare -A cmd_aliases=([csx]="split finfo | xargs -0" [cfx]="full finfo | xargs -0")
+#----------------------------------------------------------------------------
+# Preview system
+#----------------------------------------------------------------------------
 
-# preview
 source "$FTL_CFG/viewers/core"
 
-# Bindings
-redo_key='.'
-leader_key='BACKSLASH'
+#----------------------------------------------------------------------------
+# Key bindings
+#----------------------------------------------------------------------------
 
-bind ftl ftl		QUESTION_MARK	ftl_help		"show help"
+ftl_cfg_redo_key='.'
+ftl_cfg_leader_key='BACKSLASH'
 
-bind ftl entry		d		delete_selection	"delete selection using config \$RM"
-bind ftl entry		if		create_file		"create new file, prompts inline"
-bind ftl entry		id		create_dir_no_cd	"create new directory"
-bind ftl entry		iD		create_dir		"create new directory, and cd"
-bind ftl entry		ib		create_bulk		"create files and directories in bulk, uses $EDITOR, end with / for directories"
-bind ftl entry		R		rename			"rename selection"
-bind ftl entry		w		copy			"copy file to, prompts inline"
-bind ftl entry		pp		tag_copy		"copy selection to current directory"
-bind ftl entry		pm		tag_move		"move selection to current directory"
-bind ftl entry		PP		tag_copy_dest		"copy selection to preset dir_dest"
-bind ftl entry		PM		tag_move_dest		"move selection to preset dir_dest"
-bind ftl entry		pz		tag_move_fzf		"move selection to predefine location using fzf_mv"
-bind ftl entry		pZ		tag_move_fzf_sd		"move selection to sub directory using fzf_mv_sd "
-bind ftl entry		pop		tag_copy_to_tab		"copy selection to other tab"
-bind ftl entry		pom		tag_move_to_tab		"move selection to other tab"
-bind ftl entry		xmr		chmod_ar		"chmod a+r selection"
-bind ftl entry		xmw		chmod_aw		"chmod a+w selection"
-bind ftl entry		xmx		chmod_ax		"chmod a+x selection"
-bind ftl entry		xmM		chmod_dialog		"chmod selection via sc-im"
-bind ftl entry		xh		hexview			"hex view"
-bind ftl entry		xH		hexedit			"hexedit"
-bind ftl entry		xv		vim_edit		"vim"
-bind ftl entry		xV		vim_edit_window		"vim in separate tmux window"
-bind ftl entry		XV		vim_edit_shared_window	"vim in shared tmux window"
-bind ftl entry		xc		terminal_cat		"cat"
-bind ftl entry		xl		link			"symlink selection in current directory"
-bind ftl entry		xp		preview_with		"preview with"
+# --- ftl meta commands ---
 
-bind ftl filter		fe		set_filter_ext		"select external filter"
-bind ftl filter		fy		set_filter_only_tagged	"show only tagged files"
-bind ftl filter		fd		set_filter_dir		"set directories filter"
-bind ftl filter		ff		set_filter		"set filter 1"
-bind ftl filter		fF		set_filter2		"set filter 2"
-bind ftl filter		fr		set_filter_reverse	"set reverse filter"
-bind ftl filter		fc		clear_filters		"clear filters"
+ftl::kbd::bind ftl ftl QUESTION_MARK ftl::cmd::show_help "show help"
 
-bind ftl find		"/"		find_entry		"find"
-bind ftl find		n		find_next		"find next"
-bind ftl find		N		find_previous		"find previous"
-bind ftl find		gff		find_fzf		"fzf find current directory file"
-bind ftl find		b		find_fzf		"fzf find current directory file"
-bind ftl find		gfF		find_fzf_all		"fzf find from current directory"
-bind ftl find		B		find_fzf_all		"fzf find from current directory"
-bind ftl find		gfa		find_frf		"find file using regexp or fuzzy matching"
-bind ftl find		gfA		find_frf_all		"find file, using regexp or fuzzy matching"
-bind ftl find		grr		open_rg			"rg, open file"
-bind ftl find		grf		go_rg_one_match		"rg to file, show only one match"
-bind ftl find		grt		go_rg			"rg to file"
-bind ftl find		grl		go_rgl			"rg, edit file "
-bind ftl find		gfd		find_fzf_dirs		"fzf find directories"
-bind ftl find		gfi		image_go_sxiv		"image goto, using sxiv"
-bind ftl find		gfI		image_go_sxiv_rec	"image goto, including sub directories, using sxiv"
-bind ftl find		gfu		image_fzf		"image goto, using fzf/ueberzurg"
-bind ftl find		gL		follow_link		"symlink follow"
+# --- file operations ---
 
-bind ftl ftl		q		quit_ftl		"quit"
-bind ftl ftl		Q		quit_all		"quit all"
-bind ftl ftl		ZZ		quit_all		"quit all"
-bind ftl ftl		ZS		quit_keep_shell		"quit, keep shell"
-bind ftl ftl		ZP		quit_keep_preview	"quit, keep preview zoomed"
-bind ftl ftl		c		k_bindings		"show command bindings"
-bind ftl ftl		"$"		editor_detach		"detach editor preview"
-bind ftl ftl		":"		command_prompt		"run commands: q, etags, load_sel, ..."
-# bind ftl ftl		r		refresh_pane		"refresh"
-bind ftl SIG		r		SIG_REFRESH		"preview pane signal"
+ftl::kbd::bind ftl entry d               ftl::cmd::delete_selection       "delete selection using config \$ftl_cfg_delete_command"
+ftl::kbd::bind ftl entry if              ftl::cmd::create_file            "create new file, prompts inline"
+ftl::kbd::bind ftl entry id              ftl::cmd::create_dir_no_cd       "create new directory"
+ftl::kbd::bind ftl entry iD              ftl::cmd::create_dir_and_cd      "create new directory, and cd"
+ftl::kbd::bind ftl entry ib              ftl::cmd::create_bulk            "create files and directories in bulk, uses \$ftl_cfg_editor, end with / for directories"
+ftl::kbd::bind ftl entry R               ftl::cmd::rename_selection       "rename selection"
+ftl::kbd::bind ftl entry w               ftl::cmd::copy_to_prompted       "copy file to, prompts inline"
+ftl::kbd::bind ftl entry pp              ftl::cmd::copy_selection_here    "copy selection to current directory"
+ftl::kbd::bind ftl entry pm              ftl::cmd::move_selection_here    "move selection to current directory"
+ftl::kbd::bind ftl entry PP              ftl::cmd::copy_to_preset         "copy selection to preset ftl_cfg_preset_destinations"
+ftl::kbd::bind ftl entry PM              ftl::cmd::move_to_preset         "move selection to preset ftl_cfg_preset_destinations"
+ftl::kbd::bind ftl entry pz              ftl::cmd::move_via_fzf           "move selection to predefined location using fzf_mv"
+ftl::kbd::bind ftl entry pZ              ftl::cmd::move_to_subdir_via_fzf "move selection to sub directory using fzf_mv_sd"
+ftl::kbd::bind ftl entry pop             ftl::cmd::copy_to_other_tab      "copy selection to other tab"
+ftl::kbd::bind ftl entry pom             ftl::cmd::move_to_other_tab      "move selection to other tab"
+ftl::kbd::bind ftl entry xmr             ftl::cmd::chmod_toggle_read      "chmod a+r selection"
+ftl::kbd::bind ftl entry xmw             ftl::cmd::chmod_toggle_write     "chmod a+w selection"
+ftl::kbd::bind ftl entry xmx             ftl::cmd::chmod_toggle_exec      "chmod a+x selection"
+ftl::kbd::bind ftl entry xmM             ftl::cmd::chmod_via_scim         "chmod selection via sc-im"
+ftl::kbd::bind ftl entry xh              ftl::cmd::hex_view               "hex view"
+ftl::kbd::bind ftl entry xH              ftl::cmd::hex_edit               "hexedit"
+ftl::kbd::bind ftl entry xv              ftl::cmd::edit_in_vim            "vim"
+ftl::kbd::bind ftl entry xV              ftl::cmd::edit_in_vim_window     "vim in separate tmux window"
+ftl::kbd::bind ftl entry XV              ftl::cmd::edit_in_shared_vim_window "vim in shared tmux window"
+ftl::kbd::bind ftl entry xc              ftl::cmd::cat_in_terminal        "cat"
+ftl::kbd::bind ftl entry xl              ftl::cmd::symlink_selection      "symlink selection in current directory"
+ftl::kbd::bind ftl entry xp              ftl::cmd::preview_with_command   "preview with"
 
-bind ftl ftl		INVERSED_QUESTION_MARK	pdh_show		"pdh pane"
+# --- filters ---
 
-bind ftl history	Hh		history_go		"fzf current session history"
-bind ftl history	HH		ghistory		"fzf all sessions history"
-bind ftl history	DIAERESIS	ghistory		"fzf all sessions history"
-bind ftl history	Hs		ghistory_subdir		"fzf all sessions history, subdir"
-bind ftl history	He		ghistory_edit		"edit all sessions history"
-bind ftl history	Hc		ghistory_clear		"clear all sessions history"
+ftl::kbd::bind ftl filter fe             ftl::cmd::select_external_filter  "select external filter"
+ftl::kbd::bind ftl filter fy             ftl::cmd::filter_to_tagged        "show only tagged files"
+ftl::kbd::bind ftl filter fd             ftl::cmd::set_dir_filter          "set directories filter"
+ftl::kbd::bind ftl filter ff             ftl::cmd::set_filter_1            "set filter 1"
+ftl::kbd::bind ftl filter fF             ftl::cmd::set_filter_2            "set filter 2"
+ftl::kbd::bind ftl filter fr             ftl::cmd::set_reverse_filter      "set reverse filter"
+ftl::kbd::bind ftl filter fc             ftl::cmd::clear_all_filters       "clear filters"
 
-bind ftl marks		m		mark			"mark directory/file"
-bind ftl marks		QUOTE		mark_go			"go to mark"
-bind ftl marks		STAR		mark_go_tab		"go to mark, new tab"
-bind ftl marks		gm		mark_fzf		"fzf to mark"
-bind ftl marks		MM		gmark			"add persistent mark"
-bind ftl marks		gM		gmark_fzf		"fzf to persistent mark"
-bind ftl marks		Mc		gmarks_clear		"clear persistent marks"
+# --- search ---
 
-bind ftl media		ea		preview_show		"terminal media player in background"
-bind ftl media		eA		preview_show_fzf	"fzf a viewer"
-bind ftl media		ek		player_kill		"kill sound preview"
-bind ftl media		eq		preview_queue		"fzf a viewer"
-bind ftl media		ee		external_mode1		"external viewer m1"
-bind ftl media		er		external_mode2		"external viewer m2, detached"
-bind ftl media		ew		external_mode3		"external viewer, m3, detached, fullscreen"
+ftl::kbd::bind ftl find "/"              ftl::cmd::find_in_dir             "find"
+ftl::kbd::bind ftl find n                ftl::cmd::find_next               "find next"
+ftl::kbd::bind ftl find N                ftl::cmd::find_previous           "find previous"
+ftl::kbd::bind ftl find gff              ftl::cmd::find_via_fzf            "fzf find current directory file"
+ftl::kbd::bind ftl find b                ftl::cmd::find_via_fzf            "fzf find current directory file"
+ftl::kbd::bind ftl find gfF              ftl::cmd::find_via_fzf_recursive  "fzf find from current directory"
+ftl::kbd::bind ftl find B                ftl::cmd::find_via_fzf_recursive  "fzf find from current directory"
+ftl::kbd::bind ftl find gfa              ftl::cmd::find_via_frf            "find file using regexp or fuzzy matching"
+ftl::kbd::bind ftl find gfA              ftl::cmd::find_via_frf_recursive  "find file, using regexp or fuzzy matching"
+ftl::kbd::bind ftl find grr              ftl::cmd::rg_open_file            "rg, open file"
+ftl::kbd::bind ftl find grf              ftl::cmd::rg_goto_single_match    "rg to file, show only one match"
+ftl::kbd::bind ftl find grt              ftl::cmd::rg_goto_file            "rg to file"
+ftl::kbd::bind ftl find grl              ftl::cmd::rg_edit_files           "rg, edit file"
+ftl::kbd::bind ftl find gfd              ftl::cmd::find_dirs_via_fzf       "fzf find directories"
+ftl::kbd::bind ftl find gfi              ftl::cmd::goto_image_via_sxiv     "image goto, using sxiv"
+ftl::kbd::bind ftl find gfI              ftl::cmd::goto_image_via_sxiv_recursive "image goto, including sub directories, using sxiv"
+ftl::kbd::bind ftl find gfu              ftl::cmd::goto_image_via_fzf      "image goto, using fzf/ueberzug"
+ftl::kbd::bind ftl find gL               ftl::cmd::follow_symlink          "symlink follow"
 
-bind ftl move		ENTER		enter			"enter; cd or open file"
-bind ftl move		PGUP		move_page_up		"page up"
-bind ftl move		CTL-B		move_page_up		"page up"
-bind ftl move		PGDN		move_page_down		"page down"
-bind ftl move		CTL-F		move_page_down		"page down"
-bind ftl move		UP		move_up_arrow		"up to previous entry"
-bind ftl move		DOWN		move_down_arrow		"down to next entry"
-bind ftl move		RIGHT		move_right_arrow	"right; cd into directory"
-bind ftl move		LEFT		move_left_arrow		"cd to parent directory"
-bind ftl move		ALT-J		preview_down		"scroll preview down"
-bind ftl move		ALT-K		preview_up		"scroll preview up"
+# --- ftl meta ---
 
-bind ftl move		J		preview_down2		"scroll fixed preview down"
-bind ftl move		K		preview_up2		"scroll fixed preview up"
-# bind ftl move		J		move_down_step		"move down multiple lines"
-# bind ftl move		K		move_up_step		"move up multiple lines"
+ftl::kbd::bind ftl ftl q                 ftl::cmd::quit_ftl                "quit"
+ftl::kbd::bind ftl ftl Q                 ftl::cmd::quit_all                "quit all"
+ftl::kbd::bind ftl ftl ZZ               ftl::cmd::quit_all                "quit all"
+ftl::kbd::bind ftl ftl ZS               ftl::cmd::quit_keep_shell         "quit, keep shell"
+ftl::kbd::bind ftl ftl ZP               ftl::cmd::quit_keep_preview       "quit, keep preview zoomed"
+ftl::kbd::bind ftl ftl c                 ftl::kbd::show_bindings           "show command bindings"
+ftl::kbd::bind ftl ftl "\$"             ftl::cmd::detach_editor_preview   "detach editor preview"
+ftl::kbd::bind ftl ftl ":"              ftl::cmd::open_command_prompt     "run commands: q, etags, load_sel, ..."
+ftl::kbd::bind ftl SIG r                 ftl::ipc::handle_refresh          "preview pane signal"
 
+ftl::kbd::bind ftl ftl INVERSED_QUESTION_MARK ftl::log::show_debug_pane  "debug pane"
 
-bind ftl move		CTL-H		preview_left		"send left to preview"
-bind ftl move		CTL-L		preview_right		"send right to preview"
-bind ftl move		gD		change_dir		"cd"
-bind ftl move		"g LEADER"	top_file_bottom		"cycle between top/file/last"
-bind ftl move		gd		goto_first_directory	"go to the first directory"
-bind ftl move		gg		goto_first_file		"go to the first file"
-bind ftl move		gh  		goto_high_file		"position cursor on the first file in the window"
-bind ftl move		gl  		goto_low_file		"position cursor on the last file in the window"
-bind ftl move		G		goto_last_file		"go to the last file"
-bind ftl move		h		move_left		"cd to parent directory"
-bind ftl move		j		move_down		"down to next entry"
-bind ftl move		k		move_up			"up to previous entry"
-bind ftl move		l		move_right		"right; cd into entry"
-bind ftl move		"COUNT %"	move_percent		"move by percent"
-bind ftl move		"-"		goto_alt1		"next entry of same extension"
-bind ftl move		"_"		goto_alt2		"next entry of different extension"
-bind ftl move		"#"		goto_entry		"goto entry by index"
-bind ftl move		yN		goto_prev_tag		"goto previous tag"
-bind ftl move		yn		goto_next_tag		"goto next tag"
+# --- history ---
 
-bind ftl pane		"CTL-W h"	pane_left		"extra pane left"
-bind ftl pane		"CTL-W l"	pane_right		"extra pane right"
-bind ftl pane		"CTL-W j"	pane_down		"extra pane below"
-bind ftl pane		"CTL-W H"	pane_L			"extra pane: left"
-bind ftl pane		"CTL-W L"	pane_R			"extra pane: right"
-bind ftl pane		"CTL-W n"	pane_go_next		"next pane or viewer"
-bind ftl pane		gp		pane_go_next		"next pane or viewer"
+ftl::kbd::bind ftl history Hh            ftl::cmd::goto_session_history    "fzf current session history"
+ftl::kbd::bind ftl history HH            ftl::cmd::goto_global_history     "fzf all sessions history"
+ftl::kbd::bind ftl history DIAERESIS     ftl::cmd::goto_global_history     "fzf all sessions history"
+ftl::kbd::bind ftl history Hs            ftl::cmd::goto_global_history_subdir "fzf all sessions history, subdir"
+ftl::kbd::bind ftl history He            ftl::cmd::edit_global_history     "edit all sessions history"
+ftl::kbd::bind ftl history Hc            ftl::cmd::clear_global_history    "clear all sessions history"
 
-bind ftl shell		"CTL-W !"	shell_view		"view shell"
-bind ftl shell		"S!"		shell_view		"view shell"
-bind ftl shell		"CTL-W sS"	shell_files		"shell pane with selected files"
-bind ftl shell		SS		shell_files		"shell pane with selected files"
-bind ftl shell		"CTL-W ss"	shell			"shell pane"
-bind ftl shell		Ss		shell			"shell pane"
-bind ftl shell		"CTL-W sq"	quit_shell		"close shell pane"
-bind ftl shell		Sq		quit_shell		"close shell pane"
-bind ftl shell		"CTL-W sv"	shell_vertical		"shell vertical pane"
-bind ftl shell		Sv		shell_vertical		"shell vertical pane"
-bind ftl shell		"CTL-W sz"	shell_zoomed		"shell pane, zoomed out"
-bind ftl shell		Sz		shell_zoomed		"shell pane, zoomed out"
-bind ftl shell		"CTL-W sf"	shell_send_files	"send selection to shell pane"
-bind ftl shell		Sf		shell_send_files	"send selection to shell pane"
-bind ftl shell		"CTL-W sg"	shell_synch		"cd to shell pane"
-bind ftl shell		gS		shell_synch		"cd to shell pane"
-bind ftl shell		"CTL-Z sp"	shell_cmd_in_pane	"run shell command in pane"
-bind ftl shell		Sp		shell_cmd_in_pane	"run shell command in pane"
+# --- marks ---
 
-bind ftl tabs		PARAGRAPH	tab_new			"new tab"
-bind ftl tabs		TAB		tab_next		"next tab"
-bind ftl tabs		"COUNT gt"	tab_goto		"go to tab"
-bind ftl tabs		gt		tab_next		"next tab"
-bind ftl tabs		gT		tab_prev		"previous tab"
+ftl::kbd::bind ftl marks m               ftl::cmd::set_mark                "mark directory/file"
+ftl::kbd::bind ftl marks QUOTE           ftl::cmd::goto_mark               "go to mark"
+ftl::kbd::bind ftl marks STAR            ftl::cmd::goto_mark_new_tab       "go to mark, new tab"
+ftl::kbd::bind ftl marks gm              ftl::cmd::goto_mark_via_fzf       "fzf to mark"
+ftl::kbd::bind ftl marks MM              ftl::cmd::add_persistent_mark     "add persistent mark"
+ftl::kbd::bind ftl marks gM              ftl::cmd::goto_persistent_via_fzf "fzf to persistent mark"
+ftl::kbd::bind ftl marks Mc              ftl::cmd::clear_persistent_marks  "clear persistent marks"
 
-bind ftl selection	ya		select_all		"select all files and subdirs"
-bind ftl selection	yf		select_all_files	"select all files"
-bind ftl selection	yd		select_all_directories	"select all directories"
-bind ftl selection	yii		image_select		"selected images via sxiv"
-bind ftl selection	yiI		image_select_rec	"selected images, including sub directories, via sxiv"
-bind ftl selection	yif		selection_fzf		"fzf select files"
-bind ftl selection	yiF		selection_fzf_all	"fzf select files and subdirs"
-bind ftl selection	ye		selection_ext		"select files with same extension"
-bind ftl selection	yie		selection_ext_fzf	"fzf select files with same extension"
-bind ftl selection	yE		selection_ext_all	"select files ext, with subdirs"
-bind ftl selection	yiE		selection_ext_all_fzf	"fzf select files ext, with subdirs"
+# --- media ---
 
-bind ftl selection	a		selection_flip_down	"select down"
-bind ftl selection	"COUNT a"	selection_flip_down	"select down"
-bind ftl selection	yy		selection_flip_down	"select down"
-bind ftl selection	"COUNT yy"	selection_flip_down	"select down"
+ftl::kbd::bind ftl media ea              ftl::cmd::show_in_background_player "terminal media player in background"
+ftl::kbd::bind ftl media eA              ftl::cmd::show_via_fzf_viewer     "fzf a viewer"
+ftl::kbd::bind ftl media ek              ftl::cmd::kill_media_player      "kill sound preview"
+ftl::kbd::bind ftl media eq              ftl::cmd::queue_to_player        "fzf a viewer"
+ftl::kbd::bind ftl media ee              ftl::cmd::external_viewer_mode_1 "external viewer m1"
+ftl::kbd::bind ftl media er              ftl::cmd::external_viewer_mode_2 "external viewer m2, detached"
+ftl::kbd::bind ftl media ew              ftl::cmd::external_viewer_mode_3 "external viewer, m3, detached, fullscreen"
 
-bind ftl selection	s		selection_flip_up	"select up"
-bind ftl selection	"COUNT s"	selection_flip_up	"select up"
-bind ftl selection	yu		selection_flip_up	"select up"
-bind ftl selection	"COUNT yu"	selection_flip_up	"select up"
+# --- movement ---
 
-bind ftl selection	"COUNT y1"	selection_class_1	"class 1 selection"
-bind ftl selection	y1		selection_class_1	"class 1 selection"
-bind ftl selection	"COUNT y2"	selection_class_2	"class 2 selection"
-bind ftl selection	y2		selection_class_2	"class 2 selection"
-bind ftl selection	"COUNT y3"	selection_class_3	"class 3 selection"
-bind ftl selection	y3		selection_class_3	"class 3 selection"
-bind ftl selection	"COUNT y4"	selection_class_4	"class 4 selection"
-bind ftl selection	y4		selection_class_4	"class 4 selection"
-bind ftl selection	yc		selection_untag_all	"deselect all"
-bind ftl selection	yC		selection_untag_fzf	"deselect fzf"
-bind ftl selection	ytc		copy_clipboard		"copy selection to clipboard"
+ftl::kbd::bind ftl move ENTER            ftl::cmd::enter_entry             "enter; cd or open file"
+ftl::kbd::bind ftl move PGUP             ftl::cmd::page_up                "page up"
+ftl::kbd::bind ftl move CTL-B            ftl::cmd::page_up                "page up"
+ftl::kbd::bind ftl move PGDN             ftl::cmd::page_down              "page down"
+ftl::kbd::bind ftl move CTL-F            ftl::cmd::page_down              "page down"
+ftl::kbd::bind ftl move UP               ftl::cmd::cursor_up_arrow        "up to previous entry"
+ftl::kbd::bind ftl move DOWN             ftl::cmd::cursor_down_arrow      "down to next entry"
+ftl::kbd::bind ftl move RIGHT            ftl::cmd::cursor_right_arrow     "right; cd into directory"
+ftl::kbd::bind ftl move LEFT             ftl::cmd::cursor_left_arrow      "cd to parent directory"
+ftl::kbd::bind ftl move ALT-J            ftl::cmd::scroll_preview_down    "scroll preview down"
+ftl::kbd::bind ftl move ALT-K            ftl::cmd::scroll_preview_up      "scroll preview up"
 
-bind ftl selection	gy		selection_goto		"fzf goto selection"
-# bind ftl selection	""		selection_merge_all	"merge from panes"
-# bind ftl selection	""		selection_merge		"fzf merge from panes"
+ftl::kbd::bind ftl move J                ftl::cmd::scroll_fixed_preview_down "scroll fixed preview down"
+ftl::kbd::bind ftl move K                ftl::cmd::scroll_fixed_preview_up   "scroll fixed preview up"
 
-bind ftl view		zma		view_mode_all		"view mode: all"
-bind ftl view		zmm		view_mode_all		"view mode: all"
-bind ftl view		zmn		view_mode_next		"view mode: not image/image/all"
-bind ftl view		zmi		view_mode_image		"view mode: image"
-bind ftl view		zmI		view_mode_not_image	"view mode: not image"
-bind ftl view		zmP		preview_image		"show/hide image preview"
-bind ftl view		zmd		file_dir_mode		"file/dir view mode"
-bind ftl view		zmD		preview_dir_only	"preview directory only"
-bind ftl view		zt		tree_view		"tree view"
-bind ftl view		zmp		view_mode_pdf		"show pdf preview as text or image"
-bind ftl view		zz		image_zoom		"zoom image preview"
-bind ftl view		z+		preview_size		"change preview size"
-bind ftl view		+		preview_size		"change preview size"
-bind ftl view		zg		show_stat		"show/hide stat"
-bind ftl view		zs		show_size		"show/hide size"
-bind ftl view		zS		hide_size		"hide size"
-bind ftl view		zo		sort_entries		"sort type"
-bind ftl view		zO		sort_entries_reversed	"sort reversed"
-bind ftl view		zv		preview_pane		"preview show/hide"
-bind ftl view		zff		preview_pane2		"fixed preview show/hide"
-bind ftl view		zfc		tcpreview2		"fixed preview close"
-bind ftl view		"z STAR"	depth			"maximum listing depth"
-bind ftl view		zTt		etag_show		"show/hide etags"
-bind ftl view		zTT		etag_select		"select etag type"
-bind ftl view		zep		preview_ext_ign		"show/hide extension preview"
-bind ftl view		zeh		extension_hide_tab	"hide extension from listing, per tab"
-bind ftl view		zeH		extension_hide		"hide extension from listing"
-bind ftl view		zeo		extension_only_tab	"show only this extension in listing, per tab"
-bind ftl view		zeO		extension_only		"show only this extension in listing"
-bind ftl view		zec		extension_clear		"enable all extensions"
-bind ftl view		zes		extension_sort		"sort by extensions"
-bind ftl view		z.		show_hidden		"show/hide dot-files"
-bind ftl view		z1		preview_m1		"alternative preview mode 1"
-bind ftl view		z2		preview_m2		"alternative preview mode 2"
-bind ftl view		z3		preview_m3		"alternative preview mode 3"
-bind ftl view		z4		preview_m4		"alternative preview mode 4"
-bind ftl view		z5		preview_m5		"alternative preview mode 5"
-bind ftl view		Z1		full_preview_m1		"alternative preview mode 1, full screen"
-bind ftl view		Z2		full_preview_m2		"alternative preview mode 2, full screen"
-bind ftl view		Z3		full_preview_m3		"alternative preview mode 3, full screen"
-bind ftl view		Z4		full_preview_m4		"alternative preview mode 4, full screen"
-bind ftl view		Z5		full_preview_m5		"alternative preview mode 5, full screen"
-bind ftl view		zd0		set_directory_mode0	"directory default mode"
-bind ftl view		zd1		set_directory_mode1	"directory du mode"
-bind ftl view		zd2		set_directory_mode2	"directory ls mode"
-bind ftl view		zd3		set_directory_mode3	"directory readme mode"
-bind ftl view		zd4		set_directory_mode4	"directory exa mode"
-bind ftl view		zd5		set_directory_mode5	"directory image mode"
-bind ftl view		zM		preview_refresh		"refresh file preview/montage"
+ftl::kbd::bind ftl move CTL-H            ftl::cmd::send_preview_left      "send left to preview"
+ftl::kbd::bind ftl move CTL-L            ftl::cmd::send_preview_right     "send right to preview"
+ftl::kbd::bind ftl move gD               ftl::cmd::cd_prompt              "cd"
+ftl::kbd::bind ftl move "g LEADER"       ftl::cmd::cycle_top_file_bottom  "cycle between top/file/last"
+ftl::kbd::bind ftl move gd               ftl::cmd::goto_first_directory   "go to the first directory"
+ftl::kbd::bind ftl move gg               ftl::cmd::goto_first_file        "go to the first file"
+ftl::kbd::bind ftl move gh               ftl::cmd::goto_top_of_window     "position cursor on the first file in the window"
+ftl::kbd::bind ftl move gl               ftl::cmd::goto_bottom_of_window  "position cursor on the last file in the window"
+ftl::kbd::bind ftl move G                ftl::cmd::goto_last_file         "go to the last file"
+ftl::kbd::bind ftl move h                ftl::cmd::cd_to_parent           "cd to parent directory"
+ftl::kbd::bind ftl move j                ftl::cmd::cursor_down            "down to next entry"
+ftl::kbd::bind ftl move k                ftl::cmd::cursor_up              "up to previous entry"
+ftl::kbd::bind ftl move l                ftl::cmd::cd_into_entry          "right; cd into entry"
+ftl::kbd::bind ftl move "COUNT %"        ftl::cmd::jump_by_percent        "move by percent"
+ftl::kbd::bind ftl move "-"              ftl::cmd::goto_next_same_extension "next entry of same extension"
+ftl::kbd::bind ftl move "_"              ftl::cmd::goto_next_diff_extension "next entry of different extension"
+ftl::kbd::bind ftl move "#"              ftl::cmd::goto_by_index          "goto entry by index"
+ftl::kbd::bind ftl move yN               ftl::cmd::goto_prev_selected     "goto previous tag"
+ftl::kbd::bind ftl move yn               ftl::cmd::goto_next_selected     "goto next tag"
 
-# bind ftl view		not_assigned	preview_tail		"file preview at end"
-# bind ftl view		not_assigned	preview_lock		"preview lock, using external script"
-# bind ftl view		not_assigned	preview_lock_clr	"preview lock clear"
+# --- panes ---
 
-# don't change, reserved for *ftl*: [ÅåÄä]
-bind ftl SIG		'å'		SIG_PANE		"handle pane event"
-bind ftl SIG		'Ä'		SIG_REMOTE		"handle pane preview"
-# bind ftl SIG		not assigned	SIG_SYNCH_SHELL		"cd to shell pane"
+ftl::kbd::bind ftl pane "CTL-W h"        ftl::cmd::pane_left              "extra pane left"
+ftl::kbd::bind ftl pane "CTL-W l"        ftl::cmd::pane_right             "extra pane right"
+ftl::kbd::bind ftl pane "CTL-W j"        ftl::cmd::pane_down              "extra pane below"
+ftl::kbd::bind ftl pane "CTL-W H"        ftl::cmd::pane_left_keep_focus   "extra pane: left"
+ftl::kbd::bind ftl pane "CTL-W L"        ftl::cmd::pane_right_keep_focus  "extra pane: right"
+ftl::kbd::bind ftl pane "CTL-W n"        ftl::cmd::goto_next_pane         "next pane or viewer"
+ftl::kbd::bind ftl pane gp               ftl::cmd::goto_next_pane         "next pane or viewer"
 
-# Extra Bindings
-for b in $(fd  . "$FTL_CFG/etc/bindings" --type f | sort -u) ; do source "$b" ; done
-for b in $(fd  . "$FTL_CFG/bindings" --type f | sort -u) ; do source "$b" ; done
+# --- shell ---
+
+ftl::kbd::bind ftl shell "CTL-W !"       ftl::cmd::view_session_shell     "view shell"
+ftl::kbd::bind ftl shell "S!"            ftl::cmd::view_session_shell     "view shell"
+ftl::kbd::bind ftl shell "CTL-W sS"      ftl::cmd::open_shell_with_files  "shell pane with selected files"
+ftl::kbd::bind ftl shell SS              ftl::cmd::open_shell_with_files  "shell pane with selected files"
+ftl::kbd::bind ftl shell "CTL-W ss"      ftl::cmd::open_shell             "shell pane"
+ftl::kbd::bind ftl shell Ss              ftl::cmd::open_shell             "shell pane"
+ftl::kbd::bind ftl shell "CTL-W sq"      ftl::cmd::close_shell_pane       "close shell pane"
+ftl::kbd::bind ftl shell Sq              ftl::cmd::close_shell_pane       "close shell pane"
+ftl::kbd::bind ftl shell "CTL-W sv"      ftl::cmd::open_vertical_shell    "shell vertical pane"
+ftl::kbd::bind ftl shell Sv              ftl::cmd::open_vertical_shell    "shell vertical pane"
+ftl::kbd::bind ftl shell "CTL-W sz"      ftl::cmd::open_zoomed_shell      "shell pane, zoomed out"
+ftl::kbd::bind ftl shell Sz              ftl::cmd::open_zoomed_shell      "shell pane, zoomed out"
+ftl::kbd::bind ftl shell "CTL-W sf"      ftl::cmd::send_files_to_shell    "send selection to shell pane"
+ftl::kbd::bind ftl shell Sf              ftl::cmd::send_files_to_shell    "send selection to shell pane"
+ftl::kbd::bind ftl shell "CTL-W sg"      ftl::cmd::synch_shell_cwd        "cd to shell pane"
+ftl::kbd::bind ftl shell gS              ftl::cmd::synch_shell_cwd        "cd to shell pane"
+ftl::kbd::bind ftl shell "CTL-Z sp"      ftl::cmd::run_command_in_pane    "run shell command in pane"
+ftl::kbd::bind ftl shell Sp              ftl::cmd::run_command_in_pane    "run shell command in pane"
+
+# --- tabs ---
+
+ftl::kbd::bind ftl tabs PARAGRAPH        ftl::cmd::new_tab                "new tab"
+ftl::kbd::bind ftl tabs TAB              ftl::cmd::next_tab               "next tab"
+ftl::kbd::bind ftl tabs "COUNT gt"       ftl::cmd::goto_tab               "go to tab"
+ftl::kbd::bind ftl tabs gt               ftl::cmd::next_tab               "next tab"
+ftl::kbd::bind ftl tabs gT               ftl::cmd::prev_tab               "previous tab"
+
+# --- selection ---
+
+ftl::kbd::bind ftl selection ya          ftl::cmd::select_all             "select all files and subdirs"
+ftl::kbd::bind ftl selection yf          ftl::cmd::select_all_files       "select all files"
+ftl::kbd::bind ftl selection yd          ftl::cmd::select_all_directories "select all directories"
+ftl::kbd::bind ftl selection yii         ftl::cmd::select_images_via_sxiv "selected images via sxiv"
+ftl::kbd::bind ftl selection yiI         ftl::cmd::select_images_recursive_via_sxiv "selected images, including sub directories, via sxiv"
+ftl::kbd::bind ftl selection yif         ftl::cmd::select_via_fzf         "fzf select files"
+ftl::kbd::bind ftl selection yiF         ftl::cmd::select_recursive_via_fzf "fzf select files and subdirs"
+ftl::kbd::bind ftl selection ye          ftl::cmd::select_same_extension  "select files with same extension"
+ftl::kbd::bind ftl selection yie         ftl::cmd::select_extension_via_fzf "fzf select files with same extension"
+ftl::kbd::bind ftl selection yE          ftl::cmd::select_same_extension_recursive "select files ext, with subdirs"
+ftl::kbd::bind ftl selection yiE         ftl::cmd::select_extension_recursive_via_fzf "fzf select files ext, with subdirs"
+
+ftl::kbd::bind ftl selection a           ftl::cmd::flip_down              "select down"
+ftl::kbd::bind ftl selection "COUNT a"   ftl::cmd::flip_down              "select down"
+ftl::kbd::bind ftl selection yy          ftl::cmd::flip_down              "select down"
+ftl::kbd::bind ftl selection "COUNT yy"  ftl::cmd::flip_down              "select down"
+
+ftl::kbd::bind ftl selection s           ftl::cmd::flip_up                "select up"
+ftl::kbd::bind ftl selection "COUNT s"   ftl::cmd::flip_up                "select up"
+ftl::kbd::bind ftl selection yu          ftl::cmd::flip_up                "select up"
+ftl::kbd::bind ftl selection "COUNT yu"  ftl::cmd::flip_up                "select up"
+
+ftl::kbd::bind ftl selection "COUNT y1"  ftl::cmd::select_class_1         "class 1 selection"
+ftl::kbd::bind ftl selection y1          ftl::cmd::select_class_1         "class 1 selection"
+ftl::kbd::bind ftl selection "COUNT y2"  ftl::cmd::select_class_2         "class 2 selection"
+ftl::kbd::bind ftl selection y2          ftl::cmd::select_class_2         "class 2 selection"
+ftl::kbd::bind ftl selection "COUNT y3"  ftl::cmd::select_class_3         "class 3 selection"
+ftl::kbd::bind ftl selection y3          ftl::cmd::select_class_3         "class 3 selection"
+ftl::kbd::bind ftl selection "COUNT y4"  ftl::cmd::select_class_4         "class 4 selection"
+ftl::kbd::bind ftl selection y4          ftl::cmd::select_class_4         "class 4 selection"
+ftl::kbd::bind ftl selection yc          ftl::cmd::untag_all              "deselect all"
+ftl::kbd::bind ftl selection yC          ftl::cmd::untag_via_fzf          "deselect fzf"
+ftl::kbd::bind ftl selection ytc         ftl::cmd::copy_paths_to_clipboard "copy selection to clipboard"
+
+ftl::kbd::bind ftl selection gy          ftl::cmd::goto_selection_via_fzf "fzf goto selection"
+
+# --- view modes ---
+
+ftl::kbd::bind ftl view zma              ftl::cmd::view_mode_all          "view mode: all"
+ftl::kbd::bind ftl view zmm              ftl::cmd::view_mode_all          "view mode: all"
+ftl::kbd::bind ftl view zmn              ftl::cmd::view_mode_next         "view mode: not image/image/all"
+ftl::kbd::bind ftl view zmi              ftl::cmd::view_mode_image        "view mode: image"
+ftl::kbd::bind ftl view zmI              ftl::cmd::view_mode_not_image    "view mode: not image"
+ftl::kbd::bind ftl view zmP              ftl::cmd::toggle_image_preview   "show/hide image preview"
+ftl::kbd::bind ftl view zmd              ftl::cmd::file_dir_mode          "file/dir view mode"
+ftl::kbd::bind ftl view zmD              ftl::cmd::toggle_dirs_only_preview "preview directory only"
+ftl::kbd::bind ftl view zmp              ftl::cmd::view_mode_pdf          "show pdf preview as text or image"
+ftl::kbd::bind ftl view zz               ftl::cmd::toggle_image_zoom      "zoom image preview"
+ftl::kbd::bind ftl view z+               ftl::cmd::cycle_preview_size     "change preview size"
+ftl::kbd::bind ftl view +                ftl::cmd::cycle_preview_size     "change preview size"
+ftl::kbd::bind ftl view zg               ftl::cmd::show_stat              "show/hide stat"
+ftl::kbd::bind ftl view zs               ftl::cmd::show_size              "show/hide size"
+ftl::kbd::bind ftl view zS               ftl::cmd::hide_size              "hide size"
+ftl::kbd::bind ftl view zo               ftl::cmd::sort_entries           "sort type"
+ftl::kbd::bind ftl view zO               ftl::cmd::sort_entries_reversed  "sort reversed"
+ftl::kbd::bind ftl view zv               ftl::cmd::toggle_preview_pane    "preview show/hide"
+ftl::kbd::bind ftl view zff              ftl::cmd::toggle_fixed_preview   "fixed preview show/hide"
+ftl::kbd::bind ftl view zfc              _ftl::prev::clear_fixed          "fixed preview close"
+ftl::kbd::bind ftl view "z STAR"         ftl::cmd::set_listing_depth      "maximum listing depth"
+ftl::kbd::bind ftl view zt               ftl::cmd::toggle_etags           "show/hide etags"
+ftl::kbd::bind ftl view zT               ftl::cmd::select_etag_source     "select etag type"
+ftl::kbd::bind ftl view zep              ftl::cmd::toggle_ext_preview     "show/hide extension preview"
+ftl::kbd::bind ftl view zeh              ftl::cmd::extension_hide_tab    "hide extension from listing, per tab"
+ftl::kbd::bind ftl view zeH              ftl::cmd::extension_hide        "hide extension from listing"
+ftl::kbd::bind ftl view zeo              ftl::cmd::extension_only_tab    "show only this extension in listing, per tab"
+ftl::kbd::bind ftl view zeO              ftl::cmd::extension_only        "show only this extension in listing"
+ftl::kbd::bind ftl view zec              ftl::cmd::extension_clear       "enable all extensions"
+ftl::kbd::bind ftl view zes              ftl::cmd::extension_sort        "sort by extensions"
+ftl::kbd::bind ftl view z.               ftl::cmd::show_hidden           "show/hide dot-files"
+ftl::kbd::bind ftl view z1               ftl::cmd::set_preview_mode_1    "alternative preview mode 1"
+ftl::kbd::bind ftl view z2               ftl::cmd::set_preview_mode_2    "alternative preview mode 2"
+ftl::kbd::bind ftl view z3               ftl::cmd::set_preview_mode_3    "alternative preview mode 3"
+ftl::kbd::bind ftl view z4               ftl::cmd::set_preview_mode_4    "alternative preview mode 4"
+ftl::kbd::bind ftl view z5               ftl::cmd::set_preview_mode_5    "alternative preview mode 5"
+ftl::kbd::bind ftl view Z1               ftl::cmd::set_full_preview_mode_1 "alternative preview mode 1, full screen"
+ftl::kbd::bind ftl view Z2               ftl::cmd::set_full_preview_mode_2 "alternative preview mode 2, full screen"
+ftl::kbd::bind ftl view Z3               ftl::cmd::set_full_preview_mode_3 "alternative preview mode 3, full screen"
+ftl::kbd::bind ftl view Z4               ftl::cmd::set_full_preview_mode_4 "alternative preview mode 4, full screen"
+ftl::kbd::bind ftl view Z5               ftl::cmd::set_full_preview_mode_5 "alternative preview mode 5, full screen"
+ftl::kbd::bind ftl view zd0              ftl::cmd::set_directory_mode0   "directory default mode"
+ftl::kbd::bind ftl view zd1              ftl::cmd::set_directory_mode1   "directory du mode"
+ftl::kbd::bind ftl view zd2              ftl::cmd::set_directory_mode2   "directory ls mode"
+ftl::kbd::bind ftl view zd3              ftl::cmd::set_directory_mode3   "directory readme mode"
+ftl::kbd::bind ftl view zd4              ftl::cmd::set_directory_mode4   "directory exa mode"
+ftl::kbd::bind ftl view zd5              ftl::cmd::set_directory_mode5   "directory image mode"
+ftl::kbd::bind ftl view zM               ftl::cmd::refresh_preview       "refresh file preview/montage"
+
+ftl::kbd::bind ftl view zt               ftl::cmd::show_tree             "tree view"
+
+# --- signals (reserved for ftl internal use) ---
+
+# Don't change, reserved for ftl: [ÅåÄä]
+ftl::kbd::bind ftl SIG 'å'               ftl::ipc::handle_pane_focus     "handle pane event"
+ftl::kbd::bind ftl SIG 'Ä'               ftl::ipc::handle_preview_request "handle pane preview"
+
+#----------------------------------------------------------------------------
+# Auto-source binding plugins
+#----------------------------------------------------------------------------
+
+for b in $(fd . "$FTL_CFG/etc/bindings" --type f | sort -u) ; do source "$b" ; done
+for b in $(fd . "$FTL_CFG/bindings" --type f | sort -u) ; do source "$b" ; done
 
 # vim: set filetype=bash:
-

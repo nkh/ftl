@@ -1,2 +1,6 @@
 declare -g -A keep=() PWDR
-ftl_filter() { cat ; }
+
+ftl::plugin::by_all_files_reset::filter() { cat ; }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::by_all_files_reset::filter ; }

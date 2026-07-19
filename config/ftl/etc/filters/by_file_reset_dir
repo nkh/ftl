@@ -2,36 +2,40 @@ declare -g -A keep PWDS
 
 [[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
 {
-[[ "$1" == load ]] && [[ -e "$pfs/by_file_reset_dir" ]] && source "$pfs/by_file_reset_dir" ||
-	{
-	for f in "${!keep[@]}" ; do [[ "$f" =~ "$tab-$PWD/" ]] && unset 'keep[$f]' ; done
+    [[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_file_reset_dir" ]] && source "$ftl_state_parent_dir/by_file_reset_dir" ||
+    {
+        for f in "${!keep[@]}" ; do [[ "$f" =~ "$ftl_state_current_tab_index-$PWD/" ]] && unset 'keep[$f]' ; done
 
-	OIFS=$IFS ; IFS=$'\n'
-	for file in $(\
-			{ find -maxdepth 1 -type d -printf "%f\n" | grep -v '^\.$' | sort -u ; find -maxdepth 1 -type f -printf "%f\n" | sort -u ; } | \
-			lscolors | fzf-tmux -p 80% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all\
-			)
-		do 
-			keep["$tab-$PWD/$file"]=1
-			PWDS[$tab-$PWD]=1
-			ftag="~"
-		done
-	IFS=$OIFS
+        OIFS=$IFS
+        IFS=$'\n'
+        for file in $(\
+                        { find -maxdepth 1 -type d -printf "%f\n" | grep -v '^\.$' | sort -u ; find -maxdepth 1 -type f -printf "%f\n" | sort -u ; } | \
+                        lscolors | fzf-tmux -p 80% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all\
+                        )
+            do
+                keep["$ftl_state_current_tab_index-$PWD/$file"]=1
+                PWDS[$ftl_state_current_tab_index-$PWD]=1
+                ftl_filt_active_glyph="~"
+            done
+        IFS=$OIFS
 
-	declare -p keep PWDS >"$pfs/by_file_reset_dir"
-	}
+        declare -p keep PWDS >"$ftl_state_parent_dir/by_file_reset_dir"
+    }
 }
 
-ftl_filter()
+ftl::plugin::by_file_reset_dir::filter()
 {
-[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
-	{
-	while read -r file_data
-		do
-			fn="${file_data#$'*\t'*$'\t'}"
-			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] && echo "$file_data"
-		done
-	} || cat 
+    local file_data fn
+
+    [[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
+        while read -r file_data ; do
+            fn="${file_data#$'*\t'*$'\t'}"
+            [[ ${keep["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+        done
+    } || cat
 }
+
+# Override the placeholder so the listing pipeline dispatches to this plugin.
+ftl::filter::apply_external() { ftl::plugin::by_file_reset_dir::filter ; }
 
 # vim: set filetype=sh :

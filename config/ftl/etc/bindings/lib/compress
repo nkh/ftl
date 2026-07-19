@@ -1,54 +1,74 @@
 
 # tar compressed formats
 #
-# Long			Short		Archive format
-# ‘--gzip’		‘-z’		gzip
-# ‘--bzip2’		‘-j’		bzip2
-# ‘--xz’		‘-J’		xz
-# ‘--lzip’				lzip
-# ‘--lzma’				lzma
-# ‘--lzop’				lzop
-# ‘--zstd’				zstd
-# ‘--compress’		‘-Z’		compress
+# Long                  Short           Archive format
+# ‘--gzip’              ‘-z’            gzip
+# ‘--bzip2’             ‘-j’            bzip2
+# ‘--xz’                ‘-J’            xz
+# ‘--lzip’                              lzip
+# ‘--lzma’                              lzma
+# ‘--lzop’                              lzop
+# ‘--zstd’                              zstd
+# ‘--compress’          ‘-Z’            compress
 
 decompress()
 {
-[[ $e =~ rar ]]       && unrar e "$f" || \
-[[ $e =~ zip ]]       && unzip "$f"   || \
-[[ $e =~ tar ]]       && tar -xf "$f" || \
-[[ $n =~ tar\.gz$  ]] && tar --gzip  -xf "$f" || \
-[[ $n =~ tar\.bz2$ ]] && tar --bzip2 -xf "$f" || \
-[[ $n =~ tar\.xz$  ]] && tar --bzip2 -xf "$f" 
+    if [[ $ftl_state_current_extension =~ rar ]] ; then
+        unrar e "$ftl_state_current_basename"
+    elif [[ $ftl_state_current_extension =~ zip ]] ; then
+        unzip "$ftl_state_current_basename"
+    elif [[ $ftl_state_current_extension =~ tar ]] ; then
+        tar -xf "$ftl_state_current_basename"
+    elif [[ $ftl_state_current_path =~ tar\.gz$  ]] ; then
+        tar --gzip  -xf "$ftl_state_current_basename"
+    elif [[ $ftl_state_current_path =~ tar\.bz2$ ]] ; then
+        tar --bzip2 -xf "$ftl_state_current_basename"
+    elif [[ $ftl_state_current_path =~ tar\.xz$  ]] ; then
+        tar --bzip2 -xf "$ftl_state_current_basename"
+    fi
 
-cdir
+    ftl::ftl::list::render::change_dir
 }
 
 decompress_in_dir()
 {
-new_file=
+    local new_file=
 
-prompt 'directory to extract to: ' ; [[ -n $REPLY ]] || return
+    ftl::cmd::ftl::cmd::prompt 'directory to extract to: '
+    [[ -n $ftl_kbd_current_key ]] || return
 
-mkdir -p "$REPLY"
+    mkdir -p "$ftl_kbd_current_key"
 
-[[ $e =~ rar ]]       && unrar e         "$f"             "$REPLY" || \
-[[ $e =~ zip ]]       && unzip           "$f" -d          "$REPLY" || \
-[[ $e =~ tar ]]       && tar         -xf "$f" --directory="$REPLY" || \
-[[ $n =~ tar\.gz$  ]] && tar --gzip  -xf "$f" --directory="$REPLY" || \
-[[ $n =~ tar\.bz2$ ]] && tar --bzip2 -xf "$f" --directory="$REPLY" || \
-[[ $n =~ tar\.xz$  ]] && tar --bzip2 -xf "$f" --directory="$REPLY"  
+    if [[ $ftl_state_current_extension =~ rar ]] ; then
+        unrar e         "$ftl_state_current_basename"             "$ftl_kbd_current_key"
+    elif [[ $ftl_state_current_extension =~ zip ]] ; then
+        unzip           "$ftl_state_current_basename" -d          "$ftl_kbd_current_key"
+    elif [[ $ftl_state_current_extension =~ tar ]] ; then
+        tar         -xf "$ftl_state_current_basename" --directory="$ftl_kbd_current_key"
+    elif [[ $ftl_state_current_path =~ tar\.gz$  ]] ; then
+        tar --gzip  -xf "$ftl_state_current_basename" --directory="$ftl_kbd_current_key"
+    elif [[ $ftl_state_current_path =~ tar\.bz2$ ]] ; then
+        tar --bzip2 -xf "$ftl_state_current_basename" --directory="$ftl_kbd_current_key"
+    elif [[ $ftl_state_current_path =~ tar\.xz$  ]] ; then
+        tar --bzip2 -xf "$ftl_state_current_basename" --directory="$ftl_kbd_current_key"
+    fi
 
-cdir "$REPLY"
+    ftl::ftl::list::render::change_dir "$ftl_kbd_current_key"
 }
 
 compress()
 {
-new_file=
+    local new_file=
 
-{ prompt 'tar.bz2 file: ' ; [[ -n $REPLY ]] && tar -cvjSf $REPLY.tar.bz2 "${selection[@]}" && new_file="$REPLY" ; }
+    ftl::cmd::ftl::cmd::prompt 'tar.bz2 file: '
+    [[ -n $ftl_kbd_current_key ]] && {
+        tar -cvjSf "$ftl_kbd_current_key".tar.bz2 "${ftl_selection_current[@]}"
+        new_file="$ftl_kbd_current_key"
+    }
 
-tags=() ; cdir '' "$new_file" ; true
+    ftl_selection_tags=()
+    ftl::ftl::list::render::change_dir '' "$new_file"
+    true
 }
 
 # vim: set filetype=sh :
-
