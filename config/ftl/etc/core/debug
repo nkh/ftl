@@ -1,7 +1,3 @@
-# debug — shim that sources the new debug module
-#
-# Backwards compatibility: sources etc/core/modules/debug.sh
-
+# debug — deprecated, source modules/debug.sh directly
 source "$FTL_CFG/etc/core/modules/debug.sh"
-
-# vim: set filetype=bash :
+# vim: set filetype=bash:

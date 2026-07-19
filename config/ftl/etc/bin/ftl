@@ -1,14 +1,21 @@
 #!/bin/env bash
-
 # ftl — terminal file manager, with live previews, hyperorthodox
-# © Nadim Khemir 2020-2025, Artistic licence 2.0
+# © Nadim Khemir 2020-2025, Artistic Licence 2.0
 #
-# This is the entry point. It defines the main ftl() function (which sets
-# up state and runs the main loop) and the top-level listing functions.
-# The bulk of the implementation is in etc/core/modules/.
+# This is the entry point. It defines the main ftl() function and the
+# top-level listing functions. The bulk of the implementation is in
+# etc/core/modules/.
+
+# Run only inside tmux
+if [[ -z "$TMUX" ]] ; then
+    echo 'ftl: run me in tmux'
+    exit 1
+fi
+
+: "${FTL_CFG:=$HOME/.config/ftl}"
 
 ftl() {
-    # dir[/file], pfs, preview_ftl
+    # Args: dir[/file], pfs, preview_ftl
     source "$FTL_CFG/etc/core/ftl_setup"
 
     # Handle command-line options
@@ -30,10 +37,10 @@ ftl() {
     fi
 
     # Resolve the initial directory/file argument
+    local dir= search=
     if [[ -n "$1" ]] ; then
         if [[ -d "$1" ]] ; then
             dir="$1"
-            search=''
         elif [[ -f "$1" ]] ; then
             ftl::util::parse_path "$1"
             dir="$ftl_state_current_dir"
@@ -76,7 +83,6 @@ ftl() {
         ftl_state_external_viewer_mode=0
         cd "$dir"
         ftl::prev::sync_and_dispatch
-        true
     else
         ftl::sel::sync_from_other_pane
         ftl::list::change_dir "$dir" "$search"
@@ -103,53 +109,6 @@ ftl() {
     done
 }
 
-# Change directory and re-list.
-# Args:
-#   $1: directory
-#   $2: optional filename to select
-#   $3: optional index to select
-ftl::list::change_dir() {
-    if [[ -n "$ftl_state_custom_list" ]] ; then
-        _ftl::list::render_window
-    else
-        _ftl::list::scan_and_render _ftl::list::scan_directory "$@"
-    fi
-}
+ftl "$@"
 
-# Refresh listing without full rescan.
-# Args:
-#   $1: optional index to select
-#   $2: optional quick-display flag
-ftl::list::refresh_dir() {
-    ftl::pane::query_geometry
-    _ftl::list::apply_filters_and_format "$1"
-    (( ftl_list_window_height = ftl_list_entry_count > ftl_pane_height - 1 \
-        ? ftl_pane_height - 1 : ftl_list_entry_count, \
-       ftl_list_window_center = ftl_list_window_height / 2 ))
-    ftl_list_quick_display_active=${2:-1}
-    ftl::list::render
-    ftl_list_quick_display_active=0
-}
-
-# Enter the alternate screen (hide cursor, etc.)
-ftl::util::enter_alt_screen() {
-    if [[ $ftl_log_alt_screen == 0 ]] ; then
-        echo -en '\e[?1049h'
-        stty -echo
-        tput civis
-        ftl_log_alt_screen=1
-    fi
-}
-
-# Initialize the alt-screen flag.
-ftl_log_alt_screen=0
-
-# Run only inside tmux
-if [[ -n "$TMUX" ]] ; then
-    : "${FTL_CFG:=$HOME/.config/ftl}"
-    ftl "$@"
-else
-    echo 'ftl: run me in tmux'
-fi
-
-# vim: set filetype=bash :
+# vim: set filetype=bash:

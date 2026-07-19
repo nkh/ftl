@@ -1,7 +1,3 @@
-# commands — shim that sources the new commands module
-#
-# Backwards compatibility: sources etc/core/modules/commands.sh
-
+# commands — deprecated, source modules/commands.sh directly
 source "$FTL_CFG/etc/core/modules/commands.sh"
-
-# vim: set filetype=bash :
+# vim: set filetype=bash:

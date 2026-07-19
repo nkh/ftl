@@ -1,10 +1,8 @@
-# ftl — shim that sources the new modules
+# ftl — core library loader (deprecated: source modules directly)
 #
-# This file is kept for backwards compatibility. It sources all the new
-# module files, providing the same functions (under both old and new names)
-# that the original etc/core/ftl provided.
-#
-# The actual implementation is now in etc/core/modules/.
+# This file exists for backwards compatibility with external scripts that
+# source it. It loads all core modules. New code should source the specific
+# module it needs from etc/core/modules/.
 
 source "$FTL_CFG/etc/core/modules/util.sh"
 source "$FTL_CFG/etc/core/modules/log.sh"
@@ -15,7 +13,8 @@ source "$FTL_CFG/etc/core/modules/preview.sh"
 source "$FTL_CFG/etc/core/modules/selection.sh"
 source "$FTL_CFG/etc/core/modules/tab.sh"
 source "$FTL_CFG/etc/core/modules/etag.sh"
+source "$FTL_CFG/etc/core/modules/virtual.sh"
 source "$FTL_CFG/etc/core/modules/mark.sh"
 source "$FTL_CFG/etc/core/modules/time.sh"
 
-# vim: set filetype=bash :
+# vim: set filetype=bash:

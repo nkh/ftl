@@ -1,11 +1,4 @@
-# dir_file_filter — shim that sources the new filter and list modules
-#
-# Backwards compatibility: the original dir_file_filter contained both
-# the filter pipeline and the directory scan functions. These are now
-# split between modules/filter.sh (filter pipeline) and modules/list.sh
-# (directory scanning and rendering).
-
+# dir_file_filter — deprecated, source modules/filter.sh and modules/list.sh directly
 source "$FTL_CFG/etc/core/modules/filter.sh"
 source "$FTL_CFG/etc/core/modules/list.sh"
-
-# vim: set filetype=bash :
+# vim: set filetype=bash:

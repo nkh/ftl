@@ -39,8 +39,9 @@ picker (see # EXAMPLES)
 
 *ftl* is written in Bash, the language that packs a real punch ... and sometimes
 punches you; it will not work in other shells but it may be a cool exercise to
-make it portable. Most of the code is one liners, albeit long, and it's
-structured to be "easy" to expand.
+make it portable. The code is organized into focused modules under
+`etc/core/modules/`, with namespaced functions (`ftl::<module>::<function>`)
+and variables (`ftl_<module>_<name>`). It's structured to be easy to expand.
 
 ## File Listing
 
@@ -323,9 +324,9 @@ count in $COUNT variable before calling your command. If you specify "COUNT" in
 your binding then the user has to type a, non zero, count; if you want "COUNT"
 to be optional you must specify two bindings; one with "COUNT" and one without.
 
-	bind test count		"COUNT t"	count_test		""
+        bind test count         "COUNT t"       count_test              ""
 
-	count_test() { tmux popup -h90% -w90% -E "echo count = $COUNT | less " ; }
+        count_test() { tmux popup -h90% -w90% -E "echo count = $COUNT | less " ; }
 
 # COMMANDS
 
@@ -1120,51 +1121,83 @@ Examples
 
 ## Directory structure
 
-        <ftl repo>
-        ├── INSTALL
-        ├── README.md 
-        └── config
-            └── ftl
-                ├── ftlrc
-                ├── bindings
-                ├── commands -> etc/commands
-                ├── etags -> etc/etags
-                ├── etc
-                │   ├── bin
-                │   │   ├── ftl
-                │   │   ├── ftli
-                │   │   └── ...
-                │   ├── bindings
-                │   │   └── lib
-                │   ├── commands
-                │   ├── core
-                │   │   └── lib
-                │   │       ├── lock_preview
-                │   │       └── merge
-                │   ├── etags
-                │   ├── filters
-                │   ├── generators
-                │   └── viewers
-                ├── filters -> etc/filters
-                ├── generators -> etc/generators
-                ├── man
-                ├── var
-                │   └── thumbs
-                │       ├── flv
-                │       └── ...
-                └── viewers -> etc/viewers
+```
+ftl/
+├── INSTALL
+├── README.md
+├── test/                         # test framework
+│   ├── harness.sh
+│   └── unit/
+├── docs/                         # mdBook documentation
+└── config/ftl/
+    ├── ftlrc                     # main configuration
+    ├── bindings/                 # user bindings (symlinked)
+    ├── commands/                 # user commands (symlinked)
+    ├── etags/                    # user etags (symlinked)
+    ├── filters/                  # user filters (symlinked)
+    ├── generators/               # user generators (symlinked)
+    ├── viewers/                  # user viewers (symlinked)
+    ├── man/                      # man page
+    │   ├── ftl.md
+    │   └── gen_man_pages
+    └── etc/
+        ├── bin/                  # CLI helpers (ftl, ftli, finfo, fsh, ...)
+        │   └── third_party/
+        ├── bindings/             # default binding plugins
+        │   └── lib/
+        ├── commands/             # default command plugins
+        ├── core/                 # core engine
+        │   ├── ftl_setup         # initialization orchestrator
+        │   ├── ftl               # deprecated shim → modules/
+        │   ├── keyboard          # deprecated shim → modules/
+        │   ├── commands          # deprecated shim → modules/
+        │   ├── dir_file_filter   # deprecated shim → modules/
+        │   ├── debug             # deprecated shim → modules/
+        │   ├── lib/
+        │   │   ├── shell         # deprecated (now empty)
+        │   │   ├── lock_preview/
+        │   │   └── merge/
+        │   └── modules/          # ★ core modules (the implementation)
+        │       ├── util.sh
+        │       ├── log.sh
+        │       ├── debug.sh
+        │       ├── state.sh
+        │       ├── keyboard.sh
+        │       ├── selection.sh
+        │       ├── tab.sh
+        │       ├── pane.sh
+        │       ├── filter.sh
+        │       ├── list.sh
+        │       ├── preview.sh
+        │       ├── etag.sh
+        │       ├── virtual.sh
+        │       ├── mark.sh
+        │       ├── time.sh
+        │       └── commands.sh
+        ├── etags/                # default etag plugins
+        ├── filters/              # default filter plugins
+        ├── generators/           # preview thumbnail generators
+        └── viewers/              # default viewer plugins
+```
 
 ## ftlrc
 
-_ftl_ reads it's configuration from ~/.config/ftl/etc/ftlrc
+*ftl* reads its configuration from `~/.config/ftl/etc/ftlrc`.
 
-You can override configuration in your own ~/.ftlrc after sourcing the 
-default configuration.
+All configuration variables use the `ftl_cfg_*` prefix. All binding
+registrations use `ftl::kbd::bind`. See the default `ftlrc` for the
+full reference.
+
+You can override configuration in your own `~/.config/ftl/ftlrc` by
+sourcing the default and then changing values.
 
 # ENVIRONMENT
 
 $FTL_CFG (set by default to $HOME/.config/ftl) is the directory that contains
 *ftl* code and data.
+
+$FTL_STATE_DIR (set by default to $FTL_CFG/var) is the runtime state directory.
+
 
 # CONFIGURATION
 
@@ -1304,36 +1337,36 @@ name is passed via environment variable *ftl_visible_entries*.
         {
         # mode is 'load', load cache if it exists
         [[ "$1" == load ]] && [[ -e "$pfs/by_visible_entries" ]] && source "$pfs/by_visible_entries" ||
-        	# no cache, compute *keep* and save it as cache
-        	{
-        	# ftag is the filter glyph *ftl* displays in the status
-        	ftag="~"
-        	
-        	# this filter expects $ftl_visible_entries to point to a file  
-        	for file in $(cat $ftl_visible_entries)
-        		do
-        			keep["$file"]=1
-        		done
-        	
-        	# save cache, pfs is set by ftl to a temporary directory
-        	declare -p keep >"$pfs/by_visible_entries"
-        	}
+                # no cache, compute *keep* and save it as cache
+                {
+                # ftag is the filter glyph *ftl* displays in the status
+                ftag="~"
+                
+                # this filter expects $ftl_visible_entries to point to a file  
+                for file in $(cat $ftl_visible_entries)
+                        do
+                                keep["$file"]=1
+                        done
+                
+                # save cache, pfs is set by ftl to a temporary directory
+                declare -p keep >"$pfs/by_visible_entries"
+                }
         }
         
         ftl_filter()
         {
         # read entries on stdin
         while read -r file_data
-        	do
-        		# separate filename from size and date
-        		fn="${file_data#$'*\t'*$'\t'}"
-        		
-        		# compute full path for entry
-        		[[ "$PWD" == '/' ]] && pfn="/$fn" || pfn="$PWD/$fn"
-        		
-        		# send entry data on stdout if the file is to be kept
-        		[[ "${keep[$pfn]}" == 1 ]] && echo "$file_data"
-        	done
+                do
+                        # separate filename from size and date
+                        fn="${file_data#$'*\t'*$'\t'}"
+                        
+                        # compute full path for entry
+                        [[ "$PWD" == '/' ]] && pfn="/$fn" || pfn="$PWD/$fn"
+                        
+                        # send entry data on stdout if the file is to be kept
+                        [[ "${keep[$pfn]}" == 1 ]] && echo "$file_data"
+                done
         }
 
 ### loading modes

@@ -1,7 +1,3 @@
-# keyboard — shim that sources the new keyboard module
-#
-# Backwards compatibility: sources etc/core/modules/keyboard.sh
-
+# keyboard — deprecated, source modules/keyboard.sh directly
 source "$FTL_CFG/etc/core/modules/keyboard.sh"
-
-# vim: set filetype=bash :
+# vim: set filetype=bash:
