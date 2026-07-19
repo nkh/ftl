@@ -1,67 +1,141 @@
+# lib/shell — shim that provides the shell-command dispatch function
+#
+# The original lib/shell contained shell_command (the command-prompt
+# dispatcher), load_sel, and shell_cmd_in_pane. These are now part of
+# modules/commands.sh, but we keep this file for backwards compatibility
+# with any code that sources it directly.
 
-load_sel()
-{
-# eg: select all files in a directory: fd -a . > $ftl_fs/load_sel
-sel_file=${1:-$fs/load_sel}
+# Load selection from a file (was: load_sel / sel_read).
+# Args:
+#   $1: optional file path (defaults to $ftl_state_session_dir/load_sel)
+ftl::sel::load_from_file() {
+    local sel_file="${1:-$ftl_state_session_dir/load_sel}"
 
-[[ -s "$sel_file" ]] \
-	&& { <"$sel_file" readarray -t new_tags && tags_clear && for p in "${new_tags[@]}" ; do tag_flip "$(realpath "$p")" ; done ; true ; } \
-	|| { [[ "$1" ]] || tmux popup "echo -n ftl: no such file '$sel_file'" ; }
-
-return
+    if [[ -s "$sel_file" ]] ; then
+        local p
+        readarray -t new_tags <"$sel_file"
+        ftl::sel::clear_all
+        for p in "${new_tags[@]}" ; do
+            ftl::sel::flip "$(realpath "$p")"
+        done
+        true
+    else
+        if [[ -z "$1" ]] ; then
+            tmux popup "echo -n ftl: no such file '$sel_file'"
+        fi
+    fi
 }
 
-shell_command()
-{
-[[ "$1" == 0 ]] && { return 1 ; }
-[[ "$1" =~ ^[1-9][0-9]*$ ]] && { file="${files[(($1 - 1))]}"  ; [[ -d "$file" ]] && cdir "$file" || list $(($1 - 1)) ; return 1 ; }
+# Dispatch a command entered at the command prompt.
+# Args:
+#   $1: command string
+ftl::cmd::dispatch_command() {
+    # Empty command — cancel
+    [[ "$1" == 0 ]] && return 1
 
-# commands can be implemented here or in files found in "user_commands"
-[[ "$1" == "qa" ]]       && { quit_all ; return ; }
-[[ "$1" == "load_sel" ]] && { load_sel ; return ; }
+    # Numeric — goto entry by index
+    if [[ "$1" =~ ^[1-9][0-9]*$ ]] ; then
+        ftl_state_cursor_index="${ftl_list_entries[$(( $1 - 1 ))]}"
+        if [[ -d "$ftl_state_cursor_index" ]] ; then
+            ftl::list::change_dir "$ftl_state_cursor_index"
+        else
+            ftl::list::render $(( $1 - 1 ))
+        fi
+        return 1
+    fi
 
-# command or shortcut bound to command
-[[ "${kbd_trie[$1]}" ]] && R=${kbd_trie[$1]} && return ;
-[[  ${C[$1]} ]] && R=${C[$1]} && return
+    # Built-in commands
+    [[ "$1" == "qa" ]] && { ftl::cmd::quit_all ; return ; }
+    [[ "$1" == "load_sel" ]] && { ftl::sel::load_from_file ; return ; }
 
-# split command
-cmd_parts=() ; eval "$($FTL_CFG/etc/bin/parse_parts "$1")" ; cmd="$cmd_parts"
+    # Shortcut bound to a command
+    if [[ -n "${ftl_kbd_trie[$1]:-}" ]] ; then
+        ftl_state_pending_input=${ftl_kbd_trie[$1]}
+        return
+    fi
+    if [[ -n "${ftl_kbd_command_to_key[$1]:-}" ]] ; then
+        ftl_state_pending_input=${ftl_kbd_command_to_key[$1]}
+        return
+    fi
 
-# serialize ftl information
-setup_finfo
+    # Split the command into parts
+    local -a cmd_parts=()
+    eval "$($FTL_CFG/etc/bin/parse_parts "$1")"
+    local cmd="${cmd_parts[0]}"
 
-# user command
-user_cmd="$FTL_CFG/commands/$cmd"
-[[ -f  "$user_cmd" ]] && 
-	{
-	[[ ! -x "$user_cmd" ]] && { source "$user_cmd" "${cmd_parts[@]:1}" ; true ; } || { "$user_cmd" "${cmd_parts[@]:1}" ; } 
-	return
-	}
+    # Serialize ftl info for external commands
+    ftl::state::serialize_info
 
-# Shell command
-((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
+    # User command
+    local user_cmd="$FTL_CFG/commands/$cmd"
+    if [[ -f "$user_cmd" ]] ; then
+        if [[ ! -x "$user_cmd" ]] ; then
+            source "$user_cmd" "${cmd_parts[@]:1}"
+            true
+        else
+            "$user_cmd" "${cmd_parts[@]:1}"
+        fi
+        return
+    fi
 
-# check command aliases
-[[ -n "${cmd_aliases[$cmd]}" ]] && cmd_parts=(${cmd_aliases[$cmd]} $(printf "%s " "${cmd_parts[@]:1}")) ; cmd="$cmd_parts"
+    # Ensure the session shell exists
+    if (( ! ftl_pane_session_shell_active )) ; then
+        tmux new -A -d -s "ftl$$"
+        tmux neww -t "ftl$$" -n "ftl$$_bash"
+        sleep 0.2
+        ftl_pane_session_shell_active=1
+    fi
 
-[[ "$cmd" == full  ]] && { tcpreview ; clear ; eval "${cmd_parts[@]:1}" ; cdir ; return ; }
-[[ "$cmd" == split ]] && { tcpreview ; tmux split-window -e ftl_info_file="$ftl_info_file" -l 50% "$(printf "%s " "${cmd_parts[@]:1}")" ; cdir ; tmux selectp -D ; return ; }
-[[ "$cmd" == fsh   ]] && { fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; return ; }
+    # Check for command aliases
+    if [[ -n "${ftl_cfg_command_aliases[$cmd]:-}" ]] ; then
+        cmd_parts=(${ftl_cfg_command_aliases[$cmd]} $(printf "%s " "${cmd_parts[@]:1}"))
+        cmd="${cmd_parts[0]}"
+    fi
 
-{
-echo "export ftl_info_file=$ftl_info_file"
-echo "cd '$PWD'"
-echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
-echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$fs/cmd_log"
-echo "${cmd_parts[@]}"
-echo "exit_code=\$?"
-echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$fs/cmd_log"
-echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
-} >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
+    # Built-in command forms
+    if [[ "$cmd" == "full" ]] ; then
+        ftl::prev::clear
+        clear
+        eval "${cmd_parts[@]:1}"
+        ftl::list::change_dir
+        return
+    fi
+    if [[ "$cmd" == "split" ]] ; then
+        ftl::prev::clear
+        tmux split-window -e ftl_state_info_file_path="$ftl_state_info_file_path" -l 50% \
+            "$(printf "%s " "${cmd_parts[@]:1}")"
+        ftl::list::change_dir
+        tmux selectp -D
+        return
+    fi
+    if [[ "$cmd" == "fsh" ]] ; then
+        fsh "$(printf "%s " "${cmd_parts[@]:1}")"
+        return
+    fi
 
+    # Run in the session shell
+    {
+        echo "export ftl_state_info_file_path=$ftl_state_info_file_path"
+        echo "cd '$PWD'"
+        echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
+        echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$ftl_state_session_dir/command.log"
+        echo "${cmd_parts[@]}"
+        echo "exit_code=\$?"
+        echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$ftl_state_session_dir/command.log"
+        echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
+    } >"$ftl_state_session_dir/bash_command"
+    tmux send -t "ftl$$:ftl$$_bash" ". $ftl_state_session_dir/bash_command" Enter
 }
 
-shell_cmd_in_pane() { prompt "ftl> " ; qd=1 list ; [[ "$REPLY" ]] && psplit "$REPLY ; read -sn10" ; sleep 0.05 ; }
+# Run a shell command in a pane.
+ftl::cmd::shell_cmd_in_pane() {
+    ftl::cmd::prompt "ftl> "
+    ftl_list_quick_display_active=1
+    ftl::list::render
+    if [[ -n "$ftl_kbd_current_key" ]] ; then
+        ftl::pane::split_for_preview "$ftl_kbd_current_key ; read -sn10"
+    fi
+    sleep 0.05
+}
 
 # vim: set filetype=bash :
-

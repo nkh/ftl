@@ -1,22 +1,7 @@
+# debug — shim that sources the new debug module
+#
+# Backwards compatibility: sources etc/core/modules/debug.sh
 
-function stacktrace
-{ 
-local i=1 line file func
-while read -r line func file < <(caller $i); do
-	echo "[$i] $file:$line $func(): $(sed -n ${line}p $file)"
-	((i++))
-	done
-}
+source "$FTL_CFG/etc/core/modules/debug.sh"
 
-function log()
-{
-echo "[$( caller )] $*" >&2
-echo "BASH_SOURCE: ${BASH_SOURCE[*]}" >&2
-echo "BASH_LINENO: ${BASH_LINENO[*]}" >&2 
-echo "FUNCNAME: ${FUNCNAME[*]}" >&2
-}
-
-numfmt() { /usr/bin/numfmt "$@" || { echo "$@" >>nmfmt_log ; echo -e "------------------\n\n" >>nmfmt_log ; stacktrace >>nmfmt_log ; error nmfmt: error "$@" ; } ; }
-
-# vim: set ft=bash:
-
+# vim: set filetype=bash :

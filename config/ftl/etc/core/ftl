@@ -1,192 +1,21 @@
-source "$FTL_CFG/etc/core/keyboard"
-source "$FTL_CFG/etc/core/commands"
-source "$FTL_CFG/etc/core/dir_file_filter"
+# ftl — shim that sources the new modules
+#
+# This file is kept for backwards compatibility. It sources all the new
+# module files, providing the same functions (under both old and new names)
+# that the original etc/core/ftl provided.
+#
+# The actual implementation is now in etc/core/modules/.
 
-alt_screen=0
-alt_screen(){ [[ $alt_screen == 0 ]] && { echo -en '\e[?1049h' ; stty -echo ; tput civis ; alt_screen=1 ; } ; }
-
-try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && try_error "$@" || try_errorp "$@" ; } ; }
-try_error() { echo -en "\e[2J\e[H\e[31m;" ; [[ -s $fs/log ]] && { { cat $fs/log ; } | tee -a $fs/errors_log && rm $fs/log ; } ; }
-try_errorp(){ pdhn  "$(cat $fs/log)" ; read -sn1 ; tmux popup -w 80% "$(try_error "$@")" ; }
-warn()      { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[33m$*'" ; }
-error()     { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[31m$*'" ; }
-ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
-pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; } ; }
-select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
-tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id= ; in_pdir= ; in_viprev= ; in_ftli= ; sleep 0.01 ; } ; tcpreview2 ; [[ $1 ]] && prev_all=$1 ; }
-tcpreview2(){ [[ "$pane2_id" ]] && { tmux killp -t $pane2_id &>/dev/null ; pane2_id= ; sleep 0.01 ; } ; }
-vipreview() { ((in_viprev)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E -e 's/\$/\\$/g' -e 's/#/\\\\#/' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_viprev=1 ; }
-cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
-clear_list(){ for(( i=$1 ; i <= LINES  ; i++)) ; do echo -ne "\e[${i};0H\e[K$flip" ; ((i <= LINES - 1)) && echo ; done ; }
-psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; true ; }
-ctsplit()   { in_pdir= in_viprev= in_ftli= ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; sleep 0.2 ; }
-cp_mv_tags(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && { tags_unset $class ; cp_mv "$1" "$2" "${!ltags[@]}" ; } || cp_mv "$1" "$2" "$f" ; true ; }
-cp_mv()     { [[ $1 == copy ]] && cp_do "$@" || mv_do "$@" ; sleep 0.01 ; }
-cp_do()     { cmvs=$fs/cmv_$SECONDS ; printf '%s\n' "${@:3}" >$cmvs ; tscommand "xargs -a $cmvs -t -I{} -- cp -r \$'{}' ${2@Q}" ; }
-mv_do()     { cmvs=$fs/cmv_$SECONDS ; printf '%s\0' "${@:3}" >$cmvs ; tscommand "xargs -0 -a $cmvs -t -- mv -t ${2@Q}" ; }
-dedup()     { [[ -s "$1" ]] && { tac "$1" | awk '!seen[$0]++' | tac | sponge "$1" ; true ; } ; }
-delete()    { [[ $1 ]] && { [[ $REPLY =~ y|d ]] && delete_tag || { [[ $REPLY =~ c ]] && delete_cur ; } ; } || { [[ $REPLY =~ y|d ]] && delete_cur ; } ; } 
-delete_cur(){ [[ "${tags[$n]}" ]] && { unset -v 'tags[$n]' ; tags_size - "$n" ; ((stagsi++)) ; } ; $RM "$n" ; mime=() ; true ; } 
-delete_tag(){ declare -A ltags ; tag_get ltags class ; ((${#ltags[@]})) && tags_unset $class && { $RM "${!ltags[@]}" ; mime=() ; } ; true ; }
-dir_size()  { ((show_size == 2)) && dir_esize "$1" || printf "\e[94m %4s\e[m" "${du_size[$PWD/$1]}" ; }
-dir_esize() { printf "\e[94m%4s \e[m" $(find "$1/" -mindepth 1 -maxdepth 1 ${hidden[tab]:+\( ! -iname '.*' \)} -type d,f,l -xtype d,f -printf "1\n" 2>&- | wc -l) ; }
-dir_dusize(){ reset="$(printf '\e[0m')" ; declare -Ag du_size ; while IFS=$'\t' read color size file ; do du_size[$PWD/$file]="$color$size$reset" ; done < <(get_dusize) ; }
-get_dusize(){ du -L -h | color_size | perl -ne '($c, $s, $f) = m/(\e\[[0-9;]+m)(.*?)\e\[0m\t.\/(.*)/ ; printf "$c\t%4s\t$f\n", $s' ; }
-edit()      { tcpreview ; alt_screen ; inotify_k ; ${EDITOR} "${1:-${files[file]}}"; alt_screen ; emode=0 ; cdir ; }
-ftl_env()   { ftl_env+=([ftl_pfs]=$pfs [ftl_fs]=$fs) ; for i in "${!ftl_env[@]}" ; do echo -n "${1:--e} $i=${ftl_env[$i]} " ; done ; }
-go_loop()   { [[ $1 == "f" ]] && { P= ; shift ; } || P="$PWD" ; in_tab= ; while read dst ; do fzf_in_tab "$dst" && continue ; ${1}_go $in_tab "$P" "$dst" ; done<<<"$2" ; }
-go_rl_args(){ gls=""; while IFS=: read -r g l _ ; do [[ "$g" ]] || continue; [[ "$gls" ]] && gls+=" -c \"tabe +$l $g\"" || gls+=" +$l $g" ; done <<<"$(fzfr)"; echo "$gls"; }
-file_size() { h_size=$1 ; for u in ' ' K M G T ; do ((h_size < 1024)) && printf "%4s$u" $h_size && break ; ((h_size/=1024)) ; done ; }
-fzf_in_tab(){ [[ -z $in_tab ]] && { [[ "$1" == ctrl-t ]] && in_tab=1 || in_tab=0 ; } ; }
-fzf_go()    { d="$(dirname "$3")" ; (($1)) && _tab_new ; [[ "$2" ]] && nd="$2/$d" || nd="$d" ; dst="$(basename "$3")" ; [[ -d "$nd/$dst" ]] && cdir "$nd"/"$dst" || cdir "$nd" "$dst" ; }
-rg_go()     { g=${3%%:*} ; l=${3#*:} ; l=${l%%:*} ; echo "$3 -> $g => $l" >&3 ; ="$(dirname "$g")" ; (($1)) && _tab_new ; cdir "$2/$d" "$(basename "$g")" ; }
-tag_go()    { ti=0 ; for tag_path in "${!tags[@]}" ; do ((ti == $1)) && nn="$tag_path" && break ; ((ti++)) ; done ; cdir "$(dirname "$nn")" "$(basename "$nn")" ; }
-fzf_tag()   { [[ "$2" ]] && while read f ; do f="$(path_full "$f")" ; [[ "$1" == U ]] && tag_unset "$f" || tag_set "$f" ; done <<<$2 ; }
-geometry()  { read -r TOP WIDTH LINES COLS LEFT< <(tmux display -p -t $my_pane '#{pane_top} #{window_width} #{pane_height} #{pane_width} #{pane_left}') ; }
-geo_prev()  { geometry ; ((${preview:-$prev_all})) && [[ -z $pane_id ]] && ((COLS=(COLS-1) * (100 - ${zooms[zoom]}) / 100)) ; }
-geo_winch() { geometry ; WCOLS=$COLS ; WLINES=$LINES ; }
-header()    { tsc=$(tsc) ; h="${@:2} $(sort_glyph)$s_reversed$(tags_head)" ; header_pos "$h$tsc" ; echo -e "\e[H\e[K\e[${1:-94}m${PWD:hpl} \e[${1:-95}m${h:hal}\e[m \e[4;33m$tsc\e[0m" ; }
-header_pos(){ [[ $pane_id ]] && cols=$COLS || cols=50 ; hal=$((${#1} - ($cols - 1))) ; hpl=$((${#PWD} + (hal < 0 ? hal : 0) )) ; ((hal = hal < 0 ? 0 : hal, hpl = hpl < 0 ? 0 : hpl)) ; }
-hist_save() { ((!gpreview)) && { [[ "$n" ]] && echo "$n" | tee -a $fs/history >> $ghist ; } ; }
-inotify_s() { inotify_k ; (inotify_ ) & : ; ino1=$! ; ino_processes=($ino1 $(pchild $ino1 0)) ; }
-inotify_()  { inotify_w | { read a b f ; [[ "$f" ]] && tmux send -t "$my_pane" ${C[refresh_pane]} 2>&- ; } ; }
-inotify_w() { inotifywait --exclude 'index.lock|(.*\.sw.?)' -e create -e delete -e move -e modify "$PWD/" 2>&- ; }
-inotify_k() { [[ $ino1 ]] && { for p in "${ino_processes[@]}" ; do disown $p 2>&- ; kill $p 2>&- ; done ; ino1= ; } ; }
-is_bin()    { perl -le 'exit -B $ARGV[0]' "$1" ; is_bin=$? ; }
-kbdf()      { while read -t 0.01 ; do : ; done ; }
-k_bindings(){ ((pop_kbindings)) && k_bpop || k_bfull ; alt_screen ; list ; }
-k_bfull()   { tcpreview ; exec 2>&9 ; k_bgen | fzf ; exec 2>"$fs/log" ; alt_screen ; true ; }
-k_bpop()    { k_bgen | fzf-tmux $fzf_opt ; true ; }
-k_bgen()    { printf '%s\n' "${bindings[@]}" | sort -h | column -t --table-columns "____map____,____section____, ____key____,____command____,____does____" -s $'\t' -c $CMD_COLS ; }
-mime_get()  { [[ "${mime[$n]}" ]] || mime_cache "$n" ; mtype="${mime[$n]}" ; }
-mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" ; done < <($MIMETYPE "$1" "${files[@]:$file:((file + 20))}" 2>&1) ; }
-mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
-move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; ((nf != file)) && dir_file[${tab}_$PWD]=$nf ; }
-player_k()  { ((mplayer)) && { kill $mplayer &>/dev/null ; mplayer= ; } ; }
-pane_extra(){ echo "${ofs:-$fs}" >$fsp/fs ; pane_ftl "'$n' $pfs" "$1" "$2" ; sleep 0.05 ; tmux selectp -t $new_pane ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
-pane_ftl()  { pane_read ; tcpreview ; tsplit "prev_all=0 ftl $1" 30% "$2" $3 ; panes+=($pane_id) ; new_pane=$pane_id ; pane_id= ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
-pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | sponge $pfs/panes ; tmux send -t ${panes[0]} ${C[quit_ftl]} 2>&- ; sleep 0.03 ; } ; }
-pane_next() { pane_read ; pf=0 ; tp=("${panes[@]}" $main_pane "${panes[@]}") ; for p in  "${tp[@]}" ; do [[ $p == $my_pane ]] && pf=1 || { ((pf)) && echo $p && break ; } ; done ; }
-pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
-pane_send() { pane_read && for p in "${panes[@]}" ; do tmux send -t $p "$1" &>/dev/null ; done ; }
-path()      { n="$1" ; [[ "$n" =~ / ]] && p="${n%/*}" || p= ; [[ ${p:0:1} != "/" ]] && p="$PWD/$p" ; f="${n##*/}" ; b="${f%.*}" ; [[ "$f" =~ '.' ]] && e="${f##*.}" || e= ; }
-path_full() { PF="${1/\.\//$PWD\/}" ; PF="${PF%/}" ; echo "$PF" ; }
-path_none() { n= ; p= ; f= ; b= ; e= ; }
-pdh()       { ((pdhl)) && echo "$$ $my_pane: $1" >>ftl_log ; [[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh "$$ $my_pane: ${1//\\n/$'\n'}" ; } ; true ; }
-pdhn()      { pdh "$*\n" ; }
-pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm $pfs/pdh ; } || { tcpreview; tsplit "$FTL_CFG/etc/bin/fpdh $pfs" 30% -v $my_pane ; pane_id= ; } ; cdir ; }
-pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
-prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
-quit()      { qshell && return ; tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane å ; } ; rm -rf $fs ; exit ; }
-quit2()     { hist_save ; inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
-{
-qshell_c=0
-qshell()    { ((qshell_c++, qshell_c > 2)) && return 1 ; (( $(tmux lsw -t ftl$$ 2>&- | wc -l) > 2 )) && { tmux popup -h 5 "echo Shells open! «session: ctl-w !». " ; true ; } || false ; }
-
-# declare -Ag time_event_handlers
-# rqsc=0
-# reset_qshell_call(){ ((qshell_c)) && { ((rqsc)) && { (($SECONDS - rqsc > 3)) && qshell_c=0 rqsc=0 ; } || ((rqsc)) || rqsc=$SECONDS ; } ; }
-# time_event_handlers[reset_qshell_call]=reset_qshell_call
-}
-cdfl()      { true 2>&- >&3 && { ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
-quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
-refresh()   { echo -ne "\e[?25l$1" ; } 
-run_bash()  { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; alt_screen ; exec 2>"$fs/log" ; }
-run_maxed() { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; "$@" 2>/dev/null ;  wmctrl -ia $aw ; true ; }
-selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }
-shell_pane(){ tcpreview ; P=$pane_id ; tsplit bash $shell_h -v -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
-shell_vpane(){ tcpreview 0 ; P=$pane_id ; tsplit bash $shell_v -h -U ; shell_id=$pane_id ; pane_id=$P ; sleep 0.2 ; shell_send "$1" "$(printf "%s " "${selection[@]@Q}")" C-b ; cdir ; }
-shell_send(){ { (( $1 )) && [[ $shell_id ]] && $(tmux has -t $shell_id 2>&-) ; } && tmux send -t $shell_id "${@:2}" ; }
-sort_glyph(){ echo ${sglyph[s_type]} ; }
-save_state()
-{
-declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; echo $fs >$fsp/fs
-
-((!nfiles)) && : >${1:-$fs}/ftl \
-	    || {
-		>${1:-$fs}/ftl echo "sdir=\"${files[file]}\"	; sindex=${dir_file[${tab}_${files[file]}]}	; n=\"$n\"
-					ftag=$ftag		; show_size=$show_size				; prev_cb=\"$prev_cb\"
-					etag=$etag		; etag_s=\"$etag_s\"				; etag_cb=\"$etag_cb\"
-					dirmode=\"$dirmode\"
-					filter_ext=\"$filter_ext\"
-					vmode[tab]=\"${vmode[tab]}\"
-					sort_type[tab]=${sort_type[tab]}
-					filters[tab]=\"${filters[tab]}\"
-					filters2[tab]=\"${filters2[tab]}\" 
-					lmode[tab]=\"${lmode[tab]}\"
-					hidden[tab]=\"${hidden[tab]}\"
-					rfilters[tab]=\"${rfilters[tab]}\"
-					ntfilter[tab]=\"${ntfilter[tab]}\" "
-		
-		>>${1:-$fs}/ftl declare -p lignore lkeep
-		}
-}
-
-prev_synch()
-{
-tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
-
-((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
-((gpreview)) && { [[ "$prev_cb" ]] && eval "$prev_cb" ; }
-((gpreview)) && { [[ "$etag_s" ]] && { source "$FTL_CFG/etags/$etag_s" ; [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
-((gpreview)) && { view_mode "${vmode[tab]}" 1 ; }
-[[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs=
-}
-thumb()     { echo "$thumbs/$1/$(md5sum <<<"$n" | cut -d' ' -f1)_$f.$2" ; }
-q_files()   { printf "%q\n" "${files[@]}" | perl -lne '-d || print' ; }
-q_dirs()    { printf "%q\n" "${files[@]}" | perl -lne '-d && print' ; }
-q_all()     { printf "%q\n" "${files[@]}" ; }
-q_sel()     { printf "%q\n" "${selection[@]}" ; }
-tab_close() { (($ntabs > 1)) && { tabs[$tab]= ; ((ntabs--)) ; tab_next ; cdir "${tabs[tab]}" ; } ; }
-_tab_new()  { [[ "$1" == '.' ]] && dir= || dir="$1" ; [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir" ; tabs+=("$dir") && ((tab=${#tabs[@]} - 1, ntabs++)) ; tab_setup ; }
-_tab_next() { ((tab++)) ; I=(${!tabs[@]}) ; for i in "${I[@]:$tab}" "${I[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
-_tab_prev() { I=(${!tabs[@]}) ; RI=($(echo "${I[@]}" "${I[@]:0:tab}" | rev | tr ' ' '\n')) ; for i in "${RI[@]}" ; do [[ -n "${tabs[$i]}" ]] && tab=$i && break ; done ; }
-
-declare -A icache dcache # tab_read is called once wen ftl is started with -t option
-tab_read()  { tabs=() ; ntabs=0 ; while read -r P ; do P="$(path_full "$P")" ; [[ -d "$P" ]] && _tab_read "$P" || _tab_read "$(dirname "$P")" "$(basename "$P")" ; done <"$2" ; }
-_tab_read() { _tab_new "$1" ; [[ -d "$1" ]] && { _tab_index "$1" ; dir_file[${tab}_$(realpath "$1")]=${icache[$1/$2]} ; } ; true ; }
-_tab_index(){ [[ -n "${dcache[$1]}" ]] || { dcache[$1]=1 ; index=0 ; while IFS= read -r e; do icache["$1/$e"]=$index ; ((index++)) ; done < <(cd "$1" && as_dir) ; } ; }
-
-tab_setup() { pdir_only[tab]= ; depth[tab]=1 ; vmode[tab]=0 ; lmode[tab]=0 ; filters_dir[tab]='.' ; filters[tab]='.' ; filters2[tab]='.' ; rfilters[tab]="$rfilter0" ; }
-tag_check() { for tag in "${!tags[@]}" ; do [[ -e "$tag" ]] || unset -v 'tags[$tag]' ; done ; ((${#tags[@]} != 0)) ; }
-tag_class() { tag_ntags ; ((${#ntags[@]}>1)) && { echo "$(printf "%s\n" "${!ntags[@]}" | sort | tag_fzf)" ; } || echo "${tags[$t]}" ; }
-tag_fzf()   { fzf-tmux -1 -p 80% --cycle --reverse --info=inline --preview 'entry={} ; cat "'$fs'/ntags_${entry}"' ; }
-
-tags_clear(){ ((stagsi++)) ; tags=() ; tags_size=0 ; true ; }
-tag_ntags() { ((stagsi++)) ; ntags=() ; rm $fs/ntags* 2>/dev/null ; for t in "${!tags[@]}" ; do echo "$t" | lscolors >>"$fs/ntags_${tags[$t]}" ; ntags[${tags[$t]}]=1 ; done ; }
-tag_flip()  { ((stagsi++)) ; [[ "${tags[$1]}" ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; true ; } || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
-tag_set()   { ((stagsi++)) ; [[ "${tags[$1]}" ]] || { tags[$1]=${2:-▪} ; tags_size + "$1" ; } ; }
-tag_unset() { ((stagsi++)) ; [[ ${tags[$1]} ]] && { unset -v 'tags[$1]' ; tags_size - "$1" ; } ; }
-tags_unset(){ for tag in "${!tags[@]}" ; do [[ "$1" == "${tags[$tag]}" ]] && { unset -v 'tags[$tag]' ; tags_size - "$tag" ; ((stagsi++)) ; } ; done ; }
-tag_get()   { ((${#tags[@]})) && { declare -n rtags="$1" rclass="$2" ; rclass=$(tag_class) ; list ; for t in "${!tags[@]}" ; do [[ $rclass == ${tags[$t]} ]] && rtags[$t]=1 ; done ; } ; }
-{
-time_event0=$SECONDS
-time_event(){ ((time_event)) && (($SECONDS - $time_event0 >= $time_event)) && { for teh in "${!time_event_handlers[@]}" ; do $teh ; done ;  time_event0=$SECONDS ; } ; }
-}
-sel_read()  { while read P ; do P="$(path_full "$P")" ; tag_flip "$P" ; done <"$2" ; ostagsi=$stagsi ; }
-tags_size() { [[ $1 == + ]] && { ((tags_size+=$(stat --printf="%s" "$2"))) ; true ; } || ((tags_size-=$(stat --printf="%s" "$2"))) ; }
-tags_head() { ((${#tags[@]})) && { echo -n " ${#tags[@]}/" ; numfmt --to=iec --format "%f" -- "$tags_size" ; } ; }
-tag_synch() { 2>&- read ostagsi <$fsp/stagsi ; ((auto_selection && ostagsi > stagsi)) && stagsi=$ostagsi && read ofs <$fsp/fs && source $ofs/tags ; ofs= ; false ; }
-tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-border-style "fg=color$2" ; sleep 0.01 ; }
-tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
-tsucommand(){ tsnew "$1" ; tmux neww -t ftl$1 -d "echo -e \"\e[33m$(date)\nftl> $2\e[m\" ; { $2 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
-tsnew()     { tmux has-session -t ftl${1:-$$} &>/dev/null || { tmux new -A -d -s ftl${1:-$$} ; sleep 0.2 ; } ; }
-tsc()       { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w-=1)) ; (( w > 0 )) && { [[ "${1:-0}" != "$w" ]] && error Error in background command ; echo $w ; } ; }
-tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" ; sleep 0.04 ; pane_id=$(tmux display -p '#{pane_id}') ; tsplitf ; tselectp $4 ; }
-tsplitf()   { [[ $pane_id && $preview_pane2 ]] && { tmux sp -b -l 9 -t $pane_id "$EDITOR '$preview_pane2' ; read -sn 1" ; sleep 0.04 ; pane2_id=$(tmux display -p '#{pane_id}') ; } ; }
-
-tselectp()  { [[ "$1" =~ ^% ]] && tmux selectp -t $1 || tmux selectp -t $pane_id ${1:--L} ; }
-texists()   { tmux list-windows -F '#{window_name}' | grep -Fxq -- "$1" ; }
-winch()     { geometry ; { ((!in_ftli)) && [[ "$WCOLS" != "$COLS" ]] || [[ "$WLINES" != "$LINES" ]] ; } && ((winch)) && R="${C[refresh_pane]}$R" ; }
-zoom()      { geometry ; [[ $pane_id ]] && read -r COLS_P < <(tmux display -p -t $pane_id '#{pane_width}') || COLS_P=0 ; ((x = ( ($COLS + $COLS_P) * ${zooms[$zoom]} ) / 100)) ; }
-
-vfiles_set(){ etag_cb="vdirs_get(){ $1 ; } ; vfiles_get(){ $2 ; } ; vfiles_clr(){ $3 ; }  ; vfile_prev(){ $4 ; } ; vfile_key(){ $5 \"\$@\"; }" ; eval "$etag_cb" ; }
-vfiles_on() { etag_cb+="; vfiles_on $1" ; vfiles_on=$1 ; declare -Ag vfiles=() vdirs=() ; }
-vfiles_rst(){    eval 'vdirs_get(){ : ; }  ; vfiles_get(){ : ; }  ; vfiles_clr(){ cat ; } ; vfile_prev(){ : ; }  ; vfile_key(){ : ; }' ;         etag_cb= ; vfiles_on=0 ; } 
-v_entries() { vfiles=() vdirs=() ; ((vfiles_on)) && { while read -r v ; do vdirs[$v]=1 ; done < <(vdirs_get "$@")  ; while read -r v ; do vfiles[$v]=1 ; done < <(vfiles_get "$@") ; } ; }
-
-# temporal functions
-etag_dir()  { : ; }
-etag_tag()  { : ; }
+source "$FTL_CFG/etc/core/modules/util.sh"
+source "$FTL_CFG/etc/core/modules/log.sh"
+source "$FTL_CFG/etc/core/modules/state.sh"
+source "$FTL_CFG/etc/core/modules/pane.sh"
+source "$FTL_CFG/etc/core/modules/list.sh"
+source "$FTL_CFG/etc/core/modules/preview.sh"
+source "$FTL_CFG/etc/core/modules/selection.sh"
+source "$FTL_CFG/etc/core/modules/tab.sh"
+source "$FTL_CFG/etc/core/modules/etag.sh"
+source "$FTL_CFG/etc/core/modules/mark.sh"
+source "$FTL_CFG/etc/core/modules/time.sh"
 
 # vim: set filetype=bash :

@@ -1,17 +1,449 @@
+# ftl_setup — initialization orchestrator
+#
+# This file is sourced by bin/ftl at startup. It:
+#   1. Sources all the core modules in dependency order
+#   2. Sets up a compatibility layer mapping old variable names to new ones
+#   3. Sources the user's ftlrc (which uses old names)
+#   4. Initializes the runtime state
+
 export FTL_CFG
 
-source $FTL_CFG/etc/core/ftl
-source $FTL_CFG/etc/core/debug
+# Source the core modules in dependency order.
+source "$FTL_CFG/etc/core/modules/util.sh"
+source "$FTL_CFG/etc/core/modules/log.sh"
+source "$FTL_CFG/etc/core/modules/debug.sh"
+source "$FTL_CFG/etc/core/modules/state.sh"
+source "$FTL_CFG/etc/core/modules/keyboard.sh"
+source "$FTL_CFG/etc/core/modules/selection.sh"
+source "$FTL_CFG/etc/core/modules/tab.sh"
+source "$FTL_CFG/etc/core/modules/pane.sh"
+source "$FTL_CFG/etc/core/modules/filter.sh"
+source "$FTL_CFG/etc/core/modules/list.sh"
+source "$FTL_CFG/etc/core/modules/preview.sh"
+source "$FTL_CFG/etc/core/modules/etag.sh"
+source "$FTL_CFG/etc/core/modules/virtual.sh"
+source "$FTL_CFG/etc/core/modules/mark.sh"
+source "$FTL_CFG/etc/core/modules/time.sh"
+source "$FTL_CFG/etc/core/modules/commands.sh"
 
-declare -Ag C bindings kbd_trie key_map vfiles vdirs time_event_handlers marks ; source $FTL_CFG/ftlrc 2>&- || source $FTL_CFG/etc/ftlrc ;
-my_pane=$(pid_2_pane $$) ; tags_size=0 ; declare -A -g dir_file mime pignore lignore lkeep lkeep_tab tail tags ntags ftl_env du_size ; mkapipe 4 5 6
+# Source the viewers (which define ftl::prev::show_internal etc.)
+source "$FTL_CFG/viewers/core"
 
-declare -g  dir_entries_list
-declare -Ag dir_entries_path dir_entries_file dir_entries_color dir_entries_size dir_entries_relative_path_length
+# Declare the core runtime associative arrays before ftlrc populates them.
+declare -Ag ftl_kbd_command_to_key ftl_kbd_bindings_display ftl_kbd_trie \
+    ftl_kbd_submode_handler ftl_plugin_vfiles ftl_plugin_vdirs \
+    ftl_time_handlers ftl_mark_session_marks
 
-selection=() ; n= ; fs=$ftl_root/$$ ; pfs=$fs ; ofs=$fs ; tab=0 ; tabs+=("$PWD") ; ntabs=1 ; tab_setup ;
+#--- Compatibility layer -------------------------------------------------
+# The ftlrc file uses the original (v1) variable and function names.
+# We keep these working by:
+#   - Letting ftlrc set the old names
+#   - Then copying old-name values to new-name variables
+#   - Defining old-name function aliases for the new functions
+#
+# This means the user's ftlrc continues to work unchanged, while the
+# internal code uses the new namespaced names.
 
-filter_rst ; vfiles_rst ; sort_filters=('-k3 -V' '-n' '-k2 -V') ; flips=(' ' ' ')
+# Source the user's ftlrc (or the default if no user override).
+# ftlrc sets old-name variables (KEY_TIMEOUT, EDITOR, etc.) and calls
+# the old bind() function (which we alias to ftl::kbd::bind below).
+source "$FTL_CFG/ftlrc" 2>&- || source "$FTL_CFG/etc/ftlrc"
+
+# Map old-name config variables to new-name config variables.
+# These are set by ftlrc and need to be visible to the new code.
+
+# Paths
+: "${FTL_STATE_DIR:=$ftl_root}"
+: "${FTL_CACHE_DIR:=$ftl_root/thumbs}"
+export FTL_STATE_DIR FTL_CACHE_DIR
+
+ftl_gen_dir="$pgen"
+ftl_state_global_history_file="$ghist"
+ftl_cache_thumb_dir="$thumbs"
+ftl_cfg_help_command="$help_command"
+
+# Behavior options
+ftl_cfg_key_timeout="$KEY_TIMEOUT"
+ftl_cfg_shell_pane_height="$shell_h"
+ftl_cfg_shell_pane_width="$shell_v"
+ftl_cfg_auto_sync_selection="$auto_selection"
+ftl_cfg_time_event_interval="$time_event"
+ftl_cfg_debug_log_file="$pdhl"
+ftl_cfg_move_step_size="$move_step"
+ftl_cfg_msg_montage="$msg_m"
+ftl_cfg_msg_du_size="$msg_du"
+ftl_cfg_auto_select_filename="$find_auto"
+ftl_cfg_line_color_default="$line_color0"
+ftl_cfg_line_color_current="$line_color"
+ftl_cfg_line_color_highlight="$line_color_hi"
+ftl_cfg_mount_archives="$mount_archive"
+ftl_cfg_cursor_color_default="$cursor_color0"
+ftl_cfg_cursor_color_current="$cursor_color"
+ftl_cfg_cursor_color_search="$cursor_color_search"
+ftl_cfg_help_in_popup="$pop_help"
+ftl_cfg_bindings_in_popup="$pop_kbindings"
+ftl_cfg_quick_display_threshold="$quick_display"
+ftl_cfg_default_reverse_filter="$rfilter0"
+ftl_cfg_show_entry_index="$show_line"
+ftl_cfg_show_date_in_header="$show_date"
+ftl_cfg_show_tar_info="$show_tar"
+ftl_cfg_default_new_tab_dir="$tag_new_tab"
+ftl_cfg_tmux_border_colors_default="$TBCOLORS"
+
+# Runtime state (initialized from config defaults)
+ftl_state_dir_preview_mode="$dirmode"
+ftl_state_alt_preview_mode="$extmode"
+ftl_state_preview_pane_visible="${prev_all:-1}"
+ftl_state_preview_zoom_index="$zoom"
+ftl_cfg_preview_zoom_levels=("${zooms[@]}")
+ftl_state_pdf_preview_as_image="$pdf_prev_image"
+ftl_state_etag_enabled="$etag"
+ftl_state_show_size_mode="$show_size"
+ftl_state_show_stat=0
+ftl_state_images_hidden=0
+
+# Sort defaults
+ftl_cfg_default_sort_type="$sort_type0"
+ftl_cfg_default_sort_reversed="$sort_reversed0"
+
+# Glyph tables
+ftl_cfg_glyph_sort=("${sglyph[@]}")
+ftl_cfg_glyph_image_mode=("${iglyph[@]}")
+ftl_cfg_glyph_listing_mode=("${lglyph[@]}")
+ftl_cfg_glyph_tag_classes=("${tglyph[@]}")
+
+# Filter regexes
+ftl_cfg_image_extensions_regex="$ifilter"
+ftl_cfg_media_extensions_regex="$mfilter"
+
+# FZF options
+ftl_cfg_fzf_popup_opts="$fzf_opt"
+ftl_cfg_fzf_pane_opts="$fzfp_opt"
+ftl_cfg_fzf_sxiv_opts="$fzf_sxiv_opt"
+ftl_cfg_fzf_listen_port="$FZF_LISTEN"
+ftl_cfg_fzf_listen_command="$FZF_LISTEN_COMMAND"
+
+# External commands
+ftl_cfg_image_viewer="$SXIV"
+ftl_cfg_gif_viewer="$GIF_VIEWER"
+ftl_cfg_editor="$EDITOR"
+ftl_cfg_diff_tool="$FILE_DIFF"
+ftl_cfg_image_clean_borders="$FTLI_CLEAN"
+ftl_cfg_char_height_px="$FTLI_H"
+ftl_cfg_char_width_px="$FTLI_W"
+ftl_cfg_image_zoomed="$FTLI_Z"
+ftl_cfg_gpg_key_id="$GPGID"
+ftl_cfg_gui_media_player="$G_PLAYER"
+ftl_cfg_terminal_media_player="$T_PLAYER"
+ftl_cfg_external_terminal_player="$TE_PLAYER"
+ftl_cfg_live_preview_player="$T_PLAYER_STATUS"
+ftl_cfg_background_player="$B_PLAYER"
+ftl_cfg_queue_player="$Q_PLAYER"
+ftl_cfg_ansi_pager="$PAGER_ANSI"
+ftl_cfg_markdown_pager="$MD_PAGER"
+ftl_cfg_markdown_renderer_default="$MD_RENDER0"
+ftl_cfg_markdown_renderer_1="$MD_RENDER1"
+ftl_cfg_markdown_renderer_2="$MD_RENDER2"
+ftl_cfg_markdown_dir_renderer="$MD_DIR_RENDER"
+ftl_cfg_hex_viewer="$HEXVIEW"
+ftl_cfg_hex_editor="$HEXEDIT"
+ftl_cfg_mime_detector="$MIMETYPE"
+ftl_cfg_disk_usage_tool="$NCDU"
+ftl_cfg_json_viewer="$JSON_VIEWER"
+ftl_cfg_yaml_viewer="$YAML_VIEWER"
+ftl_cfg_exa_colors="$EXA_COLORS"
+ftl_cfg_exa_options="$EXA_OPTIONS"
+ftl_cfg_delete_command="$RM"
+ftl_cfg_bindings_display_width="$CMD_COLS"
+
+# Command aliases
+declare -Ag ftl_cfg_command_aliases=()
+for k in "${!cmd_aliases[@]}" ; do
+    ftl_cfg_command_aliases[$k]="${cmd_aliases[$k]}"
+done
+
+# Color overrides
+declare -Ag ftl_cfg_color_overrides=()
+if [[ $(declare -p user_colors 2>/dev/null) =~ "declare -A" ]] ; then
+    for k in "${!user_colors[@]}" ; do
+        ftl_cfg_color_overrides[$k]="${user_colors[$k]}"
+    done
+fi
+
+# Preset destinations
+declare -Ag ftl_cfg_preset_destinations=()
+for k in "${!dir_dest[@]}" ; do
+    ftl_cfg_preset_destinations[$k]="${dir_dest[$k]}"
+done
+
+# Key binding globals
+ftl_cfg_redo_key="$redo_key"
+ftl_cfg_leader_key="$leader_key"
+
+# Session marks (copy from the old `marks` array set by ftlrc)
+declare -Ag ftl_mark_session_marks=()
+for k in "${!marks[@]}" ; do
+    ftl_mark_session_marks[$k]="${marks[$k]}"
+done
+
+#--- Function aliases (old name → new function) -------------------------
+# These let the ftlrc's bind() calls and any external code that uses old
+# function names continue to work.
+
+# Keyboard
+bind()             { ftl::kbd::bind "$@" ; }
+unbind()           { ftl::kbd::unbind "$@" ; }
+get_key()          { ftl::kbd::get_key "$@" ; }
+key_command()      { ftl::kbd::dispatch ; }
+kbdf()             { ftl::kbd::drain_input ; }
+k_bindings()       { ftl::kbd::show_bindings ; }
+
+# Listing
+cdir()             { ftl::list::change_dir "$@" ; }
+rdir()             { ftl::list::refresh_dir "$@" ; }
+list()             { ftl::list::render "$@" ; }
+move()             { ftl::list::move_cursor "$@" ; }
+path()             { ftl::util::parse_path "$@" ; }
+path_full()        { ftl::util::resolve_full_path "$@" ; }
+path_none()        { ftl::util::clear_path_vars ; }
+file_size()        { ftl::util::format_size_human "$@" ; }
+is_bin()           { ftl::util::is_binary_file "$@" ; }
+run_maxed()        { ftl::util::run_maximized "$@" ; }
+refresh()          { ftl::util::refresh_screen "$@" ; }
+dedup()            { ftl::util::dedup_file "$@" ; }
+
+# Pane
+pid_2_pane()       { ftl::pane::pid_to_id "$@" ; }
+geometry()         { ftl::pane::query_geometry ; }
+geo_winch()        { ftl::pane::snapshot_geometry ; }
+winch()            { ftl::pane::check_resize ; }
+tsplit()           { ftl::pane::split "$@" ; }
+ctsplit()          { ftl::pane::split_or_respawn "$@" ; }
+psplit()           { ftl::pane::split_for_preview "$@" ; }
+tselectp()         { ftl::pane::select "$@" ; }
+tbcolor()          { ftl::pane::set_border_colors "$@" ; }
+texists()          { ftl::pane::window_exists "$@" ; }
+tsc()              { ftl::pane::count_bg_windows "$@" ; }
+tsnew()            { ftl::pane::ensure_session "$@" ; }
+tscommand()        { ftl::pane::run_in_bg_window "$@" ; }
+tsucommand()       { ftl::pane::run_in_user_session "$@" ; }
+pane_read()        { ftl::pane::read_child_list ; }
+pane_send()        { ftl::pane::send_to_all_children "$@" ; }
+pane_next()        { _ftl::pane::find_next_pane ; }
+inotify_s()        { ftl::pane::start_file_watcher ; }
+inotify_k()        { ftl::pane::stop_file_watcher ; }
+
+# Preview
+tcpreview()        { ftl::prev::clear "$@" ; }
+tcpreview2()       { _ftl::prev::clear_fixed ; }
+vipreview()        { ftl::prev::show_in_vim "$@" ; }
+pw3image()         { ftl::prev::show_image "$@" ; }
+select_myp()       { _ftl::prev::select_self_after_delay ; }
+preview()          { ftl::prev::dispatch ; }
+prev_synch()       { ftl::prev::sync_and_dispatch "$@" ; }
+thumb()            { ftl::gen::thumb_path "$@" ; }
+
+# Selection
+selection()        { ftl::sel::resolve_current ; }
+tag_flip()         { ftl::sel::flip "$@" ; }
+tag_set()          { ftl::sel::set "$@" ; }
+tag_unset()        { ftl::sel::unset "$@" ; }
+tags_unset()       { ftl::sel::unset_by_class "$@" ; }
+tag_get()          { ftl::sel::get_by_class "$@" ; }
+tag_check()        { ftl::sel::validate_existence ; }
+tag_class()        { ftl::sel::prompt_for_class ; }
+tag_fzf()          { ftl::sel::fzf_choose_class ; }
+tag_go()           { ftl::sel::goto_by_index "$@" ; }
+tag_ntags()        { ftl::sel::build_class_index ; }
+tags_clear()       { ftl::sel::clear_all ; }
+tags_size()        { ftl::sel::adjust_total_size "$@" ; }
+tags_head()        { ftl::sel::format_header_summary ; }
+tag_synch()        { ftl::sel::sync_from_other_pane ; }
+sel_read()         { ftl::sel::load_from_file "$@" ; }
+fzf_tag()          { ftl::sel::fzf_tag_or_untag "$@" ; }
+
+# Tabs
+tab_setup()        { ftl::tab::init_defaults ; }
+_tab_new()         { ftl::tab::create "$@" ; }
+_tab_next()        { ftl::tab::advance_index ; }
+_tab_prev()        { ftl::tab::retreat_index ; }
+tab_read()         { ftl::tab::load_from_file "$@" ; }
+_tab_read()        { _ftl::tab::read_one_entry "$@" ; }
+_tab_index()       { ftl::tab::index_directory "$@" ; }
+
+# Filters
+filter_add()       { ftl::filt::pipeline_add "$@" ; }
+filter_clr()       { ftl::filt::pipeline_clear ; }
+filter_rmv()       { ftl::filt::pipeline_remove "$@" ; }
+filter_rst()       { ftl::filt::reset ; }
+filter_rxt()       { _ftl::filt::reset_external ; }
+sort_by()          { ftl::filt::sort_entries ; }
+sort_glyph()       { ftl::filt::get_sort_glyph ; }
+user_color()       { ftl::filt::apply_user_colors ; }
+load_filter()      { ftl::filt::load_external "$@" ; }
+
+# State
+save_state()       { ftl::state::save "$@" ; }
+setup_finfo()      { ftl::state::serialize_info "$@" ; }
+ftl_env()          { ftl::state::render_child_env "$@" ; }
+cdfl()             { ftl::state::emit_selection_fd3 ; }
+mkapipe()          { ftl::util::create_fifos "$@" ; }
+
+# Logging
+try()              { ftl::log::wrap "$@" ; }
+try_error()        { ftl::log::show_error_full "$@" ; }
+try_errorp()       { ftl::log::show_error_popup "$@" ; }
+warn()             { ftl::log::warn "$@" ; }
+error()            { ftl::log::error "$@" ; }
+pdh()              { ftl::log::debug "$@" ; }
+pdhn()             { ftl::log::debug "$*" ; }
+pdh_show()         { ftl::log::show_debug_pane ; }
+alt_screen()       { ftl::util::enter_alt_screen ; }
+
+# Mime
+mime_get()         { ftl::list::get_mime_type ; }
+mime_cache()       { _ftl::list::cache_mime_types "$@" ; }
+
+# Directory size
+dir_size()         { _ftl::list::format_dir_size "$@" ; }
+dir_esize()        { _ftl::list::format_dir_entry_count "$@" ; }
+dir_dusize()       { ftl::list::compute_dir_sizes ; }
+get_dusize()       { _ftl::list::run_du ; }
+
+# Listing internals
+cview()            { _ftl::list::scan_and_render "$@" ; }
+get_dir_entries()  { _ftl::list::scan_directory "$@" ; }
+get_custom_entries() { _ftl::list::scan_custom_source "$@" ; }
+prepare_entries()  { _ftl::list::apply_filters_and_format "$@" ; }
+view_list()        { _ftl::list::render_window ; }
+show_header()      { _ftl::list::render_header ; }
+header()           { _ftl::list::print_header "$@" ; }
+header_pos()       { _ftl::list::compute_header_truncation "$@" ; }
+clear_list()       { _ftl::list::clear_below "$@" ; }
+as_dir()           { _ftl::list::scan_for_dir_view ; }
+dir()              { _ftl::list::scan_full ; }
+files()            { _ftl::list::find_entries "$@" ; }
+files_virt()       { _ftl::list::inject_virtual_files ; }
+dirs_virt()        { ftl::plugin::virtual::get_virtual_dirs ; }
+output_size()      { _ftl::list::emit_size_to_fifo ; }
+output_path()      { _ftl::list::emit_name_to_fifos ; }
+dir_done()         { _ftl::list::signal_scan_complete ; }
+geo_prev()         { _ftl::list::adjust_for_preview ; }
+zoom()             { ftl::list::compute_preview_width ; }
+q_files()          { ftl::list::quote_all_files ; }
+q_dirs()           { ftl::list::quote_all_dirs ; }
+q_all()            { ftl::list::quote_all_entries ; }
+q_sel()            { ftl::list::quote_selection ; }
+
+# Etag
+etag_dir()         { ftl::etag::scan_directory ; }
+etag_tag()         { ftl::etag::get_entry_tag "$@" ; }
+
+# History
+hist_save()         { _ftl::mark::save_to_history ; }
+
+# Player
+player_k()         { ftl::cmd::kill_media_player ; }
+
+# Virtual entries
+vfiles_set()       { ftl::plugin::virtual::set_callbacks "$@" ; }
+vfiles_on()        { ftl::plugin::virtual::enable "$@" ; }
+vfiles_rst()       { ftl::plugin::virtual::reset ; }
+v_entries()        { ftl::plugin::virtual::inject_entries "$@" ; }
+
+# Time
+time_event()       { ftl::time::tick ; }
+
+# Command prompt
+cmd_prompt()       { ftl::cmd::prompt_with_history "$@" ; }
+shell_command()    { ftl::cmd::dispatch_command "$@" ; }
+prompt()           { ftl::cmd::prompt "$@" ; }
+run_bash()         { ftl::cmd::run_interactive_bash ; }
+
+#--- Runtime state initialization ----------------------------------------
+
+# Initialize per-session state directories.
+ftl_state_session_dir="$FTL_STATE_DIR/$$"
+ftl_state_parent_dir="$ftl_state_session_dir"
+ftl_state_other_session_dir="$ftl_state_session_dir"
+ftl_state_shared_dir="$ftl_state_session_dir/prev"
+
+# Compute this pane's tmux id.
+ftl_pane_self_id="$(ftl::pane::pid_to_id $$)"
+
+# Initialize selection state.
+ftl_selection_total_bytes=0
+ftl_selection_revision=0
+
+# Declare the runtime associative arrays.
+declare -Ag ftl_state_cursor_memory
+declare -Ag ftl_list_mime_cache
+declare -Ag ftl_view_preview_ignore_exts
+declare -Ag ftl_filt_listing_hide_exts
+declare -Ag ftl_filt_listing_keep_exts
+declare -Ag ftl_filt_listing_keep_exts_per_tab
+declare -Ag ftl_view_vim_tail_commands
+declare -Ag ftl_selection_tags
+declare -Ag ftl_selection_class_index
+declare -Ag ftl_state_child_env
+declare -Ag ftl_list_dir_size_cache
+
+# Declare the raw-entry arrays.
+declare -ag ftl_list_raw_entries
+declare -Ag ftl_list_raw_paths
+declare -Ag ftl_list_raw_names
+declare -Ag ftl_list_raw_colors
+declare -Ag ftl_list_raw_sizes
+declare -Ag ftl_list_raw_relpath_len
+
+# Initialize the selection, path, and tab state.
+ftl_selection_current=()
+ftl_state_current_path=
+ftl_state_current_tab_index=0
+ftl_tab_directories+=("$PWD")
+ftl_tab_count=1
+ftl::tab::init_defaults
+
+# Initialize the filter pipeline and virtual entries.
+ftl::filt::reset
+ftl::plugin::virtual::reset
+ftl_cfg_sort_options=('-k3 -V' '-n' '-k2 -V')
+ftl_cfg_row_separator_chars=(' ' ' ')
+
+# Create the named pipes for the listing pipeline.
+ftl::util::create_fifos 4 5 6
+
+# Initialize the redo-exclusion set.
+ftl::kbd::init_exclusions
+
+# Initialize the filter pipeline string.
+ftl::filt::init
+
+#--- Old-name runtime variable aliases -----------------------------------
+# Some old variables are used directly by code that hasn't been updated.
+# Keep them as aliases (copy by value at init; for arrays, we use the
+# old name directly in the compatibility functions above).
+
+# These are used by the old ftl() entry point in bin/ftl.
+fs="$ftl_state_session_dir"
+pfs="$ftl_state_parent_dir"
+ofs="$ftl_state_other_session_dir"
+fsp="$ftl_state_shared_dir"
+PPWD="$ftl_state_previous_pwd"
+
+# These are used by various old-name functions.
+my_pane="$ftl_pane_self_id"
+main="$ftl_pane_is_primary"
+main_pane="$ftl_pane_primary_id"
+tab="$ftl_state_current_tab_index"
+ntabs="$ftl_tab_count"
+nfiles="$ftl_list_entry_count"
+file="$ftl_state_cursor_index"
+n="$ftl_state_current_path"
+p="$ftl_state_current_dir"
+f="$ftl_state_current_basename"
+b="$ftl_state_current_stem"
+e="$ftl_state_current_extension"
+mtype="$ftl_state_current_mime_type"
 
 # vim: set filetype=bash:
-
