@@ -1,10 +1,18 @@
 # Current
 
-functionality: run on entry in tmux popup pane
-
 functionality: marks per direcory
 	in some directories, dev, we usually jump to sub directories (test, etc ...) create shorcuts, directory specific, to jump to those sub directories, use cdm/fzf style.
 	creation, deletion? stored where? in a file in the directory? in a global file?
+
+functionality: fzf comlpetion for ftl commands
+	in a popup pane
+	single letter to start th compeletion, then fzf style completion
+	¿ too much like k_binding
+
+issue: yif not working!
+issue: zT not working!
+
+functionality: run on entry in tmux popup pane
 
 issue: inotify not working!
 

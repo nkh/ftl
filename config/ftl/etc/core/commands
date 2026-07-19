@@ -68,6 +68,7 @@ external_mode1()	{ emode=1 ; preview ; }
 external_mode2()	{ emode=2 ; preview ; }
 external_mode3()	{ emode=3 ; preview ; }
 file_dir_mode()		{ ((lmode[tab]++)) ; ((lmode[tab] > 2)) && lmode[tab]=0 ; cdir '' "$f" ; }
+tree_view()		{ tmux popup -h 90% -w 90% -E -d "$PWD" "tree -C $@ | less -R" ; }
 set_filter()		{ prompt "filter: " -i "${filters[tab]}" ; filters[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
 set_filter_dir()	{ prompt "filter dir: " -i "${filters_dir[tab]}" ; filters_dir[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }
 set_filter2()		{ prompt "filter2: " -i "${filters2[tab]}" ; filters2[tab]="${REPLY:-.}" ; ftag="~" ; cdir '' "$f" ; }

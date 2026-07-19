@@ -110,7 +110,7 @@ MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-
 MD_RENDER0='ptext'			# default markdown renderer 
 MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
 MD_RENDER2='vmd'			# markdown renderer #2
-$MD_DIR_RENDER="vmd"			# markdown renderer for mode "show README in directory"
+MD_DIR_RENDER="vmd"			# markdown renderer for mode "show README in directory"
 
 HEXVIEW=hexdump				# hex viewer
 HEXEDIT=hexedit				# hex editor
@@ -286,7 +286,7 @@ bind ftl pane		"CTL-W l"	pane_right		"extra pane right"
 bind ftl pane		"CTL-W j"	pane_down		"extra pane below"
 bind ftl pane		"CTL-W H"	pane_L			"extra pane: left"
 bind ftl pane		"CTL-W L"	pane_R			"extra pane: right"
-bind ftl pane		"CTL_W n"	pane_go_next		"next pane or viewer"
+bind ftl pane		"CTL-W n"	pane_go_next		"next pane or viewer"
 bind ftl pane		gp		pane_go_next		"next pane or viewer"
 
 bind ftl shell		"CTL-W !"	shell_view		"view shell"
@@ -360,6 +360,7 @@ bind ftl view		zmI		view_mode_not_image	"view mode: not image"
 bind ftl view		zmP		preview_image		"show/hide image preview"
 bind ftl view		zmd		file_dir_mode		"file/dir view mode"
 bind ftl view		zmD		preview_dir_only	"preview directory only"
+bind ftl view		zt		tree_view		"tree view"
 bind ftl view		zmp		view_mode_pdf		"show pdf preview as text or image"
 bind ftl view		zz		image_zoom		"zoom image preview"
 bind ftl view		z+		preview_size		"change preview size"
@@ -373,8 +374,8 @@ bind ftl view		zv		preview_pane		"preview show/hide"
 bind ftl view		zff		preview_pane2		"fixed preview show/hide"
 bind ftl view		zfc		tcpreview2		"fixed preview close"
 bind ftl view		"z STAR"	depth			"maximum listing depth"
-bind ftl view		zt		etag_show		"show/hide etags"
-bind ftl view		zT		etag_select		"select etag type"
+bind ftl view		zTt		etag_show		"show/hide etags"
+bind ftl view		zTT		etag_select		"select etag type"
 bind ftl view		zep		preview_ext_ign		"show/hide extension preview"
 bind ftl view		zeh		extension_hide_tab	"hide extension from listing, per tab"
 bind ftl view		zeH		extension_hide		"hide extension from listing"
