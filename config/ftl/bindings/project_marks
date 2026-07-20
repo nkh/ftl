@@ -1,0 +1,63 @@
+# marks per project
+
+get_project_marks()
+{
+	# search for marks in current directory and child directories
+	# search parent directories unless subdirectory only
+
+	local subdir_only="${1:-false}"
+
+	tmpfile="$(mktemp)"
+	start_dir="$PWD"
+
+	if [[ "$subdir_only" == "false" ]] ; then 
+		# Walk upward until /
+		dir="$start_dir"
+		while :; do
+			if [ -f "$dir/.ftl_project_marks" ]; then
+				cat "$dir/.ftl_project_marks" >> "$tmpfile"
+			fi
+			
+			[ "$dir" = "/" ] && break
+			dir="$(dirname "$dir")"
+		done
+	fi
+	
+	# Walk downward from the starting directory
+	find "$start_dir" -type f -name '.ftl_project_marks' -exec cat {} + >> "$tmpfile"
+	
+	printf '%s\n' "$tmpfile"
+}
+
+pmark()
+{
+	# add the current entry in the local mark file
+	{ cat ".ftl_project_marks" 2>/dev/null ; echo "$n" ; } | awk '!seen[$0]++' | tac | sponge ".ftl_project_marks"
+}
+
+pmarks_fzf()
+{
+	# go to a project mark via fzf
+	local mark_file="$(get_project_marks)"
+	go_loop f fzf "$(sed "s|^$PWD/||" "$mark_file" | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)"
+}
+
+pmarks_subdir_fzf()
+{
+	# go to a project mark via fzf in child directories only
+	local mark_file="$(get_project_marks 1)"
+	go_loop f fzf "$(sed "s|^$PWD/||" "$mark_file" | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)"
+}
+
+pmarks_edit()
+{
+	[[ -f ".ftl_project_marks" ]] && edit ".ftl_project_marks" ; list
+}
+
+bind marks project	Mpp	pmark			"add the current entry to the project marks"
+bind marks project	Mpe	pmarks_edit		"edit the current directory marks"
+bind marks project	gpp	pmarks_fzf		"go to a project mark via fzf"
+bind marks project	gps	pmarks_subdir_fzf	"go to a project mark via fzf in child directories"
+
+# vim: set filetype=bash :
+
