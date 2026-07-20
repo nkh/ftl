@@ -1,6 +1,6 @@
 [[ $ftl_state_current_extension =~ ^(mp3|mp4|flv|mkv)$ ]] && {
-    ftl::cmd::kill_media_player
-    ftl_view_media_pid -vo null "$ftl_state_current_path" </dev/null &>/dev/null &
+	ftl::cmd::kill_media_player
+	ftl_view_media_pid -vo null "$ftl_state_current_path" </dev/null &>/dev/null &
 }
 
 # vim: set filetype=sh :

@@ -1,157 +1,157 @@
 
-ftl::kbd::ftl::kbd::bind nkh test   V       show_fzf_view   "fzf view"
+ftl::kbd::ftl::kbd::bind nkh test   V       ftl::plugin::fzf_search::show_fzf_view   "fzf view"
 
-show_fzf_view()
+ftl::plugin::fzf_search::show_fzf_view()
 {
-    local fzf_to_search=
-    local fzf_answer fzf_total_count fzf_entries
+	local fzf_to_search=
+	local fzf_answer fzf_total_count fzf_entries
 
-    ftl::prev::clear
+	ftl::prev::clear
 
-    fzf_to_search=
+	fzf_to_search=
 
-    ftl::pane::run_in_user_session _FZF_LISTEN \
-        "FZF_DEFAULT_COMMAND='$ftl_cfg_fzf_listen_command' fzf --listen $ftl_cfg_fzf_listen_port"
-    sleep .1
+	ftl::pane::run_in_user_session _FZF_LISTEN \
+		"FZF_DEFAULT_COMMAND='$ftl_cfg_fzf_listen_command' fzf --listen $ftl_cfg_fzf_listen_port"
+	sleep .1
 
-    fzf_answer="$(xh :$ftl_cfg_fzf_listen_port limit=="$((ftl_pane_height * 3))")"
-    fzf_total_count="$(<<<"$fzf_answer" jq -r '.totalCount')"
-    fzf_entries="$(<<<"$fzf_answer" jq -r '.matches[].text')"
+	fzf_answer="$(xh :$ftl_cfg_fzf_listen_port limit=="$((ftl_pane_height * 3))")"
+	fzf_total_count="$(<<<"$fzf_answer" jq -r '.totalCount')"
+	fzf_entries="$(<<<"$fzf_answer" jq -r '.matches[].text')"
 
-    nfiles_h=$fzf_total_count
-    ftl_state_search_string="$fzf_to_search/0"
-    _ftl::ftl::list::render::scan_and_render get_custom_entries
+	nfiles_h=$fzf_total_count
+	ftl_state_search_string="$fzf_to_search/0"
+	__ftl::list::scan_and_render ftl::plugin::fzf_search::get_custom_entries
 
-    custom_list=1
-    ftl_kbd_submode_handler=fzf_client
+	custom_list=1
+	ftl_kbd_submode_handler=ftl::plugin::fzf_search::fzf_client
 }
 
 fzf_entries=()
-fzf_client()
+ftl::plugin::fzf_search::fzf_client()
 {
-    local fzf_rq
+	local fzf_rq
 
-    fzf_rq=
+	fzf_rq=
 
-    case "$ftl_kbd_current_key" in
-        ERROR_142   ) : ;;
+	case "$ftl_kbd_current_key" in
+		ERROR_142   ) : ;;
 
-        RIGHT       ) ;;
-        LEFT        ) ;;
+		RIGHT       ) ;;
+		LEFT        ) ;;
 
-        +           ) preview_size ;;
-        CTL-E       ) ftl_state_external_viewer_mode=2 ; ftl::prev::dispatch ;;
-        CTL-V       ) preview_pane ;;
-        PGDN        ) move_page_down ;;
-        PGUP        ) move_page_up ;;
-        DOWN        ) move_down ;;
-        UP          ) move_up ;;
+		+           ) preview_size ;;
+		CTL-E       ) ftl_state_external_viewer_mode=2 ; ftl::prev::dispatch ;;
+		CTL-V       ) preview_pane ;;
+		PGDN        ) move_page_down ;;
+		PGUP        ) move_page_up ;;
+		DOWN        ) move_down ;;
+		UP          ) move_up ;;
 
-        ,           ) selection_flip_down ;;
-        ';'         ) selection_flip_up ;;
+		,           ) selection_flip_down ;;
+		';'         ) selection_flip_up ;;
 
-        ENTER       )
-            fzf_rq=accept
-            ftl_kbd_submode_handler=
-            ftl_state_search_string=
-            custom_list=
-            [[ -d "$ftl_state_current_dir/$ftl_state_current_path" ]] && \
-                ftl::ftl::list::render::change_dir "$ftl_state_current_dir/$ftl_state_current_path" || \
-                ftl::ftl::list::render::change_dir "$ftl_state_current_dir" "$ftl_state_current_stem"
-            ;;
+		ENTER       )
+			fzf_rq=accept
+			ftl_kbd_submode_handler=
+			ftl_state_search_string=
+			custom_list=
+			[[ -d "$ftl_state_current_dir/$ftl_state_current_path" ]] && \
+				ftl::list::change_dir "$ftl_state_current_dir/$ftl_state_current_path" || \
+				ftl::list::change_dir "$ftl_state_current_dir" "$ftl_state_current_stem"
+			;;
 
-        DEL| ESCAPE )
-            fzf_rq=abort
-            ftl_kbd_submode_handler=
-            ftl_state_search_string=
-            nfiles_h=
-            custom_list=
-            ftl::ftl::list::render::change_dir
-            # ((ftl_cfg_fzf_listen_port++))
-            ;;
+		DEL| ESCAPE )
+			fzf_rq=abort
+			ftl_kbd_submode_handler=
+			ftl_state_search_string=
+			nfiles_h=
+			custom_list=
+			ftl::list::change_dir
+			# ((ftl_cfg_fzf_listen_port++))
+			;;
 
-        BACKSPACE   )
-            [[ -n "$fzf_to_search" ]] && {
-                fzf_rq=backward-delete-char
-                fzf_to_search="${fzf_to_search::-1}"
-            }
-            ;;
-        BACKSLASH   ) : ;;
-        LEADER      )
-            fzf_rq="put( )"
-            fzf_to_search="$fzf_to_search "
-            ;;
-        QUOTE       )
-            fzf_rq="put(')"
-            fzf_to_search="$fzf_to_search'"
-            ;;
-        *           )
-            fzf_rq="put($ftl_kbd_current_key)"
-            fzf_to_search="$fzf_to_search$ftl_kbd_current_key"
-            ;;
-    esac
+		BACKSPACE   )
+			[[ -n "$fzf_to_search" ]] && {
+				fzf_rq=backward-delete-char
+				fzf_to_search="${fzf_to_search::-1}"
+			}
+			;;
+		BACKSLASH   ) : ;;
+		LEADER      )
+			fzf_rq="put( )"
+			fzf_to_search="$fzf_to_search "
+			;;
+		QUOTE       )
+			fzf_rq="put(')"
+			fzf_to_search="$fzf_to_search'"
+			;;
+		*           )
+			fzf_rq="put($ftl_kbd_current_key)"
+			fzf_to_search="$fzf_to_search$ftl_kbd_current_key"
+			;;
+	esac
 
-    [[ -n "$fzf_rq" ]] && {
-        xh :$ftl_cfg_fzf_listen_port --raw "$fzf_rq" >/dev/null
+	[[ -n "$fzf_rq" ]] && {
+		xh :$ftl_cfg_fzf_listen_port --raw "$fzf_rq" >/dev/null
 
-        [[ "$fzf_rq" == abort || "$fzf_rq" == accept ]] || {
-            # fzf_answer="$(xh :$ftl_cfg_fzf_listen_port limit=="$((ftl_pane_height - 1))")"
-            fzf_answer="$(xh :$ftl_cfg_fzf_listen_port limit=="$((3 * ftl_pane_height))")"
-            fzf_total_count="$(<<<"$fzf_answer" jq -r '.totalCount')"
-            fzf_match_count="$(<<<"$fzf_answer" jq -r '.matchCount')"
-            fzf_entries="$(<<<"$fzf_answer" jq -r '.matches[].text')"
+		[[ "$fzf_rq" == abort || "$fzf_rq" == accept ]] || {
+			# fzf_answer="$(xh :$ftl_cfg_fzf_listen_port limit=="$((ftl_pane_height - 1))")"
+			fzf_answer="$(xh :$ftl_cfg_fzf_listen_port limit=="$((3 * ftl_pane_height))")"
+			fzf_total_count="$(<<<"$fzf_answer" jq -r '.totalCount')"
+			fzf_match_count="$(<<<"$fzf_answer" jq -r '.matchCount')"
+			fzf_entries="$(<<<"$fzf_answer" jq -r '.matches[].text')"
 
-            nfiles_h=$fzf_total_count
-            ftl_state_search_string="$fzf_to_search/${fzf_match_count:-?}"
+			nfiles_h=$fzf_total_count
+			ftl_state_search_string="$fzf_to_search/${fzf_match_count:-?}"
 
-            _ftl::ftl::list::render::scan_and_render get_custom_entries
-        }
-    }
+			__ftl::list::scan_and_render ftl::plugin::fzf_search::get_custom_entries
+		}
+	}
 }
 
-get_custom_entries()
+ftl::plugin::fzf_search::get_custom_entries()
 {
-    local dst dst_path dst_file relative_path entry colored_entry entry_index
+	local dst dst_path dst_file relative_path entry colored_entry entry_index
 
-    dir_entries_list=()
-    dir_entries_file=()
-    dir_entries_path=()
-    dir_entries_relative_path_length=()
-    dir_entries_size=()
-    dir_entries_color=()
+	dir_entries_list=()
+	dir_entries_file=()
+	dir_entries_path=()
+	dir_entries_relative_path_length=()
+	dir_entries_size=()
+	dir_entries_color=()
 
-    lscolors_args=()
+	lscolors_args=()
 
-    [[ -z "$fzf_entries" ]] && return
+	[[ -z "$fzf_entries" ]] && return
 
-    while read dst ; do
-        [[ "$dst" =~ / ]] && dst_path="${dst%/*}" || dst_path=
-        [[ ${dst_path:0:1} != "/" ]] && dst_path="$PWD/$dst_path"
-        dst_file="${dst##*/}"
+	while read dst ; do
+		[[ "$dst" =~ / ]] && dst_path="${dst%/*}" || dst_path=
+		[[ ${dst_path:0:1} != "/" ]] && dst_path="$PWD/$dst_path"
+		dst_file="${dst##*/}"
 
-        dir_entries_list+=("$dst")
-        dir_entries_file[$dst]="$dst_file"
-        dir_entries_path[$dst]="$dst_path"
+		dir_entries_list+=("$dst")
+		dir_entries_file[$dst]="$dst_file"
+		dir_entries_path[$dst]="$dst_path"
 
-        [[ $PWD/ == "$dst_path" ]] && dir_entries_relative_path_length[$dst]=0 || {
-            relative_path="${dst_path:((${#PWD}+1))}/"
-            dir_entries_relative_path_length[$dst]=${#relative_path}
-        }
-    done <<<"$fzf_entries"
+		[[ $PWD/ == "$dst_path" ]] && dir_entries_relative_path_length[$dst]=0 || {
+			relative_path="${dst_path:((${#PWD}+1))}/"
+			dir_entries_relative_path_length[$dst]=${#relative_path}
+		}
+	done <<<"$fzf_entries"
 
-    for entry in "${dir_entries_list[@]}" ; do
-        [[ $PWD/ == ${dir_entries_path[$entry]} ]] && \
-            lscolors_args+=("${dir_entries_file[$entry]}") || \
-            lscolors_args+=("${dir_entries_path[$entry]:((${#PWD}+1))}/${dir_entries_file[$entry]}")
+	for entry in "${dir_entries_list[@]}" ; do
+		[[ $PWD/ == ${dir_entries_path[$entry]} ]] && \
+			lscolors_args+=("${dir_entries_file[$entry]}") || \
+			lscolors_args+=("${dir_entries_path[$entry]:((${#PWD}+1))}/${dir_entries_file[$entry]}")
 
-        dir_entries_size[$entry]=10
-    done
+		dir_entries_size[$entry]=10
+	done
 
-    entry_index=0
-    while read colored_entry ; do
-        dir_entries_color[${dir_entries_list[$entry_index]}]="$colored_entry"
-        ((entry_index++))
-    done < <(lscolors "${lscolors_args[@]}")
+	entry_index=0
+	while read colored_entry ; do
+		dir_entries_color[${dir_entries_list[$entry_index]}]="$colored_entry"
+		((entry_index++))
+	done < <(lscolors "${lscolors_args[@]}")
 }
 
 # vim: set ft=bash:

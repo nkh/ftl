@@ -1,24 +1,24 @@
 etag_dir()
 {
-    declare -g -A ext_sizes=()
+	declare -g -A ext_sizes=()
 
-    local ext_file ext_size
+	local ext_file ext_size
 
-    while read ext_file ; do ext_sizes[$ext_file]="          " ; done < <(find "$PWD/" -maxdepth 1 2>&-)
+	while read ext_file ; do ext_sizes[$ext_file]="          " ; done < <(find "$PWD/" -maxdepth 1 2>&-)
 
-    while read ext_file ext_size ; do
-        ext_sizes[$ext_file]="$ext_size"
-    done < <(\
-        find "$PWD/" -maxdepth 1 -type f 2>&- | { rg "${ftl_cfg_image_extensions_regex@Q}$"  ; echo "__ftl_not_real" ; } | tr '\n' '\0' | xargs -0 file | \
-        perl -ne 'm/(^.*?):.*?(\d{3,}) ?x ?(\d{3,})/ && printf "%s\t\e[2;35m%4sx%4s \e[m\n", $1, $2, $3' \
-        )
+	while read ext_file ext_size ; do
+		ext_sizes[$ext_file]="$ext_size"
+	done < <(\
+		find "$PWD/" -maxdepth 1 -type f 2>&- | { rg "${ftl_cfg_image_extensions_regex@Q}$"  ; echo "__ftl_not_real" ; } | tr '\n' '\0' | xargs -0 file | \
+		perl -ne 'm/(^.*?):.*?(\d{3,}) ?x ?(\d{3,})/ && printf "%s\t\e[2;35m%4sx%4s \e[m\n", $1, $2, $3' \
+		)
 }
 
 etag_tag()
 {
-    local -n r2=$2 r3=$3
-    r2="${ext_sizes[$PWD/$1]}"
-    r3=10
+	local -n r2=$2 r3=$3
+	r2="${ext_sizes[$PWD/$1]}"
+	r3=10
 }
 
 # vim: set filetype=bash :

@@ -2,22 +2,22 @@ ftl::plugin::sort_by_extension::sort_glyph() { echo e ; }
 
 ftl::plugin::sort_by_extension::sort()
 {
-    local entry file_data ext i
-    local -a files_data sort_data
+	local entry file_data ext i
+	local -a files_data sort_data
 
-    entry=0
-    while IFS=$'\t' read -a file_data ; do
-        files_data+=("${file_data[0]}   ${file_data[1]} ${file_data[2]}")
+	entry=0
+	while IFS=$'\t' read -a file_data ; do
+		files_data+=("${file_data[0]}   ${file_data[1]} ${file_data[2]}")
 
-        ext=
-        [[ "${file_data[2]}" =~ '.' ]] && ext=".${file_data[2]##*.}"
-        sort_data+=("$entry     ${file_data[2]} $ext")
-        ((entry++))
-    done
+		ext=
+		[[ "${file_data[2]}" =~ '.' ]] && ext=".${file_data[2]##*.}"
+		sort_data+=("$entry     ${file_data[2]} $ext")
+		((entry++))
+	done
 
-    for i in $(printf "%s\n" "${sort_data[@]}" | sort -s -t $'\t' ${ftl_tab_sort_reversed[$ftl_state_current_tab_index]} -k3 -k2 | cut -f1) ; do
-        echo "${files_data[i]}"
-    done
+	for i in $(printf "%s\n" "${sort_data[@]}" | sort -s -t $'\t' ${ftl_tab_sort_reversed[$ftl_state_current_tab_index]} -k3 -k2 | cut -f1) ; do
+		echo "${files_data[i]}"
+	done
 }
 
 # Override the placeholder so the listing pipeline dispatches to this plugin.

@@ -1,76 +1,76 @@
 
-git_etags()
+ftl::plugin::leader_git::git_etags()
 {
-    ftl_etag_source_name=git
-    source "$FTL_CFG/etc/etags/$ftl_etag_source_name"
-    ((ftl_state_etag_enabled ^= 1))
-    ftl::ftl::list::render::change_dir
+	ftl_etag_source_name=git
+	source "$FTL_CFG/etc/etags/$ftl_etag_source_name"
+	((ftl_state_etag_enabled ^= 1))
+	ftl::list::change_dir
 }
 
-git_ignore()
+ftl::plugin::leader_git::git_ignore()
 {
-    printf "%s\n" "${ftl_selection_current[@]}" | sed "s~$PWD/~~" >>.gitignore
-    ftl::etag::scan_directory
-    ftl::ftl::list::render::change_dir
+	printf "%s\n" "${ftl_selection_current[@]}" | sed "s~$PWD/~~" >>.gitignore
+	ftl::etag::scan_directory
+	ftl::list::change_dir
 }
 
-git_add()
+ftl::plugin::leader_git::git_add()
 {
-    git add "${ftl_selection_current[@]}"
-    ftl::etag::scan_directory
-    ftl::ftl::list::render::change_dir
+	git add "${ftl_selection_current[@]}"
+	ftl::etag::scan_directory
+	ftl::list::change_dir
 }
 
-git_find()
+ftl::plugin::leader_git::git_find()
 {
-    local git_root
-    git_root="$(git rev-parse --show-toplevel)"
-    go_loop f fzf "$(cd "$git_root" ; git-color-status -u | fzf-tmux $ftl_cfg_fzf_popup_opts -m --expect=ctrl-t --ansi | sed 's#...#'"$git_root"'/#')"
+	local git_root
+	git_root="$(git rev-parse --show-toplevel)"
+	go_loop f fzf "$(cd "$git_root" ; git-color-status -u | fzf-tmux $ftl_cfg_fzf_popup_opts -m --expect=ctrl-t --ansi | sed 's#...#'"$git_root"'/#')"
 }
 
-git_diff()
+ftl::plugin::leader_git::git_diff()
 {
-    local picked pdir pfile
+	local picked pdir pfile
 
-    ftl::prev::clear
-    exec 2>&9
-    picked=$(fgd)
-    [[ "$picked" ]] && {
-        pdir=$(dirname "$picked")
-        pfile=$(basename "$picked")
-    }
-    exec 2>"$ftl_state_session_dir/log"
-    ftl::util::enter_alt_screen
-    ftl::ftl::list::render::change_dir "$pdir" "$pfile"
+	ftl::prev::clear
+	exec 2>&9
+	picked=$(fgd)
+	[[ "$picked" ]] && {
+		pdir=$(dirname "$picked")
+		pfile=$(basename "$picked")
+	}
+	exec 2>"$ftl_state_session_dir/log"
+	ftl::util::enter_alt_screen
+	ftl::list::change_dir "$pdir" "$pfile"
 }
 
-git_diff2()
+ftl::plugin::leader_git::git_diff2()
 {
-    ftl::prev::clear
-    git diff --color=always "$ftl_state_current_path" | diff-so-fancy | moar --no-statusbar --no-linenumbers
-    ftl::ftl::list::render::change_dir
+	ftl::prev::clear
+	git diff --color=always "$ftl_state_current_path" | diff-so-fancy | moar --no-statusbar --no-linenumbers
+	ftl::list::change_dir
 }
 
-git_fga()
+ftl::plugin::leader_git::git_fga()
 {
-    tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "bash -ic fga"
-    ftl::ftl::list::render::change_dir
+	tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "bash -ic fga"
+	ftl::list::change_dir
 }
 
-git_tree()
+ftl::plugin::leader_git::git_tree()
 {
-    tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "git-tree-status -u | less -r"
-    ftl::ftl::list::render::change_dir
+	tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "git-tree-status -u | less -r"
+	ftl::list::change_dir
 }
 
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g g"    git_etags       "git display status"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g t"    git_tree        "git tree status"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g d"    git_diff2       "git diff2"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g D"    git_diff        "git diff"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g f"    git_find        "git go to git file"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g g"    ftl::plugin::leader_git::git_etags       "git display status"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g t"    ftl::plugin::leader_git::git_tree        "git tree status"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g d"    ftl::plugin::leader_git::git_diff2       "git diff2"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g D"    ftl::plugin::leader_git::git_diff        "git diff"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g f"    ftl::plugin::leader_git::git_find        "git go to git file"
 
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g i"    git_ignore      "git add selection to directory .gitignore"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g a"    git_add         "git add selection"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g A"    git_fga         "git add selection in forgit"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g i"    ftl::plugin::leader_git::git_ignore      "git add selection to directory .gitignore"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g a"    ftl::plugin::leader_git::git_add         "git add selection"
+ftl::kbd::ftl::kbd::bind git        extra   "LEADER g A"    ftl::plugin::leader_git::git_fga         "git add selection in forgit"
 
 # vim: set filetype=bash:

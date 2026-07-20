@@ -36,52 +36,52 @@ ftl::plugin::virtual::handle_key()          { false ; }
 #   $4: preview_callback function name
 #   $5: handle_key function name
 ftl::plugin::virtual::set_callbacks() {
-    ftl_etag_callback="ftl::plugin::virtual::get_dirs_callback(){ $1 ; } ; \
+	ftl_etag_callback="ftl::plugin::virtual::get_dirs_callback(){ $1 ; } ; \
 ftl::plugin::virtual::get_files_callback(){ $2 ; } ; \
 ftl::plugin::virtual::clear_filter(){ $3 ; } ; \
 ftl::plugin::virtual::preview_callback(){ $4 ; } ; \
 ftl::plugin::virtual::handle_key(){ $5 \"\$@\"; }"
-    eval "$ftl_etag_callback"
+	eval "$ftl_etag_callback"
 }
 
 # Enable virtual entries.
 # Args:
 #   $1: enable flag (1=on)
 ftl::plugin::virtual::enable() {
-    ftl_etag_callback+="; ftl::plugin::virtual::enable $1"
-    ftl_plugin_virtual_enabled=$1
-    declare -Ag ftl_plugin_vfiles=() ftl_plugin_vdirs=()
+	ftl_etag_callback+="; ftl::plugin::virtual::enable $1"
+	ftl_plugin_virtual_enabled=$1
+	declare -Ag ftl_plugin_vfiles=() ftl_plugin_vdirs=()
 }
 
 # Reset (disable) virtual entries.
 ftl::plugin::virtual::reset() {
-    eval 'ftl::plugin::virtual::get_dirs_callback(){ : ; } ; \
+	eval 'ftl::plugin::virtual::get_dirs_callback(){ : ; } ; \
 ftl::plugin::virtual::get_files_callback(){ : ; } ; \
 ftl::plugin::virtual::clear_filter(){ cat ; } ; \
 ftl::plugin::virtual::preview_callback(){ : ; } ; \
 ftl::plugin::virtual::handle_key(){ : ; }'
-    ftl_etag_callback=
-    ftl_plugin_virtual_enabled=0
+	ftl_etag_callback=
+	ftl_plugin_virtual_enabled=0
 }
 
 # Populate the vfiles/vdirs arrays by calling the plugin callbacks.
 # Args:
 #   $@: passed through to the callbacks
 ftl::plugin::virtual::inject_entries() {
-    ftl_plugin_vfiles=()
-    ftl_plugin_vdirs=()
-    if (( ftl_plugin_virtual_enabled )) ; then
-        local v
-        while read -r v ; do ftl_plugin_vdirs[$v]=1 ; done \
-            < <(ftl::plugin::virtual::get_dirs_callback "$@")
-        while read -r v ; do ftl_plugin_vfiles[$v]=1 ; done \
-            < <(ftl::plugin::virtual::get_files_callback "$@")
-    fi
+	ftl_plugin_vfiles=()
+	ftl_plugin_vdirs=()
+	if (( ftl_plugin_virtual_enabled )) ; then
+		local v
+		while read -r v ; do ftl_plugin_vdirs[$v]=1 ; done \
+			< <(ftl::plugin::virtual::get_dirs_callback "$@")
+		while read -r v ; do ftl_plugin_vfiles[$v]=1 ; done \
+			< <(ftl::plugin::virtual::get_files_callback "$@")
+	fi
 }
 
 # Get virtual dirs (emit as find-format lines for the pipeline).
 ftl::plugin::virtual::get_virtual_dirs() {
-    (( ${#ftl_plugin_vdirs[@]} )) && printf "0\t0\t%s\n" "${!ftl_plugin_vdirs[@]}"
+	(( ${#ftl_plugin_vdirs[@]} )) && printf "0\t0\t%s\n" "${!ftl_plugin_vdirs[@]}"
 }
 
 # vim: set filetype=bash :

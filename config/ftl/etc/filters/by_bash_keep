@@ -1,64 +1,64 @@
 bash_filter_keep_imp()
 {
-    local OIFS p real_path keep_files
+	local OIFS p real_path keep_files
 
-    got_filter=1
+	got_filter=1
 
-    ftl::prev::clear
-    ftl::pane::stop_file_watcher
+	ftl::prev::clear
+	ftl::pane::stop_file_watcher
 
-    tmp_ftl_files="$(mktemp ftl_to_keep_XXXXXXX)"
-    : >"$tmp_ftl_file"
+	tmp_ftl_files="$(mktemp ftl_to_keep_XXXXXXX)"
+	: >"$tmp_ftl_file"
 
-    ftl::cmd::run_interactive_bash
+	ftl::cmd::run_interactive_bash
 
-    [[ -s "${tmp_ftl_files}" ]] && {
-        got_filter=0
+	[[ -s "${tmp_ftl_files}" ]] && {
+		got_filter=0
 
-        OIFS=$IFS
-        IFS=$'\n'
-        <"${tmp_ftl_files}" readarray -t keep_files
-        IFS=$OIFS
+		OIFS=$IFS
+		IFS=$'\n'
+		<"${tmp_ftl_files}" readarray -t keep_files
+		IFS=$OIFS
 
-        declare -g -A keep PWDS
-        ftl::sel::clear_all
+		declare -g -A keep PWDS
+		ftl::sel::clear_all
 
-        for p in "${keep_files[@]}" ; do
-            ftl_filt_active_glyph="~"
-            real_path="$(realpath "$p")"
+		for p in "${keep_files[@]}" ; do
+			ftl_filt_active_glyph="~"
+			real_path="$(realpath "$p")"
 
-            keep["$ftl_state_current_tab_index-$real_path"]=1
+			keep["$ftl_state_current_tab_index-$real_path"]=1
 
-            real_path="$(dirname "$real_path")"
+			real_path="$(dirname "$real_path")"
 
-            while [[ "$real_path" ]] ; do
-                keep[$ftl_state_current_tab_index-$real_path]=1
-                PWDS[$ftl_state_current_tab_index-$real_path]=1
+			while [[ "$real_path" ]] ; do
+				keep[$ftl_state_current_tab_index-$real_path]=1
+				PWDS[$ftl_state_current_tab_index-$real_path]=1
 
-                [[ "$real_path" == "$PWD" ]] && break
+				[[ "$real_path" == "$PWD" ]] && break
 
-                real_path=${real_path%/*}
-            done
-        done
+				real_path=${real_path%/*}
+			done
+		done
 
-        declare -p keep PWDS >"$ftl_state_parent_dir/by_bash_keep"
-    }
+		declare -p keep PWDS >"$ftl_state_parent_dir/by_bash_keep"
+	}
 
-    rm -f "${tmp_ftl_files}"
+	rm -f "${tmp_ftl_files}"
 
-    return $got_filter
+	return $got_filter
 }
 
 ftl::plugin::by_bash_keep::filter()
 {
-    local file_data fn
+	local file_data fn
 
-    [[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
-        while read -r file_data ; do
-            fn="${file_data#$'*\t'*$'\t'}"
-            [[ ${keep["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] && echo "$file_data"
-        done
-    } || cat
+	[[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
+		while read -r file_data ; do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat
 }
 
 # Override the placeholder so the listing pipeline dispatches to this plugin.
@@ -67,9 +67,9 @@ ftl::filter::apply_external() { ftl::plugin::by_bash_keep::filter ; }
 declare -g -A keep PWDS
 
 [[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
-    {
-        [[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_keep" ]] && source "$ftl_state_parent_dir/by_bash_keep" ; true ; } ||
-        bash_filter_keep_imp
-    }
+	{
+		[[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_keep" ]] && source "$ftl_state_parent_dir/by_bash_keep" ; true ; } ||
+		bash_filter_keep_imp
+	}
 
 # vim: set filetype=sh :

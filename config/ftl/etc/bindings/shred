@@ -1,23 +1,23 @@
 
-shred_command()
+ftl::plugin::shred::shred_command()
 {
-    local plural
+	local plural
 
-    # ftl::cmd::prompt user
-    ((${#ftl_selection_current[@]} > 1)) && plural='ies' || plural='y'
-    ftl::cmd::ftl::cmd::prompt "shred: ${#ftl_selection_current[@]} entr${plural} [yes|N]? "
+	# ftl::cmd::prompt user
+	((${#ftl_selection_current[@]} > 1)) && plural='ies' || plural='y'
+	ftl::cmd::ftl::cmd::prompt "shred: ${#ftl_selection_current[@]} entr${plural} [yes|N]? "
 
-    if [[ $ftl_kbd_current_key == yes ]] ; then
-        # reply must be "yes"
-        shred -n 2 -z -u "${ftl_selection_current[@]}" && ftl::sel::clear_all  # shred utility, then clear the selection tags
-        ftl::ftl::list::render::change_dir  # reload directory
-    else
-        # redisplay ftl::list::render to override ftl::cmd::prompt
-        ftl::ftl::list::render::render
-    fi
+	if [[ $ftl_kbd_current_key == yes ]] ; then
+		# reply must be "yes"
+		shred -n 2 -z -u "${ftl_selection_current[@]}" && ftl::sel::clear_all  # shred utility, then clear the selection tags
+		ftl::list::change_dir  # reload directory
+	else
+		# redisplay ftl::list::render to override ftl::cmd::prompt
+		ftl::list::render
+	fi
 }
 
 # ftl::kbd::bind shortcut
-ftl::kbd::ftl::kbd::bind leader file        "LEADER f s"    shred_command   "override selection multiple times and deletes it, *** bypasses ftl_cfg_delete_command ***"
+ftl::kbd::ftl::kbd::bind leader file        "LEADER f s"    ftl::plugin::shred::shred_command   "override selection multiple times and deletes it, *** bypasses ftl_cfg_delete_command ***"
 
 # vim: set filetype=bash :

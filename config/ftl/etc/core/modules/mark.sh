@@ -11,10 +11,10 @@
 
 # Save the current path to session and global history.
 _ftl::mark::save_to_history() {
-    (( ftl_pane_is_child )) && return 0
-    [[ -z "$ftl_state_current_path" ]] && return 0
-    echo "$ftl_state_current_path" \
-        | tee -a "$ftl_state_session_dir/history" >> "$FTL_STATE_DIR/shared/history"
+	(( ftl_pane_is_child )) && return 0
+	[[ -z "$ftl_state_current_path" ]] && return 0
+	echo "$ftl_state_current_path" \
+		| tee -a "$ftl_state_session_dir/history" >> "$FTL_STATE_DIR/shared/history"
 }
 
 # vim: set filetype=bash :

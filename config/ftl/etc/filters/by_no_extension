@@ -3,32 +3,32 @@ shopt -s dotglob
 
 [[ "$1" == reset ]] && { unset -v fnexts ; } ||
 {
-    [[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_no_extension" ]] && source "$ftl_state_parent_dir/by_no_extension" ; } ||
-    {
-        remove_no_ext=0
+	[[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_no_extension" ]] && source "$ftl_state_parent_dir/by_no_extension" ; } ||
+	{
+		remove_no_ext=0
 
-        for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
-                        sort -u | { echo "-without_extension-" ; cat ; } | lscolors | \
-                        fzf-tmux -p 30% -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
-            do
-                [[ $ext == "-without_extension-" ]] && remove_no_ext=1 || fnexts[$ext]=1
-                ftl_filt_active_glyph="~"
-            done
+		for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ '.' ]] && echo ".${i##*.}" ; done | \
+						sort -u | { echo "-without_extension-" ; cat ; } | lscolors | \
+						fzf-tmux -p 30% -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
+			do
+				[[ $ext == "-without_extension-" ]] && remove_no_ext=1 || fnexts[$ext]=1
+				ftl_filt_active_glyph="~"
+			done
 
-        declare -p remove_no_ext fnexts >"$ftl_state_parent_dir/by_no_extension"
-    }
+		declare -p remove_no_ext fnexts >"$ftl_state_parent_dir/by_no_extension"
+	}
 }
 
 ftl::plugin::by_no_extension::filter()
 {
-    local file_data fn ext
+	local file_data fn ext
 
-    while read -r file_data ; do
-        fn="${file_data#$'*\t'*$'\t'}"
-        ext=
-        [[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
-        { [[ -d "$fn" ]] || [[ -z "$ext" && $remove_no_ext == 0 ]] || [[ -n "$ext" && -z ${fnexts[$ext]} ]] ; } && echo "$file_data"
-    done
+	while read -r file_data ; do
+		fn="${file_data#$'*\t'*$'\t'}"
+		ext=
+		[[ "$fn" =~ '.' ]] && ext=".${fn##*.}"
+		{ [[ -d "$fn" ]] || [[ -z "$ext" && $remove_no_ext == 0 ]] || [[ -n "$ext" && -z ${fnexts[$ext]} ]] ; } && echo "$file_data"
+	done
 }
 
 # Override the placeholder so the listing pipeline dispatches to this plugin.

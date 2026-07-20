@@ -19,9 +19,9 @@
 # Default no-op etag functions (overridden by sourcing an etag plugin).
 ftl::etag::scan_directory() { : ; }
 ftl::etag::get_entry_tag() {
-    local -n r2=$2 r3=$3
-    r2=
-    r3=0
+	local -n r2=$2 r3=$3
+	r2=
+	r3=0
 }
 
 # vim: set filetype=bash :

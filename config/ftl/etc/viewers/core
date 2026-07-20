@@ -7,91 +7,91 @@ user_pviewers() { false ; }
 
 ext_viewers()
 {
-    user_eviewers && return ;
+	user_eviewers && return ;
 
-    [[ -d "$ftl_state_current_path"               ]] && { ext_dir   ; return ; }
-    [[ $ftl_state_current_extension =~ html       ]] && { ext_html  ; return ; }
-    [[ $ftl_state_current_extension =~ svg        ]] && { ext_svg   ; return ; }
-    [[ $ftl_state_current_extension =~ $ftl_cfg_image_extensions_regex ]] && { ext_image ; return ; }
-    [[ $ftl_state_current_extension == mp3        ]] && { ext_mp3   ; return ; }
-    [[ $ftl_state_current_extension =~ $ftl_cfg_media_extensions_regex ]] && { ext_media ; return ; }
-    [[ $ftl_state_current_extension == pdf || $ftl_state_current_extension == PDF ]] && { ext_pdf   ; return ; }
-    [[ $ftl_state_current_extension == sc         ]] && { ext_scim  ; return ; }
-    [[ $ftl_state_current_extension =~ ^md|MD$    ]] && { pmd       ; return ; }
-    [[ $ftl_state_current_extension == epub       ]] && { ext_epub  ; return ; }
-    [[ $ftl_state_current_extension =~ ^json|yml$ ]] && [[ -s "$ftl_state_current_path" ]] && { ext_json ; return ; }
+	[[ -d "$ftl_state_current_path"               ]] && { ext_dir   ; return ; }
+	[[ $ftl_state_current_extension =~ html       ]] && { ext_html  ; return ; }
+	[[ $ftl_state_current_extension =~ svg        ]] && { ext_svg   ; return ; }
+	[[ $ftl_state_current_extension =~ $ftl_cfg_image_extensions_regex ]] && { ext_image ; return ; }
+	[[ $ftl_state_current_extension == mp3        ]] && { ext_mp3   ; return ; }
+	[[ $ftl_state_current_extension =~ $ftl_cfg_media_extensions_regex ]] && { ext_media ; return ; }
+	[[ $ftl_state_current_extension == pdf || $ftl_state_current_extension == PDF ]] && { ext_pdf   ; return ; }
+	[[ $ftl_state_current_extension == sc         ]] && { ext_scim  ; return ; }
+	[[ $ftl_state_current_extension =~ ^md|MD$    ]] && { pmd       ; return ; }
+	[[ $ftl_state_current_extension == epub       ]] && { ext_epub  ; return ; }
+	[[ $ftl_state_current_extension =~ ^json|yml$ ]] && [[ -s "$ftl_state_current_path" ]] && { ext_json ; return ; }
 
-    ((ftl_state_external_viewer_mode == 3)) && { open_with ; return ; }
+	((ftl_state_external_viewer_mode == 3)) && { open_with ; return ; }
 
-    ftl::ftl::list::render::get_mime_type
+	ftl::list::get_mime_type
 
-    [[ $ftl_state_current_mime_type =~ ^text ]] && [[ -s "$ftl_state_current_path" ]] && { ext_text ; return ; }
+	[[ $ftl_state_current_mime_type =~ ^text ]] && [[ -s "$ftl_state_current_path" ]] && { ext_text ; return ; }
 
-    open_with
+	open_with
 }
 
 pviewers()
 {
-    ((${#ftl_plugin_vfiles[@]} || ${#ftl_plugin_vdirs[@]})) && { vfile_prev && return ; }
+	((${#ftl_plugin_vfiles[@]} || ${#ftl_plugin_vdirs[@]})) && { vfile_prev && return ; }
 
-    user_pviewers && return ;
+	user_pviewers && return ;
 
-    [[ -d "$ftl_state_current_path"               ]] && { pdir      ; return ; }
+	[[ -d "$ftl_state_current_path"               ]] && { pdir      ; return ; }
 
-    [[ $ftl_state_current_extension               ]] && ((ftl_view_preview_ignore_exts["${ftl_state_current_basename@Q}"])) && { ftl_view_preview_ignore_exts   ; return ; }
-    [[ -e "$ftl_state_session_dir/lock_preview/$ftl_state_current_path" ]] && { plock     ; return ; }
-    [[ "${ftl_tab_preview_dirs_only[ftl_state_current_tab_index]}" ]] && { [[ -d "$ftl_state_current_path" ]] || { ftl::prev::clear ; return ; } ; }
+	[[ $ftl_state_current_extension               ]] && ((ftl_view_preview_ignore_exts["${ftl_state_current_basename@Q}"])) && { ftl_view_preview_ignore_exts   ; return ; }
+	[[ -e "$ftl_state_session_dir/lock_preview/$ftl_state_current_path" ]] && { plock     ; return ; }
+	[[ "${ftl_tab_preview_dirs_only[ftl_state_current_tab_index]}" ]] && { [[ -d "$ftl_state_current_path" ]] || { ftl::prev::clear ; return ; } ; }
 
-    [[ $ftl_state_current_extension == cbr        ]] && { pcbr      ; return ; }
-    [[ $ftl_state_current_extension == cbz        ]] && { pcbz      ; return ; }
-    [[ $ftl_state_current_extension == html       ]] && { phtml     ; return ; }
-    [[ $ftl_state_current_extension == svg        ]] && { psvg      ; return ; }
-    [[ $ftl_state_current_extension == gif        ]] && { pgif      ; return ; }
-    [[ $ftl_state_current_extension =~ $ftl_cfg_image_extensions_regex ]] && { pimage    ; return ; }
-    [[ $ftl_state_current_extension == mp3        ]] && { pmp3      ; return ; }
-    [[ $ftl_state_current_extension =~ $ftl_cfg_media_extensions_regex ]] && { pmedia    ; return ; }
-    [[ $ftl_state_current_extension =~ ^md|MD$    ]] && { pmd       ; return ; }
-    [[ $ftl_state_current_extension == pdf || $ftl_state_current_extension == PDF ]] && { ppdf      ; return ; }
-    [[ $ftl_state_current_extension == epub       ]] && { pepub     ; return ; }
-    [[ $ftl_state_current_extension == 1          ]] && { pman      ; return ; }
-    [[ $ftl_state_current_extension == zip        ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
-    [[ $ftl_state_current_extension == rar        ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
-    [[ $ftl_state_current_basename =~ \.tar$      ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
-    [[ $ftl_state_current_basename =~ \.tar\.gz$  ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
-    [[ $ftl_state_current_basename =~ \.tar\.bz2$ ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
-    [[ -p "$ftl_state_current_path"               ]] && { ppipe     ; return ; }
-    [[ $ftl_state_current_extension =~ json       ]] && { pjson     ; return ; }
-    [[ $ftl_state_current_extension =~ yml        ]] && { pyaml     ; return ; }
-    [[ $ftl_state_current_extension == sc         ]] && { pscim     ; return ; }
-    [[ $ftl_state_current_extension =~ ^stl$      ]] && { pstl      ; return ; }
-    [[ $ftl_state_current_extension =~ ^asciio$   ]] && { pasciio   ; return ; }
+	[[ $ftl_state_current_extension == cbr        ]] && { pcbr      ; return ; }
+	[[ $ftl_state_current_extension == cbz        ]] && { pcbz      ; return ; }
+	[[ $ftl_state_current_extension == html       ]] && { phtml     ; return ; }
+	[[ $ftl_state_current_extension == svg        ]] && { psvg      ; return ; }
+	[[ $ftl_state_current_extension == gif        ]] && { pgif      ; return ; }
+	[[ $ftl_state_current_extension =~ $ftl_cfg_image_extensions_regex ]] && { pimage    ; return ; }
+	[[ $ftl_state_current_extension == mp3        ]] && { pmp3      ; return ; }
+	[[ $ftl_state_current_extension =~ $ftl_cfg_media_extensions_regex ]] && { pmedia    ; return ; }
+	[[ $ftl_state_current_extension =~ ^md|MD$    ]] && { pmd       ; return ; }
+	[[ $ftl_state_current_extension == pdf || $ftl_state_current_extension == PDF ]] && { ppdf      ; return ; }
+	[[ $ftl_state_current_extension == epub       ]] && { pepub     ; return ; }
+	[[ $ftl_state_current_extension == 1          ]] && { pman      ; return ; }
+	[[ $ftl_state_current_extension == zip        ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
+	[[ $ftl_state_current_extension == rar        ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
+	[[ $ftl_state_current_basename =~ \.tar$      ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
+	[[ $ftl_state_current_basename =~ \.tar\.gz$  ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
+	[[ $ftl_state_current_basename =~ \.tar\.bz2$ ]] && ((ftl_state_alt_preview_mode)) && { pcomp     ; return ; }
+	[[ -p "$ftl_state_current_path"               ]] && { ppipe     ; return ; }
+	[[ $ftl_state_current_extension =~ json       ]] && { pjson     ; return ; }
+	[[ $ftl_state_current_extension =~ yml        ]] && { pyaml     ; return ; }
+	[[ $ftl_state_current_extension == sc         ]] && { pscim     ; return ; }
+	[[ $ftl_state_current_extension =~ ^stl$      ]] && { pstl      ; return ; }
+	[[ $ftl_state_current_extension =~ ^asciio$   ]] && { pasciio   ; return ; }
 
-    ftl::ftl::list::render::get_mime_type
-    ftl::util::is_binary_file "$ftl_state_current_path"
-    ftl_state_current_file_description="$(file -b "$ftl_state_current_path")"
+	ftl::list::get_mime_type
+	ftl::util::is_binary_file "$ftl_state_current_path"
+	ftl_state_current_file_description="$(file -b "$ftl_state_current_path")"
 
-    [[ $ftl_state_current_mime_type =~ ^application/x-perl$ ]] && { ptext  ; return ; }
+	[[ $ftl_state_current_mime_type =~ ^application/x-perl$ ]] && { ptext  ; return ; }
 
-    [[ -s "$ftl_state_current_path" ]] && [[ "$ftl_state_current_file_description" =~ "escape sequence" ]] && { pansi ; return ; }
+	[[ -s "$ftl_state_current_path" ]] && [[ "$ftl_state_current_file_description" =~ "escape sequence" ]] && { pansi ; return ; }
 
-    # application/x-perl
-    # Perl script text executable
-    ((! ftl_state_current_is_binary)) && [[ -s "$ftl_state_current_path" ]] && \
-        [[ "$ftl_state_current_file_description" =~ Unicode|ASCII || $ftl_state_current_mime_type =~ ^text ]] && { ptext && return ; }
+	# application/x-perl
+	# Perl script text executable
+	((! ftl_state_current_is_binary)) && [[ -s "$ftl_state_current_path" ]] && \
+		[[ "$ftl_state_current_file_description" =~ Unicode|ASCII || $ftl_state_current_mime_type =~ ^text ]] && { ptext && return ; }
 
-    ptype
+	ptype
 }
 
 ext_dir()   { $ftl_cfg_gui_media_player "$ftl_state_current_path" &>/dev/null & }
 
 ext_html()
 {
-    if ((ftl_state_external_viewer_mode == 1)) ; then
-        ftl::prev::clear
-        w3m -o confirm_qq=0 "$ftl_state_current_path"
-    else
-        (qutebrowser "$ftl_state_current_path" 2>&- &)
-    fi
+	if ((ftl_state_external_viewer_mode == 1)) ; then
+		ftl::prev::clear
+		w3m -o confirm_qq=0 "$ftl_state_current_path"
+	else
+		(qutebrowser "$ftl_state_current_path" 2>&- &)
+	fi
 }
 
 ext_svg()   { ftl::util::run_maximized mupdf "$("$ftl_gen_dir/svg_to_pdf" "$ftl_state_current_path" "$ftl_cache_thumb_dir/svg")" ; }
@@ -100,55 +100,55 @@ ext_image() { ((ftl_state_external_viewer_mode == 1)) && ext_iall || ext_ipng ; 
 
 ext_iall()
 {
-    local images=() img
-    for img in "${ftl_list_entries[@]}" ; do
-        [[ "$img" =~ $ftl_cfg_image_extensions_regex ]] && images+=("$img")
-    done
-    $ftl_cfg_image_viewer -b -q -o -f "$ftl_state_current_path" "${images[@]}"
+	local images=() img
+	for img in "${ftl_list_entries[@]}" ; do
+		[[ "$img" =~ $ftl_cfg_image_extensions_regex ]] && images+=("$img")
+	done
+	$ftl_cfg_image_viewer -b -q -o -f "$ftl_state_current_path" "${images[@]}"
 }
 
 ext_ipng()
 {
-    ftl::prev::clear
-    ftl::util::run_maximized $ftl_cfg_gif_viewer "$ftl_state_current_path" &>/dev/null
-    ftl_state_external_viewer_mode=
-    ftl_kbd_current_key=
-    ftl::ftl::list::render::render
+	ftl::prev::clear
+	ftl::util::run_maximized $ftl_cfg_gif_viewer "$ftl_state_current_path" &>/dev/null
+	ftl_state_external_viewer_mode=
+	ftl_kbd_current_key=
+	ftl::list::render
 }
 
 ext_mp3()
 {
-    if ((ftl_state_external_viewer_mode == 1)) ; then
-        ftl::cmd::kill_media_player
-        ftl::prev::clear
-        $ftl_cfg_external_terminal_player "${ftl_selection_current[@]}"
-        true
-    else
-        ($ftl_cfg_gui_media_player "${ftl_selection_current[@]}" &>/dev/null &)
-    fi
-    ftl_view_media_pid=$!
+	if ((ftl_state_external_viewer_mode == 1)) ; then
+		ftl::cmd::kill_media_player
+		ftl::prev::clear
+		$ftl_cfg_external_terminal_player "${ftl_selection_current[@]}"
+		true
+	else
+		($ftl_cfg_gui_media_player "${ftl_selection_current[@]}" &>/dev/null &)
+	fi
+	ftl_view_media_pid=$!
 }
 
 ext_media()
 {
-    if ((ftl_state_external_viewer_mode == 1)) ; then
-        ftl::cmd::kill_media_player
-        $ftl_cfg_terminal_media_player "$ftl_state_current_path" </dev/null &>/dev/null &
-    else
-        ($ftl_cfg_gui_media_player "${ftl_selection_current[@]}" &>/dev/null &)
-    fi
-    ftl_view_media_pid=$!
+	if ((ftl_state_external_viewer_mode == 1)) ; then
+		ftl::cmd::kill_media_player
+		$ftl_cfg_terminal_media_player "$ftl_state_current_path" </dev/null &>/dev/null &
+	else
+		($ftl_cfg_gui_media_player "${ftl_selection_current[@]}" &>/dev/null &)
+	fi
+	ftl_view_media_pid=$!
 }
 
 ext_pdf()
 {
-    if ((ftl_state_external_viewer_mode == 1)) ; then
-        ((ftl_state_pdf_preview_as_image)) && ftl::util::run_maximized mupdf "$ftl_state_current_path" || ext_pdf_vi
-    elif ((ftl_state_external_viewer_mode == 3)) ; then
-        ftl::util::run_maximized mupdf "$ftl_state_current_path"
-    else
-        mupdf "$ftl_state_current_path" 2>/dev/null &
-    fi
+	if ((ftl_state_external_viewer_mode == 1)) ; then
+		((ftl_state_pdf_preview_as_image)) && ftl::util::run_maximized mupdf "$ftl_state_current_path" || ext_pdf_vi
+	elif ((ftl_state_external_viewer_mode == 3)) ; then
+		ftl::util::run_maximized mupdf "$ftl_state_current_path"
+	else
+		mupdf "$ftl_state_current_path" 2>/dev/null &
+	fi
 }
 
 ext_epub()  { ((ftl_state_external_viewer_mode == 1)) && { ftl::util::run_maximized okular "$ftl_state_current_path" ; } ; }
@@ -157,20 +157,20 @@ ext_pdf_vi(){ edit "$("$ftl_gen_dir/pdf" "$ftl_state_current_path" "$ftl_cache_t
 
 ext_text()
 {
-    ftl::prev::clear
-    ftl::pane::split "$ftl_cfg_editor ${ftl_selection_current[@]@Q}" "33%" '-h -b' -R
-    ftl_pane_preview_id=
+	ftl::prev::clear
+	ftl::pane::split "$ftl_cfg_editor ${ftl_selection_current[@]@Q}" "33%" '-h -b' -R
+	ftl_pane_preview_id=
 }
 
 ext_json()  { ftl::prev::clear ; $ftl_cfg_json_viewer "$ftl_state_current_path" ; }
 
 ext_scim()
 {
-    ftl::prev::clear
-    exec 2>&9
-    scim "${ftl_state_current_path@Q}"
-    exec 2>"$ftl_state_session_dir/log"
-    ftl::util::enter_alt_screen
+	ftl::prev::clear
+	exec 2>&9
+	scim "${ftl_state_current_path@Q}"
+	exec 2>"$ftl_state_session_dir/log"
+	ftl::util::enter_alt_screen
 }
 
 ftl_view_preview_ignore_exts()   { ftl_preview_is_dir_ftl= ; ftl_preview_is_vim= ; ptype ; }
@@ -178,53 +178,53 @@ plock()     { ftl::prev::show_in_vim "$ftl_state_session_dir/lock_preview/$ftl_s
 
 ptype()
 {
-    ftl::ftl::list::render::get_mime_type
-    ftl::pane::split_for_preview "echo ${ftl_state_current_basename@Q} | lscolors ; \
-        echo 'mime type: $ftl_state_current_mime_type' ; \
-        echo -n 'file type: '; file -b ${ftl_state_current_path@Q} ; \
-        stat -c %s ${ftl_state_current_path@Q} | numfmt --to=iec ; read -sn 100"
+	ftl::list::get_mime_type
+	ftl::pane::split_for_preview "echo ${ftl_state_current_basename@Q} | lscolors ; \
+		echo 'mime type: $ftl_state_current_mime_type' ; \
+		echo -n 'file type: '; file -b ${ftl_state_current_path@Q} ; \
+		stat -c %s ${ftl_state_current_path@Q} | numfmt --to=iec ; read -sn 100"
 }
 
 pcbr()
 {
-    local t
-    t="$("$ftl_gen_dir/cbr" "$ftl_state_current_path" "$ftl_cache_thumb_dir/cbr" '' ONE)"
-    ftl::log::debug "ftl::prev::dispatch file: $t"
-    [[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ptype
+	local t
+	t="$("$ftl_gen_dir/cbr" "$ftl_state_current_path" "$ftl_cache_thumb_dir/cbr" '' ONE)"
+	ftl::log::debug "ftl::prev::dispatch file: $t"
+	[[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ptype
 }
 
 pcbz()
 {
-    local t
-    t="$("$ftl_gen_dir/cbz" "$ftl_state_current_path" "$ftl_cache_thumb_dir/cbz" '' ONE)"
-    [[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ptype
+	local t
+	t="$("$ftl_gen_dir/cbz" "$ftl_state_current_path" "$ftl_cache_thumb_dir/cbz" '' ONE)"
+	[[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ptype
 }
 
 pdir()
 {
-    local pdirv
-    pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image)
-    (( ftl_state_alt_preview_mode != 0 )) && { [[ "${pdirv[$ftl_state_alt_preview_mode]}" ]] && ${pdirv[$ftl_state_alt_preview_mode]} ; } || pdir_def
+	local pdirv
+	pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image)
+	(( ftl_state_alt_preview_mode != 0 )) && { [[ "${pdirv[$ftl_state_alt_preview_mode]}" ]] && ${pdirv[$ftl_state_alt_preview_mode]} ; } || pdir_def
 }
 
 pdir_def()
 {
-    local pdirv
-    pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image)
-    echo "${ftl_state_other_session_dir:-$ftl_state_session_dir}" >"$ftl_state_shared_dir/fs"
-    [[ "${pdirv[$ftl_state_dir_preview_mode]}" ]] && ${pdirv[$ftl_state_dir_preview_mode]} || pdir_ftl
+	local pdirv
+	pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image)
+	echo "${ftl_state_other_session_dir:-$ftl_state_session_dir}" >"$ftl_state_shared_dir/fs"
+	[[ "${pdirv[$ftl_state_dir_preview_mode]}" ]] && ${pdirv[$ftl_state_dir_preview_mode]} || pdir_ftl
 }
 
 pdir_ftl()
 {
-    if ((ftl_preview_is_dir_ftl)) && [[ $ftl_pane_preview_id ]] ; then
-        tmux send -t "$ftl_pane_preview_id" 'r'
-    else
-        tmux selectp -t "$ftl_pane_self_id"
-        ftl::pane::split_for_preview "ftl ${ftl_state_current_path@Q} $ftl_state_parent_dir 1"
-        ftl_preview_is_dir_ftl=1
-    fi
-    true
+	if ((ftl_preview_is_dir_ftl)) && [[ $ftl_pane_preview_id ]] ; then
+		tmux send -t "$ftl_pane_preview_id" 'r'
+	else
+		tmux selectp -t "$ftl_pane_self_id"
+		ftl::pane::split_for_preview "ftl ${ftl_state_current_path@Q} $ftl_state_parent_dir 1"
+		ftl_preview_is_dir_ftl=1
+	fi
+	true
 }
 
 pdir_du()   { ftl::pane::split_for_preview "$ftl_cfg_disk_usage_tool \"$ftl_state_current_path\" ; read -sn 1000" ; true ; }
@@ -234,16 +234,16 @@ pdir_exa()  { ftl::pane::split_for_preview "ftl_cfg_exa_colors='$ftl_cfg_exa_col
 
 pdir_image()
 {
-    local m
-    ftl_preview_is_dir_ftl=
-    m="$ftl_state_dir/ftl_state_montage_glyph/$ftl_state_current_path/ftl_state_montage_glyph.jpg"
-    [[ -e "$m" ]] || {
-        _ftl::ftl::list::render::print_header '' "$ftl_cfg_msg_montage"
-        "$ftl_gen_dir/ftl_state_montage_glyph" "$ftl_state_dir" "$ftl_state_current_path"
-        _ftl::ftl::list::render::print_header '' "$ftl_list_header_mode_glyphs"
-    }
-    ftl::prev::show_image "$m"
-    true
+	local m
+	ftl_preview_is_dir_ftl=
+	m="$ftl_state_dir/ftl_state_montage_glyph/$ftl_state_current_path/ftl_state_montage_glyph.jpg"
+	[[ -e "$m" ]] || {
+		__ftl::list::print_header '' "$ftl_cfg_msg_montage"
+		"$ftl_gen_dir/ftl_state_montage_glyph" "$ftl_state_dir" "$ftl_state_current_path"
+		__ftl::list::print_header '' "$ftl_list_header_mode_glyphs"
+	}
+	ftl::prev::show_image "$m"
+	true
 }
 
 
@@ -252,12 +252,12 @@ ppipe()     { ftl::pane::split_for_preview "echo \"fifo (named pipe)\"; read -sn
 phtml()     { ftl::prev::show_in_vim "$("$ftl_gen_dir/html" "$ftl_state_current_path" "$ftl_cache_thumb_dir/html")" ; }
 pimage()
 {
-    if ((ftl_state_alt_preview_mode)) ; then
-        ftl::pane::split_for_preview "exiftool ${ftl_state_current_path@Q} | piper '^.*?:' blue | $ftl_cfg_markdown_pager ; read -sn1"
-        ftl::pane::snapshot_geometry
-    else
-        ftl::prev::show_image "$ftl_state_current_path"
-    fi
+	if ((ftl_state_alt_preview_mode)) ; then
+		ftl::pane::split_for_preview "exiftool ${ftl_state_current_path@Q} | piper '^.*?:' blue | $ftl_cfg_markdown_pager ; read -sn1"
+		ftl::pane::snapshot_geometry
+	else
+		ftl::prev::show_image "$ftl_state_current_path"
+	fi
 }
 
 psvg()      { ftl::prev::show_image "$("$ftl_gen_dir/svg" "$ftl_state_current_path" "$ftl_cache_thumb_dir/svg")" ; }
@@ -265,37 +265,37 @@ pgif()      { ftl::prev::show_image "$("$ftl_gen_dir/gif" "$ftl_state_current_pa
 
 pmp3()
 {
-    local t
-    pmlive || {
-        t="$("$ftl_gen_dir/$ftl_state_current_extension" "$ftl_state_current_path" "$ftl_cache_thumb_dir/$ftl_state_current_extension")"
-        ftl::pane::split_for_preview "$ftl_cfg_ansi_pager ${t@Q} ; read -sn1"
-    }
+	local t
+	pmlive || {
+		t="$("$ftl_gen_dir/$ftl_state_current_extension" "$ftl_state_current_path" "$ftl_cache_thumb_dir/$ftl_state_current_extension")"
+		ftl::pane::split_for_preview "$ftl_cfg_ansi_pager ${t@Q} ; read -sn1"
+	}
 }
 
 pmedia()
 {
-    local t
-    pmlive || {
-        t="$("$ftl_gen_dir/$ftl_state_current_extension" "$ftl_state_current_path" "$ftl_cache_thumb_dir/$ftl_state_current_extension" '' ONE)"
-        [[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ptype
-    }
+	local t
+	pmlive || {
+		t="$("$ftl_gen_dir/$ftl_state_current_extension" "$ftl_state_current_path" "$ftl_cache_thumb_dir/$ftl_state_current_extension" '' ONE)"
+		[[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ptype
+	}
 }
 
 pmlive()
 {
-    local t
-    ((ftl_state_alt_preview_mode)) && {
-        ftl::cmd::kill_media_player
-        t="$("$ftl_gen_dir/$ftl_state_current_extension" "$ftl_state_current_path" "$ftl_cache_thumb_dir/$ftl_state_current_extension")"
-        ftl::pane::split_for_preview "cat ${t@Q} ; $ftl_cfg_live_preview_player ${ftl_state_current_path@Q}"
-        true
-    }
+	local t
+	((ftl_state_alt_preview_mode)) && {
+		ftl::cmd::kill_media_player
+		t="$("$ftl_gen_dir/$ftl_state_current_extension" "$ftl_state_current_path" "$ftl_cache_thumb_dir/$ftl_state_current_extension")"
+		ftl::pane::split_for_preview "cat ${t@Q} ; $ftl_cfg_live_preview_player ${ftl_state_current_path@Q}"
+		true
+	}
 }
 
 pmd()       { pmd_1 || pmd_2 || pmd_3 || pmd_def ; ftl_state_alt_preview_mode=0 ; }
 pmd_1()     { ((ftl_state_alt_preview_mode==1)) && { ftl::pane::split_for_preview "$ftl_cfg_markdown_renderer_1 \"$ftl_state_current_basename\" | $ftl_cfg_markdown_pager" ; true ; } ; }
 pmd_2()     { ((ftl_state_alt_preview_mode==2)) && { ftl::pane::split_for_preview "$ftl_cfg_markdown_renderer_2 \"$ftl_state_current_basename\" | $ftl_cfg_markdown_pager" ; true ; } ; }
-pmd_3()     { ((ftl_state_alt_preview_mode==3)) && { ftl::prev::clear ; <<<"Y" mo --clear >/dev/null 2>&1 ; mo_vimb --no-open "$ftl_state_current_basename" &>/dev/null ; ftl_state_alt_preview_mode=0 ; ftl::ftl::list::render::render ; true ; } ; }
+pmd_3()     { ((ftl_state_alt_preview_mode==3)) && { ftl::prev::clear ; <<<"Y" mo --clear >/dev/null 2>&1 ; mo_vimb --no-open "$ftl_state_current_basename" &>/dev/null ; ftl_state_alt_preview_mode=0 ; ftl::list::render ; true ; } ; }
 pmd_def()   { $ftl_cfg_markdown_renderer_default \"$ftl_state_current_basename\" ; }
 
 pmdd()      { local md="${1:-$ftl_state_current_path}" ; ftl::pane::split_for_preview "$ftl_cfg_markdown_dir_renderer \"$md\" " ;  }
@@ -304,13 +304,13 @@ ptext()     { ftl::prev::show_in_vim "$ftl_state_current_path" ; }
 
 pansi()
 {
-    if ((!ftl_state_alt_preview_mode)) ; then
-        ftl::pane::split_for_preview "$PAGER \"$ftl_state_current_path\""
-    elif ((ftl_state_alt_preview_mode==1)) ; then
-        ftl::pane::split_for_preview "$ftl_cfg_editor -R ${ftl_state_current_path@Q} -c AnsiEsc -c 'set nospell'"
-    else
-        ftl::pane::split_for_preview "ansi_show ${ftl_state_current_path@Q} | $PAGER "
-    fi
+	if ((!ftl_state_alt_preview_mode)) ; then
+		ftl::pane::split_for_preview "$PAGER \"$ftl_state_current_path\""
+	elif ((ftl_state_alt_preview_mode==1)) ; then
+		ftl::pane::split_for_preview "$ftl_cfg_editor -R ${ftl_state_current_path@Q} -c AnsiEsc -c 'set nospell'"
+	else
+		ftl::pane::split_for_preview "ansi_show ${ftl_state_current_path@Q} | $PAGER "
+	fi
 }
 
 pjson()     { ftl::pane::split_for_preview "$ftl_cfg_json_viewer \"$ftl_state_current_path\" ; read -sn100" ; }
@@ -318,38 +318,38 @@ pyaml()     { ftl::pane::split_for_preview "$ftl_cfg_yaml_viewer \"$ftl_state_cu
 
 ppdf()
 {
-    if (( ftl_state_alt_preview_mode==2 || ftl_state_pdf_preview_as_image )) ; then
-        ppdfpng
-    else
-        ftl::prev::show_in_vim "$("$ftl_gen_dir/pdf" "$ftl_state_current_path" "$ftl_cache_thumb_dir/pdf" "$ftl_state_alt_preview_mode")"
-    fi
+	if (( ftl_state_alt_preview_mode==2 || ftl_state_pdf_preview_as_image )) ; then
+		ppdfpng
+	else
+		ftl::prev::show_in_vim "$("$ftl_gen_dir/pdf" "$ftl_state_current_path" "$ftl_cache_thumb_dir/pdf" "$ftl_state_alt_preview_mode")"
+	fi
 }
 
 ppdfpng()
 {
-    local t
-    t="$ftl_cache_thumb_dir/$ftl_state_current_extension/et_$(head -c50000 "$ftl_state_current_path" | md5sum | cut -f1 -d' ').png"
-    [[ -f "$t" ]] || { mutool draw -o "$t" "$ftl_state_current_path" 1 2>/dev/null ; }
-    ftl::prev::show_image "$t"
-    true
+	local t
+	t="$ftl_cache_thumb_dir/$ftl_state_current_extension/et_$(head -c50000 "$ftl_state_current_path" | md5sum | cut -f1 -d' ').png"
+	[[ -f "$t" ]] || { mutool draw -o "$t" "$ftl_state_current_path" 1 2>/dev/null ; }
+	ftl::prev::show_image "$t"
+	true
 }
 
 pepub()
 {
-    if (( ftl_state_alt_preview_mode==2 || ftl_state_pdf_preview_as_image )) ; then
-        pepubpng
-    else
-        ftl::prev::show_in_vim "$("$ftl_gen_dir/epub" "$ftl_state_current_path" "$ftl_cache_thumb_dir/epub" "$ftl_state_alt_preview_mode")"
-    fi
+	if (( ftl_state_alt_preview_mode==2 || ftl_state_pdf_preview_as_image )) ; then
+		pepubpng
+	else
+		ftl::prev::show_in_vim "$("$ftl_gen_dir/epub" "$ftl_state_current_path" "$ftl_cache_thumb_dir/epub" "$ftl_state_alt_preview_mode")"
+	fi
 }
 
 pepubpng()
 {
-    local t
-    t="$ftl_cache_thumb_dir/$ftl_state_current_extension/et_$(head -c50000 "$ftl_state_current_path" | md5sum | cut -f1 -d' ').png"
-    [[ -f "$t" ]] || { mutool draw -o "$t" "$ftl_state_current_path" 1 2>/dev/null ; }
-    ftl::prev::show_image "$t"
-    true
+	local t
+	t="$ftl_cache_thumb_dir/$ftl_state_current_extension/et_$(head -c50000 "$ftl_state_current_path" | md5sum | cut -f1 -d' ').png"
+	[[ -f "$t" ]] || { mutool draw -o "$t" "$ftl_state_current_path" 1 2>/dev/null ; }
+	ftl::prev::show_image "$t"
+	true
 }
 
 pman()      { ftl::pane::split_for_preview "man \"$ftl_state_current_path\" ; read -sn 1000" ; true ; }
@@ -361,34 +361,34 @@ pstl()      { ftl::prev::show_image "$("$ftl_gen_dir/stl" "$ftl_state_current_pa
 
 pcomp()
 {
-    if [[ $ftl_state_current_extension == zip         ]] ; then
-        _pcomp unzip -l
-    elif [[ $ftl_state_current_extension == rar         ]] ; then
-        _pcomp unrar ftl::list::render
-    elif [[ $ftl_state_current_basename =~ \.tar$      ]] ; then
-        _pcomp tar --ftl::list::render         --verbose -f
-    elif [[ $ftl_state_current_basename =~ \.tar\.gz$  ]] ; then
-        _pcomp tar --gzip  --ftl::list::render --verbose -f
-    elif [[ $ftl_state_current_basename =~ \.tar\.bz2$ ]] ; then
-        _pcomp tar --bzip2 --ftl::list::render --verbose -f
-    fi
+	if [[ $ftl_state_current_extension == zip         ]] ; then
+		_pcomp unzip -l
+	elif [[ $ftl_state_current_extension == rar         ]] ; then
+		_pcomp unrar ftl::list::render
+	elif [[ $ftl_state_current_basename =~ \.tar$      ]] ; then
+		_pcomp tar --ftl::list::render         --verbose -f
+	elif [[ $ftl_state_current_basename =~ \.tar\.gz$  ]] ; then
+		_pcomp tar --gzip  --ftl::list::render --verbose -f
+	elif [[ $ftl_state_current_basename =~ \.tar\.bz2$ ]] ; then
+		_pcomp tar --bzip2 --ftl::list::render --verbose -f
+	fi
 }
 
 _pcomp()
 {
-    local fp
-    ((ftl_state_alt_preview_mode)) && {
-        fp="$ftl_state_session_dir/$ftl_state_current_basename.txt"
-        [[ -e "$fp" ]] || timeout 1 "$@" "$ftl_state_current_basename" >"$fp"
-        ftl::prev::show_in_vim "$fp"
-    }
+	local fp
+	((ftl_state_alt_preview_mode)) && {
+		fp="$ftl_state_session_dir/$ftl_state_current_basename.txt"
+		[[ -e "$fp" ]] || timeout 1 "$@" "$ftl_state_current_basename" >"$fp"
+		ftl::prev::show_in_vim "$fp"
+	}
 }
 
 # needed when used as an fzf viewer from ftl
 ((!FTLRC_LOADED)) && {
-    : ${FTL_CFG:=$HOME/.config/ftl}
-    source "$FTL_CFG/etc/core/ftl_setup"
-    [[ "$1" ]] && pfzf "$1"
+	: ${FTL_CFG:=$HOME/.config/ftl}
+	source "$FTL_CFG/etc/core/ftl_setup"
+	[[ "$1" ]] && ftl::plugin::fzf_pane_preview::pfzf "$1"
 }
 
 # vim: set filetype=bash :

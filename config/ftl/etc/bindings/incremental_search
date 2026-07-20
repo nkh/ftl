@@ -1,54 +1,54 @@
 
-incremental_search()
+ftl::plugin::incremental_search::incremental_search()
 {
-    ftl_kbd_submode_handler=incremental_find
-    goto_first_directory
-    ftl_state_search_string=
-    ftl_cfg_cursor_color_current="$ftl_cfg_cursor_color_search"
-    ftl::ftl::list::render::render
+	ftl_kbd_submode_handler=ftl::plugin::incremental_search::incremental_find
+	goto_first_directory
+	ftl_state_search_string=
+	ftl_cfg_cursor_color_current="$ftl_cfg_cursor_color_search"
+	ftl::list::render
 }
 
-incremental_find()
+ftl::plugin::incremental_search::incremental_find()
 {
-    case "$ftl_kbd_current_key" in
-        ERROR_142   ) : ;;
-        ESCAPE      )
-            ftl_cfg_cursor_color_current="$ftl_cfg_cursor_color_default"
-            ftl_state_search_string=
-            ftl::ftl::list::render::render
-            ftl_kbd_submode_handler=
-            ;;
-        RIGHT|ENTER )
-            [[ -d "$ftl_state_current_path" ]] && {
-                ftl_state_search_string=
-                ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD/$ftl_state_current_basename]=0
-                move_right
-            }
-            ;;
-        LEFT        )
-            ftl_state_search_string=
-            move_left
-            ;;
-        UP          ) move_up ;;
-        DOWN        ) move_down ;;
-        LEADER      )
-            ftl_state_search_string="$ftl_state_search_string "
-            find_next
-            ;;
-        BACKSPACE   )
-            [[ "$ftl_state_search_string" ]] && {
-                goto_first_directory
-                ftl_state_search_string="${ftl_state_search_string::-1}"
-                find_next
-            }
-            ;;
-        *           )
-            ftl_state_search_string="$ftl_state_search_string$ftl_kbd_current_key"
-            find_next
-            ;;
-    esac
+	case "$ftl_kbd_current_key" in
+		ERROR_142   ) : ;;
+		ESCAPE      )
+			ftl_cfg_cursor_color_current="$ftl_cfg_cursor_color_default"
+			ftl_state_search_string=
+			ftl::list::render
+			ftl_kbd_submode_handler=
+			;;
+		RIGHT|ENTER )
+			[[ -d "$ftl_state_current_path" ]] && {
+				ftl_state_search_string=
+				ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD/$ftl_state_current_basename]=0
+				move_right
+			}
+			;;
+		LEFT        )
+			ftl_state_search_string=
+			ftl::plugin::type_handlers::move_left
+			;;
+		UP          ) move_up ;;
+		DOWN        ) move_down ;;
+		LEADER      )
+			ftl_state_search_string="$ftl_state_search_string "
+			find_next
+			;;
+		BACKSPACE   )
+			[[ "$ftl_state_search_string" ]] && {
+				goto_first_directory
+				ftl_state_search_string="${ftl_state_search_string::-1}"
+				find_next
+			}
+			;;
+		*           )
+			ftl_state_search_string="$ftl_state_search_string$ftl_kbd_current_key"
+			find_next
+			;;
+	esac
 }
 
-ftl::kbd::ftl::kbd::bind ftl        find    "/"     incremental_search      "start incremental search, press 'escape' to end"
+ftl::kbd::ftl::kbd::bind ftl        find    "/"     ftl::plugin::incremental_search::incremental_search      "start incremental search, press 'escape' to end"
 
 # vim: set filetype=bash :

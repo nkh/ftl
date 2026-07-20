@@ -3,54 +3,54 @@ reset=$'\e[0m'
 
 etag_dir()
 {
-    declare -g -A git_tags=()
-    is_git=0
+	declare -g -A git_tags=()
+	is_git=0
 
-    ((ftl_state_etag_enabled)) && git rev-parse HEAD &>/dev/null && {
-        readarray -t lines < <(unbuffer git status -s * 2>/dev/null)
-        is_git=1
+	((ftl_state_etag_enabled)) && git rev-parse HEAD &>/dev/null && {
+		readarray -t lines < <(unbuffer git status -s * 2>/dev/null)
+		is_git=1
 
-        for line in "${lines[@]}" ; do
-            git_status=
+		for line in "${lines[@]}" ; do
+			git_status=
 
-            if [[ $line == " "* ]] ; then
-                # Plain space cell
-                git_status+=" "
-                line=${line:1}
-            elif [[ $line == $'\e['* ]] ; then
-                # ANSI-colored character cell
-                tmp=${line#*$'m'}      # remove opening CSI sequence
-                ch=${tmp:0:1}          # the visible character
-                tmp=${tmp:1}
-                end=${tmp%%m*}         # until the terminating 'm'
-                len=$(( ${#line} - ${#tmp} + ${#end} + 1 ))
-                git_status+=${line:0:len}
-                line=${line:len}
-            fi
+			if [[ $line == " "* ]] ; then
+				# Plain space cell
+				git_status+=" "
+				line=${line:1}
+			elif [[ $line == $'\e['* ]] ; then
+				# ANSI-colored character cell
+				tmp=${line#*$'m'}      # remove opening CSI sequence
+				ch=${tmp:0:1}          # the visible character
+				tmp=${tmp:1}
+				end=${tmp%%m*}         # until the terminating 'm'
+				len=$(( ${#line} - ${#tmp} + ${#end} + 1 ))
+				git_status+=${line:0:len}
+				line=${line:len}
+			fi
 
-            file=${line# }
-            file=${file#\"}
-            file=${file%\"}
+			file=${line# }
+			file=${file#\"}
+			file=${file%\"}
 
-            case $file in
-                # directory
-                */*) file="${file%%/*}" ; git_status="$yellow**$reset" ;;
-            esac
+			case $file in
+				# directory
+				*/*) file="${file%%/*}" ; git_status="$yellow**$reset" ;;
+			esac
 
-            git_tags[$file]="${git_status} "
-        done
-    }
+			git_tags[$file]="${git_status} "
+		done
+	}
 }
 
 etag_tag()
 {
-    local -n r2=$2 r3=$3
-    r2=
-    r3=0
-    (( is_git && ftl_state_etag_enabled )) && {
-        r2="${git_tags[$1]:-   }"
-        r3=3
-    }
+	local -n r2=$2 r3=$3
+	r2=
+	r3=0
+	(( is_git && ftl_state_etag_enabled )) && {
+		r2="${git_tags[$1]:-   }"
+		r3=3
+	}
 }
 
 # vim: set filetype=sh :

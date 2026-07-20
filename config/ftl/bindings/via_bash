@@ -1,55 +1,55 @@
-bash_select()
+ftl::plugin::via_bash::bash_select()
 {
-    local tmp_ftl_files
+	local tmp_ftl_files
 
-    ftl::prev::clear
+	ftl::prev::clear
 
-    # inotify send refresh message (via stdin) we don't want to see in
-    # the pane when running bash
-    ftl::pane::stop_file_watcher
-    tmp_ftl_files="$(mktemp ftl_to_select_XXXXXXX)"
-    : >"$tmp_ftl_file"
+	# inotify send refresh message (via stdin) we don't want to see in
+	# the pane when running bash
+	ftl::pane::stop_file_watcher
+	tmp_ftl_files="$(mktemp ftl_to_select_XXXXXXX)"
+	: >"$tmp_ftl_file"
 
-    ftl::cmd::run_interactive_bash
+	ftl::cmd::run_interactive_bash
 
-    [[ -s "${tmp_ftl_files}" ]] && load_sel "${tmp_ftl_files}"
+	[[ -s "${tmp_ftl_files}" ]] && load_sel "${tmp_ftl_files}"
 
-    rm -f "${tmp_ftl_files}"
+	rm -f "${tmp_ftl_files}"
 
-    ftl::ftl::list::render::change_dir
+	ftl::list::change_dir
 }
 
-up_select()
+ftl::plugin::via_bash::up_select()
 {
-    rm -f "$ftl_state_session_dir/load_sel"
+	rm -f "$ftl_state_session_dir/load_sel"
 
-    tmux popup -E -h 95% -w 70% -d "$PWD" \
-        "TERM=xterm ; { fd -d1 -td -I ; fd -d1 -tf -I ; } | up -o $ftl_state_session_dir/ups && \
-         { chmod a+x $ftl_state_session_dir/ups ; find -type f | $ftl_state_session_dir/ups | xargs realpath >$ftl_state_session_dir/load_sel ; }"
+	tmux popup -E -h 95% -w 70% -d "$PWD" \
+		"TERM=xterm ; { fd -d1 -td -I ; fd -d1 -tf -I ; } | up -o $ftl_state_session_dir/ups && \
+		 { chmod a+x $ftl_state_session_dir/ups ; find -type f | $ftl_state_session_dir/ups | xargs realpath >$ftl_state_session_dir/load_sel ; }"
 
-    [[ -s "$ftl_state_session_dir/load_sel" ]] && load_sel
-    ftl::ftl::list::render::change_dir
+	[[ -s "$ftl_state_session_dir/load_sel" ]] && load_sel
+	ftl::list::change_dir
 }
 
 # filter are best as external filter to allow synch with ftl::prev::dispatch
 # and we can chose them via fzf
-bash_filter_keep()
+ftl::plugin::via_bash::bash_filter_keep()
 {
-    ftl_filt_external_name="by_bash_keep"
-    source "$FTL_CFG/filters/$ftl_filt_external_name" || ftl_filt_external_name=
-    ftl::ftl::list::render::change_dir
+	ftl_filt_external_name="by_bash_keep"
+	source "$FTL_CFG/filters/$ftl_filt_external_name" || ftl_filt_external_name=
+	ftl::list::change_dir
 }
 
-bash_filter_hide()
+ftl::plugin::via_bash::bash_filter_hide()
 {
-    ftl_filt_external_name="by_bash_hide"
-    source "$FTL_CFG/filters/$ftl_filt_external_name" || ftl_filt_external_name=
-    ftl::ftl::list::render::change_dir
+	ftl_filt_external_name="by_bash_hide"
+	source "$FTL_CFG/filters/$ftl_filt_external_name" || ftl_filt_external_name=
+	ftl::list::change_dir
 }
 
-ftl::kbd::ftl::kbd::bind ftl file   yx      bash_select             "select files via bash"
-ftl::kbd::ftl::kbd::bind ftl file   yX      up_select               "select file via the ultimate plumber"
-ftl::kbd::ftl::kbd::bind ftl file   fx      bash_filter_keep        "select files to keep via bash"
-ftl::kbd::ftl::kbd::bind ftl file   fX      bash_filter_hide        "select files to hide via bash"
+ftl::kbd::ftl::kbd::bind ftl file   yx      ftl::plugin::via_bash::bash_select             "select files via bash"
+ftl::kbd::ftl::kbd::bind ftl file   yX      ftl::plugin::via_bash::up_select               "select file via the ultimate plumber"
+ftl::kbd::ftl::kbd::bind ftl file   fx      ftl::plugin::via_bash::bash_filter_keep        "select files to keep via bash"
+ftl::kbd::ftl::kbd::bind ftl file   fX      ftl::plugin::via_bash::bash_filter_hide        "select files to hide via bash"
 
 # vim: set filetype=bash :

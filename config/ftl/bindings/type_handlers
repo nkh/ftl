@@ -1,78 +1,78 @@
 
-move_left()
+ftl::plugin::type_handlers::move_left()
 {
-    local nd
+	local nd
 
-    if [[ "$PWD" =~ _#$ ]] ; then
-        exit_archive
-    else
-        [[ "$PWD" != / ]] && nd="${PWD%/*}" && ftl::ftl::list::render::change_dir "${nd:-/}" "$(basename "$ftl_state_current_dir")"
-    fi
+	if [[ "$PWD" =~ _#$ ]] ; then
+		ftl::plugin::type_handlers::exit_archive
+	else
+		[[ "$PWD" != / ]] && nd="${PWD%/*}" && ftl::list::change_dir "${nd:-/}" "$(basename "$ftl_state_current_dir")"
+	fi
 }
 
-# move_right() { enter ; } # default move right only changes directory, uncomment to open files
+# move_right() { ftl::plugin::type_handlers::enter ; } # default move right only changes directory, uncomment to open files
 
-enter()
+ftl::plugin::type_handlers::enter()
 {
-    ((ftl_list_entry_count)) || return
+	((ftl_list_entry_count)) || return
 
-    if [[ -d "${ftl_list_entries[ftl_state_cursor_index]}" ]] ; then
-        ftl::ftl::list::render::change_dir "${ftl_list_entries[ftl_state_cursor_index]}"
-    else
-        # mount archives
-        [[ $ftl_cfg_mount_archives && $ftl_state_current_extension =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && {
-            ftl_cfg_mount_archives "$ftl_state_current_path"
-            return
-        }
+	if [[ -d "${ftl_list_entries[ftl_state_cursor_index]}" ]] ; then
+		ftl::list::change_dir "${ftl_list_entries[ftl_state_cursor_index]}"
+	else
+		# mount archives
+		[[ $ftl_cfg_mount_archives && $ftl_state_current_extension =~ ^7z|bz2|cab|gz|iso|rar|tar|tar.bz2|tar.gz|zip$ ]] && {
+			ftl_cfg_mount_archives "$ftl_state_current_path"
+			return
+		}
 
-        #  type handlers below
-        [[ $ftl_state_current_extension = asciio ]] && {
-            ftl::util::run_maximized asciio "$ftl_state_current_path"
-            ftl::ftl::list::render::change_dir
-            return
-        }
+		#  type handlers below
+		[[ $ftl_state_current_extension = asciio ]] && {
+			ftl::util::run_maximized asciio "$ftl_state_current_path"
+			ftl::list::change_dir
+			return
+		}
 
-        # edit text files with vi
-        ftl::ftl::list::render::get_mime_type
-        ftl::util::is_binary_file "$ftl_state_current_path"
+		# edit text files with vi
+		ftl::list::get_mime_type
+		ftl::util::is_binary_file "$ftl_state_current_path"
 
-        [[ $ftl_state_current_is_binary == 0 && "$ftl_state_current_file_description" =~ ^Unicode || \
-           $ftl_state_current_mime_type =~ ^text || \
-           $ftl_state_current_mime_type == application/x-zerosize || \
-           $ftl_state_current_mime_type == 'application/x-shellscript' || \
-           $ftl_state_current_mime_type == application/x-perl ]] && edit
-    fi
+		[[ $ftl_state_current_is_binary == 0 && "$ftl_state_current_file_description" =~ ^Unicode || \
+		   $ftl_state_current_mime_type =~ ^text || \
+		   $ftl_state_current_mime_type == application/x-zerosize || \
+		   $ftl_state_current_mime_type == 'application/x-shellscript' || \
+		   $ftl_state_current_mime_type == application/x-perl ]] && edit
+	fi
 }
 
-ftl_event_quit()
+ftl::plugin::type_handlers::ftl_event_quit()
 {
-    [[ "$tmsu_mp" ]] && {
-        unmount_archives
-        umount "$tmsu_mp"
-        rm -rf "$tmsu_mp"
-    }
+	[[ "$tmsu_mp" ]] && {
+		ftl::plugin::type_handlers::unmount_archives
+		umount "$tmsu_mp"
+		rm -rf "$tmsu_mp"
+	}
 }
 
 ftl_cfg_mount_archives()
 {
-    local mpt
-    mpt="$ftl_state_session_dir/mnt/${1}_#"
-    { [[ -e "$mpt" ]] || { mkdir -p "$mpt" && fuse-archive -o allow_other "$1" "$mpt" && ftl_mount_points+=("$mpt") ; } } && \
-        ftl::ftl::list::render::change_dir "$mpt"
+	local mpt
+	mpt="$ftl_state_session_dir/mnt/${1}_#"
+	{ [[ -e "$mpt" ]] || { mkdir -p "$mpt" && fuse-archive -o allow_other "$1" "$mpt" && ftl_mount_points+=("$mpt") ; } } && \
+		ftl::list::change_dir "$mpt"
 }
 
-unmount_archives()
+ftl::plugin::type_handlers::unmount_archives()
 {
-    local mpt
-    for mpt in "${ftl_mount_points[@]}" ; do fusermount -uz "$mpt" ; done
+	local mpt
+	for mpt in "${ftl_mount_points[@]}" ; do fusermount -uz "$mpt" ; done
 }
 
-exit_archive()
+ftl::plugin::type_handlers::exit_archive()
 {
-    local nd
-    nd="${PWD#$ftl_state_session_dir/mnt}"
-    nd=${nd%_mnt_root}
-    ftl::ftl::list::render::change_dir "$(dirname "$nd")"
+	local nd
+	nd="${PWD#$ftl_state_session_dir/mnt}"
+	nd=${nd%_mnt_root}
+	ftl::list::change_dir "$(dirname "$nd")"
 }
 
 # vim: set filetype=bash :

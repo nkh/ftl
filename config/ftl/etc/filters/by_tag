@@ -2,47 +2,47 @@ declare -g -A keep=() PWDS=()
 
 [[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
 {
-    [[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag" ]] && source "$ftl_state_parent_dir/by_tag" ||
-    {
-        exec 2>&9
+	[[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag" ]] && source "$ftl_state_parent_dir/by_tag" ||
+	{
+		exec 2>&9
 
-        readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | fzf-tmux $ftl_cfg_fzf_popup_opts -0 -1 -m -p 30% -h 80%)
-        declare -A tags
-        for tag in "${all_tags[@]}" ; do tags[$tag]=1 ; done
+		readarray -t all_tags < <(tmsu tags -1 --name=never $PWD/* | sort -u | sed -e '/^$/d' | fzf-tmux $ftl_cfg_fzf_popup_opts -0 -1 -m -p 30% -h 80%)
+		declare -A tags
+		for tag in "${all_tags[@]}" ; do tags[$tag]=1 ; done
 
-        readarray -t files_and_tags < <(shopt -s dotglob ; tmsu tags * 2>&-)
-        for file_and_tag in "${files_and_tags[@]}" ; do
-            file_tag_array=($file_and_tag)
-            file="${file_tag_array%%:}"
+		readarray -t files_and_tags < <(shopt -s dotglob ; tmsu tags * 2>&-)
+		for file_and_tag in "${files_and_tags[@]}" ; do
+			file_tag_array=($file_and_tag)
+			file="${file_tag_array%%:}"
 
-            [[ -d "$file" ]] && keep["$ftl_state_current_tab_index-$PWD/$file"]=1 && PWDS[$ftl_state_current_tab_index-$PWD]=1 && continue
+			[[ -d "$file" ]] && keep["$ftl_state_current_tab_index-$PWD/$file"]=1 && PWDS[$ftl_state_current_tab_index-$PWD]=1 && continue
 
-            for file_tag in "${file_tag_array[@]:1}" ; do
-                [[ $file_tag =~ ^([^=]+)=+(.+) ]] && file_tag="${BASH_REMATCH[1]}"
+			for file_tag in "${file_tag_array[@]:1}" ; do
+				[[ $file_tag =~ ^([^=]+)=+(.+) ]] && file_tag="${BASH_REMATCH[1]}"
 
-                [[ -n "${tags[$file_tag]}" ]] && keep["$ftl_state_current_tab_index-$PWD/$file"]=1 && PWDS[$ftl_state_current_tab_index-$PWD]=1
-            done
-        done
+				[[ -n "${tags[$file_tag]}" ]] && keep["$ftl_state_current_tab_index-$PWD/$file"]=1 && PWDS[$ftl_state_current_tab_index-$PWD]=1
+			done
+		done
 
-        exec 2>"$ftl_state_session_dir/log"
-        ftl::util::enter_alt_screen
+		exec 2>"$ftl_state_session_dir/log"
+		ftl::util::enter_alt_screen
 
-        declare -p keep PWDS >"$ftl_state_parent_dir/by_tag"
-    }
+		declare -p keep PWDS >"$ftl_state_parent_dir/by_tag"
+	}
 }
 
 ftl::plugin::by_tag::filter()
 {
-    local file_data fn
+	local file_data fn
 
-    ftl_filt_active_glyph="~"
+	ftl_filt_active_glyph="~"
 
-    [[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
-        while read -r file_data ; do
-            fn="${file_data#$'*\t'*$'\t'}"
-            [[ ${keep["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] && echo "$file_data"
-        done
-    } || cat
+	[[ ${PWDS["$ftl_state_current_tab_index-$PWD"]} == 1 ]] && {
+		while read -r file_data ; do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ ${keep["$ftl_state_current_tab_index-$PWD/$fn"]} == 1 ]] && echo "$file_data"
+		done
+	} || cat
 }
 
 # Override the placeholder so the listing pipeline dispatches to this plugin.

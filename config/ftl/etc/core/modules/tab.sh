@@ -32,58 +32,58 @@
 
 # Set up default state for the current tab.
 ftl::tab::init_defaults() {
-    local t=$ftl_state_current_tab_index
-    ftl_tab_preview_dirs_only[$t]=
-    ftl_tab_listing_depth[$t]=1
-    ftl_tab_view_mode[$t]=0
-    ftl_tab_listing_mode[$t]=0
-    ftl_tab_filter_dirs[$t]='.'
-    ftl_tab_filter_1[$t]='.'
-    ftl_tab_filter_2[$t]='.'
-    ftl_tab_filter_reverse[$t]="$ftl_cfg_default_reverse_filter"
+	local t=$ftl_state_current_tab_index
+	ftl_tab_preview_dirs_only[$t]=
+	ftl_tab_listing_depth[$t]=1
+	ftl_tab_view_mode[$t]=0
+	ftl_tab_listing_mode[$t]=0
+	ftl_tab_filter_dirs[$t]='.'
+	ftl_tab_filter_1[$t]='.'
+	ftl_tab_filter_2[$t]='.'
+	ftl_tab_filter_reverse[$t]="$ftl_cfg_default_reverse_filter"
 }
 
 # Create a new tab.
 # Args:
 #   $1: directory path (or "." for current)
 ftl::tab::create() {
-    local dir
-    if [[ "$1" == "." ]] ; then
-        dir=
-    else
-        dir="$1"
-    fi
-    [[ "$dir" =~ ^/ ]] || dir="$PWD/$dir"
-    ftl_tab_directories+=("$dir")
-    (( ftl_state_current_tab_index = ${#ftl_tab_directories[@]} - 1, ftl_tab_count++ ))
-    ftl::tab::init_defaults
+	local dir
+	if [[ "$1" == "." ]] ; then
+		dir=
+	else
+		dir="$1"
+	fi
+	[[ "$dir" =~ ^/ ]] || dir="$PWD/$dir"
+	ftl_tab_directories+=("$dir")
+	(( ftl_state_current_tab_index = ${#ftl_tab_directories[@]} - 1, ftl_tab_count++ ))
+	ftl::tab::init_defaults
 }
 
 # Move to the next tab (skipping closed gaps).
 ftl::tab::advance_index() {
-    (( ftl_state_current_tab_index++ ))
-    local -a indices=( ${!ftl_tab_directories[@]} )
-    local i
-    for i in "${indices[@]:$ftl_state_current_tab_index}" "${indices[@]}" ; do
-        if [[ -n "${ftl_tab_directories[$i]:-}" ]] ; then
-            ftl_state_current_tab_index=$i
-            break
-        fi
-    done
+	(( ftl_state_current_tab_index++ ))
+	local -a indices=( ${!ftl_tab_directories[@]} )
+	local i
+	for i in "${indices[@]:$ftl_state_current_tab_index}" "${indices[@]}" ; do
+		if [[ -n "${ftl_tab_directories[$i]:-}" ]] ; then
+			ftl_state_current_tab_index=$i
+			break
+		fi
+	done
 }
 
 # Move to the previous tab (skipping closed gaps).
 ftl::tab::retreat_index() {
-    local -a indices=( ${!ftl_tab_directories[@]} )
-    local -a reversed_indices
-    reversed_indices=($(echo "${indices[@]}" "${indices[@]:0:ftl_state_current_tab_index}" | rev | tr ' ' '\n'))
-    local i
-    for i in "${reversed_indices[@]}" ; do
-        if [[ -n "${ftl_tab_directories[$i]:-}" ]] ; then
-            ftl_state_current_tab_index=$i
-            break
-        fi
-    done
+	local -a indices=( ${!ftl_tab_directories[@]} )
+	local -a reversed_indices
+	reversed_indices=($(echo "${indices[@]}" "${indices[@]:0:ftl_state_current_tab_index}" | rev | tr ' ' '\n'))
+	local i
+	for i in "${reversed_indices[@]}" ; do
+		if [[ -n "${ftl_tab_directories[$i]:-}" ]] ; then
+			ftl_state_current_tab_index=$i
+			break
+		fi
+	done
 }
 
 # Load tabs from a file (one path per line).
@@ -91,17 +91,17 @@ ftl::tab::retreat_index() {
 #   $1: unused (positional)
 #   $2: file containing tab paths
 ftl::tab::load_from_file() {
-    ftl_tab_directories=()
-    ftl_tab_count=0
-    local p
-    while read -r p ; do
-        p="$(ftl::util::resolve_full_path "$p")"
-        if [[ -d "$p" ]] ; then
-            _ftl::tab::read_one_entry "$p"
-        else
-            _ftl::tab::read_one_entry "$(dirname "$p")" "$(basename "$p")"
-        fi
-    done <"$2"
+	ftl_tab_directories=()
+	ftl_tab_count=0
+	local p
+	while read -r p ; do
+		p="$(ftl::util::resolve_full_path "$p")"
+		if [[ -d "$p" ]] ; then
+			_ftl::tab::read_one_entry "$p"
+		else
+			_ftl::tab::read_one_entry "$(dirname "$p")" "$(basename "$p")"
+		fi
+	done <"$2"
 }
 
 # Read one tab entry from the load file.
@@ -109,26 +109,26 @@ ftl::tab::load_from_file() {
 #   $1: directory
 #   $2: optional filename to select within the directory
 _ftl::tab::read_one_entry() {
-    ftl::tab::create "$1"
-    if [[ -d "$1" ]] ; then
-        ftl::tab::index_directory "$1"
-        ftl_state_cursor_memory[${ftl_state_current_tab_index}_$(realpath "$1")]=${ftl_tab_index_cache[$1/$2]}
-    fi
-    true
+	ftl::tab::create "$1"
+	if [[ -d "$1" ]] ; then
+		ftl::tab::index_directory "$1"
+		ftl_state_cursor_memory[${ftl_state_current_tab_index}_$(realpath "$1")]=${ftl_tab_index_cache[$1/$2]}
+	fi
+	true
 }
 
 # Build the entry-index cache for a directory (for -t option).
 # Args:
 #   $1: directory path
 ftl::tab::index_directory() {
-    [[ -n "${ftl_tab_dir_cache[$1]:-}" ]] && return 0
-    ftl_tab_dir_cache[$1]=1
-    local index=0
-    local e
-    while IFS= read -r e ; do
-        ftl_tab_index_cache["$1/$e"]=$index
-        ((index++))
-    done < <(cd "$1" && _ftl::list::scan_for_dir_view)
+	[[ -n "${ftl_tab_dir_cache[$1]:-}" ]] && return 0
+	ftl_tab_dir_cache[$1]=1
+	local index=0
+	local e
+	while IFS= read -r e ; do
+		ftl_tab_index_cache["$1/$e"]=$index
+		((index++))
+	done < <(cd "$1" && _ftl::list::scan_for_dir_view)
 }
 
 # Caches used during tab loading.

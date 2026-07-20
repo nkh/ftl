@@ -46,11 +46,11 @@ ftl_cfg_help_command="man ftl.1"
 # Session marks (single-char bookmarks). Keys are characters, values are
 # paths ending in $ for directories or no suffix for files.
 declare -Ag ftl_mark_session_marks=(
-    [0]=/
-    [1]="$HOME/"
-    [2]=/CHANGE_ME/dir/filename
-    [3]=/CHANGE_ME/dir/filename
-    ["'"]="$(tail -n1 "$ftl_state_global_history_file")"
+	[0]=/
+	[1]="$HOME/"
+	[2]=/CHANGE_ME/dir/filename
+	[3]=/CHANGE_ME/dir/filename
+	["'"]="$(tail -n1 "$ftl_state_global_history_file")"
 )
 
 # Preset destinations for copy/move (PP / PM bindings)
@@ -251,8 +251,8 @@ ftl_cfg_bindings_display_width=150
 
 # Command aliases for the command prompt
 declare -Ag ftl_cfg_command_aliases=(
-    [csx]="split finfo | xargs -0"
-    [cfx]="full finfo | xargs -0"
+	[csx]="split finfo | xargs -0"
+	[cfx]="full finfo | xargs -0"
 )
 
 #----------------------------------------------------------------------------

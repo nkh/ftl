@@ -1,47 +1,47 @@
 
-image_optimize()
+ftl::plugin::file_utils::image_optimize()
 {
-    [[ $ftl_state_current_extension == jpg ]] && {
-        cp "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
-        jpegoptim --size=50% "$ftl_state_current_basename"
-        ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
-    }
-    [[ $ftl_state_current_extension == png ]] && {
-        mv "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
-        convert "$ftl_state_current_stem.original.$ftl_state_current_extension" -quality 90% "$ftl_state_current_stem.jpg"
-        ftl::ftl::list::render::change_dir '' "$ftl_state_current_stem.jpg"
-    }
-    pw3image FTL_RESTART_W3M
-    true
+	[[ $ftl_state_current_extension == jpg ]] && {
+		cp "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
+		jpegoptim --size=50% "$ftl_state_current_basename"
+		ftl::list::change_dir '' "$ftl_state_current_basename"
+	}
+	[[ $ftl_state_current_extension == png ]] && {
+		mv "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
+		convert "$ftl_state_current_stem.original.$ftl_state_current_extension" -quality 90% "$ftl_state_current_stem.jpg"
+		ftl::list::change_dir '' "$ftl_state_current_stem.jpg"
+	}
+	pw3image FTL_RESTART_W3M
+	true
 }
 
-pdf_optimize()
+ftl::plugin::file_utils::pdf_optimize()
 {
-    [[ $ftl_state_current_extension == pdf ]] || return
+	[[ $ftl_state_current_extension == pdf ]] || return
 
-    cp "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
-    ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen \
-        -dNOPAUSE -dQUIET -dBATCH -sOutputFile="$ftl_state_current_basename" \
-        "$ftl_state_current_stem.original.$ftl_state_current_extension"
-    # -dFILTERIMAGE: produces an output where all raster images are removed.
-    # -dFILTERTEXT: produces an output where all text elements are removed.
-    # -dFILTERVECTOR: produces an output where all vector drawings are removed.
-    # also: pdfimages, part of the poppler-utils package
-    ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
+	cp "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
+	ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen \
+		-dNOPAUSE -dQUIET -dBATCH -sOutputFile="$ftl_state_current_basename" \
+		"$ftl_state_current_stem.original.$ftl_state_current_extension"
+	# -dFILTERIMAGE: produces an output where all raster images are removed.
+	# -dFILTERTEXT: produces an output where all text elements are removed.
+	# -dFILTERVECTOR: produces an output where all vector drawings are removed.
+	# also: pdfimages, part of the poppler-utils package
+	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
 
-video_optimize()
+ftl::plugin::file_utils::video_optimize()
 {
-    local id
+	local id
 
-    [[ $ftl_state_current_extension == mp4 ]] || return
+	[[ $ftl_state_current_extension == mp4 ]] || return
 
-    mv "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
-    id=ftl_video$$$(date +%s%N)
-    tmux new-session -d -s "$id" \
-        "ffmpeg -i '$ftl_state_current_stem.original.$ftl_state_current_extension' -vcodec libx265 -crf 24 '$ftl_state_current_basename' ; \
-         tmux popup -h 5 echo Done re-encoding '$ftl_state_current_path'"
-    ftl::ftl::list::render::change_dir ''  "$ftl_state_current_stem.original.$ftl_state_current_extension"
+	mv "$ftl_state_current_basename" "$ftl_state_current_stem.original.$ftl_state_current_extension"
+	id=ftl_video$$$(date +%s%N)
+	tmux new-session -d -s "$id" \
+		"ffmpeg -i '$ftl_state_current_stem.original.$ftl_state_current_extension' -vcodec libx265 -crf 24 '$ftl_state_current_basename' ; \
+		 tmux popup -h 5 echo Done re-encoding '$ftl_state_current_path'"
+	ftl::list::change_dir ''  "$ftl_state_current_stem.original.$ftl_state_current_extension"
 }
 
 # vim: set filetype=sh :

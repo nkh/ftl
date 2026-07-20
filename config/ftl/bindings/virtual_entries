@@ -4,148 +4,148 @@
 
 # callbacks
 
-virt_dirs_get()
+ftl::plugin::virtual_entries::virt_dirs_get()
 {
-    # return ftl::list::render of virtual directories, $PWD is set
+	# return ftl::list::render of virtual directories, $PWD is set
 
-    echo "VIRTUAL DIRECTORY 0"
-    echo "VIRTUAL DIRECTORY ${#PWD}"
+	echo "VIRTUAL DIRECTORY 0"
+	echo "VIRTUAL DIRECTORY ${#PWD}"
 }
 
-virt_files_get()
+ftl::plugin::virtual_entries::virt_files_get()
 {
-    # return ftl::list::render of virtual files
+	# return ftl::list::render of virtual files
 
-    echo "virtual_file"
+	echo "virtual_file"
 }
 
-virt_color()
+ftl::plugin::virtual_entries::virt_color()
 {
-    # colorize virtual entries
+	# colorize virtual entries
 
-    local cfile
+	local cfile
 
-    ((${#ftl_plugin_vfiles[@]} || ${#ftl_plugin_vdirs[@]})) && {
-        while read cfile ; do
-            ((${#ftl_plugin_vfiles[$cfile]})) && echo -e "\e[4m$cfile\e[m" || {
-                ((${#ftl_plugin_vdirs[$cfile]})) && echo -e "\e[32m$cfile" || echo "$cfile"
-            }
-        done
-    } || cat
+	((${#ftl_plugin_vfiles[@]} || ${#ftl_plugin_vdirs[@]})) && {
+		while read cfile ; do
+			((${#ftl_plugin_vfiles[$cfile]})) && echo -e "\e[4m$cfile\e[m" || {
+				((${#ftl_plugin_vdirs[$cfile]})) && echo -e "\e[32m$cfile" || echo "$cfile"
+			}
+		done
+	} || cat
 }
 
-virt_prev()
+ftl::plugin::virtual_entries::virt_prev()
 {
-    # show ftl::prev::dispatch for virtual entries
+	# show ftl::prev::dispatch for virtual entries
 
-    ((${#ftl_plugin_vdirs["$(basename "$ftl_state_current_path")"]})) && {
-        ftl::pane::split_or_respawn "echo \"ftl virtual directory '$ftl_state_current_path'\"; read -sn 100"
-        return 0
-    }
+	((${#ftl_plugin_vdirs["$(basename "$ftl_state_current_path")"]})) && {
+		ftl::pane::split_or_respawn "echo \"ftl virtual directory '$ftl_state_current_path'\"; read -sn 100"
+		return 0
+	}
 
-    ((${#ftl_plugin_vfiles["$(basename "$ftl_state_current_path")"]})) && {
-        ftl::pane::split_or_respawn "echo \"ftl virtual file '$ftl_state_current_path'\"; read -sn 100"
-        return 0
-    }
+	((${#ftl_plugin_vfiles["$(basename "$ftl_state_current_path")"]})) && {
+		ftl::pane::split_or_respawn "echo \"ftl virtual file '$ftl_state_current_path'\"; read -sn 100"
+		return 0
+	}
 
-    return 1
+	return 1
 }
 
-virt_key()
+ftl::plugin::virtual_entries::virt_key()
 {
-    # handle key press for virtual entries, return 1 if not handled
+	# handle key press for virtual entries, return 1 if not handled
 
-    ((${#ftl_plugin_vfiles[$(basename "$ftl_state_current_path")]} || ${#ftl_plugin_vdirs[$(basename "$ftl_state_current_path")]})) && {
-        # update the ftl::prev::dispatch when a ENTER key is pressed
+	((${#ftl_plugin_vfiles[$(basename "$ftl_state_current_path")]} || ${#ftl_plugin_vdirs[$(basename "$ftl_state_current_path")]})) && {
+		# update the ftl::prev::dispatch when a ENTER key is pressed
 
-        [[ "$1" == ENTER ]] && {
-            ftl::pane::split_or_respawn "echo \"ftl virtual entry: <ENTER>\" ; read -sn 100"
-            keys_command= HAS_COUNT= ftl_kbd_count=
-            return 0
-        }
-    } || return 1
+		[[ "$1" == ENTER ]] && {
+			ftl::pane::split_or_respawn "echo \"ftl virtual entry: <ENTER>\" ; read -sn 100"
+			keys_command= HAS_COUNT= ftl_kbd_count=
+			return 0
+		}
+	} || return 1
 }
 
 # commands
 
-ventries_off()
+ftl::plugin::virtual_entries::ventries_off()
 {
-    # turn injection off
-    ftl::plugin::virtual::reset
+	# turn injection off
+	ftl::plugin::virtual::reset
 
-    # don't show virtual entries in ftl::prev::dispatch pane
-    ftl_state_preview_callback="ventries_off"
+	# don't show virtual entries in ftl::prev::dispatch pane
+	ftl_state_preview_callback="ftl::plugin::virtual_entries::ventries_off"
 
-    ftl::ftl::list::render::change_dir
+	ftl::list::change_dir
 }
 
-ventries_on()
+ftl::plugin::virtual_entries::ventries_on()
 {
-    # turn injection on
+	# turn injection on
 
-    # register call backs
-    ftl::plugin::virtual::set_callbacks virt_dirs_get virt_files_get virt_color virt_prev virt_key
+	# register call backs
+	ftl::plugin::virtual::set_callbacks ftl::plugin::virtual_entries::virt_dirs_get ftl::plugin::virtual_entries::virt_files_get ftl::plugin::virtual_entries::virt_color ftl::plugin::virtual_entries::virt_prev ftl::plugin::virtual_entries::virt_key
 
-    # turn injection on
-    ftl::plugin::virtual::enable 1
+	# turn injection on
+	ftl::plugin::virtual::enable 1
 
-    # also show virtual entries in ftl::prev::dispatch pane
-    ftl_state_preview_callback="ventries_on"
+	# also show virtual entries in ftl::prev::dispatch pane
+	ftl_state_preview_callback="ftl::plugin::virtual_entries::ventries_on"
 
-    ftl::ftl::list::render::change_dir
+	ftl::list::change_dir
 }
 
-ventries_etag()
+ftl::plugin::virtual_entries::ventries_etag()
 {
-    ftl_etag_source_name="virtual"
-    source "$FTL_CFG/etags/$ftl_etag_source_name"
-    ftl_state_etag_enabled=1
-    ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
+	ftl_etag_source_name="virtual"
+	source "$FTL_CFG/etags/$ftl_etag_source_name"
+	ftl_state_etag_enabled=1
+	ftl::list::change_dir '' "$ftl_state_current_basename"
 }  # ftl_etag_source_name synchs source with ftl::prev::dispatch
 
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v v"    ventries_on     "insert virtual entries"
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v V"    ventries_off    "removes virtual entries"
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v e"    ventries_etag   "show virtual entries etag"
+ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v v"    ftl::plugin::virtual_entries::ventries_on     "insert virtual entries"
+ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v V"    ftl::plugin::virtual_entries::ventries_off    "removes virtual entries"
+ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v e"    ftl::plugin::virtual_entries::ventries_etag   "show virtual entries etag"
 
 #--------------------------------------------------------------------------------
 
 # example 2 using virtual entries to implement a save_as functionality
 
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "vf"            add_save_as     "insert a virtual entry for save_as"
+ftl::kbd::ftl::kbd::bind leader_ftl extra   "vf"            ftl::plugin::virtual_entries::add_save_as     "insert a virtual entry for save_as"
 
 SAF='save_as.txt'
 
-add_save_as()
+ftl::plugin::virtual_entries::add_save_as()
 {
-    get_file_name
-    ventry_save_as
+	ftl::plugin::virtual_entries::get_file_name
+	ftl::plugin::virtual_entries::ventry_save_as
 }
 
-get_file_name()
+ftl::plugin::virtual_entries::get_file_name()
 {
-    local C
+	local C
 
-    gcn
-    echo -ne "\e[H"
-    tput cnorm
-    stty echo
-    C="$(ftl::cmd::prompt_with_history "name: ")"
-    stty -echo
-    tput civis
-    [[ "$C" ]] && header '' "$ftl_list_header_mode_glyphs" && SAF="$C"
-    ftl::ftl::list::render::render
+	gcn
+	echo -ne "\e[H"
+	tput cnorm
+	stty echo
+	C="$(ftl::cmd::prompt_with_history "name: ")"
+	stty -echo
+	tput civis
+	[[ "$C" ]] && header '' "$ftl_list_header_mode_glyphs" && SAF="$C"
+	ftl::list::render
 }
 
-ventry_save_as()
+ftl::plugin::virtual_entries::ventry_save_as()
 {
-    ftl::plugin::virtual::set_callbacks virt_dirs_save_as virt_files_save_as virt_color virt_prev virt_key
-    ftl::plugin::virtual::enable 1
-    ftl_state_preview_callback="ventry_save_as"
-    ftl::ftl::list::render::change_dir '' "$SAF"
+	ftl::plugin::virtual::set_callbacks ftl::plugin::virtual_entries::virt_dirs_save_as ftl::plugin::virtual_entries::virt_files_save_as ftl::plugin::virtual_entries::virt_color ftl::plugin::virtual_entries::virt_prev ftl::plugin::virtual_entries::virt_key
+	ftl::plugin::virtual::enable 1
+	ftl_state_preview_callback="ftl::plugin::virtual_entries::ventry_save_as"
+	ftl::list::change_dir '' "$SAF"
 }
 
-virt_dirs_save_as() { : ; }
-virt_files_save_as() { echo "$SAF" ; }
+ftl::plugin::virtual_entries::virt_dirs_save_as() { : ; }
+ftl::plugin::virtual_entries::virt_files_save_as() { echo "$SAF" ; }
 
 
 # vim: set filetype=bash :

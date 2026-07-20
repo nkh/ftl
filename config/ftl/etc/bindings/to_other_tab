@@ -21,58 +21,58 @@
 ftl_cfg_default_new_tab_dir=  # in default new tab location if no other tab exists
 
 # function you can ftl::kbd::bind
-tag_copy_to_tab()
+ftl::plugin::to_other_tab::tag_copy_to_tab()
 {
-    ftl::sel::validate_existence && {
-        other_dir="$(other_tab_dir)" && {
-            cp_mv_tags copy "$other_dir"
-            ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
-        } || ftl_cfg_default_new_tab_dir
-    }
+	ftl::sel::validate_existence && {
+		other_dir="$(ftl::plugin::to_other_tab::other_tab_dir)" && {
+			cp_mv_tags copy "$other_dir"
+			ftl::list::change_dir '' "$ftl_state_current_basename"
+		} || ftl_cfg_default_new_tab_dir
+	}
 }
 
-tag_move_to_tab()
+ftl::plugin::to_other_tab::tag_move_to_tab()
 {
-    ftl::sel::validate_existence && {
-        other_dir="$(other_tab_dir)" && {
-            cp_mv_tags move "$other_dir"
-            ftl::ftl::list::render::change_dir '' "$ftl_state_current_basename"
-        } || ftl_cfg_default_new_tab_dir
-    }
+	ftl::sel::validate_existence && {
+		other_dir="$(ftl::plugin::to_other_tab::other_tab_dir)" && {
+			cp_mv_tags move "$other_dir"
+			ftl::list::change_dir '' "$ftl_state_current_basename"
+		} || ftl_cfg_default_new_tab_dir
+	}
 }
 
 # support functions
 ftl_cfg_default_new_tab_dir()
 {
-    ftl::log::warn "copy/move to tab:\n\tcreating new tab"
-    ftl::tab::create "${ftl_cfg_default_new_tab_dir:-$HOME}"
+	ftl::log::warn "copy/move to tab:\n\tcreating new tab"
+	ftl::tab::create "${ftl_cfg_default_new_tab_dir:-$HOME}"
 }
 
-other_tab_dir()
+ftl::plugin::to_other_tab::other_tab_dir()
 {
-    if (( ftl_tab_count > 2 )) ; then
-        pick_tab_dir
-        return $?
-    else
-        pick_other_tab_dir
-    fi
+	if (( ftl_tab_count > 2 )) ; then
+		ftl::plugin::to_other_tab::pick_tab_dir
+		return $?
+	else
+		ftl::plugin::to_other_tab::pick_other_tab_dir
+	fi
 }
 
-pick_tab_dir()
+ftl::plugin::to_other_tab::pick_tab_dir()
 {
-    local ptd
-    ptd="$(printf "%s\n" "${ftl_tab_directories[@]}" | sort -u | lscolors | fzf-tmux $ftl_cfg_fzf_popup_opts --tac --ansi)" && \
-        echo "$ptd"
+	local ptd
+	ptd="$(printf "%s\n" "${ftl_tab_directories[@]}" | sort -u | lscolors | fzf-tmux $ftl_cfg_fzf_popup_opts --tac --ansi)" && \
+		echo "$ptd"
 }
 
-pick_other_tab_dir()
+ftl::plugin::to_other_tab::pick_other_tab_dir()
 {
-    local ctab other_tab
-    ctab=$ftl_state_current_tab_index
-    ftl::tab::advance_index
-    other_tab=$ftl_state_current_tab_index
-    ftl_state_current_tab_index=$ctab
-    [[ $other_tab != $ftl_state_current_tab_index ]] && echo "${ftl_tab_directories[$other_tab]}"
+	local ctab other_tab
+	ctab=$ftl_state_current_tab_index
+	ftl::tab::advance_index
+	other_tab=$ftl_state_current_tab_index
+	ftl_state_current_tab_index=$ctab
+	[[ $other_tab != $ftl_state_current_tab_index ]] && echo "${ftl_tab_directories[$other_tab]}"
 }
 
 # vim: ft=bash:

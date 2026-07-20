@@ -6,7 +6,7 @@ $i = 0 ;
 
 for ( quotewords '\s+', 0, $ARGV[0] ) 
 {
-    print qq{cmd_parts[$i]="$_"\n} ;
-    $i++ ;
+	print qq{cmd_parts[$i]="$_"\n} ;
+	$i++ ;
 }
 

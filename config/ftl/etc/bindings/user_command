@@ -1,13 +1,13 @@
-run_user_command()
+ftl::plugin::user_command::run_user_command()
 {
-    local p cmd
+	local p cmd
 
-    p="$FTL_CFG/commands"
-    cmd=$(cd "$p" 2>&- && fd -t f | sed 's/^.\///' | fzf-tmux -p80% --cycle --reverse --info=inline)
-    [[ $cmd ]] && . "$p/$cmd"
-    ftl::ftl::list::render::render
+	p="$FTL_CFG/commands"
+	cmd=$(cd "$p" 2>&- && fd -t f | sed 's/^.\///' | fzf-tmux -p80% --cycle --reverse --info=inline)
+	[[ $cmd ]] && . "$p/$cmd"
+	ftl::list::render
 }
 
-ftl::kbd::ftl::kbd::bind leader shell "LEADER u" run_user_command "choose a user command to run"
+ftl::kbd::ftl::kbd::bind leader shell "LEADER u" ftl::plugin::user_command::run_user_command "choose a user command to run"
 
 # vim: set filetype=bash :

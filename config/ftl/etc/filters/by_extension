@@ -2,34 +2,34 @@ declare -g -A fexts=()
 
 [[ "$1" == reset ]] && { unset -v fexts ; } ||
 {
-    [[ "$1" == load ]] && [[ -e "$2/by_extension" ]] && source "$2/by_extension" ||
-    {
-        shopt -s dotglob
+	[[ "$1" == load ]] && [[ -e "$2/by_extension" ]] && source "$2/by_extension" ||
+	{
+		shopt -s dotglob
 
-        for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ \. ]] && echo ".${i##*.}" ; done | \
-                        sort -u | { echo "-no_extension-" ; cat ; } | lscolors | \
-                        fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
-            do
-                fexts[$ext]=1
-                ftl_filt_active_glyph="~"
-            done
+		for ext in $(for i in * ; do [[ -f "$i" ]] && [[ "$i" =~ \. ]] && echo ".${i##*.}" ; done | \
+						sort -u | { echo "-no_extension-" ; cat ; } | lscolors | \
+						fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
+			do
+				fexts[$ext]=1
+				ftl_filt_active_glyph="~"
+			done
 
-        declare -p fexts >"$ftl_state_session_dir/by_extension"
-    }
+		declare -p fexts >"$ftl_state_session_dir/by_extension"
+	}
 }
 
 ftl::plugin::by_extension::filter()
 {
-    local file_data fn ext
+	local file_data fn ext
 
-    while read -r file_data ; do
-        #fn=$(cut -f 3- <<<"$file_data") # the slowwwwwwww way, left here as an example of when to optimize
-        fn="${file_data#$'*\t'*$'\t'}"
-        ext=
-        [[ "$fn" =~ \. ]] && ext=".${fn##*.}"
+	while read -r file_data ; do
+		#fn=$(cut -f 3- <<<"$file_data") # the slowwwwwwww way, left here as an example of when to optimize
+		fn="${file_data#$'*\t'*$'\t'}"
+		ext=
+		[[ "$fn" =~ \. ]] && ext=".${fn##*.}"
 
-        [[ -d "$fn" ]] || [[ "$ext" && ${fexts[$ext]} == 1 || -z "$ext" && ${fexts[-no_extension-]} == 1 ]] && echo "$file_data"
-    done
+		[[ -d "$fn" ]] || [[ "$ext" && ${fexts[$ext]} == 1 || -z "$ext" && ${fexts[-no_extension-]} == 1 ]] && echo "$file_data"
+	done
 }
 
 # Override the placeholder so the listing pipeline dispatches to this plugin.

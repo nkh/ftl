@@ -4,36 +4,36 @@ ftl::log::debug "by regex: $1"
 
 [[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
 {
-    [[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_regexp" ]] && source "$ftl_state_parent_dir/by_regexp" ||
-    {
-        exec 2>&9
-        OIFS=$IFS
-        IFS=$'\n'
+	[[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_regexp" ]] && source "$ftl_state_parent_dir/by_regexp" ||
+	{
+		exec 2>&9
+		OIFS=$IFS
+		IFS=$'\n'
 
-        for file in $(frf 1 "-tmux -p 80%" ctrl-t) ; do
-            keep["$ftl_state_current_tab_index-$PWD/$file"]=1
-            PWDS[$ftl_state_current_tab_index-$PWD]=1
-            ftl_filt_active_glyph="~"
-        done
+		for file in $(frf 1 "-tmux -p 80%" ctrl-t) ; do
+			keep["$ftl_state_current_tab_index-$PWD/$file"]=1
+			PWDS[$ftl_state_current_tab_index-$PWD]=1
+			ftl_filt_active_glyph="~"
+		done
 
-        IFS=$OIFS
-        exec 2>"$ftl_state_session_dir/log"
-        ftl::util::enter_alt_screen
+		IFS=$OIFS
+		exec 2>"$ftl_state_session_dir/log"
+		ftl::util::enter_alt_screen
 
-        declare -p keep PWDS >"$ftl_state_parent_dir/by_regexp"
-    }
+		declare -p keep PWDS >"$ftl_state_parent_dir/by_regexp"
+	}
 }
 
 ftl::plugin::by_regexp::filter()
 {
-    local file_data fn
+	local file_data fn
 
-    [[ "${PWDS["$ftl_state_current_tab_index-$PWD"]}" == 1 ]] && {
-        while read -r file_data ; do
-            fn="${file_data#$'*\t'*$'\t'}"
-            [[ "${keep["$ftl_state_current_tab_index-$PWD/$fn"]}" == 1 ]] && echo "$file_data"
-        done
-    } || cat
+	[[ "${PWDS["$ftl_state_current_tab_index-$PWD"]}" == 1 ]] && {
+		while read -r file_data ; do
+			fn="${file_data#$'*\t'*$'\t'}"
+			[[ "${keep["$ftl_state_current_tab_index-$PWD/$fn"]}" == 1 ]] && echo "$file_data"
+		done
+	} || cat
 }
 
 # Override the placeholder so the listing pipeline dispatches to this plugin.

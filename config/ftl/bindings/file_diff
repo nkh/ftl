@@ -1,31 +1,31 @@
-file_diff()
+ftl::plugin::file_diff::file_diff()
 {
-    local files directories entry
+	local files directories entry
 
-    files=0
-    directories=0
+	files=0
+	directories=0
 
-    (( ${#ftl_selection_current[@]} == 2 )) && {
-        for entry in "${ftl_selection_current[@]}" ; do
-            [[ -f "$entry" ]] && ((files++))
-            [[ -d "$entry" ]] && ((directories++))
-        done
+	(( ${#ftl_selection_current[@]} == 2 )) && {
+		for entry in "${ftl_selection_current[@]}" ; do
+			[[ -f "$entry" ]] && ((files++))
+			[[ -d "$entry" ]] && ((directories++))
+		done
 
-        ((files == 2)) && {
-            ftl::prev::clear
-            $ftl_cfg_diff_tool "${ftl_selection_current[@]}"
-        }
+		((files == 2)) && {
+			ftl::prev::clear
+			$ftl_cfg_diff_tool "${ftl_selection_current[@]}"
+		}
 
-        ((directories == 2)) && {
-            ftl::prev::clear
-            exec 2>&9
-            TDD=pdiff tdiff "${ftl_selection_current[@]}"
-            exec 2>"$ftl_state_session_dir/log"
-            ftl::util::enter_alt_screen
-        }
-    }
+		((directories == 2)) && {
+			ftl::prev::clear
+			exec 2>&9
+			TDD=pdiff tdiff "${ftl_selection_current[@]}"
+			exec 2>"$ftl_state_session_dir/log"
+			ftl::util::enter_alt_screen
+		}
+	}
 }
 
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v d"    file_diff       "diff two selected files or directories"
+ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v d"    ftl::plugin::file_diff::file_diff       "diff two selected files or directories"
 
 # vim: set filetype=bash :
