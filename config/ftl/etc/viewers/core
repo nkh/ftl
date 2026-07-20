@@ -385,7 +385,7 @@ _pcomp()
 }
 
 # needed when used as an fzf viewer from ftl
-((!FTLRC_LOADED)) && {
+((!FTL_BOOTSTRAP_DONE)) && {
 	: ${FTL_CFG:=$HOME/.config/ftl}
 	source "$FTL_CFG/etc/core/ftl_setup"
 	[[ "$1" ]] && ftl::plugin::fzf_pane_preview::pfzf "$1"

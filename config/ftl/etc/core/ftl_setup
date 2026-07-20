@@ -31,7 +31,9 @@ source "$FTL_CFG/etc/core/modules/time.sh"
 source "$FTL_CFG/etc/core/modules/commands.sh"
 
 # Source the viewer dispatcher (defines ftl::prev::show_internal etc.)
-source "$FTL_CFG/viewers/core"
+# Set FTL_BOOTSTRAP_DONE first so viewers/core doesn't try to re-source ftl_setup
+FTL_BOOTSTRAP_DONE=1
+source "$FTL_CFG/etc/viewers/core"
 
 #----------------------------------------------------------------------------
 # Declare core associative arrays before ftlrc populates them
@@ -65,6 +67,9 @@ ftl_state_shared_dir="$ftl_state_session_dir/prev"
 
 # Compute this pane's tmux id
 ftl_pane_self_id="$(ftl::pane::pid_to_id $$)"
+
+# Initialize logging (after session dir is set)
+ftl::log::init
 
 # Selection state
 ftl_selection_total_bytes=0

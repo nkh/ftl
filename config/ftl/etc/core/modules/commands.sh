@@ -67,7 +67,7 @@ ftl::cmd::dispatch_command() {
 	ftl::state::serialize_info
 
 	# User command
-	local user_cmd="$FTL_CFG/commands/$cmd"
+	local user_cmd="$FTL_CFG/etc/commands/$cmd"
 	if [[ -f "$user_cmd" ]] ; then
 		if [[ ! -x "$user_cmd" ]] ; then
 			source "$user_cmd" "${cmd_parts[@]:1}"
@@ -1149,7 +1149,7 @@ ftl::cmd::set_filter_reverse() {
 
 ftl::cmd::select_external_filter() {
 	local filter_name
-	filter_name=$(cd "$FTL_CFG/filters" ; fd | fzf-tmux -p 50% --cycle)
+	filter_name=$(cd "$FTL_CFG/etc/filters" ; fd | fzf-tmux -p 50% --cycle)
 	ftl::filt::load_external "$filter_name"
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
@@ -1937,7 +1937,7 @@ ftl::cmd::preview_show() {
 }
 
 ftl::cmd::show_via_fzf_viewer() {
-	local p="$FTL_CFG/viewers"
+	local p="$FTL_CFG/etc/viewers"
 	local viewer
 	viewer=$(cd "$p" 2>&- && fd | fzf-tmux -p80% --cycle --reverse --info=inline)
 	[[ -n "$viewer" ]] && source "$p/$viewer"
@@ -2262,7 +2262,7 @@ ftl::cmd::etag_show() {
 }
 
 ftl::cmd::select_etag_source() {
-	local p="$FTL_CFG/etags"
+	local p="$FTL_CFG/etc/etags"
 	ftl_etag_source_name=$(cd "$p" ; fd | fzf-tmux -p 50% --cycle --reverse --info=inline)
 	if [[ -n "$ftl_etag_source_name" ]] ; then
 		source "$p/$ftl_etag_source_name" "$ftl_state_session_dir"
@@ -2319,7 +2319,7 @@ ftl::cmd::extension_clear() {
 }
 
 ftl::cmd::extension_sort() {
-	source "$FTL_CFG/filters/sort_by_extension"
+	source "$FTL_CFG/etc/filters/sort_by_extension"
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
 
@@ -2663,7 +2663,7 @@ ftl::cmd::command_prompt() {
 
 _ftl::cmd::build_command_name_list() {
 	{
-		find "$FTL_CFG/commands" -type f -printf "%f\n"
+		find "$FTL_CFG/etc/commands" -type f -printf "%f\n"
 		printf "%s\n" "${!ftl_kbd_command_to_key[@]}" fsh finfo show_cmd_log
 	} >"$ftl_state_session_dir/command_names"
 }
@@ -2688,7 +2688,7 @@ ftl::cmd::prompt() {
 }
 
 ftl::cmd::ftl::plugin::user_command::run_user_command() {
-	local p="$FTL_CFG/commands"
+	local p="$FTL_CFG/etc/commands"
 	local cmd
 	cmd=$(cd "$p" 2>&- && fd -t f | sed 's/^.\///' \
 		| fzf-tmux -p80% --cycle --reverse --info=inline)

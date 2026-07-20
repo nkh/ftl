@@ -27,35 +27,35 @@
 # Args:
 #   $1: full path to parse
 ftl::util::parse_path() {
-	ftl_state_current_path="$1"
+        ftl_state_current_path="$1"
 
-	if [[ "$ftl_state_current_path" =~ / ]] ; then
-		ftl_state_current_dir="${ftl_state_current_path%/*}"
-	else
-		ftl_state_current_dir=
-	fi
+        if [[ "$ftl_state_current_path" =~ / ]] ; then
+                ftl_state_current_dir="${ftl_state_current_path%/*}"
+        else
+                ftl_state_current_dir=
+        fi
 
-	if [[ ${ftl_state_current_dir:0:1} != "/" ]] ; then
-		ftl_state_current_dir="$PWD/$ftl_state_current_dir"
-	fi
+        if [[ ${ftl_state_current_dir:0:1} != "/" ]] ; then
+                ftl_state_current_dir="$PWD/$ftl_state_current_dir"
+        fi
 
-	ftl_state_current_basename="${ftl_state_current_path##*/}"
-	ftl_state_current_stem="${ftl_state_current_basename%.*}"
+        ftl_state_current_basename="${ftl_state_current_path##*/}"
+        ftl_state_current_stem="${ftl_state_current_basename%.*}"
 
-	if [[ "$ftl_state_current_basename" =~ '.' ]] ; then
-		ftl_state_current_extension="${ftl_state_current_basename##*.}"
-	else
-		ftl_state_current_extension=
-	fi
+        if [[ "$ftl_state_current_basename" =~ '.' ]] ; then
+                ftl_state_current_extension="${ftl_state_current_basename##*.}"
+        else
+                ftl_state_current_extension=
+        fi
 }
 
 # Reset all path globals to empty.
 ftl::util::clear_path_vars() {
-	ftl_state_current_path=
-	ftl_state_current_dir=
-	ftl_state_current_basename=
-	ftl_state_current_stem=
-	ftl_state_current_extension=
+        ftl_state_current_path=
+        ftl_state_current_dir=
+        ftl_state_current_basename=
+        ftl_state_current_stem=
+        ftl_state_current_extension=
 }
 
 # Resolve a relative path to an absolute one.
@@ -64,9 +64,9 @@ ftl::util::clear_path_vars() {
 #   $1: path (possibly relative)
 # Outputs: absolute path on stdout
 ftl::util::resolve_full_path() {
-	local pf="${1/\.\//$PWD\/}"
-	pf="${pf%/}"
-	echo "$pf"
+        local pf="${1/\.\//$PWD\/}"
+        pf="${pf%/}"
+        echo "$pf"
 }
 
 # Format a byte count as a human-readable size.
@@ -74,15 +74,15 @@ ftl::util::resolve_full_path() {
 #   $1: size in bytes
 # Outputs: formatted size like " 1.2K" on stdout
 ftl::util::format_size_human() {
-	local h_size=$1
-	local u
-	for u in ' ' K M G T ; do
-		if (( h_size < 1024 )) ; then
-			printf "%4s$u" "$h_size"
-			return
-		fi
-		(( h_size /= 1024 ))
-	done
+        local h_size=$1
+        local u
+        for u in ' ' K M G T ; do
+                if (( h_size < 1024 )) ; then
+                        printf "%4s$u" "$h_size"
+                        return
+                fi
+                (( h_size /= 1024 ))
+        done
 }
 
 # Check if a file is binary (using perl's -B test).
@@ -90,36 +90,36 @@ ftl::util::format_size_human() {
 # Args:
 #   $1: file path
 ftl::util::is_binary_file() {
-	perl -le 'exit -B $ARGV[0]' "$1"
-	ftl_state_current_is_binary=$?
+        perl -le 'exit -B $ARGV[0]' "$1"
+        ftl_state_current_is_binary=$?
 }
 
 # Run a command with the ftl window minimized, then restore focus.
 # Args:
 #   $@: command and args
 ftl::util::run_maximized() {
-	local active_window
-	active_window=$(xdotool getwindowfocus -f)
-	xdotool windowminimize "$active_window"
-	"$@" 2>/dev/null
-	wmctrl -ia "$active_window"
-	true
+        local active_window
+        active_window=$(xdotool getwindowfocus -f)
+        xdotool windowminimize "$active_window"
+        "$@" 2>/dev/null
+        wmctrl -ia "$active_window"
+        true
 }
 
 # Emit a refresh escape sequence.
 # Args:
 #   $1: optional escape sequence to append
 ftl::util::refresh_screen() {
-	echo -ne "\e[?25l$1"
+        echo -ne "\e[?25l$1"
 }
 
 # Deduplicate lines in a file, preserving order.
 # Args:
 #   $1: file path
 ftl::util::dedup_file() {
-	[[ -s "$1" ]] || return 0
-	tac "$1" | awk '!seen[$0]++' | tac | sponge "$1"
-	true
+        [[ -s "$1" ]] || return 0
+        tac "$1" | awk '!seen[$0]++' | tac | sponge "$1"
+        true
 }
 
 # Create named pipes and attach them to the given file descriptors.
@@ -127,24 +127,35 @@ ftl::util::dedup_file() {
 # Args:
 #   $@: file descriptor numbers
 ftl::util::create_fifos() {
-	local fd
-	local pipe
-	for fd in "$@" ; do
-		pipe=$(mktemp -u)
-		mkfifo "$pipe"
-		eval "exec $fd<>$pipe"
-		rm "$pipe"
-	done
+        local fd
+        local pipe
+        for fd in "$@" ; do
+                pipe=$(mktemp -u)
+                mkfifo "$pipe"
+                eval "exec $fd<>$pipe"
+                rm "$pipe"
+        done
 }
 
 # Print a bash stack trace to stderr.
 ftl::util::stacktrace() {
-	local i=1
-	local line func file
-	while read -r line func file < <(caller $i) ; do
-		echo "[$i] $file:$line $func(): $(sed -n "${line}p" "$file")"
-		((i++))
-	done
+        local i=1
+        local line func file
+        while read -r line func file < <(caller $i) ; do
+                echo "[$i] $file:$line $func(): $(sed -n "${line}p" "$file")"
+                ((i++))
+        done
+}
+
+# Enter the alternate screen (hide cursor, disable echo).
+ftl_log_alt_screen=0
+ftl::util::enter_alt_screen() {
+        if [[ $ftl_log_alt_screen == 0 ]] ; then
+                echo -en '\e[?1049h'
+                stty -echo
+                tput civis
+                ftl_log_alt_screen=1
+        fi
 }
 
 # vim: set filetype=bash :

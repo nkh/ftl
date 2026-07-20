@@ -99,7 +99,11 @@ ftl::kbd::bind() {
 			fi
 		fi
 
-		(( ftl_kbd_trie[$shortcut]++ ))
+		# Track prefix usage count (safe for non-numeric values)
+		local __current="${ftl_kbd_trie[$shortcut]:-}"
+		if [[ "$__current" =~ ^[0-9]+$ ]] ; then
+			ftl_kbd_trie[$shortcut]=$(( __current + 1 ))
+		fi
 
 		# Build display string with AltGr annotations
 		if [[ -n "${ftl_kbd_altgr_inverse[$key]:-}" ]] ; then
@@ -111,7 +115,7 @@ ftl::kbd::bind() {
 		fi
 	done
 
-	if (( ftl_kbd_warn_on_override )) && (( ${ftl_kbd_trie[$shortcut]} > 1 )) ; then
+	if (( ftl_kbd_warn_on_override )) && [[ "${ftl_kbd_trie[$shortcut]:-}" != "$command" ]] ; then
 		echo "ftl: bind: map: $map, section: $section, keys:'$keys'," \
 			 "command: '$command' is overriding command path"
 	fi

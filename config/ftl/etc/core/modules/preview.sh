@@ -124,7 +124,7 @@ ftl::prev::sync_and_dispatch() {
 
 	if (( ftl_pane_is_child )) ; then
 		if [[ -n "$ftl_filt_external_name" ]] ; then
-			source "$FTL_CFG/filters/$ftl_filt_external_name" load "$ftl_state_other_session_dir"
+			source "$FTL_CFG/etc/filters/$ftl_filt_external_name" load "$ftl_state_other_session_dir"
 		else
 			ftl::filt::reset
 		fi
@@ -138,13 +138,13 @@ ftl::prev::sync_and_dispatch() {
 
 	if (( ftl_pane_is_child )) ; then
 		if [[ -n "$ftl_etag_source_name" ]] ; then
-			source "$FTL_CFG/etags/$ftl_etag_source_name"
+			source "$FTL_CFG/etc/etags/$ftl_etag_source_name"
 			if [[ -n "$ftl_etag_callback" ]] ; then
 				eval "$ftl_etag_callback"
 			fi
 			true
 		else
-			source "$FTL_CFG/etags/none"
+			source "$FTL_CFG/etc/etags/none"
 		fi
 	fi
 

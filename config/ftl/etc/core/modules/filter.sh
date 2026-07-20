@@ -71,7 +71,7 @@ ftl::filt::reset() {
 # Reset the external filter (call its reset hook).
 _ftl::filt::reset_external() {
 	[[ -z "$ftl_filt_external_name" ]] && return 0
-	source "$FTL_CFG/filters/$ftl_filt_external_name" "reset"
+	source "$FTL_CFG/etc/filters/$ftl_filt_external_name" "reset"
 	ftl_filt_external_name=
 }
 
@@ -135,7 +135,7 @@ ftl::filt::apply_user_colors() {
 # Args:
 #   $1: filter name
 ftl::filt::load_external() {
-	local p="$FTL_CFG/filters"
+	local p="$FTL_CFG/etc/filters"
 	if [[ -f "$p/$1" ]] ; then
 		source "$p/$1"
 		ftl_filt_external_name="$1"
