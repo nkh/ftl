@@ -1,0 +1,84 @@
+# project_marks — per-project bookmark management
+#
+# Provides project-scoped marks that are stored in .ftl_project_marks files.
+# Marks are searched upward (parent directories) and downward (child
+# directories) from the current location, allowing hierarchical project
+# navigation.
+
+# Get all project marks relevant to the current directory.
+# Searches parent directories (unless subdir_only) and child directories.
+# Args:
+#   $1: "1" for subdir-only mode (skip parent search)
+# Outputs: temp file path containing all marks on stdout
+ftl::plugin::project_marks::get_project_marks()
+{
+	local subdir_only="${1:-false}"
+	local tmpfile
+	local start_dir
+	local dir
+
+	tmpfile="$(mktemp)"
+	start_dir="$PWD"
+
+	if [[ "$subdir_only" == "false" ]] ; then
+		# Walk upward until /
+		dir="$start_dir"
+		while : ; do
+			if [[ -f "$dir/.ftl_project_marks" ]] ; then
+				cat "$dir/.ftl_project_marks" >>"$tmpfile"
+			fi
+
+			[[ "$dir" == "/" ]] && break
+			dir="$(dirname "$dir")"
+		done
+	fi
+
+	# Walk downward from the starting directory
+	find "$start_dir" -type f -name '.ftl_project_marks' -exec cat {} + >>"$tmpfile"
+
+	printf '%s\n' "$tmpfile"
+}
+
+# Add the current entry to the local project marks file.
+ftl::plugin::project_marks::pmark()
+{
+	{
+		cat ".ftl_project_marks" 2>/dev/null
+		echo "$ftl_state_current_path"
+	} | awk '!seen[$0]++' | tac | sponge ".ftl_project_marks"
+}
+
+# Go to a project mark via fzf (searches parents and children).
+ftl::plugin::project_marks::pmarks_fzf()
+{
+	local mark_file
+	mark_file="$(ftl::plugin::project_marks::get_project_marks)"
+	_ftl::cmd::process_search_results f fzf \
+		"$(sed "s|^$PWD/||" "$mark_file" | sort -u | lscolors \
+			| fzf-tmux $ftl_cfg_fzf_popup_opts -m --expect=ctrl-t --ansi)"
+}
+
+# Go to a project mark via fzf (child directories only).
+ftl::plugin::project_marks::pmarks_subdir_fzf()
+{
+	local mark_file
+	mark_file="$(ftl::plugin::project_marks::get_project_marks 1)"
+	_ftl::cmd::process_search_results f fzf \
+		"$(sed "s|^$PWD/||" "$mark_file" | sort -u | lscolors \
+			| fzf-tmux $ftl_cfg_fzf_popup_opts -m --expect=ctrl-t --ansi)"
+}
+
+# Edit the current directory's project marks file.
+ftl::plugin::project_marks::pmarks_edit()
+{
+	[[ -f ".ftl_project_marks" ]] && ftl::cmd::edit_current ".ftl_project_marks"
+	ftl::list::render
+}
+
+# Bindings
+ftl::kbd::bind marks project Mpp  ftl::plugin::project_marks::pmark            "add the current entry to the project marks"
+ftl::kbd::bind marks project Mpe  ftl::plugin::project_marks::pmarks_edit      "edit the current directory marks"
+ftl::kbd::bind marks project gpp  ftl::plugin::project_marks::pmarks_fzf       "go to a project mark via fzf"
+ftl::kbd::bind marks project gps  ftl::plugin::project_marks::pmarks_subdir_fzf "go to a project mark via fzf in child directories"
+
+# vim: set filetype=bash :
