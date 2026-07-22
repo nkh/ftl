@@ -26,6 +26,6 @@ ftl::plugin::file_diff::file_diff()
 	}
 }
 
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v d"    ftl::plugin::file_diff::file_diff       "diff two selected files or directories"
+ftl::kbd::bind	leader_ftl	extra	"LEADER v d"	ftl::plugin::file_diff::file_diff	"diff two selected files or directories"
 
 # vim: set filetype=bash :

@@ -103,15 +103,15 @@ ftl::plugin::virtual_entries::ventries_etag()
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }  # ftl_etag_source_name synchs source with ftl::prev::dispatch
 
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v v"    ftl::plugin::virtual_entries::ventries_on     "insert virtual entries"
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v V"    ftl::plugin::virtual_entries::ventries_off    "removes virtual entries"
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "LEADER v e"    ftl::plugin::virtual_entries::ventries_etag   "show virtual entries etag"
+ftl::kbd::bind	leader_ftl	extra	"LEADER v v"	ftl::plugin::virtual_entries::ventries_on	"insert virtual entries"
+ftl::kbd::bind	leader_ftl	extra	"LEADER v V"	ftl::plugin::virtual_entries::ventries_off	"removes virtual entries"
+ftl::kbd::bind	leader_ftl	extra	"LEADER v e"	ftl::plugin::virtual_entries::ventries_etag	"show virtual entries etag"
 
 #--------------------------------------------------------------------------------
 
 # example 2 using virtual entries to implement a save_as functionality
 
-ftl::kbd::ftl::kbd::bind leader_ftl extra   "vf"            ftl::plugin::virtual_entries::add_save_as     "insert a virtual entry for save_as"
+ftl::kbd::bind	leader_ftl	extra	"vf"	ftl::plugin::virtual_entries::add_save_as	"insert a virtual entry for save_as"
 
 SAF='save_as.txt'
 

@@ -18,6 +18,6 @@ ftl::plugin::shred::shred_command()
 }
 
 # ftl::kbd::bind shortcut
-ftl::kbd::ftl::kbd::bind leader file        "LEADER f s"    ftl::plugin::shred::shred_command   "override selection multiple times and deletes it, *** bypasses ftl_cfg_delete_command ***"
+ftl::kbd::bind	leader	file	"LEADER f s"	ftl::plugin::shred::shred_command	"override selection multiple times and deletes it, *** bypasses ftl_cfg_delete_command ***"
 
 # vim: set filetype=bash :

@@ -204,10 +204,12 @@ test_integration_tab_count() {
 #==========================================================================
 
 test_integration_filter_pipeline_build() {
+        ftl_filter_pipeline_list=()
         ftl::filt::pipeline_add filter_a filter_b
         ftl::test::assert_eq "2" "${#ftl_filter_pipeline_list[@]}" "pipeline has 2 filters"
+        ftl_filter_pipeline_list=()
         local result
-        result=$(ftl::filt::pipeline_add filter_c)
+        result=$(ftl::filt::pipeline_add filter_a filter_b filter_c)
         ftl::test::assert_eq "filter_a|filter_b|filter_c" "$result" "pipe string correct"
 }
 

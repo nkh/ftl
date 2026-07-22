@@ -139,13 +139,13 @@ ftl::plugin::tmsu::tmsu_goto()
 
 # tmsu_get_queries() { echo "find queries/ -type d" ; }
 
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t LEADER"       ftl::plugin::tmsu::tmsu_preview            "show tmsu tags"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t f"            ftl::plugin::tmsu::tmsu_tag_fzf            "tmsu tag selection via fzf"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t g"            ftl::plugin::tmsu::tmsu_goto               "tmsu goto via fzf"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t m"            ftl::plugin::tmsu::tmsu_mount              "tmsu mount"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t q"            ftl::plugin::tmsu::tmsu_filter_query       "tmsu tag filter via query"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t r"            ftl::plugin::tmsu::tmsu_filter             "tmsu tag filter via fzf"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t s"            ftl::plugin::tmsu::tmsu_tag_scim           "tmsu tag selection via scim"
-ftl::kbd::ftl::kbd::bind tmsu tag   "LEADER t t"            ftl::plugin::tmsu::tmsu_tag                "tmsu tag selection"
+ftl::kbd::bind	tmsu	tag	"LEADER t LEADER"	ftl::plugin::tmsu::tmsu_preview	"show tmsu tags"
+ftl::kbd::bind	tmsu	tag	"LEADER t f"	ftl::plugin::tmsu::tmsu_tag_fzf	"tmsu tag selection via fzf"
+ftl::kbd::bind	tmsu	tag	"LEADER t g"	ftl::plugin::tmsu::tmsu_goto	"tmsu goto via fzf"
+ftl::kbd::bind	tmsu	tag	"LEADER t m"	ftl::plugin::tmsu::tmsu_mount	"tmsu mount"
+ftl::kbd::bind	tmsu	tag	"LEADER t q"	ftl::plugin::tmsu::tmsu_filter_query	"tmsu tag filter via query"
+ftl::kbd::bind	tmsu	tag	"LEADER t r"	ftl::plugin::tmsu::tmsu_filter	"tmsu tag filter via fzf"
+ftl::kbd::bind	tmsu	tag	"LEADER t s"	ftl::plugin::tmsu::tmsu_tag_scim	"tmsu tag selection via scim"
+ftl::kbd::bind	tmsu	tag	"LEADER t t"	ftl::plugin::tmsu::tmsu_tag	"tmsu tag selection"
 
 # vim: set filetype=bash:

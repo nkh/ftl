@@ -49,6 +49,6 @@ ftl::plugin::incremental_search::incremental_find()
 	esac
 }
 
-ftl::kbd::ftl::kbd::bind ftl        find    "/"     ftl::plugin::incremental_search::incremental_search      "start incremental search, press 'escape' to end"
+ftl::kbd::bind	ftl	find	"/"	ftl::plugin::incremental_search::incremental_search	"start incremental search, press 'escape' to end"
 
 # vim: set filetype=bash :

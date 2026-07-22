@@ -63,14 +63,14 @@ ftl::plugin::leader_git::git_tree()
 	ftl::list::change_dir
 }
 
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g g"    ftl::plugin::leader_git::git_etags       "git display status"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g t"    ftl::plugin::leader_git::git_tree        "git tree status"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g d"    ftl::plugin::leader_git::git_diff2       "git diff2"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g D"    ftl::plugin::leader_git::git_diff        "git diff"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g f"    ftl::plugin::leader_git::git_find        "git go to git file"
+ftl::kbd::bind	git	extra	"LEADER g g"	ftl::plugin::leader_git::git_etags	"git display status"
+ftl::kbd::bind	git	extra	"LEADER g t"	ftl::plugin::leader_git::git_tree	"git tree status"
+ftl::kbd::bind	git	extra	"LEADER g d"	ftl::plugin::leader_git::git_diff2	"git diff2"
+ftl::kbd::bind	git	extra	"LEADER g D"	ftl::plugin::leader_git::git_diff	"git diff"
+ftl::kbd::bind	git	extra	"LEADER g f"	ftl::plugin::leader_git::git_find	"git go to git file"
 
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g i"    ftl::plugin::leader_git::git_ignore      "git add selection to directory .gitignore"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g a"    ftl::plugin::leader_git::git_add         "git add selection"
-ftl::kbd::ftl::kbd::bind git        extra   "LEADER g A"    ftl::plugin::leader_git::git_fga         "git add selection in forgit"
+ftl::kbd::bind	git	extra	"LEADER g i"	ftl::plugin::leader_git::git_ignore	"git add selection to directory .gitignore"
+ftl::kbd::bind	git	extra	"LEADER g a"	ftl::plugin::leader_git::git_add	"git add selection"
+ftl::kbd::bind	git	extra	"LEADER g A"	ftl::plugin::leader_git::git_fga	"git add selection in forgit"
 
 # vim: set filetype=bash:

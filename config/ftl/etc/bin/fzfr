@@ -3,7 +3,13 @@
 arg_n() { perl -e 'print [split /(?<!:):(?!:)/, $ARGV[1]]->[$ARGV[0] - 1]' $1 "$2" ; }
 export -f arg_n
 
-minus_limit(){ number=$1 ; minus=$2 ; limit=$3 ; test $(($number - $minus)) -le $limit && echo $limit || echo $(($number - $minus)) ; }
+minus_limit()
+{
+	number=$1
+	minus=$2
+	limit=$3
+	test $(($number - $minus)) -le $limit && echo $limit || echo $(($number - $minus))
+}
 export -f minus_limit
 
 # todo: if the search is contained in file names, we get a lot of hits that are of no interest

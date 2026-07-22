@@ -1,5 +1,14 @@
 L=({A..Z})
-ToAA() { AA= ; local i=$1 ; (($i == 0)) && AA='@' ; while ((i)) ; do AA="${L[((--i % 26))]}$AA" ; ((i /= 26)) ; done ; }
+ToAA()
+{
+	AA=
+	local i=$1
+	(($i == 0)) && AA='@'
+	while ((i))
+	do AA="${L[((--i % 26))]}$AA"
+	((i /= 26))
+	done
+}
 
 st()
 {

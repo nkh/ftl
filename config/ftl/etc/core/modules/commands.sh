@@ -1835,7 +1835,7 @@ ftl::cmd::full_preview_m1() {
 
 ftl::cmd::set_full_preview_mode_2() {
 	[[ "$ftl_state_current_extension" == 'md' ]] || return 0
-	ftl::util::run_maximized _ftl::cmd::mo_vimb "$ftl_state_current_basename"
+	ftl::util::run_maximized _ftl::cmd::_ftl::plugin::core::mo_vimb "$ftl_state_current_basename"
 	ftl::list::render
 }
 
@@ -1845,7 +1845,7 @@ ftl::cmd::full_preview_m2() {
 
 ftl::cmd::set_full_preview_mode_3() {
 	[[ "$ftl_state_current_extension" == 'md' ]] || return 0
-	ftl::util::run_maximized _ftl::cmd::mo_vimb -R .
+	ftl::util::run_maximized _ftl::cmd::_ftl::plugin::core::mo_vimb -R .
 	ftl::list::render
 }
 
@@ -1871,7 +1871,7 @@ ftl::cmd::full_preview_m5() {
 	ftl::cmd::set_full_preview_mode_5
 }
 
-_ftl::cmd::mo_vimb() {
+_ftl::cmd::_ftl::plugin::core::mo_vimb() {
 	mo --no-open "$@" &>/dev/null
 	vimb "http://localhost:6275" 2>/dev/null
 }

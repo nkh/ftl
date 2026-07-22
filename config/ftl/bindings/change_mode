@@ -1,5 +1,5 @@
 
-ftl::kbd::ftl::kbd::bind ftl entry  xmm     ftl::plugin::change_mode::chmod_dialog_one        "chmod entry via whiptail"
+ftl::kbd::bind	ftl	entry	xmm	ftl::plugin::change_mode::chmod_dialog_one	"chmod entry via whiptail"
 
 ftl::plugin::change_mode::chmod_dialog_one()
 {

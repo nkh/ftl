@@ -95,9 +95,9 @@ ftl::plugin::fzf_pane_preview::pfzf()
 	pviewers
 }
 
-ftl::kbd::ftl::kbd::bind ftl find           "/"     ftl::plugin::fzf_pane_preview::fzf_pane_preview        "find via fzf with pane ftl::prev::dispatch"
-ftl::kbd::ftl::kbd::bind ftl search         gfp     ftl::plugin::fzf_pane_preview::fzf_pane_preview        "fzf with ftl::prev::dispatch in ftl::prev::dispatch pane"
-ftl::kbd::ftl::kbd::bind ftl search         gfP     ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_all    "fzf with ftl::prev::dispatch in ftl::prev::dispatch pane, sub directories"
+ftl::kbd::bind	ftl	find	"/"	ftl::plugin::fzf_pane_preview::fzf_pane_preview	"find via fzf with pane ftl::prev::dispatch"
+ftl::kbd::bind	ftl	search	gfp	ftl::plugin::fzf_pane_preview::fzf_pane_preview	"fzf with ftl::prev::dispatch in ftl::prev::dispatch pane"
+ftl::kbd::bind	ftl	search	gfP	ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_all	"fzf with ftl::prev::dispatch in ftl::prev::dispatch pane, sub directories"
 
 
 # vim: set filetype=bash :

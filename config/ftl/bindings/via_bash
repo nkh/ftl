@@ -47,9 +47,9 @@ ftl::plugin::via_bash::bash_filter_hide()
 	ftl::list::change_dir
 }
 
-ftl::kbd::ftl::kbd::bind ftl file   yx      ftl::plugin::via_bash::bash_select             "select files via bash"
-ftl::kbd::ftl::kbd::bind ftl file   yX      ftl::plugin::via_bash::up_select               "select file via the ultimate plumber"
-ftl::kbd::ftl::kbd::bind ftl file   fx      ftl::plugin::via_bash::bash_filter_keep        "select files to keep via bash"
-ftl::kbd::ftl::kbd::bind ftl file   fX      ftl::plugin::via_bash::bash_filter_hide        "select files to hide via bash"
+ftl::kbd::bind	ftl	file	yx	ftl::plugin::via_bash::bash_select	"select files via bash"
+ftl::kbd::bind	ftl	file	yX	ftl::plugin::via_bash::up_select	"select file via the ultimate plumber"
+ftl::kbd::bind	ftl	file	fx	ftl::plugin::via_bash::bash_filter_keep	"select files to keep via bash"
+ftl::kbd::bind	ftl	file	fX	ftl::plugin::via_bash::bash_filter_hide	"select files to hide via bash"
 
 # vim: set filetype=bash :

@@ -2,7 +2,7 @@ ftl::plugin::add_to_a_log::leader_add_to_a_log()
 {
 	echo "$ftl_state_current_basename" >> a_log
 }
-ftl::kbd::ftl::kbd::bind leader add_to_a_log        "LEADER a a"            ftl::plugin::add_to_a_log::leader_add_to_a_log             "add filename to a_log"
+ftl::kbd::bind	leader	add_to_a_log	"LEADER a a"	ftl::plugin::add_to_a_log::leader_add_to_a_log	"add filename to a_log"
 
 ftl::plugin::add_to_a_log::leader_a_edit_leader_a_log()
 {
@@ -10,7 +10,7 @@ ftl::plugin::add_to_a_log::leader_a_edit_leader_a_log()
 	$ftl_cfg_editor "a_log"
 	ftl::list::render
 }
-ftl::kbd::ftl::kbd::bind leader add_to_a_log        "LEADER a v"            ftl::plugin::add_to_a_log::leader_a_edit_leader_a_log      "edit a_log"
+ftl::kbd::bind	leader	add_to_a_log	"LEADER a v"	ftl::plugin::add_to_a_log::leader_a_edit_leader_a_log	"edit a_log"
 
 ftl::plugin::add_to_a_log::leader_a_add_to_log_and_edit()
 {
@@ -19,4 +19,4 @@ ftl::plugin::add_to_a_log::leader_a_add_to_log_and_edit()
 	$ftl_cfg_editor "a_log"
 	ftl::list::render
 }
-ftl::kbd::ftl::kbd::bind leader add_to_a_log        "LEADER a e"            ftl::plugin::add_to_a_log::leader_a_add_to_log_and_edit    "add filename to a_log and edit"
+ftl::kbd::bind	leader	add_to_a_log	"LEADER a e"	ftl::plugin::add_to_a_log::leader_a_add_to_log_and_edit	"add filename to a_log and edit"

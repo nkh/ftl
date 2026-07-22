@@ -42,7 +42,12 @@ echo -e "0;1;$img_x;$img_y;$img_sw;$img_sh;;;;;$image\n4;\n3;" >&7 ;
 # ((img_sh < pane_h)) && echo redraw bottom $img_x $((img_y+img_sh)) $pane_w $((pane_h - img_sh))
 }
 
-pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
+pid_2_pane()
+{
+	while read -s pi pp
+	do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break
+	done < <(tmux lsp -F '#{pane_id} #{pane_pid}')
+}
 my_pane=$(pid_2_pane $$)
 
 # args: location for pipe, image, clear around image, font width, font height

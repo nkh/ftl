@@ -1,4 +1,4 @@
-etag_dir()
+ftl::etag::scan_directory()
 {
 	declare -g -A ext_lines=()
 
@@ -9,7 +9,7 @@ etag_dir()
 	done < <(find "$PWD/" -mindepth 1 -maxdepth 1 -type f,l -printf '%P\n' | xargs grep -I -H -l . 2>&- | xargs wc -l)
 }
 
-etag_tag()
+ftl::etag::get_entry_tag()
 {
 	local -n r2=$2 r3=$3
 	r2=

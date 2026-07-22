@@ -211,7 +211,7 @@ ftl_cfg_ansi_pager='/usr/bin/less -R'
 ftl_cfg_markdown_pager='/usr/bin/less -R'
 
 # Markdown renderers
-ftl_cfg_markdown_renderer_default='ptext'
+ftl_cfg_markdown_renderer_default='ftl::plugin::core::ptext'
 ftl_cfg_markdown_renderer_1='vmd'
 ftl_cfg_markdown_renderer_2='vmd'
 ftl_cfg_markdown_dir_renderer="vmd"
@@ -240,7 +240,7 @@ ftl_cfg_delete_command="rm -rf"
 # Using rm-improved (rip) instead:
 # ftl_cfg_delete_command="rip --graveyard '$HOME/graveyard'"
 # mkdir -p "$HOME/graveyard"
-# ftl::kbd::bind ftl entry U unbury "undo last deletion"
+# ftl::kbd::bind	ftl	entry	U	unbury	"undo last deletion"
 # unbury() { last_bury="$(rip --graveyard "$HOME/graveyard" -s | tail -n1)" ; [[ -n "$last_bury" ]] && { rip --graveyard "$HOME/graveyard" -u ; ftl::list::change_dir "$PWD" "$(basename "$last_bury")" ; } ; }
 
 # Using FreeDesktop.org Trash:
@@ -395,7 +395,7 @@ ftl::kbd::bind	ftl	move	K	ftl::cmd::scroll_fixed_preview_up	"scroll fixed previe
 ftl::kbd::bind	ftl	move	CTL-H	ftl::cmd::send_preview_left	"send left to preview"
 ftl::kbd::bind	ftl	move	CTL-L	ftl::cmd::send_preview_right	"send right to preview"
 ftl::kbd::bind	ftl	move	gD	ftl::cmd::cd_prompt	"cd"
-ftl::kbd::bind ftl move "g LEADER"       ftl::cmd::cycle_top_file_bottom  "cycle between top/file/last"
+ftl::kbd::bind	ftl	move	"g LEADER"	ftl::cmd::cycle_top_file_bottom	"cycle between top/file/last"
 ftl::kbd::bind	ftl	move	gd	ftl::cmd::goto_first_directory	"go to the first directory"
 ftl::kbd::bind	ftl	move	gg	ftl::cmd::goto_first_file	"go to the first file"
 ftl::kbd::bind	ftl	move	gh	ftl::cmd::goto_top_of_window	"position cursor on the first file in the window"
@@ -405,7 +405,7 @@ ftl::kbd::bind	ftl	move	h	ftl::cmd::cd_to_parent	"cd to parent directory"
 ftl::kbd::bind	ftl	move	j	ftl::cmd::cursor_down	"down to next entry"
 ftl::kbd::bind	ftl	move	k	ftl::cmd::cursor_up	"up to previous entry"
 ftl::kbd::bind	ftl	move	l	ftl::cmd::cd_into_entry	"right; cd into entry"
-ftl::kbd::bind ftl move "COUNT %"        ftl::cmd::jump_by_percent        "move by percent"
+ftl::kbd::bind	ftl	move	"COUNT %"	ftl::cmd::jump_by_percent	"move by percent"
 ftl::kbd::bind	ftl	move	"-"	ftl::cmd::goto_next_same_extension	"next entry of same extension"
 ftl::kbd::bind	ftl	move	"_"	ftl::cmd::goto_next_diff_extension	"next entry of different extension"
 ftl::kbd::bind	ftl	move	"#"	ftl::cmd::goto_by_index	"goto entry by index"
@@ -414,40 +414,40 @@ ftl::kbd::bind	ftl	move	yn	ftl::cmd::goto_next_selected	"goto next tag"
 
 # --- panes ---
 
-ftl::kbd::bind ftl pane "CTL-W h"        ftl::cmd::pane_left              "extra pane left"
-ftl::kbd::bind ftl pane "CTL-W l"        ftl::cmd::pane_right             "extra pane right"
-ftl::kbd::bind ftl pane "CTL-W j"        ftl::cmd::pane_down              "extra pane below"
-ftl::kbd::bind ftl pane "CTL-W H"        ftl::cmd::pane_left_keep_focus   "extra pane: left"
-ftl::kbd::bind ftl pane "CTL-W L"        ftl::cmd::pane_right_keep_focus  "extra pane: right"
-ftl::kbd::bind ftl pane "CTL-W n"        ftl::cmd::goto_next_pane         "next pane or viewer"
+ftl::kbd::bind	ftl	pane	"CTL-W h"	ftl::cmd::pane_left	"extra pane left"
+ftl::kbd::bind	ftl	pane	"CTL-W l"	ftl::cmd::pane_right	"extra pane right"
+ftl::kbd::bind	ftl	pane	"CTL-W j"	ftl::cmd::pane_down	"extra pane below"
+ftl::kbd::bind	ftl	pane	"CTL-W H"	ftl::cmd::pane_left_keep_focus	"extra pane: left"
+ftl::kbd::bind	ftl	pane	"CTL-W L"	ftl::cmd::pane_right_keep_focus	"extra pane: right"
+ftl::kbd::bind	ftl	pane	"CTL-W n"	ftl::cmd::goto_next_pane	"next pane or viewer"
 ftl::kbd::bind	ftl	pane	gp	ftl::cmd::goto_next_pane	"next pane or viewer"
 
 # --- shell ---
 
-ftl::kbd::bind ftl shell "CTL-W !"       ftl::cmd::view_session_shell     "view shell"
+ftl::kbd::bind	ftl	shell	"CTL-W !"	ftl::cmd::view_session_shell	"view shell"
 ftl::kbd::bind	ftl	shell	"S!"	ftl::cmd::view_session_shell	"view shell"
-ftl::kbd::bind ftl shell "CTL-W sS"      ftl::cmd::open_shell_with_files  "shell pane with selected files"
+ftl::kbd::bind	ftl	shell	"CTL-W sS"	ftl::cmd::open_shell_with_files	"shell pane with selected files"
 ftl::kbd::bind	ftl	shell	SS	ftl::cmd::open_shell_with_files	"shell pane with selected files"
-ftl::kbd::bind ftl shell "CTL-W ss"      ftl::cmd::open_shell             "shell pane"
+ftl::kbd::bind	ftl	shell	"CTL-W ss"	ftl::cmd::open_shell	"shell pane"
 ftl::kbd::bind	ftl	shell	Ss	ftl::cmd::open_shell	"shell pane"
-ftl::kbd::bind ftl shell "CTL-W sq"      ftl::cmd::close_shell_pane       "close shell pane"
+ftl::kbd::bind	ftl	shell	"CTL-W sq"	ftl::cmd::close_shell_pane	"close shell pane"
 ftl::kbd::bind	ftl	shell	Sq	ftl::cmd::close_shell_pane	"close shell pane"
-ftl::kbd::bind ftl shell "CTL-W sv"      ftl::cmd::open_vertical_shell    "shell vertical pane"
+ftl::kbd::bind	ftl	shell	"CTL-W sv"	ftl::cmd::open_vertical_shell	"shell vertical pane"
 ftl::kbd::bind	ftl	shell	Sv	ftl::cmd::open_vertical_shell	"shell vertical pane"
-ftl::kbd::bind ftl shell "CTL-W sz"      ftl::cmd::open_zoomed_shell      "shell pane, zoomed out"
+ftl::kbd::bind	ftl	shell	"CTL-W sz"	ftl::cmd::open_zoomed_shell	"shell pane, zoomed out"
 ftl::kbd::bind	ftl	shell	Sz	ftl::cmd::open_zoomed_shell	"shell pane, zoomed out"
-ftl::kbd::bind ftl shell "CTL-W sf"      ftl::cmd::send_files_to_shell    "send selection to shell pane"
+ftl::kbd::bind	ftl	shell	"CTL-W sf"	ftl::cmd::send_files_to_shell	"send selection to shell pane"
 ftl::kbd::bind	ftl	shell	Sf	ftl::cmd::send_files_to_shell	"send selection to shell pane"
-ftl::kbd::bind ftl shell "CTL-W sg"      ftl::cmd::synch_shell_cwd        "cd to shell pane"
+ftl::kbd::bind	ftl	shell	"CTL-W sg"	ftl::cmd::synch_shell_cwd	"cd to shell pane"
 ftl::kbd::bind	ftl	shell	gS	ftl::cmd::synch_shell_cwd	"cd to shell pane"
-ftl::kbd::bind ftl shell "CTL-Z sp"      ftl::cmd::run_command_in_pane    "run shell command in pane"
+ftl::kbd::bind	ftl	shell	"CTL-Z sp"	ftl::cmd::run_command_in_pane	"run shell command in pane"
 ftl::kbd::bind	ftl	shell	Sp	ftl::cmd::run_command_in_pane	"run shell command in pane"
 
 # --- tabs ---
 
 ftl::kbd::bind	ftl	tabs	PARAGRAPH	ftl::cmd::new_tab	"new tab"
 ftl::kbd::bind	ftl	tabs	TAB	ftl::cmd::next_tab	"next tab"
-ftl::kbd::bind ftl tabs "COUNT gt"       ftl::cmd::goto_tab               "go to tab"
+ftl::kbd::bind	ftl	tabs	"COUNT gt"	ftl::cmd::goto_tab	"go to tab"
 ftl::kbd::bind	ftl	tabs	gt	ftl::cmd::next_tab	"next tab"
 ftl::kbd::bind	ftl	tabs	gT	ftl::cmd::prev_tab	"previous tab"
 
@@ -466,22 +466,22 @@ ftl::kbd::bind	ftl	selection	yE	ftl::cmd::select_same_extension_recursive	"selec
 ftl::kbd::bind	ftl	selection	yiE	ftl::cmd::select_extension_recursive_via_fzf	"fzf select files ext, with subdirs"
 
 ftl::kbd::bind	ftl	selection	a	ftl::cmd::flip_down	"select down"
-ftl::kbd::bind ftl selection "COUNT a"   ftl::cmd::flip_down              "select down"
+ftl::kbd::bind	ftl	selection	"COUNT a"	ftl::cmd::flip_down	"select down"
 ftl::kbd::bind	ftl	selection	yy	ftl::cmd::flip_down	"select down"
-ftl::kbd::bind ftl selection "COUNT yy"  ftl::cmd::flip_down              "select down"
+ftl::kbd::bind	ftl	selection	"COUNT yy"	ftl::cmd::flip_down	"select down"
 
 ftl::kbd::bind	ftl	selection	s	ftl::cmd::flip_up	"select up"
-ftl::kbd::bind ftl selection "COUNT s"   ftl::cmd::flip_up                "select up"
+ftl::kbd::bind	ftl	selection	"COUNT s"	ftl::cmd::flip_up	"select up"
 ftl::kbd::bind	ftl	selection	yu	ftl::cmd::flip_up	"select up"
-ftl::kbd::bind ftl selection "COUNT yu"  ftl::cmd::flip_up                "select up"
+ftl::kbd::bind	ftl	selection	"COUNT yu"	ftl::cmd::flip_up	"select up"
 
-ftl::kbd::bind ftl selection "COUNT y1"  ftl::cmd::select_class_1         "class 1 selection"
+ftl::kbd::bind	ftl	selection	"COUNT y1"	ftl::cmd::select_class_1	"class 1 selection"
 ftl::kbd::bind	ftl	selection	y1	ftl::cmd::select_class_1	"class 1 selection"
-ftl::kbd::bind ftl selection "COUNT y2"  ftl::cmd::select_class_2         "class 2 selection"
+ftl::kbd::bind	ftl	selection	"COUNT y2"	ftl::cmd::select_class_2	"class 2 selection"
 ftl::kbd::bind	ftl	selection	y2	ftl::cmd::select_class_2	"class 2 selection"
-ftl::kbd::bind ftl selection "COUNT y3"  ftl::cmd::select_class_3         "class 3 selection"
+ftl::kbd::bind	ftl	selection	"COUNT y3"	ftl::cmd::select_class_3	"class 3 selection"
 ftl::kbd::bind	ftl	selection	y3	ftl::cmd::select_class_3	"class 3 selection"
-ftl::kbd::bind ftl selection "COUNT y4"  ftl::cmd::select_class_4         "class 4 selection"
+ftl::kbd::bind	ftl	selection	"COUNT y4"	ftl::cmd::select_class_4	"class 4 selection"
 ftl::kbd::bind	ftl	selection	y4	ftl::cmd::select_class_4	"class 4 selection"
 ftl::kbd::bind	ftl	selection	yc	ftl::cmd::untag_all	"deselect all"
 ftl::kbd::bind	ftl	selection	yC	ftl::cmd::untag_via_fzf	"deselect fzf"
@@ -511,7 +511,7 @@ ftl::kbd::bind	ftl	view	zO	ftl::cmd::sort_entries_reversed	"sort reversed"
 ftl::kbd::bind	ftl	view	zv	ftl::cmd::toggle_preview_pane	"preview show/hide"
 ftl::kbd::bind	ftl	view	zff	ftl::cmd::toggle_fixed_preview	"fixed preview show/hide"
 ftl::kbd::bind	ftl	view	zfc	_ftl::prev::clear_fixed	"fixed preview close"
-ftl::kbd::bind ftl view "z STAR"         ftl::cmd::set_listing_depth      "maximum listing depth"
+ftl::kbd::bind	ftl	view	"z STAR"	ftl::cmd::set_listing_depth	"maximum listing depth"
 ftl::kbd::bind	ftl	view	zt	ftl::cmd::toggle_etags	"show/hide etags"
 ftl::kbd::bind	ftl	view	zT	ftl::cmd::select_etag_source	"select etag type"
 ftl::kbd::bind	ftl	view	zep	ftl::cmd::toggle_ext_preview	"show/hide extension preview"
@@ -574,8 +574,8 @@ ftl::cmd::toggle_trace() {
         fi
 }
 
-ftl::kbd::bind ftl ftl "LEADER d d" ftl::cmd::toggle_debug "toggle debug logging"
-ftl::kbd::bind ftl ftl "LEADER d t" ftl::cmd::toggle_trace "toggle trace logging"
+ftl::kbd::bind	ftl	ftl	"LEADER d d"	ftl::cmd::toggle_debug	"toggle debug logging"
+ftl::kbd::bind	ftl	ftl	"LEADER d t"	ftl::cmd::toggle_trace	"toggle trace logging"
 
 #----------------------------------------------------------------------------
 # Auto-source binding plugins

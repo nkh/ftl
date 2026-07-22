@@ -1,5 +1,5 @@
 
-ftl::kbd::ftl::kbd::bind nkh test   V       ftl::plugin::fzf_search::show_fzf_view   "fzf view"
+ftl::kbd::bind	nkh	test	V	ftl::plugin::fzf_search::show_fzf_view	"fzf view"
 
 ftl::plugin::fzf_search::show_fzf_view()
 {

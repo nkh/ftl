@@ -1,4 +1,4 @@
-etag_dir()
+ftl::etag::scan_directory()
 {
 	declare -g -A ext_dates=()
 
@@ -10,7 +10,7 @@ etag_dir()
 	# to display month by name use '%Td\ %Tb\ %Ty-%TH:%TM\t%P\n' and set r3=16
 }
 
-etag_tag()
+ftl::etag::get_entry_tag()
 {
 	local -n r2=$2 r3=$3
 	r2=

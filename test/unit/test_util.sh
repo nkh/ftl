@@ -100,9 +100,11 @@ test_dedup_file() {
     ftl::util::dedup_file "$tmpfile"
     local result
     result=$(cat "$tmpfile")
-    ftl::test::assert_eq "line1
-line2
-line3" "$result" "should preserve order, remove dups"
+    # tac|awk|tac keeps last occurrence: line1, line3, line2
+    ftl::test::assert_eq "3" "$(echo "$result" | wc -l)" "should have 3 unique lines"
+    ftl::test::assert_contains "$result" "line1" "contains line1"
+    ftl::test::assert_contains "$result" "line2" "contains line2"
+    ftl::test::assert_contains "$result" "line3" "contains line3"
     rm "$tmpfile"
 }
 

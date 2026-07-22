@@ -1,4 +1,4 @@
-etag_dir()
+ftl::etag::scan_directory()
 {
 	declare -g -A tmsu_untags=()
 
@@ -11,7 +11,7 @@ etag_dir()
 }
 
 #ᵀ⁝
-etag_tag()
+ftl::etag::get_entry_tag()
 {
 	local -n r2=$2 r3=$3
 	r2=

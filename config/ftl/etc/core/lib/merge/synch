@@ -1,4 +1,4 @@
-do_tag_synch()
+_ftl::sel::apply_synced_tags()
 {
 source $pfs/synched_tags
 for p in "${!new_tags[@]}"

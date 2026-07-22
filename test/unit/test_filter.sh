@@ -16,6 +16,7 @@ ftl::test::setup() {
 
 # Test: pipeline_add adds to the list
 test_pipeline_add() {
+    ftl_filter_pipeline_list=()
     ftl::filt::pipeline_add filter_a filter_b
     ftl::test::assert_eq "2" "${#ftl_filter_pipeline_list[@]}" "should have 2 filters"
     ftl::test::assert_eq "filter_a" "${ftl_filter_pipeline_list[0]}" "first filter"
@@ -24,6 +25,7 @@ test_pipeline_add() {
 
 # Test: pipeline_add returns pipe-separated string
 test_pipeline_add_returns_string() {
+    ftl_filter_pipeline_list=()
     local result
     result=$(ftl::filt::pipeline_add filter_a filter_b filter_c)
     ftl::test::assert_eq "filter_a|filter_b|filter_c" "$result" "should return pipe string"
@@ -31,6 +33,7 @@ test_pipeline_add_returns_string() {
 
 # Test: pipeline_clear empties the list
 test_pipeline_clear() {
+    ftl_filter_pipeline_list=()
     ftl::filt::pipeline_add filter_a filter_b
     ftl::filt::pipeline_clear
     ftl::test::assert_eq "0" "${#ftl_filter_pipeline_list[@]}" "should be empty"
@@ -38,6 +41,7 @@ test_pipeline_clear() {
 
 # Test: pipeline_remove removes one filter
 test_pipeline_remove() {
+    ftl_filter_pipeline_list=()
     ftl::filt::pipeline_add filter_a filter_b filter_c
     ftl::filt::pipeline_remove filter_b
     ftl::test::assert_eq "2" "${#ftl_filter_pipeline_list[@]}" "should have 2 filters"
@@ -47,6 +51,7 @@ test_pipeline_remove() {
 
 # Test: pipeline_remove on non-existent filter is a no-op
 test_pipeline_remove_nonexistent() {
+    ftl_filter_pipeline_list=()
     ftl::filt::pipeline_add filter_a
     ftl::filt::pipeline_remove filter_z
     ftl::test::assert_eq "1" "${#ftl_filter_pipeline_list[@]}" "should still have 1 filter"

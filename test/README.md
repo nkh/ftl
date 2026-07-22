@@ -12,7 +12,7 @@ A comprehensive test framework for unit-testing and integration-testing ftl's Ba
 ./test/harness.sh test/unit/
 
 # Run only integration tests
-./test/harness.sh test/integration/test_integration.sh
+./test/harness.sh test/integration/
 
 # Run a specific test file
 ./test/harness.sh test/unit/test_keyboard.sh
@@ -25,51 +25,55 @@ A comprehensive test framework for unit-testing and integration-testing ftl's Ba
 
 | Category | Files | Test functions | Assertions |
 |----------|-------|---------------|------------|
-| Unit tests | 16 | ~140 | ~272 |
-| Integration tests | 1 | 48 | 48 |
-| **Total** | **17** | **~188** | **~320** |
+| Unit tests (core) | 16 | ~140 | ~272 |
+| Unit tests (extra) | 6 | ~130 | ~189 |
+| Integration tests | 2 | ~148 | ~148 |
+| Tmux tests (if available) | 1 | 15 | 15 |
+| **Total** | **25** | **~433** | **~624** |
 
 ## Unit test files
 
-| File | Module tested | Tests |
-|------|---------------|-------|
-| `test_util.sh` | `util.sh` — path parsing, size formatting, dedup, fifos | 12 |
-| `test_log.sh` | `log.sh` — init, set_level, debug/info/trace, wrap | 13 |
-| `test_debug.sh` | `debug.sh` — stacktrace, log_caller, format_size | 10 |
-| `test_state.sh` | `state.sh` — save, load, serialize_info, child_env | 14 |
-| `test_keyboard.sh` | `keyboard.sh` — bind, normalize_key, trie, AltGr | 13 |
-| `test_selection.sh` | `selection.sh` — flip/set/unset/clear/validate | 13 |
-| `test_tab.sh` | `tab.sh` — create, advance, retreat, wrap | 9 |
-| `test_pane.sh` | `pane.sh` — pid_to_id, geometry, border colors | 14 |
-| `test_filter.sh` | `filter.sh` — pipeline add/remove/clear, user colors | 11 |
-| `test_list.sh` | `list.sh` — move_cursor, quote_*, mime_type | 15 |
-| `test_preview.sh` | `preview.sh` — clear, show_in_vim, dispatch | 12 |
-| `test_etag.sh` | `etag.sh` — default no-op scan/tag | 8 |
-| `test_virtual.sh` | `virtual.sh` — enable/reset/inject/callbacks | 11 |
-| `test_mark.sh` | `mark.sh` — save_to_history | 9 |
-| `test_time.sh` | `time.sh` — tick, handlers, timer reset | 8 |
-| `test_commands.sh` | `commands.sh` — dispatch_command, quote_selection | 10 |
+### Core unit tests (one per module)
 
-## Integration test file
+| File | Module tested |
+|------|---------------|
+| `test_util.sh` | `util.sh` — path parsing, size formatting, dedup |
+| `test_log.sh` | `log.sh` — init, set_level, debug/info/trace |
+| `test_debug.sh` | `debug.sh` — stacktrace, format_size |
+| `test_state.sh` | `state.sh` — save, load, serialize_info |
+| `test_keyboard.sh` | `keyboard.sh` — bind, normalize_key, trie |
+| `test_selection.sh` | `selection.sh` — flip/set/unset/clear |
+| `test_tab.sh` | `tab.sh` — create, advance, retreat |
+| `test_pane.sh` | `pane.sh` — pid_to_id, geometry |
+| `test_filter.sh` | `filter.sh` — pipeline add/remove/clear |
+| `test_list.sh` | `list.sh` — move_cursor, quote_* |
+| `test_preview.sh` | `preview.sh` — clear, dispatch |
+| `test_etag.sh` | `etag.sh` — default no-op |
+| `test_virtual.sh` | `virtual.sh` — enable, reset, inject |
+| `test_mark.sh` | `mark.sh` — save_to_history |
+| `test_time.sh` | `time.sh` — tick, handlers |
+| `test_commands.sh` | `commands.sh` — dispatch_command |
+
+### Extra unit tests (more depth per module)
+
+| File | Focus |
+|------|-------|
+| `test_util_extra.sh` | Edge cases for path parsing, sizes, binary detection |
+| `test_keyboard_extra.sh` | All key types (arrows, F-keys, control, alt), AltGr tables |
+| `test_selection_extra.sh` | Tag cycles, classes, validation, size tracking |
+| `test_state_extra.sh` | Serialization roundtrips, child env, cleanup |
+| `test_filter_extra.sh` | Pipeline manipulation, sort glyphs, user colors |
+| `test_log_extra.sh` | Log levels, file output, trace suppression |
+| `test_virtual_extra.sh` | Full virtual entry lifecycle, callbacks |
+| `test_tab_extra.sh` | Tab creation, switching, init_defaults |
+
+## Integration test files
 
 | File | Categories | Tests |
 |------|-----------|-------|
 | `test_integration.sh` | 13 categories | 48 |
-
-Integration test categories:
-1. Module loading (6 tests)
-2. Path parsing + selection workflow (6 tests)
-3. Tab + cursor memory (6 tests)
-4. Filter pipeline + listing (6 tests)
-5. Keyboard binding + dispatch (6 tests)
-6. State serialization roundtrip (6 tests)
-7. Virtual entries lifecycle (6 tests)
-8. Etag system (5 tests)
-9. Time events (4 tests)
-10. Logging system (5 tests)
-11. Command dispatch (5 tests)
-12. Preview state management (4 tests)
-13. Pane geometry (3 tests)
+| `test_integration_extra.sh` | 8 categories | 100 |
+| `test_tmux_integration.sh` | tmux operations | 15 (skipped if no tmux) |
 
 ## Writing tests
 
@@ -85,23 +89,9 @@ ftl::test::pass [msg]
 ftl::test::skip [msg]
 ```
 
-### Example
-
-```bash
-#!/bin/env bash
-source "$FTL_CFG/etc/core/modules/util.sh"
-
-test_parse_path() {
-    ftl::util::parse_path "/home/user/file.txt"
-    ftl::test::assert_eq "file.txt" "$ftl_state_current_basename"
-    ftl::test::assert_eq "txt" "$ftl_state_current_extension"
-}
-```
-
 ## Notes
 
-- Tests run outside tmux; tmux commands are mocked.
+- Tests run outside tmux; tmux commands are mocked (except tmux integration tests).
 - Each test file runs in a subshell for isolation.
 - `ftl::test::setup()` is called before each test function.
-- `ftl::test::teardown()` is called after each test function.
-- The harness supports `--source-only` flag for sourcing without running.
+- Tmux integration tests are auto-skipped when tmux is not installed.

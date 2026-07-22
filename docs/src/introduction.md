@@ -1,5 +1,9 @@
 # Introduction
 
+![ftl main view](assets/ftl.png)
+
+![ftl image preview](assets/image_preview.png)
+
 **ftl** is a terminal file manager written in Bash 5+ that uses **tmux** as its
 composition substrate. Where most terminal file managers implement their own
 preview pane and pane multiplexer, ftl leans on tmux for both: each pane is a
@@ -8,6 +12,10 @@ separate `ftl` process, and the preview pane runs *real programs* — `vim`,
 them. This makes ftl **hyperorthodox**: panes are independent processes that
 happen to share state through the filesystem, exactly as separate Unix
 processes should.
+
+## Introduction Video
+
+[![Introduction video](assets/introduction_video.png)](https://www.youtube.com/watch?v=nvSDmhXymVA)
 
 ## Philosophy
 
