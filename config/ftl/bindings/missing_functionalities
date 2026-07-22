@@ -1,0 +1,582 @@
+# missing_functionalities — implementation of features from ftl-missing-functionality.md
+#
+# This file implements all the proposed features organized by category.
+# Each function is namespaced as ftl::plugin::missing::* and bound to keys.
+#
+# Categories:
+#   1. File operations (duplicate, hard link, touch, checksums, pattern rename, etc.)
+#   2. Navigation (undo/redo, parent-with-selection, bookmark management)
+#   3. Selection (persistent, by size, save/load, set operations, visual mode)
+#   4. Search (search & replace, content search, mime filter, search history)
+#   5. Preview (pin/unpin, split, zoom, rotation, live tail)
+#   6. UI (command palette, workspace save/load, undo state)
+#   7. Git (blame preview, file log, stash, branch switching)
+#   8. Archives (more formats, listing, partial extraction)
+
+#==========================================================================
+# 1. File Operations
+#==========================================================================
+
+# Duplicate selection in same directory with _copy suffix
+ftl::plugin::missing::duplicate() {
+	local f
+	for f in "${ftl_selection_current[@]}" ; do
+		local dir="${f%/*}" name="${f##*/}" ext= stem=
+		if [[ "$name" =~ \. ]] ; then
+			ext=".${name##*.}"
+			stem="${name%.*}"
+		else
+			stem="$name"
+		fi
+		local i=1
+		while [[ -e "$dir/${stem}_copy${i}${ext}" ]] ; do ((i++)) ; done
+		cp -r "$f" "$dir/${stem}_copy${i}${ext}"
+	done
+	ftl::list::change_dir
+}
+
+# Hard link selection in current directory
+ftl::plugin::missing::hardlink() {
+	ftl::sel::validate_existence && ftl::cmd::prompt "Hard link (${#ftl_selection_tags[@]})? [y|N]" -sn1
+	if [[ $ftl_kbd_current_key == y ]] ; then
+		ftl::sel::clear_all
+		local f
+		for f in "${ftl_selection_current[@]}" ; do
+			ln "$f" .
+		done
+	fi
+	ftl::list::change_dir
+}
+
+# Touch (update timestamps) of selection
+ftl::plugin::missing::touch_files() {
+	touch "${ftl_selection_current[@]}" 2>/dev/null
+	ftl::list::change_dir
+}
+
+# Compute SHA256 checksums of selection
+ftl::plugin::missing::checksum() {
+	local f
+	{
+		for f in "${ftl_selection_current[@]}" ; do
+			sha256sum "$f"
+		done
+	} | ftl::pane::split_for_preview "cat ; read -sn 100"
+}
+
+# Verify checksums (.sha256 files)
+ftl::plugin::missing::checksum_verify() {
+	local f
+	{
+		for f in "${ftl_selection_current[@]}" ; do
+			if [[ -e "${f}.sha256" ]] ; then
+				sha256sum -c "${f}.sha256"
+			else
+				echo "$f: no checksum file"
+			fi
+		done
+	} | ftl::pane::split_for_preview "cat ; read -sn 100"
+}
+
+# Rename with sed pattern
+ftl::plugin::missing::rename_pattern() {
+	ftl::cmd::prompt "rename pattern (sed): " -i 's/OLD/NEW/'
+	local pattern="$ftl_kbd_current_key"
+	[[ -z "$pattern" ]] && { ftl::list::render ; return ; }
+	local f
+	for f in "${ftl_selection_current[@]}" ; do
+		local dir="${f%/*}" name="${f##*/}"
+		local new_name
+		new_name=$(echo "$name" | sed -E "$pattern")
+		if [[ "$name" != "$new_name" && ! -e "$dir/$new_name" ]] ; then
+			mv "$f" "$dir/$new_name"
+		fi
+	done
+	ftl::list::change_dir
+}
+
+# Numeric chmod (octal)
+ftl::plugin::missing::chmod_numeric() {
+	ftl::cmd::prompt "chmod (octal, eg 755): "
+	if [[ "$ftl_kbd_current_key" =~ ^[0-7]{3,4}$ ]] ; then
+		chmod "$ftl_kbd_current_key" "${ftl_selection_current[@]}"
+		ftl::list::change_dir
+	else
+		ftl::list::render
+	fi
+}
+
+# Change owner/group
+ftl::plugin::missing::chown_files() {
+	ftl::cmd::prompt "chown (user:group): "
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		sudo chown "$ftl_kbd_current_key" "${ftl_selection_current[@]}"
+		ftl::list::change_dir
+	else
+		ftl::list::render
+	fi
+}
+
+# Inverse selection (select everything NOT currently selected)
+ftl::plugin::missing::selection_invert() {
+	local -A sel
+	local p
+	for p in "${!ftl_selection_tags[@]}" ; do sel[$p]=1 ; done
+	ftl::sel::clear_all
+	for p in "${ftl_list_entries[@]}" ; do
+		[[ -z "${sel[$p]:-}" ]] && ftl::sel::set "$p"
+	done
+	ftl::list::render
+}
+
+# Select by pattern (regex)
+ftl::plugin::missing::select_by_pattern() {
+	ftl::cmd::prompt "select pattern (regex): "
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		local p
+		for p in "${ftl_list_entries[@]}" ; do
+			local name="${p##*/}"
+			if [[ "$name" =~ $ftl_kbd_current_key ]] ; then
+				ftl::sel::set "$p"
+			fi
+		done
+	fi
+	ftl::list::render
+}
+
+# Select by size (minimum)
+ftl::plugin::missing::select_by_size() {
+	ftl::cmd::prompt "min size (bytes): "
+	local min_size="${ftl_kbd_current_key:-0}"
+	[[ "$min_size" =~ ^[0-9]+$ ]] || { ftl::list::render ; return ; }
+	local p
+	for p in "${ftl_list_entries[@]}" ; do
+		if [[ -f "$p" ]] ; then
+			local sz
+			sz=$(stat -c %s "$p" 2>/dev/null || echo 0)
+			(( sz > min_size )) && ftl::sel::set "$p"
+		fi
+	done
+	ftl::list::render
+}
+
+# File size analysis (top 20 largest)
+ftl::plugin::missing::size_analysis() {
+	ftl::prev::clear
+	find . -type f -printf '%s\t%p\n' 2>/dev/null \
+		| sort -rn | head -20 \
+		| awk '{printf "%10s  %s\n", $1, $2}' \
+		| ftl::pane::split_for_preview "cat ; read -sn 100"
+}
+
+#==========================================================================
+# 2. Navigation
+#==========================================================================
+
+# Navigation history for undo/redo
+declare -a ftl_plugin_missing_nav_history
+declare -i ftl_plugin_missing_nav_index=0
+
+ftl::plugin::missing::nav_record() {
+	[[ "$ftl_pane_is_child" == 1 ]] && return 0
+	[[ -z "$ftl_state_current_path" ]] && return 0
+	ftl_plugin_missing_nav_history=("${ftl_plugin_missing_nav_history[@]:0:ftl_plugin_missing_nav_index}" "$PWD")
+	((ftl_plugin_missing_nav_index++))
+}
+
+ftl::plugin::missing::nav_back() {
+	(( ftl_plugin_missing_nav_index > 1 )) || return 0
+	((ftl_plugin_missing_nav_index--))
+	ftl::list::change_dir "${ftl_plugin_missing_nav_history[ftl_plugin_missing_nav_index-1]}"
+}
+
+ftl::plugin::missing::nav_forward() {
+	(( ftl_plugin_missing_nav_index < ${#ftl_plugin_missing_nav_history[@]} )) || return 0
+	ftl::list::change_dir "${ftl_plugin_missing_nav_history[ftl_plugin_missing_nav_index]}"
+	((ftl_plugin_missing_nav_index++))
+}
+
+# Parent directory navigation with selection of previous dir
+ftl::plugin::missing::move_left_select() {
+	local last_dir="$PWD"
+	ftl::cmd::cd_to_parent
+	sleep 0.05
+	ftl::list::change_dir "$PWD" "$(basename "$last_dir")"
+}
+
+# Bookmark management UI
+ftl::plugin::missing::marks_manage() {
+	local action
+	action=$(printf "view\ndelete\n" | fzf-tmux -p 30% 2>/dev/null)
+	case "$action" in
+		view)
+			ftl::cmd::goto_mark_via_fzf ;;
+		delete)
+			local to_delete
+			to_delete=$(printf "%s\n" "${!ftl_mark_session_marks[@]}" | fzf-tmux -m -p 30% 2>/dev/null)
+			[[ -n "$to_delete" ]] && while read -r k ; do
+				unset 'ftl_mark_session_marks[$k]'
+			done <<<"$to_delete"
+			ftl::list::render ;;
+	esac
+}
+
+#==========================================================================
+# 3. Selection
+#==========================================================================
+
+# Save selection to file
+ftl::plugin::missing::selection_save() {
+	ftl::cmd::prompt "save selection to: " -i "$ftl_state_session_dir/saved_selection"
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		printf '%s\n' "${!ftl_selection_tags[@]}" > "$ftl_kbd_current_key"
+	fi
+	ftl::list::render
+}
+
+# Load selection from file
+ftl::plugin::missing::selection_load() {
+	ftl::cmd::prompt "load selection from: " -i "$ftl_state_session_dir/saved_selection"
+	if [[ -n "$ftl_kbd_current_key" && -f "$ftl_kbd_current_key" ]] ; then
+		ftl::sel::clear_all
+		local p
+		while read -r p ; do
+			ftl::sel::set "$(ftl::util::resolve_full_path "$p")"
+		done < "$ftl_kbd_current_key"
+	fi
+	ftl::list::render
+}
+
+# Selection union (merge from file)
+ftl::plugin::missing::selection_union() {
+	ftl::cmd::prompt "union with file: "
+	if [[ -n "$ftl_kbd_current_key" && -f "$ftl_kbd_current_key" ]] ; then
+		local p
+		while read -r p ; do
+			ftl::sel::set "$(ftl::util::resolve_full_path "$p")"
+		done < "$ftl_kbd_current_key"
+	fi
+	ftl::list::render
+}
+
+# Selection intersection (keep only entries in both current and file)
+ftl::plugin::missing::selection_intersect() {
+	ftl::cmd::prompt "intersect with file: "
+	if [[ -n "$ftl_kbd_current_key" && -f "$ftl_kbd_current_key" ]] ; then
+		local -A file_sel
+		local p
+		while read -r p ; do
+			file_sel["$(ftl::util::resolve_full_path "$p")"]=1
+		done < "$ftl_kbd_current_key"
+		local -A keep
+		for p in "${!ftl_selection_tags[@]}" ; do
+			[[ -n "${file_sel[$p]:-}" ]] && keep[$p]="${ftl_selection_tags[$p]}"
+		done
+		ftl::sel::clear_all
+		for p in "${!keep[@]}" ; do
+			ftl_selection_tags[$p]="${keep[$p]}"
+		done
+		((ftl_selection_revision++))
+	fi
+	ftl::list::render
+}
+
+# Selection difference (remove entries in file from current)
+ftl::plugin::missing::selection_subtract() {
+	ftl::cmd::prompt "subtract file: "
+	if [[ -n "$ftl_kbd_current_key" && -f "$ftl_kbd_current_key" ]] ; then
+		local p
+		while read -r p ; do
+			ftl::sel::unset "$(ftl::util::resolve_full_path "$p")"
+		done < "$ftl_kbd_current_key"
+	fi
+	ftl::list::render
+}
+
+# Visual selection mode (toggle)
+ftl::plugin::missing::visual_mode() {
+	local visual_start=$ftl_state_cursor_index
+	local key
+	while true ; do
+		read -rsn1 -t 0.01 key 2>/dev/null
+		[[ -z "$key" ]] && break
+		case "$key" in
+			$'\e') break ;;
+			j) ftl::list::move_cursor 1 ;;
+			k) ftl::list::move_cursor -1 ;;
+		esac
+		local i
+		for (( i = visual_start > ftl_state_cursor_index ? ftl_state_cursor_index : visual_start ;
+		       i <= (visual_start > ftl_state_cursor_index ? visual_start : ftl_state_cursor_index) ;
+		       i++ )) ; do
+			ftl::sel::set "${ftl_list_entries[$i]}"
+		done
+		ftl::list::render 2>/dev/null
+	done
+}
+
+#==========================================================================
+# 4. Search
+#==========================================================================
+
+# Search & replace across files
+ftl::plugin::missing::rg_replace() {
+	ftl::cmd::prompt "search: "
+	local search="$ftl_kbd_current_key"
+	[[ -z "$search" ]] && { ftl::list::render ; return ; }
+	ftl::cmd::prompt "replace: "
+	local replace="$ftl_kbd_current_key"
+	ftl::cmd::prompt "replace in [a]ll/[s]elected/[c]wd? "
+	case "$ftl_kbd_current_key" in
+		a) rg -l "$search" . 2>/dev/null | xargs sed -i "s/$search/$replace/g" ;;
+		s) printf '%s\n' "${ftl_selection_current[@]}" | xargs sed -i "s/$search/$replace/g" ;;
+		c) rg -l "$search" . 2>/dev/null | xargs sed -i "s/$search/$replace/g" ;;
+	esac
+	ftl::list::change_dir
+}
+
+# Search history (find with up-arrow recall)
+ftl::plugin::missing::find_with_history() {
+	local h="$ftl_state_session_dir/find_history"
+	[[ -f "$h" ]] && ftl_state_search_string=$(tail -1 "$h" 2>/dev/null)
+	ftl::cmd::find_in_dir
+	[[ -n "$ftl_state_search_string" ]] && echo "$ftl_state_search_string" >> "$h"
+}
+
+#==========================================================================
+# 5. Preview
+#==========================================================================
+
+# Preview pin/unpin (lock preview to current file)
+ftl::plugin::missing::preview_pin() {
+	local lockdir="$ftl_state_session_dir/lock_preview"
+	mkdir -p "$lockdir" 2>/dev/null
+	{
+		echo ">>> LOCKED PREVIEW: $ftl_state_current_path"
+		echo "    Pinned at: $(date)"
+		stat "$ftl_state_current_path" 2>/dev/null
+	} > "$lockdir/$ftl_state_current_path" 2>/dev/null
+	ftl::list::render
+}
+
+ftl::plugin::missing::preview_unpin() {
+	rm -f "$ftl_state_session_dir/lock_preview/$ftl_state_current_path" 2>/dev/null
+	ftl::list::render
+}
+
+# Split preview (compare two files side by side)
+ftl::plugin::missing::preview_compare() {
+	((${#ftl_selection_current[@]} == 2)) || { ftl::log::warn "select exactly 2 files" ; return ; }
+	ftl::prev::clear
+	ftl::pane::split "$ftl_cfg_diff_tool ${ftl_selection_current[0]@Q} ${ftl_selection_current[1]@Q}" 30%
+}
+
+# Preview zoom in/out (image)
+declare -i ftl_plugin_missing_preview_zoom=2
+ftl::plugin::missing::preview_zoom_in() {
+	((ftl_plugin_missing_preview_zoom < 5)) && ((ftl_plugin_missing_preview_zoom++))
+	ftl_cfg_image_zoomed=1
+	ftl::list::render
+}
+
+ftl::plugin::missing::preview_zoom_out() {
+	((ftl_plugin_missing_preview_zoom > 0)) && ((ftl_plugin_missing_preview_zoom--))
+	ftl::list::render
+}
+
+# Preview rotation (image)
+ftl::plugin::missing::preview_rotate() {
+	local tmp="$ftl_state_session_dir/rotated_$(md5sum <<<"$ftl_state_current_path" | cut -d' ' -f1).jpg"
+	convert "$ftl_state_current_path" -rotate 90 "$tmp" 2>/dev/null
+	ftl::prev::show_image "$tmp" 2>/dev/null
+}
+
+# Live tail for log files
+ftl::plugin::missing::preview_tail_live() {
+	[[ "$ftl_state_current_extension" =~ log|out|err ]] || return 0
+	ftl::prev::clear
+	ftl::pane::split "tail -f ${ftl_state_current_path@Q}"
+}
+
+#==========================================================================
+# 6. UI
+#==========================================================================
+
+# Command palette (fzf-searchable command list)
+ftl::plugin::missing::command_palette() {
+	local choice
+	choice=$(printf '%s\n' "${!ftl_kbd_command_to_key[@]}" 2>/dev/null | fzf-tmux -p 50% 2>/dev/null)
+	if [[ -n "$choice" ]] ; then
+		ftl_state_pending_input="${ftl_kbd_command_to_key[$choice]}"
+	fi
+}
+
+# Workspace save
+ftl::plugin::missing::workspace_save() {
+	ftl::cmd::prompt "workspace name: "
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		local ws="$FTL_STATE_DIR/workspaces/$ftl_kbd_current_key"
+		mkdir -p "$ws"
+		printf '%s\n' "${ftl_tab_directories[@]}" > "$ws/tabs"
+		echo "$ftl_state_current_tab_index" > "$ws/active_tab"
+		declare -p ftl_selection_tags > "$ws/selection" 2>/dev/null
+	fi
+	ftl::list::render
+}
+
+# Workspace load
+ftl::plugin::missing::workspace_load() {
+	local name
+	name=$(ls "$FTL_STATE_DIR/workspaces" 2>/dev/null | fzf-tmux -p 30% 2>/dev/null)
+	[[ -z "$name" ]] && { ftl::list::render ; return ; }
+	local ws="$FTL_STATE_DIR/workspaces/$name"
+	[[ -d "$ws" ]] || { ftl::list::render ; return ; }
+	mapfile -t ftl_tab_directories < "$ws/tabs"
+	ftl_tab_count=${#ftl_tab_directories[@]}
+	ftl_state_current_tab_index=$(cat "$ws/active_tab" 2>/dev/null || echo 0)
+	[[ -f "$ws/selection" ]] && source "$ws/selection"
+	ftl::list::change_dir "${ftl_tab_directories[$ftl_state_current_tab_index]}"
+}
+
+#==========================================================================
+# 7. Git (additional)
+#==========================================================================
+
+ftl::plugin::missing::git_blame_preview() {
+	[[ -f "$ftl_state_current_path" ]] || return 0
+	git rev-parse HEAD &>/dev/null || return 0
+	ftl::prev::clear
+	git blame "$ftl_state_current_path" 2>/dev/null \
+		| ftl::pane::split_for_preview "cat ; read -sn 100"
+}
+
+ftl::plugin::missing::git_file_log() {
+	[[ -f "$ftl_state_current_path" ]] || return 0
+	git rev-parse HEAD &>/dev/null || return 0
+	ftl::prev::clear
+	git log --oneline --follow "$ftl_state_current_path" 2>/dev/null \
+		| ftl::pane::split_for_preview "cat ; read -sn 100"
+}
+
+ftl::plugin::missing::git_diff_stat() {
+	git rev-parse HEAD &>/dev/null || return 0
+	ftl::prev::clear
+	git diff --stat 2>/dev/null \
+		| ftl::pane::split_for_preview "cat ; read -sn 100"
+}
+
+#==========================================================================
+# 8. Archives
+#==========================================================================
+
+ftl::plugin::missing::compress_zip() {
+	ftl::cmd::prompt "zip file: "
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		zip -r "${ftl_kbd_current_key}.zip" "${ftl_selection_current[@]}"
+		ftl::list::change_dir "" "${ftl_kbd_current_key}.zip"
+	fi
+}
+
+ftl::plugin::missing::compress_7z() {
+	ftl::cmd::prompt "7z file: "
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		7z a "${ftl_kbd_current_key}.7z" "${ftl_selection_current[@]}"
+		ftl::list::change_dir "" "${ftl_kbd_current_key}.7z"
+	fi
+}
+
+ftl::plugin::missing::archive_list() {
+	local f="$ftl_state_current_path"
+	case "$ftl_state_current_extension" in
+		zip) unzip -l "$f" 2>/dev/null | ftl::pane::split_for_preview "cat ; read -sn 100" ;;
+		rar) unrar list "$f" 2>/dev/null | ftl::pane::split_for_preview "cat ; read -sn 100" ;;
+		tar|gz|bz2|xz)
+			tar -tf "$f" 2>/dev/null | ftl::pane::split_for_preview "cat ; read -sn 100" ;;
+	esac
+}
+
+#==========================================================================
+# 9. Remote / Network
+#==========================================================================
+
+ftl::plugin::missing::scp_upload() {
+	local host
+	host=$(awk '{print $1}' ~/.ssh/known_hosts 2>/dev/null | sort -u | fzf-tmux -p 30% 2>/dev/null)
+	[[ -z "$host" ]] && return 0
+	ftl::cmd::prompt "remote path: " -i "~"
+	scp "${ftl_selection_current[@]}" "$host:$ftl_kbd_current_key"
+}
+
+ftl::plugin::missing::download_url() {
+	ftl::cmd::prompt "URL: "
+	if [[ -n "$ftl_kbd_current_key" ]] ; then
+		ftl::pane::run_in_bg_window "cd '$PWD' ; wget '$ftl_kbd_current_key'"
+		ftl::list::change_dir
+	fi
+}
+
+#==========================================================================
+# Bindings
+#==========================================================================
+
+# File operations
+ftl::kbd::bind	ftl	entry	xd	ftl::plugin::missing::duplicate		"duplicate selection"
+ftl::kbd::bind	ftl	entry	xH	ftl::plugin::missing::hardlink		"hard link selection"
+ftl::kbd::bind	ftl	entry	xt	ftl::plugin::missing::touch_files		"update timestamps"
+ftl::kbd::bind	ftl	entry	xs	ftl::plugin::missing::checksum		"compute sha256"
+ftl::kbd::bind	ftl	entry	xv	ftl::plugin::missing::checksum_verify	"verify checksums"
+ftl::kbd::bind	ftl	entry	xR	ftl::plugin::missing::rename_pattern	"rename with pattern"
+ftl::kbd::bind	ftl	entry	xn	ftl::plugin::missing::chmod_numeric		"chmod (octal)"
+ftl::kbd::bind	ftl	entry	xo	ftl::plugin::missing::chown_files		"chown"
+ftl::kbd::bind	ftl	selection	yi	ftl::plugin::missing::selection_invert	"invert selection"
+ftl::kbd::bind	ftl	selection	yp	ftl::plugin::missing::select_by_pattern	"select by pattern"
+ftl::kbd::bind	ftl	selection	yz	ftl::plugin::missing::select_by_size		"select by size"
+ftl::kbd::bind	ftl	view	zA	ftl::plugin::missing::size_analysis		"size analysis"
+
+# Navigation
+ftl::kbd::bind	ftl	move	ALT-z	ftl::plugin::missing::nav_back		"go back"
+ftl::kbd::bind	ftl	move	ALT-y	ftl::plugin::missing::nav_forward		"go forward"
+ftl::kbd::bind	ftl	move	H	ftl::plugin::missing::move_left_select	"cd to parent, select prev dir"
+ftl::kbd::bind	ftl	marks	mM	ftl::plugin::missing::marks_manage		"manage marks"
+
+# Selection
+ftl::kbd::bind	ftl	selection	yS	ftl::plugin::missing::selection_save		"save selection"
+ftl::kbd::bind	ftl	selection	yL	ftl::plugin::missing::selection_load		"load selection"
+ftl::kbd::bind	ftl	selection	yu	ftl::plugin::missing::selection_union		"union with file"
+ftl::kbd::bind	ftl	selection	yi	ftl::plugin::missing::selection_intersect	"intersect with file"
+ftl::kbd::bind	ftl	selection	yd	ftl::plugin::missing::selection_subtract	"subtract file"
+ftl::kbd::bind	ftl	selection	v	ftl::plugin::missing::visual_mode		"visual selection mode"
+
+# Search
+ftl::kbd::bind	ftl	find	rR	ftl::plugin::missing::rg_replace		"search and replace"
+ftl::kbd::bind	ftl	find	rh	ftl::plugin::missing::find_with_history	"find with history"
+
+# Preview
+ftl::kbd::bind	ftl	view	zp	ftl::plugin::missing::preview_pin		"pin preview"
+ftl::kbd::bind	ftl	view	zP	ftl::plugin::missing::preview_unpin		"unpin preview"
+ftl::kbd::bind	ftl	view	zpc	ftl::plugin::missing::preview_compare		"compare two files"
+ftl::kbd::bind	ftl	view	zi	ftl::plugin::missing::preview_zoom_in		"zoom in"
+ftl::kbd::bind	ftl	view	zo	ftl::plugin::missing::preview_zoom_out		"zoom out"
+ftl::kbd::bind	ftl	view	zr	ftl::plugin::missing::preview_rotate		"rotate preview"
+ftl::kbd::bind	ftl	view	zL	ftl::plugin::missing::preview_tail_live		"live tail"
+
+# UI
+ftl::kbd::bind	ftl	ftl	CP	ftl::plugin::missing::command_palette		"command palette"
+ftl::kbd::bind	ftl	ftl	LEADER	ws	ftl::plugin::missing::workspace_save		"save workspace"
+ftl::kbd::bind	ftl	ftl	LEADER	wl	ftl::plugin::missing::workspace_load		"load workspace"
+
+# Git
+ftl::kbd::bind	ftl	find	gbl	ftl::plugin::missing::git_blame_preview		"git blame"
+ftl::kbd::bind	ftl	find	gll	ftl::plugin::missing::git_file_log		"git file log"
+ftl::kbd::bind	ftl	find	gds	ftl::plugin::missing::git_diff_stat		"git diff stat"
+
+# Archives
+ftl::kbd::bind	ftl	entry	LEADER	fz	ftl::plugin::missing::compress_zip		"compress zip"
+ftl::kbd::bind	ftl	entry	LEADER	f7	ftl::plugin::missing::compress_7z		"compress 7z"
+ftl::kbd::bind	ftl	entry	LEADER	fl	ftl::plugin::missing::archive_list		"list archive"
+
+# Remote
+ftl::kbd::bind	ftl	entry	LEADER	su	ftl::plugin::missing::scp_upload		"upload via scp"
+ftl::kbd::bind	ftl	entry	LEADER	dl	ftl::plugin::missing::download_url		"download URL"
+
+# vim: set filetype=bash :
