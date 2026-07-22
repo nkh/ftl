@@ -13,7 +13,7 @@ declare -g -A keep PWDS
 			do
 				keep["$PWD/$file"]=1
 				PWDS[$PWD]=1
-				ftl_filt_active_glyph="~"
+				ftl_filter_active_glyph="~"
 			done
 		IFS=$OIFS
 

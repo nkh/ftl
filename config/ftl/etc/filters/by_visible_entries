@@ -4,7 +4,7 @@ declare -g -A keep
 {
 	[[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_visible_entries" ]] && source "$ftl_state_parent_dir/by_visible_entries" ||
 	{
-		ftl_filt_active_glyph="~"
+		ftl_filter_active_glyph="~"
 
 		for file in $(cat $ftl_visible_entries) ; do
 			keep["$file"]=1

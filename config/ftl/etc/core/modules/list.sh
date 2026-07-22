@@ -232,19 +232,19 @@ _ftl::list::apply_filters_and_format() {
 		if [[ -f "$pnc" ]] ; then
 			if [[ "$pnc" =~ '.' ]] ; then
 				e=${pnc##*.}
-				if (( ${ftl_filt_listing_hide_exts[${ftl_state_current_tab_index}_${e@Q}]:-0} \
-					  || ${ftl_filt_listing_hide_exts[${e@Q}]:-0} )) ; then
+				if (( ${ftl_filter_listing_hide_exts[${ftl_state_current_tab_index}_${e@Q}]:-0} \
+					  || ${ftl_filter_listing_hide_exts[${e@Q}]:-0} )) ; then
 					continue
 				fi
-				if (( ${#ftl_filt_listing_keep_exts_per_tab[$ftl_state_current_tab_index]:-0} )) ; then
-					(( ${ftl_filt_listing_keep_exts_per_tab[${ftl_state_current_tab_index}_${e@Q}]:-0} )) || continue
+				if (( ${#ftl_filter_listing_keep_exts_per_tab[$ftl_state_current_tab_index]:-0} )) ; then
+					(( ${ftl_filter_listing_keep_exts_per_tab[${ftl_state_current_tab_index}_${e@Q}]:-0} )) || continue
 				fi
-				if (( ${#ftl_filt_listing_keep_exts[@]} )) ; then
-					(( ${ftl_filt_listing_keep_exts[${e@Q}]:-0} )) || continue
+				if (( ${#ftl_filter_listing_keep_exts[@]} )) ; then
+					(( ${ftl_filter_listing_keep_exts[${e@Q}]:-0} )) || continue
 				fi
 			else
-				if (( ${#ftl_filt_listing_keep_exts[@]} \
-					  || ${#ftl_filt_listing_keep_exts_per_tab[$ftl_state_current_tab_index]:-0} )) ; then
+				if (( ${#ftl_filter_listing_keep_exts[@]} \
+					  || ${#ftl_filter_listing_keep_exts_per_tab[$ftl_state_current_tab_index]:-0} )) ; then
 					continue
 				fi
 			fi
@@ -434,7 +434,7 @@ _ftl::list::render_header() {
 	fi
 
 	if (( ! ftl_list_entry_count )) ; then
-		_ftl::list::print_header '' "\e[33m∅  $head$ftl_filt_active_glyph$tabsd$search_h"
+		_ftl::list::print_header '' "\e[33m∅  $head$ftl_filter_active_glyph$tabsd$search_h"
 		return
 	fi
 
@@ -452,7 +452,7 @@ $(stat -c %s "${ftl_list_entries[$ftl_state_cursor_index]}" | numfmt --to=iec --
 	fi
 
 	_ftl::list::print_header '' \
-		"$head$ftl_filt_active_glyph$(printf "%${ftl_list_index_padding}d" $((ftl_state_cursor_index+1)))/${ftl_list_header_total_count:-$ftl_list_entry_count}$ftl_list_header_total_size$stat$date$tabsd$search_h"
+		"$head$ftl_filter_active_glyph$(printf "%${ftl_list_index_padding}d" $((ftl_state_cursor_index+1)))/${ftl_list_header_total_count:-$ftl_list_entry_count}$ftl_list_header_total_size$stat$date$tabsd$search_h"
 }
 
 # Print the header with PWD (left) and info (right), truncated to fit.
@@ -518,13 +518,13 @@ _ftl::list::scan_for_dir_view() {
 	fi
 	_ftl::list::find_entries "-xtype p,l" \
 		| ftl::filter::apply_external \
-		| eval "$ftl_filt_pipeline_string" \
+		| eval "$ftl_filter_pipeline_string" \
 		| ftl::filt::sort_entries \
 		| cut -f 3-
 	if (( ftl_tab_listing_mode[$t] != 1 )) ; then
 		{ _ftl::list::find_entries "-type  f,l -xtype f" ; ftl::list::inject_virtual_files ; } \
 			| ftl::filter::apply_external \
-			| eval "$ftl_filt_pipeline_string" \
+			| eval "$ftl_filter_pipeline_string" \
 			| ftl::filt::sort_entries \
 			| cut -f 3-
 	fi
@@ -543,14 +543,14 @@ _ftl::list::scan_full() {
 	fi
 	_ftl::list::find_entries "-xtype p,l" \
 		| ftl::filter::apply_external \
-		| eval "$ftl_filt_pipeline_string" \
+		| eval "$ftl_filter_pipeline_string" \
 		| ftl::filt::sort_entries \
 		| _ftl::list::emit_size_to_fifo \
 		| _ftl::list::emit_name_to_fifos
 	if (( ftl_tab_listing_mode[$t] != 1 )) ; then
 		{ _ftl::list::find_entries "-type  f,l -xtype f" ; ftl::list::inject_virtual_files ; } \
 			| ftl::filter::apply_external \
-			| eval "$ftl_filt_pipeline_string" \
+			| eval "$ftl_filter_pipeline_string" \
 			| ftl::filt::sort_entries \
 			| _ftl::list::emit_size_to_fifo \
 			| _ftl::list::emit_name_to_fifos

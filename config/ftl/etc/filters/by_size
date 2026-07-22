@@ -9,7 +9,7 @@
 		declare -p ftl_min_size >"$ftl_state_parent_dir/by_size"
 	}
 
-	ftl_filt_active_glyph="~"
+	ftl_filter_active_glyph="~"
 }
 
 ftl::plugin::by_size::filter()

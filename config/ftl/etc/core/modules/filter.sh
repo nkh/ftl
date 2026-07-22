@@ -22,31 +22,31 @@
 #   _ftl::filt::apply_reverse_filter — apply reverse filter (was: filter_rev)
 #
 # Globals:
-#   ftl_filt_pipeline_list         — indexed array of filter fn names (was: filter_list)
-#   ftl_filt_pipeline_string       — eval-able pipe string (was: filter_pipe)
-#   ftl_filt_external_name         — name of loaded external filter (was: filter_ext)
-#   ftl_filt_active_glyph          — glyph shown when filter active (was: ftag)
-#   ftl_filt_listing_hide_exts     — assoc: extension → 1 (hide) (was: lignore)
-#   ftl_filt_listing_keep_exts     — assoc: extension → 1 (keep only) (was: lkeep)
-#   ftl_filt_listing_keep_exts_per_tab — per-tab keep list (was: lkeep_tab)
+#   ftl_filter_pipeline_list         — indexed array of filter fn names (was: filter_list)
+#   ftl_filter_pipeline_string       — eval-able pipe string (was: filter_pipe)
+#   ftl_filter_external_name         — name of loaded external filter (was: filter_ext)
+#   ftl_filter_active_glyph          — glyph shown when filter active (was: ftag)
+#   ftl_filter_listing_hide_exts     — assoc: extension → 1 (hide) (was: lignore)
+#   ftl_filter_listing_keep_exts     — assoc: extension → 1 (keep only) (was: lkeep)
+#   ftl_filter_listing_keep_exts_per_tab — per-tab keep list (was: lkeep_tab)
 
 # The pipeline list and string.
-declare -ag ftl_filt_pipeline_list
-ftl_filt_pipeline_string=
+declare -ag ftl_filter_pipeline_list
+ftl_filter_pipeline_string=
 
 # Add a filter to the pipeline.
 # Args:
 #   $@: filter function names
 # Outputs: pipe-separated string on stdout
 ftl::filt::pipeline_add() {
-	ftl_filt_pipeline_list+=("$@")
+	ftl_filter_pipeline_list+=("$@")
 	local IFS='|'
-	echo "${ftl_filt_pipeline_list[*]}"
+	echo "${ftl_filter_pipeline_list[*]}"
 }
 
 # Clear the pipeline.
 ftl::filt::pipeline_clear() {
-	ftl_filt_pipeline_list=()
+	ftl_filter_pipeline_list=()
 }
 
 # Remove a filter from the pipeline.
@@ -55,24 +55,24 @@ ftl::filt::pipeline_clear() {
 ftl::filt::pipeline_remove() {
 	local -a new_list=()
 	local f
-	for f in "${ftl_filt_pipeline_list[@]}" ; do
+	for f in "${ftl_filter_pipeline_list[@]}" ; do
 		[[ "$f" != "$1" ]] && new_list+=("$f")
 	done
-	ftl_filt_pipeline_list=("${new_list[@]}")
+	ftl_filter_pipeline_list=("${new_list[@]}")
 }
 
 # Reset all filters to defaults.
 ftl::filt::reset() {
-	ftl_filt_active_glyph=
+	ftl_filter_active_glyph=
 	_ftl::filt::reset_external
 	eval 'ftl::filter::apply_external() { cat ; } ; ftl::filt::sort_entries() { ftl::filt::sort_by ; } ; ftl::filt::get_sort_glyph() { echo ${ftl_cfg_glyph_sort[$ftl_list_resolved_sort_type]} ; }'
 }
 
 # Reset the external filter (call its reset hook).
 _ftl::filt::reset_external() {
-	[[ -z "$ftl_filt_external_name" ]] && return 0
-	source "$FTL_CFG/etc/filters/$ftl_filt_external_name" "reset"
-	ftl_filt_external_name=
+	[[ -z "$ftl_filter_external_name" ]] && return 0
+	source "$FTL_CFG/etc/filters/$ftl_filter_external_name" "reset"
+	ftl_filter_external_name=
 }
 
 # Apply the image-mode filter (with optional negation).
@@ -138,9 +138,9 @@ ftl::filt::load_external() {
 	local p="$FTL_CFG/etc/filters"
 	if [[ -f "$p/$1" ]] ; then
 		source "$p/$1"
-		ftl_filt_external_name="$1"
+		ftl_filter_external_name="$1"
 	else
-		ftl_filt_external_name=
+		ftl_filter_external_name=
 		echo "ftl: load_filter error" >&2
 		false
 	fi
@@ -148,7 +148,7 @@ ftl::filt::load_external() {
 
 # Initialize the default pipeline.
 ftl::filt::init() {
-	ftl_filt_pipeline_string="$(ftl::filt::pipeline_add \
+	ftl_filter_pipeline_string="$(ftl::filt::pipeline_add \
 		_ftl::filt::apply_image_mode_filter \
 		_ftl::filt::apply_filter_1 \
 		_ftl::filt::apply_filter_2 \

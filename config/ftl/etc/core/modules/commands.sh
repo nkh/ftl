@@ -1106,7 +1106,7 @@ ftl::cmd::preview_with() {
 ftl::cmd::set_filter_1() {
 	ftl::cmd::prompt "filter: " -i "${ftl_tab_filter_1[$ftl_state_current_tab_index]}"
 	ftl_tab_filter_1[$ftl_state_current_tab_index]="${ftl_kbd_current_key:-.}"
-	ftl_filt_active_glyph="~"
+	ftl_filter_active_glyph="~"
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
 
@@ -1117,7 +1117,7 @@ ftl::cmd::set_filter() {
 ftl::cmd::set_filter_2() {
 	ftl::cmd::prompt "filter2: " -i "${ftl_tab_filter_2[$ftl_state_current_tab_index]}"
 	ftl_tab_filter_2[$ftl_state_current_tab_index]="${ftl_kbd_current_key:-.}"
-	ftl_filt_active_glyph="~"
+	ftl_filter_active_glyph="~"
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
 
@@ -1128,7 +1128,7 @@ ftl::cmd::set_filter2() {
 ftl::cmd::set_dir_filter() {
 	ftl::cmd::prompt "filter dir: " -i "${ftl_tab_filter_dirs[$ftl_state_current_tab_index]}"
 	ftl_tab_filter_dirs[$ftl_state_current_tab_index]="${ftl_kbd_current_key:-.}"
-	ftl_filt_active_glyph="~"
+	ftl_filter_active_glyph="~"
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
 
@@ -1139,7 +1139,7 @@ ftl::cmd::set_filter_dir() {
 ftl::cmd::set_reverse_filter() {
 	ftl::cmd::prompt "rfilter: " -i "${ftl_tab_filter_reverse[$ftl_state_current_tab_index]}"
 	ftl_tab_filter_reverse[$ftl_state_current_tab_index]="$ftl_kbd_current_key"
-	ftl_filt_active_glyph="~"
+	ftl_filter_active_glyph="~"
 	ftl::list::change_dir '' "$ftl_state_current_basename"
 }
 
@@ -1175,7 +1175,7 @@ ftl::cmd::clear_all_filters() {
 	ftl_tab_filter_reverse[$t]="$ftl_cfg_default_reverse_filter"
 	ftl_tab_filter_image_negate[$t]=
 	ftl::filt::reset
-	ftl_filt_active_glyph=
+	ftl_filter_active_glyph=
 	ftl::list::change_dir
 }
 
@@ -2278,13 +2278,13 @@ ftl::cmd::etag_select() {
 ftl::cmd::extension_hide_tab() {
 	[[ -n "$ftl_state_current_extension" ]] || return 0
 	local t=$ftl_state_current_tab_index
-	(( ftl_filt_listing_hide_exts[${t}_${ftl_state_current_extension@Q}] = 1 ))
+	(( ftl_filter_listing_hide_exts[${t}_${ftl_state_current_extension@Q}] = 1 ))
 	ftl::list::change_dir
 }
 
 ftl::cmd::extension_hide() {
 	[[ -n "$ftl_state_current_extension" ]] || return 0
-	(( ftl_filt_listing_hide_exts[${ftl_state_current_extension@Q}] = 1 ))
+	(( ftl_filter_listing_hide_exts[${ftl_state_current_extension@Q}] = 1 ))
 	ftl::list::change_dir
 }
 
@@ -2293,8 +2293,8 @@ ftl::cmd::extension_only_tab() {
 	local t=$ftl_state_current_tab_index
 	for i in "${ftl_selection_current[@]}" ; do
 		e="${i##*.}"
-		[[ -n "$e" ]] && (( ftl_filt_listing_keep_exts_per_tab[$t] = 1, \
-			ftl_filt_listing_keep_exts_per_tab[${t}_${e@Q}] = 1 ))
+		[[ -n "$e" ]] && (( ftl_filter_listing_keep_exts_per_tab[$t] = 1, \
+			ftl_filter_listing_keep_exts_per_tab[${t}_${e@Q}] = 1 ))
 	done
 	ftl::sel::clear_all
 	ftl::list::change_dir
@@ -2304,16 +2304,16 @@ ftl::cmd::extension_only() {
 	local i e
 	for i in "${ftl_selection_current[@]}" ; do
 		e="${i##*.}"
-		[[ -n "$e" ]] && (( ftl_filt_listing_keep_exts[${e@Q}] = 1 ))
+		[[ -n "$e" ]] && (( ftl_filter_listing_keep_exts[${e@Q}] = 1 ))
 	done
 	ftl::sel::clear_all
 	ftl::list::change_dir
 }
 
 ftl::cmd::extension_clear() {
-	ftl_filt_listing_hide_exts=()
-	ftl_filt_listing_keep_exts=()
-	ftl_filt_listing_keep_exts_per_tab=()
+	ftl_filter_listing_hide_exts=()
+	ftl_filter_listing_keep_exts=()
+	ftl_filter_listing_keep_exts_per_tab=()
 	ftl::filt::sort_entries() { ftl::filt::sort_by ; }
 	ftl::list::change_dir
 }

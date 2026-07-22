@@ -13,7 +13,7 @@ ftl::log::debug "by regex: $1"
 		for file in $(frf 1 "-tmux -p 80%" ctrl-t) ; do
 			keep["$ftl_state_current_tab_index-$PWD/$file"]=1
 			PWDS[$ftl_state_current_tab_index-$PWD]=1
-			ftl_filt_active_glyph="~"
+			ftl_filter_active_glyph="~"
 		done
 
 		IFS=$OIFS

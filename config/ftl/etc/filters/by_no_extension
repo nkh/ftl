@@ -12,7 +12,7 @@ shopt -s dotglob
 						fzf-tmux -p 30% -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
 			do
 				[[ $ext == "-without_extension-" ]] && remove_no_ext=1 || fnexts[$ext]=1
-				ftl_filt_active_glyph="~"
+				ftl_filter_active_glyph="~"
 			done
 
 		declare -p remove_no_ext fnexts >"$ftl_state_parent_dir/by_no_extension"

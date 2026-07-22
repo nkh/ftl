@@ -24,7 +24,7 @@ declare -g -A keep=() PWDS=()
 		done
 
 		vi +start "$query_file" && {
-			ftl_filt_active_glyph="~"
+			ftl_filter_active_glyph="~"
 
 			while read l ; do
 				[[ "$l" =~ ^$ || "$l" =~ ^# ]] && continue # skip empty_line or comments

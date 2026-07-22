@@ -79,9 +79,9 @@ ftl_selection_revision=0
 declare -Ag ftl_state_cursor_memory
 declare -Ag ftl_list_mime_cache
 declare -Ag ftl_view_preview_ignore_exts
-declare -Ag ftl_filt_listing_hide_exts
-declare -Ag ftl_filt_listing_keep_exts
-declare -Ag ftl_filt_listing_keep_exts_per_tab
+declare -Ag ftl_filter_listing_hide_exts
+declare -Ag ftl_filter_listing_keep_exts
+declare -Ag ftl_filter_listing_keep_exts_per_tab
 declare -Ag ftl_view_vim_tail_commands
 declare -Ag ftl_selection_tags
 declare -Ag ftl_selection_class_index

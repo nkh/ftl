@@ -123,8 +123,8 @@ ftl::prev::sync_and_dispatch() {
 	source "$ftl_state_other_session_dir/ftl"
 
 	if (( ftl_pane_is_child )) ; then
-		if [[ -n "$ftl_filt_external_name" ]] ; then
-			source "$FTL_CFG/etc/filters/$ftl_filt_external_name" load "$ftl_state_other_session_dir"
+		if [[ -n "$ftl_filter_external_name" ]] ; then
+			source "$FTL_CFG/etc/filters/$ftl_filter_external_name" load "$ftl_state_other_session_dir"
 		else
 			ftl::filt::reset
 		fi

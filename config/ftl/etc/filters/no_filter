@@ -3,4 +3,4 @@ ftl::plugin::no_filter::filter() { /bin/cat ; }
 # Override the placeholder so the listing pipeline dispatches to this plugin.
 ftl::filter::apply_external() { ftl::plugin::no_filter::filter ; }
 
-ftl_filt_external_name=
+ftl_filter_external_name=

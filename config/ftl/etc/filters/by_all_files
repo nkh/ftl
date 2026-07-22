@@ -7,7 +7,7 @@ declare -g -A keep PWDR
 		OIFS=$IFS
 		IFS=$'\n'
 
-		ftl_filt_active_glyph="~"
+		ftl_filter_active_glyph="~"
 		[[ "$PWDR" ]] && {
 			OPWDR="$PWDR"
 

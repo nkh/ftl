@@ -35,15 +35,15 @@ ftl::plugin::via_bash::up_select()
 # and we can chose them via fzf
 ftl::plugin::via_bash::bash_filter_keep()
 {
-	ftl_filt_external_name="by_bash_keep"
-	source "$FTL_CFG/filters/$ftl_filt_external_name" || ftl_filt_external_name=
+	ftl_filter_external_name="by_bash_keep"
+	source "$FTL_CFG/filters/$ftl_filter_external_name" || ftl_filter_external_name=
 	ftl::list::change_dir
 }
 
 ftl::plugin::via_bash::bash_filter_hide()
 {
-	ftl_filt_external_name="by_bash_hide"
-	source "$FTL_CFG/filters/$ftl_filt_external_name" || ftl_filt_external_name=
+	ftl_filter_external_name="by_bash_hide"
+	source "$FTL_CFG/filters/$ftl_filter_external_name" || ftl_filter_external_name=
 	ftl::list::change_dir
 }
 

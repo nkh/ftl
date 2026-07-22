@@ -11,7 +11,7 @@ declare -g -A fexts=()
 						fzf-tmux -p 30% --cycle -m --ansi --info=inline --layout=reverse --bind ctrl-s:select-all)
 			do
 				fexts[$ext]=1
-				ftl_filt_active_glyph="~"
+				ftl_filter_active_glyph="~"
 			done
 
 		declare -p fexts >"$ftl_state_session_dir/by_extension"

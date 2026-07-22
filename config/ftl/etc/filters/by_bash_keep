@@ -24,7 +24,7 @@ bash_filter_keep_imp()
 		ftl::sel::clear_all
 
 		for p in "${keep_files[@]}" ; do
-			ftl_filt_active_glyph="~"
+			ftl_filter_active_glyph="~"
 			real_path="$(realpath "$p")"
 
 			keep["$ftl_state_current_tab_index-$real_path"]=1

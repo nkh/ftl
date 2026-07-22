@@ -53,14 +53,14 @@ ftl::state::save() {
                 echo "sdir=\"${ftl_list_entries[$ftl_state_cursor_index]}\""
                 echo "sindex=${ftl_state_cursor_memory[${ftl_state_current_tab_index}_$ftl_list_entries[$ftl_state_cursor_index]]}"
                 echo "n=\"$ftl_state_current_path\""
-                echo "ftag=$ftl_filt_active_glyph"
+                echo "ftag=$ftl_filter_active_glyph"
                 echo "show_size=$ftl_state_show_size_mode"
                 echo "prev_cb=\"$ftl_state_preview_callback\""
                 echo "etag=$ftl_state_etag_enabled"
                 echo "etag_s=\"$ftl_etag_source_name\""
                 echo "etag_cb=\"$ftl_etag_callback\""
                 echo "dirmode=\"$ftl_state_dir_preview_mode\""
-                echo "filter_ext=\"$ftl_filt_external_name\""
+                echo "filter_ext=\"$ftl_filter_external_name\""
                 echo "vmode[tab]=\"${ftl_tab_view_mode[$ftl_state_current_tab_index]}\""
                 echo "sort_type[tab]=${ftl_tab_sort_type[$ftl_state_current_tab_index]}"
                 echo "filters[tab]=\"${ftl_tab_filter_1[$ftl_state_current_tab_index]}\""
@@ -71,7 +71,7 @@ ftl::state::save() {
                 echo "ntfilter[tab]=\"${ftl_tab_filter_image_negate[$ftl_state_current_tab_index]}\""
         } >"$target_dir/ftl"
 
-        declare -p ftl_filt_listing_hide_exts ftl_filt_listing_keep_exts >>"$target_dir/ftl"
+        declare -p ftl_filter_listing_hide_exts ftl_filter_listing_keep_exts >>"$target_dir/ftl"
 }
 
 # Load (source) a state file.

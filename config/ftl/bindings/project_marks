@@ -76,9 +76,9 @@ ftl::plugin::project_marks::pmarks_edit()
 }
 
 # Bindings
-ftl::kbd::bind	marks               	project         	Mpp                 	ftl::plugin::project_marks::pmark                 	"add the current entry to the project marks"
-ftl::kbd::bind	marks               	project         	Mpe                 	ftl::plugin::project_marks::pmarks_edit           	"edit the current directory marks"
-ftl::kbd::bind	marks               	project         	gpp                 	ftl::plugin::project_marks::pmarks_fzf            	"go to a project mark via fzf"
-ftl::kbd::bind	marks               	project         	gps                 	ftl::plugin::project_marks::pmarks_subdir_fzf     	"go to a project mark via fzf in child directories"
+ftl::kbd::bind	marks	project	Mpp	ftl::plugin::project_marks::pmark	"add the current entry to the project marks"
+ftl::kbd::bind	marks	project	Mpe	ftl::plugin::project_marks::pmarks_edit	"edit the current directory marks"
+ftl::kbd::bind	marks	project	gpp	ftl::plugin::project_marks::pmarks_fzf	"go to a project mark via fzf"
+ftl::kbd::bind	marks	project	gps	ftl::plugin::project_marks::pmarks_subdir_fzf	"go to a project mark via fzf in child directories"
 
 # vim: set filetype=bash :
