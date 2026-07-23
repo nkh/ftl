@@ -138,6 +138,13 @@ bind ftl entry xv checksum_verify "verify checksums"
 
 ### 1.6 Batch rename with patterns
 
+> **Status:** Implemented (extended) — the inline rename mode (`LEADER r i`)
+> provides regexp rename (`R` key inside the mode), sequential numbered
+> rename (`r`), single-file inline rename (`Return`), TAB-flow multi-file
+> rename, and EXIF/IPTC image labeling (`l`). See
+> `documentation/ftl-inline-rename-proposal.md` for the full design and
+> `docs/src/user-guide/inline-rename.md` for user docs.
+
 **What:** The existing `R` (rename) uses `edir` (interactive bulk renamer). Missing: pattern-based rename (regex substitution).
 
 **Why:** Renaming 100 photos from `IMG_001.jpg` to `vacation_001.jpg` is tedious with `edir` but trivial with a regex.

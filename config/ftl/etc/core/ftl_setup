@@ -29,6 +29,7 @@ source "$FTL_CFG/etc/core/modules/virtual.sh"
 source "$FTL_CFG/etc/core/modules/mark.sh"
 source "$FTL_CFG/etc/core/modules/time.sh"
 source "$FTL_CFG/etc/core/modules/commands.sh"
+source "$FTL_CFG/etc/core/modules/inline_rename.sh"
 
 # Source the viewer dispatcher (defines ftl::prev::show_internal etc.)
 # Set FTL_BOOTSTRAP_DONE first so viewers/core doesn't try to re-source ftl_setup

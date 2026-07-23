@@ -14,6 +14,7 @@ function, and a test.
 | `xs` | `ftl::plugin::missing::checksum` | Compute SHA256 checksums |
 | `xv` | `ftl::plugin::missing::checksum_verify` | Verify `.sha256` files |
 | `xR` | `ftl::plugin::missing::rename_pattern` | Rename with sed pattern |
+| `LEADER r i` | `ftl::plugin::inline_rename::enter` | Inline rename mode (single/sequential/regexp/image-label). See [Inline Rename Mode](./user-guide/inline-rename.md). |
 | `xn` | `ftl::plugin::missing::chmod_numeric` | Chmod with octal mode |
 | `xo` | `ftl::plugin::missing::chown_files` | Change owner/group |
 | `zA` | `ftl::plugin::missing::size_analysis` | Show top 20 largest files |

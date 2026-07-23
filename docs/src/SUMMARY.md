@@ -19,6 +19,7 @@
 - [Shell Integration](./user-guide/shell.md)
 - [Marks & History](./user-guide/marks-history.md)
 - [File Operations](./user-guide/file-operations.md)
+- [Inline Rename Mode](./user-guide/inline-rename.md)
 - [Missing Functionalities](./missing-functionalities.md)
 
 # Configuration

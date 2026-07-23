@@ -275,6 +275,7 @@ this man page.
 | **pop** | Copy selection to other tab |
 | **pom** | Move selection to other tab |
 | **R** | Rename selection (via **edir**(1)) |
+| **LEADER r i** | Enter inline rename mode (see below) |
 | **xl** | Symlink selection |
 | **xmr** | Toggle read permission |
 | **xmw** | Toggle write permission |
@@ -291,6 +292,57 @@ this man page.
 | **xh** | Hex view |
 | **xH** | Hex edit |
 | **xp** | Preview with custom command |
+
+### Inline Rename Mode
+
+Press **LEADER r i** to enter inline rename mode. The header shows `[RENAME]`.
+This is a modal, two-level workflow that complements **R** (which invokes
+**edir**(1) for full `$EDITOR`-based bulk rename).
+
+**Outer mode** (navigation + dispatch):
+
+| Key | Action |
+|-----|--------|
+| **j** / **k** or arrows | Move cursor |
+| **J** / **K** (PgDn/PgUp) | Move by `ftl_cfg_move_step_size` |
+| **g** / **G** (Home/End) | Jump to first / last entry |
+| **SPACE** / **t** | Toggle selection on current entry |
+| **TAB** | Toggle selection and move down |
+| **Return** | Edit current entry's name (pre-filled) |
+| any letter `[a-zA-Z0-9_\-.]` | Edit current entry with a fresh name starting with that letter |
+| **r** | Sequential rename across selection (or all entries if none selected) |
+| **R** | Regexp rename (prompts for a `sed -E` expression) |
+| **l** | Edit EXIF/IPTC label of current image (no filename change) |
+| **x** / **DEL** | Delete current entry (with confirmation) |
+| **d** | Delete without confirmation if `ftl_cfg_inline_rename_no_confirm_delete=1` |
+| **Escape** / **q** | Exit inline rename mode |
+
+**Inner mode** (per-entry text editing):
+
+| Key | Action |
+|-----|--------|
+| printable ASCII | Append (or insert at cursor) |
+| **Backspace** | Delete last character |
+| **CTL-W** | Delete previous word |
+| **CTL-U** | Clear entire draft |
+| **CTL-A** / **Home** | Move insertion cursor to start |
+| **CTL-E** / **End** | Move insertion cursor to end |
+| **Return** | Commit (`mv` for filenames, `exiftool` for labels) |
+| **Escape** | Abort (discard draft, return to outer mode) |
+| **TAB** | Commit and start editing the next entry down |
+
+The draft is rendered in inverse video at the cursor's row, with the
+insertion cursor highlighted. If a commit would overwrite an existing
+file, the operation is refused and an error message is shown inline.
+
+Configuration variables (in `ftlrc`):
+
+- `ftl_cfg_inline_rename_no_confirm_delete=0` — set to 1 to skip delete confirmation
+- `ftl_cfg_inline_rename_sequence_format='%03d'` — `printf` format for sequential rename
+- `ftl_cfg_inline_rename_regexp_default='s/OLD/NEW/'` — pre-filled default for the regexp prompt
+- `ftl_cfg_image_extensions=(jpg jpeg png gif tiff tif bmp webp heic)` — extensions valid for `l`
+- `ftl_cfg_glyph_inline_rename='⟦R⟧'` — header glyph in outer mode
+- `ftl_cfg_glyph_inline_rename_edit='⟦R✎⟧'` — header glyph in inner mode
 
 ## Tabs
 

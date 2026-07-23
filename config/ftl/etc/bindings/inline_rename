@@ -1,0 +1,3 @@
+ftl::kbd::bind	leader	rename	"LEADER r i"	ftl::plugin::inline_rename::enter	"inline rename mode"
+
+# vim: set filetype=bash :

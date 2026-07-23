@@ -58,7 +58,10 @@ declare -Ag ftl_cfg_preset_destinations=(
 
 | Key | Command | Description |
 |-----|---------|-------------|
-| `R` | `ftl::cmd::rename_selection` | rename the current entry (or bulk-rename the selection) |
+| `R` | `ftl::cmd::rename_selection` | rename the current entry (or bulk-rename the selection) via `edir` |
+| `LEADER r i` | `ftl::plugin::inline_rename::enter` | enter inline rename mode (modal single/bulk/sequential/regexp/image-label) |
+
+See [Inline Rename Mode](./inline-rename.md) for the full modal workflow.
 
 ## Permissions (chmod)
 

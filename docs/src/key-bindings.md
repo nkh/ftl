@@ -164,6 +164,7 @@ are space-separated.
 | `d` | `delete_selection` | delete |
 | `if` / `id` / `iD` / `ib` | `create_file` / `create_dir_no_cd` / `create_dir_and_cd` / `create_bulk` | create |
 | `R` | `rename_selection` | rename |
+| `LEADER r i` | `ftl::plugin::inline_rename::enter` | inline rename mode (modal) |
 | `w` | `copy_to_prompted` | copy to prompted |
 | `pp` / `pm` | `copy_selection_here` / `move_selection_here` | copy / move here |
 | `PP` / `PM` | `copy_to_preset` / `move_to_preset` | to preset |

@@ -237,6 +237,26 @@ ftl_cfg_exa_options="-l --tree -L 3 --header --color=always"
 # Deletion command
 ftl_cfg_delete_command="rm -rf"
 
+#----------------------------------------------------------------------------
+# Inline rename mode (LEADER r i) — see documentation/ftl-inline-rename-proposal.md
+#----------------------------------------------------------------------------
+
+# Whether 'd' in inline-rename mode deletes without confirmation
+ftl_cfg_inline_rename_no_confirm_delete=0
+
+# Format string for sequential rename. printf-style; %03d = zero-padded 3-digit
+ftl_cfg_inline_rename_sequence_format='%03d'
+
+# Default sed expression pre-filled in the regexp-rename prompt
+ftl_cfg_inline_rename_regexp_default='s/OLD/NEW/'
+
+# File extensions considered images (for the 'l' label sub-mode)
+ftl_cfg_image_extensions=(jpg jpeg png gif tiff tif bmp webp heic)
+
+# Glyphs shown in the header while inline-rename mode is active
+ftl_cfg_glyph_inline_rename='⟦R⟧'
+ftl_cfg_glyph_inline_rename_edit='⟦R✎⟧'
+
 # Using rm-improved (rip) instead:
 # ftl_cfg_delete_command="rip --graveyard '$HOME/graveyard'"
 # mkdir -p "$HOME/graveyard"
