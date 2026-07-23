@@ -21,7 +21,11 @@ set -u
 
 FTL_TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
 FTL_ROOT_DIR="$(cd "$FTL_TEST_DIR/.." && pwd)"
-FTL_CFG="${FTL_CFG:-$HOME/.config/ftl}"
+# Default FTL_CFG to the project's config dir if not already set in the env.
+# Do NOT use $HOME/.config/ftl — that may not exist in CI/sandbox environments.
+# Individual test files can still override with their own ${FTL_CFG:-...} default.
+FTL_CFG="${FTL_CFG:-$FTL_ROOT_DIR/config/ftl}"
+export FTL_CFG
 
 # Colors
 if [[ -t 1 ]]; then

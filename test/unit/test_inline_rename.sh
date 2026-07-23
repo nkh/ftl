@@ -10,7 +10,7 @@
 # ftl::list::change_dir, ftl::cmd::prompt, ftl::cmd::cursor_up, etc.)
 # are stubbed to no-op or to mutate state predictably.
 
-FTL_CFG="/home/z/my-project/ftl-work/config/ftl"
+FTL_CFG="${FTL_CFG:-/home/z/my-project/ftl-work/config/ftl}"
 export FTL_CFG
 
 source "$FTL_CFG/etc/core/modules/util.sh"
