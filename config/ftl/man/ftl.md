@@ -344,6 +344,98 @@ Configuration variables (in `ftlrc`):
 - `ftl_cfg_glyph_inline_rename='⟦R⟧'` — header glyph in outer mode
 - `ftl_cfg_glyph_inline_rename_edit='⟦R✎⟧'` — header glyph in inner mode
 
+### Missing Functionalities (extended bindings)
+
+A collection of 42 additional features implemented from the
+`ftl-missing-functionality.md` analysis. See
+`docs/src/missing-functionalities.md` for full per-feature documentation,
+examples, and test coverage.
+
+**File Operations:**
+
+| Key | Action |
+|-----|--------|
+| **xd** | Duplicate selection with `_copy<N>` suffix |
+| **xH** | Hard link selection in current directory (overrides hexedit) |
+| **xt** | Update timestamps (`touch`) |
+| **xs** | Compute SHA256 checksums |
+| **xv** | Verify `.sha256` checksum files |
+| **xR** | Rename with `sed -E` pattern |
+| **xn** | Chmod with octal mode (e.g. `755`) |
+| **xo** | Chown (user:group, requires sudo) |
+| **zA** | Size analysis — top 20 largest files |
+
+**Navigation:**
+
+| Key | Action |
+|-----|--------|
+| **ALT-z** | Go back in directory history |
+| **ALT-y** | Go forward in directory history |
+| **H** | Cd to parent, select previous directory |
+| **mM** | Bookmark management UI (fzf) |
+
+**Selection:**
+
+| Key | Action |
+|-----|--------|
+| **yi** | Invert selection |
+| **yp** | Select by regex pattern |
+| **yz** | Select by minimum size (bytes) |
+| **yS** | Save selection to file |
+| **yL** | Load selection from file |
+| **yu** | Union selection with file |
+| **yd** | Subtract file entries from selection |
+| **v** | Visual selection mode (modal) |
+
+**Search:**
+
+| Key | Action |
+|-----|--------|
+| **rR** | Search & replace across files (ripgrep + sed) |
+| **rh** | Find with history recall |
+
+**Preview:**
+
+| Key | Action |
+|-----|--------|
+| **zp** | Pin (lock) preview to current file |
+| **zP** | Unpin preview |
+| **zpc** | Compare two selected files (diff) |
+| **zi** / **zo** | Zoom image preview in / out |
+| **zr** | Rotate image preview 90° (ImageMagick) |
+| **zL** | Live `tail -f` for `.log`/`.out`/`.err` files |
+
+**UI:**
+
+| Key | Action |
+|-----|--------|
+| **CP** | Command palette (fzf) |
+| **\\ws** | Save workspace (tabs + selection) |
+| **\\wl** | Load workspace |
+
+**Git:**
+
+| Key | Action |
+|-----|--------|
+| **gbl** | Git blame in preview |
+| **gll** | Git log for current file |
+| **gds** | Git diff stat |
+
+**Archives:**
+
+| Key | Action |
+|-----|--------|
+| **\\fz** | Compress selection as zip |
+| **\\f7** | Compress selection as 7z |
+| **\\fl** | List archive contents (zip/rar/tar) |
+
+**Remote:**
+
+| Key | Action |
+|-----|--------|
+| **\\su** | Upload via SCP (host from `~/.ssh/known_hosts`) |
+| **\\dl** | Download URL with wget |
+
 ## Tabs
 
 | Key | Action |

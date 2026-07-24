@@ -5,6 +5,16 @@
 > **Companion documents:** `ftl-ftlrc-reference.md` (config reference), `ftl-bindings-analysis.md` (binding critique).
 > **Approach:** For each missing feature: what it is, why it matters, how it could be implemented (sketch), and what binding(s) it could use.
 
+> **Status (2026-07):** 42 of the proposed features have been implemented in
+> `config/ftl/bindings/missing_functionalities` (582 lines), with 128
+> behavioral tests in `test/unit/test_missing_functionalities_behavior.sh`.
+> See `docs/src/missing-functionalities.md` for the full per-feature
+> reference. Sections below are annotated with `**Status: Implemented**`
+> where applicable. The inline rename mode (`LEADER r i`, see
+> `documentation/ftl-inline-rename-proposal.md`) subsumes §1.6 (batch
+> rename) and adds sequential rename, image-label editing, and a modal
+> single-rename workflow.
+
 ---
 
 ## Table of Contents
