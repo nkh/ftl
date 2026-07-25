@@ -1,6 +1,8 @@
 # Summary
 
 [Introduction](./introduction.md)
+[Extra Features](./extra-features.md)
+[Extending ftl](./extending-ftl.md)
 
 # Getting Started
 
