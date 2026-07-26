@@ -1141,6 +1141,94 @@ The `Todo.txt` notes "issue: inotify not working!" — there are known races whe
 - High contrast by default (black bg, bright colors). User-configurable.
 - No `--no-color` mode; ANSI codes are integral to the rendering.
 
+### 8.8 Shell integration — bash/zsh completion
+
+ftl provides **no shell completion** (bash, zsh, or fish) for its CLI
+invocation or for its `:` command prompt. This is a significant gap
+for a tool that targets command-line power users.
+
+#### What is missing
+
+1. **CLI argument completion.** `ftl <TAB>` should complete directory
+   paths (like `cd`). `ftl -<TAB>` should show `-f`, `-s`, `-t`,
+   `-h`. `ftl -f <TAB>` should complete filter plugin names from
+   `$FTL_CFG/filters/`. `ftl -s <TAB>` and `ftl -t <TAB>` should
+   complete file paths. Currently, none of these work — bash falls
+   back to default filename completion.
+
+2. **`:` command prompt completion.** Inside ftl, the `:` prompt
+   accepts command names (`:tree`, `:etags`, `:count`, etc.) and
+   command aliases. There is no tab completion for these — the user
+   must remember the exact name. The `rlwrap`-based prompt
+   (`ftl::cmd::prompt_with_history`) supports history recall (up/down
+   arrows) but not completion.
+
+3. **Binding name completion.** The `c` command (show bindings table)
+   is the closest thing to completion for keybindings, but it is a
+   full-screen fzf table, not a tab-completion. There is no way to
+   type a partial command name and tab-complete to its binding.
+
+4. **`fsh` / `ftll` / `cdf` completion.** ftl's companion commands
+   (`fsh` runs a shell command with ftl's state, `ftll`/`cdf` are
+   file pickers) have no completion either. `fsh <TAB>` should
+   complete based on the current ftl selection; `ftll <TAB>` should
+   complete file paths.
+
+#### What a bash completion implementation would look like
+
+A bash completion script (`etc/bash_completion.d/ftl`) would define a
+`_ftl()` function:
+
+```bash
+_ftl() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Options
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "-f -s -t -h --help" -- "${cur}") )
+        return 0
+    fi
+
+    # -f <filter>: complete filter plugin names
+    if [[ ${prev} == "-f" ]] ; then
+        local filters=$(ls "${FTL_CFG:-$HOME/.config/ftl}/filters/" 2>/dev/null)
+        COMPREPLY=( $(compgen -W "${filters}" -- "${cur}") )
+        return 0
+    fi
+
+    # Default: complete directories
+    COMPREPLY=( $(compgen -d -- "${cur}") )
+    return 0
+}
+complete -F _ftl ftl
+```
+
+For the `:` prompt inside ftl, the completion would need to be
+integrated into the `rlwrap` invocation or into a custom readline
+configuration. The command names are available in
+`$ftl_state_session_dir/command_names` (populated by
+`_ftl::cmd::build_command_name_list`), so a completion function could
+read that file.
+
+#### Impact
+
+The lack of shell completion is a usability barrier for new users.
+Power users who expect `ftl -f <TAB>` to list filters, or `:tree
+<TAB>` to complete arguments, will be frustrated. Adding completion is
+low-effort (a single bash completion file, ~50 lines) and
+high-impact.
+
+#### Recommendation
+
+Ship a `etc/bash_completion.d/ftl` file and document its installation
+in the getting-started guide. Add zsh and fish equivalents if there is
+demand. For the `:` prompt, consider replacing `rlwrap` with a
+completion-aware reader (or configure `rlwrap` with a completion file
+generated from `command_names`).
+
 ---
 
 ## 9. Code Quality, Idioms, and Complexity
