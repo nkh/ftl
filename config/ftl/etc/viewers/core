@@ -1,6 +1,6 @@
 # ftl::prev::dispatch and external viewer for ftl
 
-source "$FTL_CFG/etc/commands/ftl::plugin::core::open_with"
+source "$FTL_CFG/etc/commands/open_with"
 
 ftl::plugin::core::user_eviewers() { false ; }
 ftl::plugin::core::user_pviewers() { false ; }
@@ -96,12 +96,12 @@ ftl::plugin::core::ext_html()
 
 ftl::plugin::core::ext_svg()
 {
-	ftl::util::run_maximized mupdf "$("$ftl_gen_dir/svg_to_pdf" "$ftl_state_current_path" "$ftl_cache_thumb_dir/svg")"
+        ftl::util::run_maximized mupdf "$("$ftl_gen_dir/svg_to_pdf" "$ftl_state_current_path" "$ftl_cache_thumb_dir/svg")"
 }
 
 ftl::plugin::core::ext_image()
 {
-	((ftl_state_external_viewer_mode == 1)) && ftl::plugin::core::ext_iall || ftl::plugin::core::ext_ipng
+        ((ftl_state_external_viewer_mode == 1)) && ftl::plugin::core::ext_iall || ftl::plugin::core::ext_ipng
 }
 
 ftl::plugin::core::ext_iall()
@@ -178,8 +178,8 @@ ftl::plugin::core::ext_text()
 
 ftl::plugin::core::ext_json()
 {
-	ftl::prev::clear
-	$ftl_cfg_json_viewer "$ftl_state_current_path"
+        ftl::prev::clear
+        $ftl_cfg_json_viewer "$ftl_state_current_path"
 }
 
 ftl::plugin::core::ext_scim()
@@ -199,7 +199,7 @@ ftl::plugin::core::pignore()
 }
 ftl::plugin::core::plock()
 {
-	ftl::prev::show_in_vim "$ftl_state_session_dir/lock_preview/$ftl_state_current_path"
+        ftl::prev::show_in_vim "$ftl_state_session_dir/lock_preview/$ftl_state_current_path"
 }
 
 ftl::plugin::core::ptype()
@@ -255,25 +255,25 @@ ftl::plugin::core::pdir_ftl()
 
 ftl::plugin::core::pdir_du()
 {
-	ftl::pane::split_for_preview "$ftl_cfg_disk_usage_tool \"$ftl_state_current_path\" ; read -sn 1000"
-	true
+        ftl::pane::split_for_preview "$ftl_cfg_disk_usage_tool \"$ftl_state_current_path\" ; read -sn 1000"
+        true
 }
 ftl::plugin::core::pdir_ls()
 {
-	ftl::pane::split_for_preview "ls -lh --group-directories-first --color=always \"$ftl_state_current_path\" ; read -sn 10"
-	true
+        ftl::pane::split_for_preview "ls -lh --group-directories-first --color=always \"$ftl_state_current_path\" ; read -sn 10"
+        true
 }
 ftl::plugin::core::pdir_rmd()
 {
-	local m
-	for m in "README.md" "README"
-	do [[ -f "$ftl_state_current_path/$m" ]] && ftl::plugin::core::pmdd "$ftl_state_current_path/$m" && break
-	done
+        local m
+        for m in "README.md" "README"
+        do [[ -f "$ftl_state_current_path/$m" ]] && ftl::plugin::core::pmdd "$ftl_state_current_path/$m" && break
+        done
 }
 ftl::plugin::core::pdir_exa()
 {
-	ftl::pane::split_for_preview "ftl_cfg_exa_colors='$ftl_cfg_exa_colors' exa \"$ftl_state_current_path\" $ftl_cfg_exa_options | $PAGER"
-	true
+        ftl::pane::split_for_preview "ftl_cfg_exa_colors='$ftl_cfg_exa_colors' exa \"$ftl_state_current_path\" $ftl_cfg_exa_options | $PAGER"
+        true
 }
 
 ftl::plugin::core::pdir_image()
@@ -295,7 +295,7 @@ ftl::plugin::core::ppipe()     { ftl::pane::split_for_preview "echo \"fifo (name
 
 ftl::plugin::core::phtml()
 {
-	ftl::prev::show_in_vim "$("$ftl_gen_dir/html" "$ftl_state_current_path" "$ftl_cache_thumb_dir/html")"
+        ftl::prev::show_in_vim "$("$ftl_gen_dir/html" "$ftl_state_current_path" "$ftl_cache_thumb_dir/html")"
 }
 ftl::plugin::core::pimage()
 {
@@ -309,11 +309,11 @@ ftl::plugin::core::pimage()
 
 ftl::plugin::core::psvg()
 {
-	ftl::prev::show_image "$("$ftl_gen_dir/svg" "$ftl_state_current_path" "$ftl_cache_thumb_dir/svg")"
+        ftl::prev::show_image "$("$ftl_gen_dir/svg" "$ftl_state_current_path" "$ftl_cache_thumb_dir/svg")"
 }
 ftl::plugin::core::pgif()
 {
-	ftl::prev::show_image "$("$ftl_gen_dir/gif" "$ftl_state_current_path" "$ftl_cache_thumb_dir/gif")"
+        ftl::prev::show_image "$("$ftl_gen_dir/gif" "$ftl_state_current_path" "$ftl_cache_thumb_dir/gif")"
 }
 
 ftl::plugin::core::pmp3()
@@ -347,8 +347,8 @@ ftl::plugin::core::pmlive()
 
 ftl::plugin::core::pmd()
 {
-	ftl::plugin::core::pmd_1 || ftl::plugin::core::pmd_2 || ftl::plugin::core::pmd_3 || ftl::plugin::core::pmd_def
-	ftl_state_alt_preview_mode=0
+        ftl::plugin::core::pmd_1 || ftl::plugin::core::pmd_2 || ftl::plugin::core::pmd_3 || ftl::plugin::core::pmd_def
+        ftl_state_alt_preview_mode=0
 }
 ftl::plugin::core::pmd_1()
 {
@@ -398,11 +398,11 @@ ftl::plugin::core::pansi()
 
 ftl::plugin::core::pjson()
 {
-	ftl::pane::split_for_preview "$ftl_cfg_json_viewer \"$ftl_state_current_path\" ; read -sn100"
+        ftl::pane::split_for_preview "$ftl_cfg_json_viewer \"$ftl_state_current_path\" ; read -sn100"
 }
 ftl::plugin::core::pyaml()
 {
-	ftl::pane::split_for_preview "$ftl_cfg_yaml_viewer \"$ftl_state_current_path\" ; read -sn100"
+        ftl::pane::split_for_preview "$ftl_cfg_yaml_viewer \"$ftl_state_current_path\" ; read -sn100"
 }
 
 ftl::plugin::core::ppdf()
@@ -443,22 +443,22 @@ ftl::plugin::core::pepubpng()
 
 ftl::plugin::core::pman()
 {
-	ftl::pane::split_for_preview "man \"$ftl_state_current_path\" ; read -sn 1000"
-	true
+        ftl::pane::split_for_preview "man \"$ftl_state_current_path\" ; read -sn 1000"
+        true
 }
 
 ftl::plugin::core::pscim()
 {
-	ftl::pane::split_for_preview "scim \"$ftl_state_current_path\" | $PAGER ; read -sn100"
+        ftl::pane::split_for_preview "scim \"$ftl_state_current_path\" | $PAGER ; read -sn100"
 }
 ftl::plugin::core::pasciio()
 {
-	ftl::pane::split_for_preview "asciio_to_text \"$ftl_state_current_path\" | $PAGER ; read -sn100"
+        ftl::pane::split_for_preview "asciio_to_text \"$ftl_state_current_path\" | $PAGER ; read -sn100"
 }
 
 ftl::plugin::core::pstl()
 {
-	ftl::prev::show_image "$("$ftl_gen_dir/stl" "$ftl_state_current_path" "$ftl_cache_thumb_dir/stl")"
+        ftl::prev::show_image "$("$ftl_gen_dir/stl" "$ftl_state_current_path" "$ftl_cache_thumb_dir/stl")"
 }
 
 ftl::plugin::core::pcomp()

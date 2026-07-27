@@ -97,6 +97,49 @@ test_normalize_special_chars() {
     ftl::test::assert_eq "SPACE" "$result" "Space"
 }
 
+# Test: normalize_key passes through plain ASCII letters and digits
+# This is critical — without the *) fallback, j/k/h/l navigation breaks
+test_normalize_plain_ascii() {
+    local result
+    result=$(ftl::kbd::normalize_key "j")
+    ftl::test::assert_eq "j" "$result" "plain j passes through"
+    
+    result=$(ftl::kbd::normalize_key "k")
+    ftl::test::assert_eq "k" "$result" "plain k passes through"
+    
+    result=$(ftl::kbd::normalize_key "h")
+    ftl::test::assert_eq "h" "$result" "plain h passes through"
+    
+    result=$(ftl::kbd::normalize_key "l")
+    ftl::test::assert_eq "l" "$result" "plain l passes through"
+    
+    result=$(ftl::kbd::normalize_key "q")
+    ftl::test::assert_eq "q" "$result" "plain q passes through"
+    
+    result=$(ftl::kbd::normalize_key "a")
+    ftl::test::assert_eq "a" "$result" "plain a passes through"
+    
+    result=$(ftl::kbd::normalize_key "5")
+    ftl::test::assert_eq "5" "$result" "plain 5 passes through"
+    
+    result=$(ftl::kbd::normalize_key "Z")
+    ftl::test::assert_eq "Z" "$result" "plain Z passes through"
+    
+    result=$(ftl::kbd::normalize_key ".")
+    ftl::test::assert_eq "." "$result" "plain . passes through"
+    
+    result=$(ftl::kbd::normalize_key "-")
+    ftl::test::assert_eq "-" "$result" "plain - passes through"
+}
+
+# Test: normalize_key drops multi-byte / unrecognized sequences
+test_normalize_unrecognized() {
+    local result
+    # Multi-byte UTF-8 (é = \xc3\xa9) should produce empty
+    result=$(ftl::kbd::normalize_key $'\xc3\xa9')
+    ftl::test::assert_eq "" "$result" "multi-byte UTF-8 drops to empty"
+}
+
 # Test: exclude_from_redo adds to the exclusion set
 test_exclude_from_redo() {
     ftl::kbd::exclude_from_redo "test_cmd"

@@ -2,17 +2,13 @@
 # sourced bash scripts are running in the same shell and have access to * ftl *
 # data, the arguments are those you give on the command line.
 
-{ 
-echo CWD: $PWD
-echo current entry: $n
-echo Selection: ; printf "\t%s\n" "${selection[@]}"
-echo Arguments: ; printf "\t%s\n" "$@"
-} >$fs/01_example_info
+{
+	echo CWD: $PWD
+	echo current entry: $ftl_state_current_path
+	echo Selection: ; printf "\t%s\n" "${ftl_selection_current[@]}"
+	echo Arguments: ; printf "\t%s\n" "$@"
+} >"$ftl_state_session_dir/01_example_info"
 
-tmux popup cat $fs/01_example_info
-
-# to run a command in the session-shell
-# tmux send -t ftl$$:ftl$$_bash "command" Enter
+tmux popup cat "$ftl_state_session_dir/01_example_info"
 
 # vim: set filetype=bash :
-

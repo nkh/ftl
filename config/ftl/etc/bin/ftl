@@ -14,6 +14,51 @@ fi
 
 : "${FTL_CFG:=$HOME/.config/ftl}"
 
+# --- Startup dependency check ---
+# Check for critical tools before entering the alt screen. If any are
+# missing, print a warning to stderr (visible in the terminal) so the
+# user knows why ftl might not work correctly. Non-critical tools are
+# silently skipped (ftl degrades gracefully).
+_ftl_check_deps() {
+        local missing=()
+        local warnings=()
+
+        # Critical: tmux (already checked above, but double-check)
+        command -v tmux >/dev/null 2>&1 || missing+=("tmux")
+
+        # Critical: find (used for directory scanning and binding auto-source)
+        command -v find >/dev/null 2>&1 || missing+=("find")
+
+        # Recommended: fd (used for fuzzy find, binding auto-source, fzf-listen)
+        command -v fd >/dev/null 2>&1 || warnings+=("fd (fuzzy find will use 'find' fallback)")
+
+        # Recommended: fzf (used for search, command palette, marks)
+        command -v fzf >/dev/null 2>&1 || warnings+=("fzf (fuzzy search will be disabled)")
+
+        # Recommended: ripgrep (used for content search)
+        command -v rg >/dev/null 2>&1 || warnings+=("ripgrep (content search will be disabled)")
+
+        if (( ${#missing[@]} )) ; then
+                echo "ftl: ERROR: missing critical dependencies: ${missing[*]}" >&2
+                echo "ftl: Install them and try again." >&2
+                exit 1
+        fi
+
+        if (( ${#warnings[@]} )) ; then
+                echo "ftl: WARNING: missing optional tools:" >&2
+                for w in "${warnings[@]}" ; do
+                        echo "ftl:   - $w" >&2
+                done
+                echo "ftl: Some features will be disabled." >&2
+        fi
+}
+_ftl_check_deps
+
+# Enable debug logging if FTL_DEBUG=1 in the environment
+if [[ "${FTL_DEBUG:-0}" == "1" || "${FTL_TRACE:-0}" == "1" ]] ; then
+        echo "ftl: debug logging enabled (FTL_DEBUG=${FTL_DEBUG:-0} FTL_TRACE=${FTL_TRACE:-0})" >&2
+fi
+
 ftl() {
         # Args: dir[/file], pfs, preview_ftl
         source "$FTL_CFG/etc/core/ftl_setup"
@@ -73,6 +118,20 @@ ftl() {
 
         ftl_state_shared_dir="$ftl_state_parent_dir/prev"
         ftl_state_previous_pwd="$dir"
+
+        # Re-initialize logging now that session dir is set (so debug.log
+        # lands in the right place). The first ftl::log::init in ftl_setup
+        # ran before session_dir was known.
+        ftl::log::init
+
+        # Print log file path for debugging (visible if FTL_DEBUG=1)
+        if (( ftl_log_level > 0 )) ; then
+                ftl::log::info "=== ftl session started ==="
+                ftl::log::info "session_dir=$ftl_state_session_dir"
+                ftl::log::info "log_file=$ftl_log_file"
+                ftl::log::info "bindings registered: ${#ftl_kbd_trie[@]}"
+                ftl::log::info "leader_key=$ftl_cfg_leader_key"
+        fi
 
         # Initialize the main info file
         ftl_state_main_info_file_path="$(mktemp -p "$ftl_state_session_dir" ftl_main_info_XXXXXXX)"

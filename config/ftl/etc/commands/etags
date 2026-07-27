@@ -1,8 +1,12 @@
-p="$FTL_CFG/etags" ; file="${1#etags }"
+# etags — activate an etag plugin by name or via fzf
+# Usage: :etags <name>   (activate by name)
+#        :etags           (fzf-select from available etags)
+
+p="$FTL_CFG/etags"
+file="${1#etags }"
 
 [[ -f "$p/$file" ]] &&
-	{ . "$p/$file" $fs ; etag=1 ; ftl::list::change_dir ; } || 
-	{ file="$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline)" ; [[ "$file" ]] && { . "$p/$file" $fs ; etag=1 ; ftl::list::change_dir ; } ; }
+	{ . "$p/$file" ; ftl_state_etag_enabled=1 ; ftl::list::change_dir ; } ||
+	{ file="$(cd "$p" 2>/dev/null && find . -maxdepth 1 -type f -exec basename {} \; | fzf-tmux -p 50% --reverse --info=inline)" ; [[ "$file" ]] && { . "$p/$file" ; ftl_state_etag_enabled=1 ; ftl::list::change_dir ; } ; }
 
 # vim: set filetype=bash :
-

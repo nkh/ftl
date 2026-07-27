@@ -1,20 +1,22 @@
 #!/bin/bash
 
-fs=/tmp/$USER
-mkdir -p $fs
+# 02_example — an executable command
+# Demonstrates sourcing $ftl_state_info_file_path to access ftl's state
 
-source $ftl_state_info_file_path # to get serialized information from * ftl *
+source "$ftl_state_info_file_path"  # get serialized information from ftl
 
-{ 
-echo ftl_state_info_file_path: $ftl_state_info_file_path
-echo FTL_PID: $FTL_PID
-echo FTL_CWD: $FTL_CWD
-echo current entry: $n
-echo Selection: ;        printf "\t%s\n" "${selection[@]}"
-echo Arguments: ;        printf "\t%s\n" "$@"
-} >$fs/02_example_info
+{
+	echo ftl_state_info_file_path: "$ftl_state_info_file_path"
+	echo FTL_PID: "$FTL_PID"
+	echo FTL_SESSION_DIR: "$FTL_SESSION_DIR"
+	echo FTL_CWD: "$FTL_CWD"
+	echo current entry: "$ftl_state_current_path"
+	echo Selection:
+	printf '\t%s\n' "${ftl_selection_current[@]}"
+	echo Arguments:
+	printf '\t%s\n' "$@"
+} >"${FTL_SESSION_DIR}/02_example_info"
 
-tmux popup cat $fs/02_example_info
+tmux popup cat "${FTL_SESSION_DIR}/02_example_info"
 
 # vim: set filetype=bash :
-
