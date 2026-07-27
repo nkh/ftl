@@ -22,6 +22,7 @@ while : ; do tag_synch ; winch ; time_event ; { [[ "$R" ]] && { REPLY="${R:0:1}"
 }
 
 cdir() { [[ -n $custom_list ]] && view_list || cview get_dir_entries "$@" ; }
+
 rdir() { geometry ; prepare_entries "$1" ; ((lines = nfiles > LINES - 1 ? LINES - 1 : nfiles, center = lines / 2)) ; qd=${2:-1} ; list ; qd=0 ; }
 
 cview() 
@@ -116,10 +117,13 @@ for p_index in "${dir_entries_list[@]}" ; do
 	[[ ${#pc} == $pnc_l ]] || pc="${pc:0:-4}" # remove color reset if entry is colored
 	
 	((rpath_l + pnc_l > COLS - 1)) && { 
-		[[ "$pnc" =~ '.' ]] && e=${pnc##*.} || e= 
-		ext_l=$((${#e}+1))
+		[[ "$pnc" =~ '.' ]] && e="${pnc##*.}" || e= 
+		ext_l="$((${#e}+1))"
 		
-		pc="${pc:0:((- (((rpath_l + pnc_l) - (COLS - 1)) + ext_l) ))}…${e}"
+		local prefix_length=$((- (((rpath_l + pnc_l) - (COLS - 1)) + ext_l) ))
+		((prefix_length < 0)) && prefix_length=$((COLS - (${#e} + 1))) 
+		
+		pc="${pc:0:$prefix_length}…${e}"
 		}
 	
 	files_color[$nfiles]="$pc" ; files[$nfiles]="$ppath$sep$pnc"

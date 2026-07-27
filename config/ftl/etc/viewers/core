@@ -100,7 +100,7 @@ pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }
 ptype()     { mime_get ; psplit "echo ${f@Q} | lscolors ; echo 'mime type: $mtype' ; echo -n 'file type: '; file -b ${n@Q} ; stat -c %s ${n@Q} | numfmt --to=iec ; read -sn 100" ; }
 
-pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; pdhn "preview file: $t" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
+pcbr()      { t="$($pgen/cbr "$n" "$thumbs/cbr" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 pcbz()      { t="$($pgen/cbz "$n" "$thumbs/cbz" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; }
 
 pdir()      { pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; (( extmode != 0 )) && { [[ "${pdirv[$extmode]}" ]] && ${pdirv[$extmode]} ; } || pdir_def ; }
