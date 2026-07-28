@@ -11,7 +11,7 @@ ftl::plugin::file_utils::image_optimize()
 		convert "$ftl_state_current_stem.original.$ftl_state_current_extension" -quality 90% "$ftl_state_current_stem.jpg"
 		ftl::list::change_dir '' "$ftl_state_current_stem.jpg"
 	}
-	pw3image FTL_RESTART_W3M
+	ftl::prev::show_image FTL_RESTART_W3M
 	true
 }
 

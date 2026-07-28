@@ -34,7 +34,7 @@ ftl::plugin::file_utils::decompress_in_dir()
 {
 	local new_file=
 
-	ftl::cmd::ftl::cmd::prompt 'directory to extract to: '
+	ftl::cmd::prompt 'directory to extract to: '
 	[[ -n $ftl_kbd_current_key ]] || return
 
 	mkdir -p "$ftl_kbd_current_key"
@@ -60,7 +60,7 @@ ftl::plugin::file_utils::compress()
 {
 	local new_file=
 
-	ftl::cmd::ftl::cmd::prompt 'tar.bz2 file: '
+	ftl::cmd::prompt 'tar.bz2 file: '
 	[[ -n $ftl_kbd_current_key ]] && {
 		tar -cvjSf "$ftl_kbd_current_key".tar.bz2 "${ftl_selection_current[@]}"
 		new_file="$ftl_kbd_current_key"

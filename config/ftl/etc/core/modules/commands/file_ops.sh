@@ -390,7 +390,7 @@ ftl::cmd::copy_to_other_tab() {
 	fi
 }
 
-ftl::cmd::ftl::plugin::to_other_tab::tag_copy_to_tab() {
+ftl::plugin::to_other_tab::tag_copy_to_tab() {
 	ftl::cmd::copy_to_other_tab
 }
 
@@ -406,7 +406,7 @@ ftl::cmd::move_to_other_tab() {
 	fi
 }
 
-ftl::cmd::ftl::plugin::to_other_tab::tag_move_to_tab() {
+ftl::plugin::to_other_tab::tag_move_to_tab() {
 	ftl::cmd::move_to_other_tab
 }
 

@@ -65,7 +65,7 @@ ftl::filt::pipeline_remove() {
 ftl::filt::reset() {
         ftl_filter_active_glyph=
         _ftl::filt::reset_external
-        eval 'ftl::filter::apply_external() { cat ; } ; ftl::filt::sort_entries() { ftl::filt::sort_by ; } ; ftl::filt::get_sort_glyph() { echo ${ftl_cfg_glyph_sort[$ftl_list_resolved_sort_type]} ; }'
+        eval 'ftl::filter::apply_external() { cat ; } ; ftl::filt::get_sort_glyph() { echo ${ftl_cfg_glyph_sort[$ftl_list_resolved_sort_type]} ; }'
 }
 
 # Reset the external filter (call its reset hook).
@@ -100,14 +100,13 @@ _ftl::filt::apply_reverse_filter() {
         fi
 }
 
-# Default sort function.
+# Default sort function. This is a plugin slot — filter plugins (like
+# sort_by_extension or no_sort) override this function to change sort behavior.
+# The reset function does NOT redefine this; it only resets the external
+# filter and sort glyph. This prevents the infinite recursion that occurred
+# when reset defined sort_entries as a call to sort_by, which called sort_entries.
 ftl::filt::sort_entries() {
         sort $ftl_list_resolved_sort_reversed ${ftl_cfg_sort_options[$ftl_list_resolved_sort_type]}
-}
-
-# Alias for sort_entries (used by sort_by_extension plugin).
-ftl::filt::sort_by() {
-        ftl::filt::sort_entries
 }
 
 # Return the sort glyph for the current sort type.

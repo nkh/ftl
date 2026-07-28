@@ -154,6 +154,10 @@ ftl_state_etag_enabled=0
 ftl_cfg_default_sort_type=0        # 0=alphanumeric, 1=size, 2=date
 ftl_cfg_default_sort_reversed=
 
+# Sort options for each sort type (passed to `sort` command)
+# 0=alphanumeric (sort by name), 1=size (sort by size), 2=date (sort by date)
+ftl_cfg_sort_options=('-k3 -V' '-n' '-k2 -V')
+
 #----------------------------------------------------------------------------
 # Glyph tables
 #----------------------------------------------------------------------------

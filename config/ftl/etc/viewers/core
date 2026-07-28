@@ -32,13 +32,13 @@ ftl::plugin::core::ext_viewers()
 
 ftl::plugin::core::pviewers()
 {
-        ((${#ftl_plugin_vfiles[@]} || ${#ftl_plugin_vdirs[@]})) && { vfile_prev && return ; }
+        ((${#ftl_plugin_vfiles[@]} || ${#ftl_plugin_vdirs[@]})) && { ftl::plugin::virtual::preview_callback && return ; }
 
         ftl::plugin::core::user_pviewers && return ;
 
         [[ -d "$ftl_state_current_path"               ]] && { ftl::plugin::core::pdir      ; return ; }
 
-        [[ $ftl_state_current_extension               ]] && ((ftl_view_preview_ignore_exts["${ftl_state_current_basename@Q}"])) && { ftl_view_preview_ignore_exts   ; return ; }
+        [[ $ftl_state_current_extension               ]] && ((ftl_view_preview_ignore_exts["${ftl_state_current_basename@Q}"])) && { ftl_preview_is_dir_ftl= ; ftl::plugin::core::ptype ; return ; }
         [[ -e "$ftl_state_session_dir/lock_preview/$ftl_state_current_path" ]] && { ftl::plugin::core::plock     ; return ; }
         [[ "${ftl_tab_preview_dirs_only[ftl_state_current_tab_index]}" ]] && { [[ -d "$ftl_state_current_path" ]] || { ftl::prev::clear ; return ; } ; }
 
@@ -280,11 +280,11 @@ ftl::plugin::core::pdir_image()
 {
         local m
         ftl_preview_is_dir_ftl=
-        m="$ftl_state_dir/ftl_state_montage_glyph/$ftl_state_current_path/ftl_state_montage_glyph.jpg"
+        m="$ftl_state_dir/montage/$ftl_state_current_path/montage.jpg"
         [[ -e "$m" ]] || {
-                __ftl::list::print_header '' "$ftl_cfg_msg_montage"
-                "$ftl_gen_dir/ftl_state_montage_glyph" "$ftl_state_dir" "$ftl_state_current_path"
-                __ftl::list::print_header '' "$ftl_list_header_mode_glyphs"
+                _ftl::list::print_header '' "$ftl_cfg_msg_montage"
+                "$ftl_gen_dir/montage" "$ftl_state_dir" "$ftl_state_current_path"
+                _ftl::list::print_header '' "$ftl_list_header_mode_glyphs"
         }
         ftl::prev::show_image "$m"
         true
@@ -464,19 +464,19 @@ ftl::plugin::core::pstl()
 ftl::plugin::core::pcomp()
 {
         if [[ $ftl_state_current_extension == zip         ]] ; then
-                _ftl::plugin::core::ftl::plugin::core::pcomp unzip -l
+                ftl::plugin::core::pcomp unzip -l
         elif [[ $ftl_state_current_extension == rar         ]] ; then
-                _ftl::plugin::core::ftl::plugin::core::pcomp unrar ftl::list::render
+                ftl::plugin::core::pcomp unrar list
         elif [[ $ftl_state_current_basename =~ \.tar$      ]] ; then
-                _ftl::plugin::core::ftl::plugin::core::pcomp tar --ftl::list::render         --verbose -f
+                ftl::plugin::core::pcomp tar --list         --verbose -f
         elif [[ $ftl_state_current_basename =~ \.tar\.gz$  ]] ; then
-                _ftl::plugin::core::ftl::plugin::core::pcomp tar --gzip  --ftl::list::render --verbose -f
+                ftl::plugin::core::pcomp tar --gzip  --list --verbose -f
         elif [[ $ftl_state_current_basename =~ \.tar\.bz2$ ]] ; then
-                _ftl::plugin::core::ftl::plugin::core::pcomp tar --bzip2 --ftl::list::render --verbose -f
+                ftl::plugin::core::pcomp tar --bzip2 --list --verbose -f
         fi
 }
 
-_ftl::plugin::core::ftl::plugin::core::pcomp()
+ftl::plugin::core::pcomp()
 {
         local fp
         ((ftl_state_alt_preview_mode)) && {

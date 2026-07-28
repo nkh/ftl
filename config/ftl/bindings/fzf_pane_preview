@@ -26,7 +26,7 @@ ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_a
 {
 	local fzf_choice
 
-	mkapipe 10
+	ftl::util::create_fifos 10
 	<&10 ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::previewd &
 
 	exec 2>&9

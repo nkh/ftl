@@ -39,7 +39,7 @@ ftl::cmd::cursor_left_arrow() {
 	ftl::cmd::cd_to_parent
 }
 
-ftl::cmd::ftl::plugin::type_handlers::move_left() {
+ftl::plugin::type_handlers::move_left() {
 	ftl::cmd::cd_to_parent
 }
 
@@ -78,7 +78,7 @@ ftl::cmd::enter_entry() {
 	fi
 }
 
-ftl::cmd::ftl::plugin::type_handlers::enter() {
+ftl::plugin::type_handlers::enter() {
 	ftl::cmd::enter_entry
 }
 

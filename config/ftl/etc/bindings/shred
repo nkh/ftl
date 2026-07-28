@@ -5,7 +5,7 @@ ftl::plugin::shred::shred_command()
 
 	# ftl::cmd::prompt user
 	((${#ftl_selection_current[@]} > 1)) && plural='ies' || plural='y'
-	ftl::cmd::ftl::cmd::prompt "shred: ${#ftl_selection_current[@]} entr${plural} [yes|N]? "
+	ftl::cmd::prompt "shred: ${#ftl_selection_current[@]} entr${plural} [yes|N]? "
 
 	if [[ $ftl_kbd_current_key == yes ]] ; then
 		# reply must be "yes"

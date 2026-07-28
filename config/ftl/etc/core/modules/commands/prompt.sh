@@ -55,7 +55,7 @@ ftl::cmd::prompt() {
 	exec 2>"$ftl_state_session_dir/log"
 }
 
-ftl::cmd::ftl::plugin::user_command::run_user_command() {
+ftl::plugin::user_command::run_user_command() {
 	local p="$FTL_CFG/etc/commands"
 	local cmd
 	cmd=$(cd "$p" 2>&- && fd -t f | sed 's/^.\///' \

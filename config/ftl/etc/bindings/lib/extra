@@ -58,7 +58,7 @@ ftl::plugin::file_utils::gpg_encrypt()
 ftl::plugin::file_utils::pass_encrypt()
 {
 	if [[ $ftl_state_current_extension =~ gpg ]] ; then
-		ftl::cmd::ftl::cmd::prompt 'file: ' -e
+		ftl::cmd::prompt 'file: ' -e
 		[[ -n "$ftl_kbd_current_key" ]] && gpg -d --no-symkey-cache "$ftl_state_current_path" > "$ftl_kbd_current_key"
 	else
 		gpg --no-symkey-cache --symmetric "$ftl_state_current_basename" || read -sn1
