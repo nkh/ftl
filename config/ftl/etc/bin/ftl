@@ -8,8 +8,8 @@
 
 # Run only inside tmux
 if [[ -z "$TMUX" ]] ; then
-        echo 'ftl: run me in tmux'
-        exit 1
+	echo 'ftl: run me in tmux'
+	exit 1
 fi
 
 : "${FTL_CFG:=$HOME/.config/ftl}"
@@ -20,158 +20,158 @@ fi
 # user knows why ftl might not work correctly. Non-critical tools are
 # silently skipped (ftl degrades gracefully).
 _ftl_check_deps() {
-        local missing=()
-        local warnings=()
+	local missing=()
+	local warnings=()
 
-        # Critical: tmux (already checked above, but double-check)
-        command -v tmux >/dev/null 2>&1 || missing+=("tmux")
+	# Critical: tmux (already checked above, but double-check)
+	command -v tmux >/dev/null 2>&1 || missing+=("tmux")
 
-        # Critical: find (used for directory scanning and binding auto-source)
-        command -v find >/dev/null 2>&1 || missing+=("find")
+	# Critical: find (used for directory scanning and binding auto-source)
+	command -v find >/dev/null 2>&1 || missing+=("find")
 
-        # Recommended: fd (used for fuzzy find, binding auto-source, fzf-listen)
-        command -v fd >/dev/null 2>&1 || warnings+=("fd (fuzzy find will use 'find' fallback)")
+	# Recommended: fd (used for fuzzy find, binding auto-source, fzf-listen)
+	command -v fd >/dev/null 2>&1 || warnings+=("fd (fuzzy find will use 'find' fallback)")
 
-        # Recommended: fzf (used for search, command palette, marks)
-        command -v fzf >/dev/null 2>&1 || warnings+=("fzf (fuzzy search will be disabled)")
+	# Recommended: fzf (used for search, command palette, marks)
+	command -v fzf >/dev/null 2>&1 || warnings+=("fzf (fuzzy search will be disabled)")
 
-        # Recommended: ripgrep (used for content search)
-        command -v rg >/dev/null 2>&1 || warnings+=("ripgrep (content search will be disabled)")
+	# Recommended: ripgrep (used for content search)
+	command -v rg >/dev/null 2>&1 || warnings+=("ripgrep (content search will be disabled)")
 
-        if (( ${#missing[@]} )) ; then
-                echo "ftl: ERROR: missing critical dependencies: ${missing[*]}" >&2
-                echo "ftl: Install them and try again." >&2
-                exit 1
-        fi
+	if (( ${#missing[@]} )) ; then
+		echo "ftl: ERROR: missing critical dependencies: ${missing[*]}" >&2
+		echo "ftl: Install them and try again." >&2
+		exit 1
+	fi
 
-        if (( ${#warnings[@]} )) ; then
-                echo "ftl: WARNING: missing optional tools:" >&2
-                for w in "${warnings[@]}" ; do
-                        echo "ftl:   - $w" >&2
-                done
-                echo "ftl: Some features will be disabled." >&2
-        fi
+	if (( ${#warnings[@]} )) ; then
+		echo "ftl: WARNING: missing optional tools:" >&2
+		for w in "${warnings[@]}" ; do
+			echo "ftl:   - $w" >&2
+		done
+		echo "ftl: Some features will be disabled." >&2
+	fi
 }
 _ftl_check_deps
 
 # Enable debug logging if FTL_DEBUG=1 in the environment
 if [[ "${FTL_DEBUG:-0}" == "1" || "${FTL_TRACE:-0}" == "1" ]] ; then
-        echo "ftl: debug logging enabled (FTL_DEBUG=${FTL_DEBUG:-0} FTL_TRACE=${FTL_TRACE:-0})" >&2
+	echo "ftl: debug logging enabled (FTL_DEBUG=${FTL_DEBUG:-0} FTL_TRACE=${FTL_TRACE:-0})" >&2
 fi
 
 ftl() {
-        # Args: dir[/file], pfs, preview_ftl
-        source "$FTL_CFG/etc/core/ftl_setup"
-        ftl::log::trace "ftl() starting, args: $*"
-        ftl::log::trace "ftl_setup sourced, ftl_state_session_dir=$ftl_state_session_dir"
+	# Args: dir[/file], pfs, preview_ftl
+	source "$FTL_CFG/etc/core/ftl_setup"
+	ftl::log::trace "ftl() starting, args: $*"
+	ftl::log::trace "ftl_setup sourced, ftl_state_session_dir=$ftl_state_session_dir"
 
-        # Handle command-line options
-        if [[ "$1" == '-f' ]] ; then
-                ftl_state_parent_dir="$FTL_STATE_DIR/$$"
-                mkdir -p "$ftl_state_parent_dir"
-                ftl::log::wrap ftl::filt::load_external "$2"
-                shift 2
-        fi
+	# Handle command-line options
+	if [[ "$1" == '-f' ]] ; then
+		ftl_state_parent_dir="$FTL_STATE_DIR/$$"
+		mkdir -p "$ftl_state_parent_dir"
+		ftl::log::wrap ftl::filt::load_external "$2"
+		shift 2
+	fi
 
-        if [[ "$1" == '-s' ]] ; then
-                ftl::sel::load_from_file "$@"
-                shift 2
-        fi
+	if [[ "$1" == '-s' ]] ; then
+		ftl::sel::load_from_file "$@"
+		shift 2
+	fi
 
-        if [[ "$1" == '-t' ]] ; then
-                ftl::tab::load_from_file "$@"
-                shift 2
-        fi
+	if [[ "$1" == '-t' ]] ; then
+		ftl::tab::load_from_file "$@"
+		shift 2
+	fi
 
-        # Resolve the initial directory/file argument
-        local dir= search=
-        if [[ -n "$1" ]] ; then
-                if [[ -d "$1" ]] ; then
-                        dir="$1"
-                elif [[ -f "$1" ]] ; then
-                        ftl::util::parse_path "$1"
-                        dir="$ftl_state_current_dir"
-                        search="$ftl_state_current_basename"
-                else
-                        echo "ftl: '$1', no such path"
-                        exit 1
-                fi
-        fi
+	# Resolve the initial directory/file argument
+	local dir= search=
+	if [[ -n "$1" ]] ; then
+		if [[ -d "$1" ]] ; then
+			dir="$1"
+		elif [[ -f "$1" ]] ; then
+			ftl::util::parse_path "$1"
+			dir="$ftl_state_current_dir"
+			search="$ftl_state_current_basename"
+		else
+			echo "ftl: '$1', no such path"
+			exit 1
+		fi
+	fi
 
-        ftl::util::enter_alt_screen
+	ftl::util::enter_alt_screen
 
-        # Set up session directories
-        if [[ -n "$2" ]] ; then
-                # We're a child (preview) pane
-                ftl_state_session_dir="$2/$$"
-                ftl_state_parent_dir="$2"
-                mkdir -p "$ftl_state_session_dir"
-                touch "$ftl_state_session_dir/history"
-        else
-                # We're the main pane
-                ftl_state_session_dir="$FTL_STATE_DIR/$$"
-                ftl_state_parent_dir="$ftl_state_session_dir"
-                ftl_pane_is_primary=1
-                mkdir -p "$ftl_state_session_dir/prev"
-                echo "$ftl_pane_self_id" >"$ftl_state_session_dir/pane"
-        fi
+	# Set up session directories
+	if [[ -n "$2" ]] ; then
+		# We're a child (preview) pane
+		ftl_state_session_dir="$2/$$"
+		ftl_state_parent_dir="$2"
+		mkdir -p "$ftl_state_session_dir"
+		touch "$ftl_state_session_dir/history"
+	else
+		# We're the main pane
+		ftl_state_session_dir="$FTL_STATE_DIR/$$"
+		ftl_state_parent_dir="$ftl_state_session_dir"
+		ftl_pane_is_primary=1
+		mkdir -p "$ftl_state_session_dir/prev"
+		echo "$ftl_pane_self_id" >"$ftl_state_session_dir/pane"
+	fi
 
-        ftl_state_shared_dir="$ftl_state_parent_dir/prev"
-        ftl_state_previous_pwd="$dir"
+	ftl_state_shared_dir="$ftl_state_parent_dir/prev"
+	ftl_state_previous_pwd="$dir"
 
-        # Re-initialize logging now that session dir is set (so debug.log
-        # lands in the right place). The first ftl::log::init in ftl_setup
-        # ran before session_dir was known.
-        ftl::log::init
+	# Re-initialize logging now that session dir is set (so debug.log
+	# lands in the right place). The first ftl::log::init in ftl_setup
+	# ran before session_dir was known.
+	ftl::log::init
 
-        # Print log file path for debugging (visible if FTL_DEBUG=1)
-        if (( ftl_log_level > 0 )) ; then
-                ftl::log::info "=== ftl session started ==="
-                ftl::log::info "session_dir=$ftl_state_session_dir"
-                ftl::log::info "log_file=$ftl_log_file"
-                ftl::log::info "bindings registered: ${#ftl_kbd_trie[@]}"
-                ftl::log::info "leader_key=$ftl_cfg_leader_key"
-        fi
+	# Print log file path for debugging (visible if FTL_DEBUG=1)
+	if (( ftl_log_level > 0 )) ; then
+		ftl::log::info "=== ftl session started ==="
+		ftl::log::info "session_dir=$ftl_state_session_dir"
+		ftl::log::info "log_file=$ftl_log_file"
+		ftl::log::info "bindings registered: ${#ftl_kbd_trie[@]}"
+		ftl::log::info "leader_key=$ftl_cfg_leader_key"
+	fi
 
-        # Initialize the main info file
-        ftl_state_main_info_file_path="$(mktemp -p "$ftl_state_session_dir" ftl_main_info_XXXXXXX)"
-        ftl::state::serialize_info "$ftl_state_main_info_file_path"
+	# Initialize the main info file
+	ftl_state_main_info_file_path="$(mktemp -p "$ftl_state_session_dir" ftl_main_info_XXXXXXX)"
+	ftl::state::serialize_info "$ftl_state_main_info_file_path"
 
-        # Either sync from parent (child pane) or start fresh (main pane)
-        if [[ -n "$3" ]] ; then
-                ftl_pane_is_child=1
-                ftl_state_preview_pane_visible=0
-                ftl_state_external_viewer_mode=0
-                cd "$dir"
-                ftl::log::trace "child pane, syncing from parent"
-                ftl::prev::sync_and_dispatch
-        else
-                ftl::log::trace "main pane, opening dir=$dir search=$search"
-                ftl::sel::sync_from_other_pane
-                ftl::list::change_dir "$dir" "$search"
-        fi
+	# Either sync from parent (child pane) or start fresh (main pane)
+	if [[ -n "$3" ]] ; then
+		ftl_pane_is_child=1
+		ftl_state_preview_pane_visible=0
+		ftl_state_external_viewer_mode=0
+		cd "$dir"
+		ftl::log::trace "child pane, syncing from parent"
+		ftl::prev::sync_and_dispatch
+	else
+		ftl::log::trace "main pane, opening dir=$dir search=$search"
+		ftl::sel::sync_from_other_pane
+		ftl::list::change_dir "$dir" "$search"
+	fi
 
-        ftl::log::trace "entering main loop"
+	ftl::log::trace "entering main loop"
 
-        # The main loop
-        while : ; do
-                ftl::sel::sync_from_other_pane
-                ftl::pane::check_resize
-                ftl::time::tick
+	# The main loop
+	while : ; do
+		ftl::sel::sync_from_other_pane
+		ftl::pane::check_resize
+		ftl::time::tick
 
-                # Get next input: either from pending queue or from the keyboard
-                if [[ -n "$ftl_state_pending_input" ]] ; then
-                        ftl_kbd_current_key="${ftl_state_pending_input:0:1}"
-                        ftl_state_pending_input="${ftl_state_pending_input:1}"
-                else
-                        ftl::kbd::get_key "$ftl_cfg_key_timeout"
-                fi
+		# Get next input: either from pending queue or from the keyboard
+		if [[ -n "$ftl_state_pending_input" ]] ; then
+			ftl_kbd_current_key="${ftl_state_pending_input:0:1}"
+			ftl_state_pending_input="${ftl_state_pending_input:1}"
+		else
+			ftl::kbd::get_key "$ftl_cfg_key_timeout"
+		fi
 
-                ftl::log::wrap ftl::kbd::dispatch
-                ftl::kbd::drain_input
-                ftl_state_winch_pending=1
-                ftl_kbd_current_key=
-        done
+		ftl::log::wrap ftl::kbd::dispatch
+		ftl::kbd::drain_input
+		ftl_state_winch_pending=1
+		ftl_kbd_current_key=
+	done
 }
 
 ftl "$@"
