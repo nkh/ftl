@@ -69,6 +69,24 @@ ftl_state_shared_dir="$ftl_state_session_dir/prev"
 # Compute this pane's tmux id
 ftl_pane_self_id="$(ftl::pane::pid_to_id $$)"
 
+# Pane state — must be initialized before any code uses them under set -u
+ftl_pane_is_primary=0
+ftl_pane_is_child=0
+ftl_pane_preview_id=
+ftl_pane_fixed_preview_id=
+ftl_pane_shell_id=
+ftl_pane_height=24
+ftl_pane_width=80
+ftl_pane_prev_width=80
+ftl_pane_prev_height=24
+ftl_pane_top=0
+ftl_pane_window_width=80
+ftl_pane_left=0
+ftl_pane_preview_width=0
+ftl_pane_session_shell_active=0
+ftl_pane_inotify_pid=
+ftl_pane_inotify_all_pids=()
+
 # Initialize logging (after session dir is set)
 ftl::log::init
 
@@ -100,10 +118,54 @@ declare -Ag ftl_list_raw_relpath_len
 # Initialize selection, path, and tab state
 ftl_selection_current=()
 ftl_state_current_path=
+ftl_state_current_dir=
+ftl_state_current_basename=
+ftl_state_current_stem=
+ftl_state_current_extension=
+ftl_state_current_mime_type=
+ftl_state_current_is_binary=0
+ftl_state_current_file_description=
+ftl_state_cursor_index=0
 ftl_state_current_tab_index=0
+ftl_state_previous_pwd=
+ftl_state_custom_list=
+ftl_state_quit_cancelled=0
+ftl_state_pending_input=
+ftl_state_winch_pending=0
+ftl_state_search_string=
+ftl_state_preview_callback=
+ftl_state_montage_glyph=
+ftl_state_external_viewer_mode=0
+ftl_state_preview_pane_visible=${ftl_state_preview_pane_visible:-1}
+ftl_state_alt_preview_mode=0
+ftl_state_dir_preview_mode=0
+ftl_state_show_size_mode=0
+ftl_state_etag_enabled=0
 ftl_tab_directories+=("$PWD")
 ftl_tab_count=1
 ftl::tab::init_defaults
+
+# Initialize listing state (must be set before any render)
+ftl_list_entry_count=0
+ftl_list_entries=()
+ftl_list_entry_colors=()
+ftl_list_window_top=0
+ftl_list_window_bottom=0
+ftl_list_window_height=0
+ftl_list_window_center=0
+ftl_list_display_line_no=0
+ftl_list_total_size=0
+ftl_list_index_padding=1
+ftl_list_first_file_index=
+ftl_list_search_found_index=
+ftl_list_header_total_count=
+ftl_list_header_total_size=
+ftl_list_quick_display_active=0
+ftl_list_flip_index=0
+ftl_list_current_flip_char=
+ftl_list_path_separator=/
+ftl_list_resolved_sort_type=0
+ftl_list_resolved_sort_reversed=
 
 # Initialize filter pipeline and virtual entries
 ftl::filt::reset
