@@ -1,11 +1,11 @@
 
-# an experimental fzf search with ftl::prev::dispatch in a ftl pane
+# an experimental fzf search with preview in a ftl pane
 
-ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::previewd()
+ftl::plugin::fzf_pane_preview::previewd()
 {
 	local preview_path
 
-	source '$FTL_CFG'/viewers/core "$ftl_state_current_basename"
+	source "$FTL_CFG/etc/viewers/core"
 
 	while read -r preview_path ; do
 		if [[ "$preview_path" == previewd_shutdown ]] ; then
@@ -19,35 +19,31 @@ ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::previewd()
 
 ftl::plugin::fzf_pane_preview::fzf_pane_preview()
 {
-	ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_all 1
+	ftl::plugin::fzf_pane_preview::fzf_pane_preview_all 1
 }
 
-ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_all()
+ftl::plugin::fzf_pane_preview::fzf_pane_preview_all()
 {
 	local fzf_choice
 
 	ftl::util::create_fifos 10
-	<&10 ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::previewd &
+	<&10 ftl::plugin::fzf_pane_preview::previewd &
 
 	exec 2>&9
 
-	# find all files and pass then to fzf, and declare a previewr
-
-	# the previewer sets a few variable and sources 'viewers/core' which
-	# detects that it was sourced directly and calls ftl_setup and then calls
-	# ftl::plugin::fzf_pane_preview::pfzf which is defined below
+	# find all files and pass them to fzf, with a previewer
 
 	fzf_choice="$( \
 		{ (( "$1" )) && { { fd -HI -d1 -td | sort ; fd -HI -d1 -tf -tl | sort ; } | sed 's/^.\///' ; } \
 				|| { fd -HI -E'.git/*' | sed 's/^.\///' ; } ; } | \
 		lscolors | \
 				fzf \
-						--ansi \
-						-m \
-						--expect=ctrl-t \
-						--ftl::prev::dispatch 'echo {} >&10 ; read -sn 100' \
-						--ftl::prev::dispatch-window='right:0%' \
-						--cycle --reverse --info=inline
+					--ansi \
+					-m \
+					--expect=ctrl-t \
+					--preview 'echo {} >&10 ; read -sn 100' \
+					--preview-window='right:0%' \
+					--cycle --reverse --info=inline
 		)"
 
 	echo previewd_shutdown >&10
@@ -68,10 +64,7 @@ ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_a
 
 ftl::plugin::fzf_pane_preview::pfzf()
 {
-	# fzf ftl::prev::dispatch in ftl ftl::prev::dispatch pane, reusing the normal previewer
-
-	# replace ftl::pane::split_or_respawn with ftl::pane::split_for_preview
-	# ftl_view_fzf_as_viewer=1
+	# fzf preview in ftl preview pane, reusing the normal previewer
 
 	ftl_state_current_path="$(realpath "$1")"
 	ftl_state_current_basename="$(basename "$1")"
@@ -81,23 +74,15 @@ ftl::plugin::fzf_pane_preview::pfzf()
 		ftl_state_current_extension=
 	fi
 
-	# set ftl_state_parent_dir
-	# fzf_viewer_fs=/tmp/ftl_view_fzf_as_viewer ; mkdir -p "$fzf_viewer_fs" ; ftl_state_parent_dir="$fzf_viewer_fs"
-
-	# handle tmux "not cleaning" pane
-	# tmux respawn-pane -k -t $ftl_pane_preview_id "for i in \$(seq 100) ; do echo -e '\e[30m.' ; done ; read -sn1"
-	# sleep .02
-
 	# use pdir_ls for directory
 	[[ -d "$ftl_state_current_path" ]] && { pdir_ls ; return ; }
 
 	# call the default previewers
-	pviewers
+	ftl::plugin::core::pviewers
 }
 
-ftl::kbd::bind	ftl	find	"/"	ftl::plugin::fzf_pane_preview::fzf_pane_preview	"find via fzf with pane ftl::prev::dispatch"
-ftl::kbd::bind	ftl	search	gfp	ftl::plugin::fzf_pane_preview::fzf_pane_preview	"fzf with ftl::prev::dispatch in ftl::prev::dispatch pane"
-ftl::kbd::bind	ftl	search	gfP	ftl::plugin::ftl::plugin::fzf_pane_preview::fzf_pane_preview::fzf_pane_preview_all	"fzf with ftl::prev::dispatch in ftl::prev::dispatch pane, sub directories"
-
+ftl::kbd::bind	ftl	find	"/"	ftl::plugin::fzf_pane_preview::fzf_pane_preview	"find via fzf with pane preview"
+ftl::kbd::bind	ftl	search	gfp	ftl::plugin::fzf_pane_preview::fzf_pane_preview	"fzf with preview in preview pane"
+ftl::kbd::bind	ftl	search	gfP	ftl::plugin::fzf_pane_preview::fzf_pane_preview_all	"fzf with preview in preview pane, sub directories"
 
 # vim: set filetype=bash :

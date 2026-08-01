@@ -36,7 +36,7 @@ ftl::cmd::close_pane() {
 	ftl::pane::read_child_list
 	if (( ftl_pane_is_primary && ${#ftl_pane_child_ids[@]} )) ; then
 		tail -n +2 "$ftl_state_parent_dir/panes" | sponge "$ftl_state_parent_dir/panes"
-		tmux send -t "${ftl_pane_child_ids[0]}" "${ftl_kbd_command_to_key[quit_ftl]}" 2>&-
+		tmux send -t "${ftl_pane_child_ids[0]}" "${ftl_kbd_command_to_key[ftl::cmd::quit_ftl]:-}" 2>&-
 		sleep 0.03
 	fi
 }
@@ -80,7 +80,7 @@ ftl::cmd::goto_next_pane() {
 		echo -e "\e[H\e[K"
 		_ftl::list::print_header '2;97' "$ftl_list_header_mode_glyphs"
 		tmux selectp -t "$p" &>/dev/null
-		tmux send -t "$p" "${ftl_kbd_command_to_key[refresh_pane]}"
+		tmux send -t "$p" "${ftl_kbd_command_to_key[ftl::cmd::refresh_pane]:-}"
 	fi
 }
 

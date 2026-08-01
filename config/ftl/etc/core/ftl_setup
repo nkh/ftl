@@ -86,6 +86,7 @@ ftl_pane_preview_width=0
 ftl_pane_session_shell_active=0
 ftl_pane_inotify_pid=
 ftl_pane_inotify_all_pids=()
+ftl_pane_primary_id=
 
 # Initialize logging (after session dir is set)
 ftl::log::init
@@ -93,6 +94,21 @@ ftl::log::init
 # Selection state
 ftl_selection_total_bytes=0
 ftl_selection_revision=0
+ftl_selection_other_revision=0
+ftl_selection_class_cursor=0
+declare -Ag ftl_selection_tags=()
+ftl_selection_current=()
+declare -Ag ftl_selection_class_index=()
+
+# Preview state
+ftl_preview_is_vim=0
+ftl_state_images_hidden=0
+ftl_state_show_stat=0
+
+# Virtual entries state
+declare -Ag ftl_plugin_vfiles=()
+declare -Ag ftl_plugin_vdirs=()
+ftl_plugin_virtual_enabled=0
 
 # Runtime associative arrays
 declare -Ag ftl_state_cursor_memory
@@ -166,6 +182,10 @@ ftl_list_current_flip_char=
 ftl_list_path_separator=/
 ftl_list_resolved_sort_type=0
 ftl_list_resolved_sort_reversed=
+
+# Initialize filter state
+ftl_filter_external_name=
+ftl_filter_active_glyph=
 
 # Initialize filter pipeline and virtual entries
 ftl::filt::reset

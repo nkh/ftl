@@ -3,44 +3,44 @@ leader_help_index=${FTL_LTC_INDEX:-1}
 
 ftl::plugin::leader::leader_help()
 {
-	local test_cmd
+        local test_cmd
 
-	if [[ "$FTL_LTC" ]] ; then
-		test_cmd="$FTL_LTC"
-	else
-		test_cmd='echo -n ftl: ftl::plugin::leader::leader_help: variable FTL_LTC not set'
-	fi
+        if [[ "${FTL_LTC:-}" ]] ; then
+                test_cmd="$FTL_LTC"
+        else
+                test_cmd='echo -n ftl: ftl::plugin::leader::leader_help: variable FTL_LTC not set'
+        fi
 
-	tmux popup ${FTL_LTC_OPT:- -h 40% -w 80%} -d "$PWD" \
-		"leader_help_index='${1:-$leader_help_index}' ; \
-		 ftl_proc=$$ \
-		 ftl_state_current_dir='$ftl_state_current_dir' \
-		 ftl_state_current_path='$ftl_state_current_path' \
-		 $test_cmd"
+        tmux popup ${FTL_LTC_OPT:- -h 40% -w 80%} -d "$PWD" \
+                "leader_help_index='${1:-$leader_help_index}' ; \
+                 ftl_proc=$$ \
+                 ftl_state_current_dir='$ftl_state_current_dir' \
+                 ftl_state_current_path='$ftl_state_current_path' \
+                 $test_cmd"
 }
 
 ftl::plugin::leader::leader_help_reset()
 {
-	leader_help_index=${1:-${FTL_LTC_INDEX:-1}}
+        leader_help_index=${1:-${FTL_LTC_INDEX:-1}}
 }
 
 ftl::plugin::leader::leader_help_next()
 {
-	((leader_help_index++))
-	ftl::plugin::leader::leader_help "$leader_help_index"
+        ((leader_help_index++))
+        ftl::plugin::leader::leader_help "$leader_help_index"
 }
 
 ftl::plugin::leader::leader_help_previous()
 {
-	((leader_help_index > 1 && leader_help_index--))
-	ftl::plugin::leader::leader_help "$leader_help_index"
+        ((leader_help_index > 1 && leader_help_index--))
+        ftl::plugin::leader::leader_help "$leader_help_index"
 }
 
-ftl::kbd::bind	leader	help	"LEADER h h"	ftl::plugin::leader::leader_help	"leader help"
-ftl::kbd::bind	leader	help	"LEADER h r"	ftl::plugin::leader::leader_help_reset	"leader help reset"
-ftl::kbd::bind	leader	help	"LEADER h n"	ftl::plugin::leader::leader_help_next	"leader help next"
-ftl::kbd::bind	leader	help	"LEADER h p"	ftl::plugin::leader::leader_help_previous	"leader help previous"
+ftl::kbd::bind  leader  help    "LEADER h h"    ftl::plugin::leader::leader_help        "leader help"
+ftl::kbd::bind  leader  help    "LEADER h r"    ftl::plugin::leader::leader_help_reset  "leader help reset"
+ftl::kbd::bind  leader  help    "LEADER h n"    ftl::plugin::leader::leader_help_next   "leader help next"
+ftl::kbd::bind  leader  help    "LEADER h p"    ftl::plugin::leader::leader_help_previous       "leader help previous"
 
-ftl::kbd::bind	leader	selection	"LEADER ${ftl_kbd_altgr_map[t]}"	add_selection_to_file	"add selection to file"
+ftl::kbd::bind  leader  selection       "LEADER ${ftl_kbd_altgr_map[t]}"        ftl::cmd::add_selection_to_file "add selection to file"
 
 # vim: set filetype=bash :

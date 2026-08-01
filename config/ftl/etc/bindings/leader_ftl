@@ -8,7 +8,7 @@ ftl::kbd::bind  leader_ftl      extra   "LEADER f D"    ftl::plugin::file_utils:
 ftl::kbd::bind  leader_ftl      extra   "LEADER f e"    ftl::plugin::file_utils::gpg_encrypt    "GPG encrypt/decrypt"
 ftl::kbd::bind  leader_ftl      extra   "LEADER f E"    ftl::plugin::file_utils::pass_encrypt   "password encrypt/decrypt"
 ftl::kbd::bind  leader_ftl      extra   "LEADER f g"    ftl::plugin::file_utils::stat_file      "display stat information in ftl::prev::dispatch pane"
-ftl::kbd::bind  leader_ftl      extra   "LEADER f h"    ftl_help        "display help"
+ftl::kbd::bind  leader_ftl      extra   "LEADER f h"    ftl::cmd::ftl_help      "display help"
 ftl::kbd::bind  leader_ftl      extra   "LEADER f i"    ftl::plugin::file_utils::image_optimize "reduce jpg image size, converts png to jpg"
 ftl::kbd::bind  leader_ftl      extra   "LEADER f l"    ftl::plugin::file_utils::lint   "run rmlint in current_directory"
 ftl::kbd::bind  leader_ftl      extra   "LEADER f m"    ftl::plugin::file_utils::run_mutt       "send selection in mail"

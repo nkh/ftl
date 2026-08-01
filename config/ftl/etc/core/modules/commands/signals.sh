@@ -17,7 +17,7 @@ ftl::ipc::handle_pane_focus() {
 		tmux selectp -t "$ftl_pane_self_id"
 	fi
 	ftl_state_other_session_dir=
-	ftl_state_pending_input="${ftl_kbd_command_to_key[refresh_pane]}"
+	ftl_state_pending_input="${ftl_kbd_command_to_key[ftl::cmd::refresh_pane]:-}"
 }
 
 ftl::cmd::SIG_PANE() {

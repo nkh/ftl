@@ -10,7 +10,7 @@
 #----------------------------------------------------------------------------
 
 ftl::cmd::view_mode_all() {
-	local no_redraw=$1
+	local no_redraw=${1:-0}
 	local t=$ftl_state_current_tab_index
 	ftl_tab_view_mode[$t]=0
 	ftl_tab_filter_image_mode[$t]=
@@ -19,7 +19,7 @@ ftl::cmd::view_mode_all() {
 }
 
 ftl::cmd::view_mode_image() {
-	local no_redraw=$1
+	local no_redraw=${1:-0}
 	local t=$ftl_state_current_tab_index
 	ftl_tab_view_mode[$t]=1
 	ftl_tab_filter_image_negate[$t]=
@@ -28,7 +28,7 @@ ftl::cmd::view_mode_image() {
 }
 
 ftl::cmd::view_mode_not_image() {
-	local no_redraw=$1
+	local no_redraw=${1:-0}
 	local t=$ftl_state_current_tab_index
 	ftl_tab_view_mode[$t]=2
 	ftl_tab_filter_image_mode[$t]="$ftl_cfg_image_extensions_regex$"
@@ -44,7 +44,7 @@ ftl::cmd::view_mode_next() {
 }
 
 ftl::cmd::view_mode() {
-	local no_redraw=$2
+	local no_redraw=${2:-0}
 	[[ $1 == 0 ]] && ftl::cmd::view_mode_all "$no_redraw"
 	[[ $1 == 1 ]] && ftl::cmd::view_mode_image "$no_redraw"
 	[[ $1 == 2 ]] && ftl::cmd::view_mode_not_image "$no_redraw"

@@ -11,7 +11,7 @@
 
 ftl::cmd::find_in_dir() {
 	ftl::cmd::prompt "find: " -i "$ftl_state_search_string"
-	ftl_state_pending_input="${ftl_kbd_command_to_key[find_next]}"
+	ftl_state_pending_input="${ftl_kbd_command_to_key[ftl::cmd::find_next]:-}"
 }
 
 ftl::cmd::find_entry() {

@@ -56,7 +56,7 @@ ftl::cmd::quit_all() {
 		ftl_state_quit_cancelled=1
 		ftl::cmd::quit
 	else
-		tmux send -t "$ftl_pane_primary_id" "${ftl_kbd_command_to_key[quit_all]}"
+		tmux send -t "$ftl_pane_primary_id" "${ftl_kbd_command_to_key[ftl::cmd::quit_all]:-}"
 	fi
 }
 

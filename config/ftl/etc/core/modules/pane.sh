@@ -82,7 +82,7 @@ ftl::pane::check_resize() {
 		  && [[ "$ftl_pane_prev_width" != "$ftl_pane_width" ]] ; } \
 	   || [[ "$ftl_pane_prev_height" != "$ftl_pane_height" ]] ; then
 		if (( ftl_state_winch_pending )) ; then
-			ftl_state_pending_input="${ftl_kbd_command_to_key[refresh_pane]}$ftl_state_pending_input"
+			ftl_state_pending_input="${ftl_kbd_command_to_key[ftl::cmd::refresh_pane]:-}$ftl_state_pending_input"
 		fi
 	fi
 }
@@ -269,7 +269,7 @@ _ftl::pane::file_watcher_loop() {
 		local a b f
 		read -r a b f
 		if [[ -n "$f" ]] ; then
-			tmux send -t "$ftl_pane_self_id" "${ftl_kbd_command_to_key[refresh_pane]}" 2>&-
+			tmux send -t "$ftl_pane_self_id" "${ftl_kbd_command_to_key[ftl::cmd::refresh_pane]:-}" 2>&-
 		fi
 	}
 }

@@ -117,7 +117,7 @@ test_check_resize_width_change() {
     ftl_pane_prev_width=100
     ftl_pane_prev_height=50
     ftl_state_winch_pending=1
-    ftl_kbd_command_to_key[refresh_pane]="R"
+    ftl_kbd_command_to_key[ftl::cmd::refresh_pane]="R"
     ftl_state_pending_input=""
     ftl::pane::check_resize
     ftl::test::assert_contains "$ftl_state_pending_input" "R" \
@@ -134,7 +134,7 @@ test_check_resize_height_change() {
     ftl_pane_prev_width=100
     ftl_pane_prev_height=50
     ftl_state_winch_pending=1
-    ftl_kbd_command_to_key[refresh_pane]="R"
+    ftl_kbd_command_to_key[ftl::cmd::refresh_pane]="R"
     ftl_state_pending_input=""
     ftl::pane::check_resize
     ftl::test::assert_contains "$ftl_state_pending_input" "R" \

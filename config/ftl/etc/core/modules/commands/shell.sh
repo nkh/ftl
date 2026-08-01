@@ -69,7 +69,7 @@ ftl::cmd::shell_vertical() {
 
 ftl::cmd::open_shell_with_files() {
 	if [[ -n "$ftl_pane_shell_id" ]] && tmux has -t "$ftl_pane_shell_id" 2>&- ; then
-		ftl_state_pending_input="${ftl_kbd_command_to_key[shell_file]}"
+		ftl_state_pending_input="${ftl_kbd_command_to_key[ftl::cmd::shell_file]:-}"
 	else
 		ftl::cmd::open_shell_pane 1
 	fi
