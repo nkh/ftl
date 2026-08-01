@@ -153,7 +153,7 @@ _ftl::list::scan_directory() {
         ftl_list_raw_names=()
         ftl_list_raw_colors=()
         ftl_list_raw_sizes=()
-        declare -A uniq_file
+        declare -A uniq_file=()
 
         # Run etag directory scan
         if (( ftl_state_etag_enabled )) ; then
@@ -645,7 +645,7 @@ ftl::list::get_mime_type() {
         if [[ -z "${ftl_list_mime_cache[$ftl_state_current_path]:-}" ]] ; then
                 _ftl::list::cache_mime_types "$ftl_state_current_path"
         fi
-        ftl_state_current_mime_type="${ftl_list_mime_cache[$ftl_state_current_path]}"
+        ftl_state_current_mime_type="${ftl_list_mime_cache[$ftl_state_current_path]:-}"
 }
 
 # Cache mime types for a batch of entries.

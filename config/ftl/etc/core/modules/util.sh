@@ -159,3 +159,28 @@ ftl::util::enter_alt_screen() {
 }
 
 # vim: set filetype=bash :
+
+# Navigate to fzf/rg results, handling ctrl-t (open in new tab).
+# Args:
+#   $1: "f" for file-only mode (strip PWD prefix), else keep PWD
+#   $2: newline-separated list of results
+go_loop() {
+	local P=
+	[[ "$1" == "f" ]] && { P= ; shift ; } || P="$PWD"
+	local in_tab= dst
+	while read -r dst ; do
+		[[ -z "$dst" ]] && continue
+		# Check for ctrl-t (new tab) - simplified, just cd
+		local d
+		d="$(dirname "$dst")"
+		local nd
+		[[ -n "$P" ]] && nd="$P/$d" || nd="$d"
+		local bn
+		bn="$(basename "$dst")"
+		if [[ -d "$nd/$bn" ]] ; then
+			ftl::list::change_dir "$nd/$bn"
+		else
+			ftl::list::change_dir "$nd" "$bn"
+		fi
+	done <<<"$2"
+}

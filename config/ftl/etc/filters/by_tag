@@ -1,8 +1,8 @@
 declare -g -A keep=() PWDS=()
 
-[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+[[ "${1:-}" == reset ]] && { unset -v keep PWDS ; } ||
 {
-	[[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag" ]] && source "$ftl_state_parent_dir/by_tag" ||
+	[[ "${1:-}" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag" ]] && source "$ftl_state_parent_dir/by_tag" ||
 	{
 		exec 2>&9
 

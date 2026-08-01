@@ -66,9 +66,9 @@ ftl::filter::apply_external() { ftl::plugin::by_bash_keep::filter ; }
 
 declare -g -A keep PWDS
 
-[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+[[ "${1:-}" == reset ]] && { unset -v keep PWDS ; } ||
 	{
-		[[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_keep" ]] && source "$ftl_state_parent_dir/by_bash_keep" ; true ; } ||
+		[[ "${1:-}" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_keep" ]] && source "$ftl_state_parent_dir/by_bash_keep" ; true ; } ||
 		bash_filter_keep_imp
 	}
 

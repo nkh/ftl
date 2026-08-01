@@ -22,7 +22,7 @@ ftl::cmd::open_shell_pane() {
 	ftl_pane_shell_id=$ftl_pane_preview_id
 	ftl_pane_preview_id=$saved_pane
 	sleep 0.2
-	ftl::pane::send_to_shell "$1" "$(printf "%s " "${ftl_selection_current[@]@Q}")" C-b
+	ftl::pane::send_to_shell "${1:-}" "$(printf "%s " "${ftl_selection_current[@]@Q}")" C-b
 	ftl::list::change_dir
 }
 
@@ -37,7 +37,7 @@ ftl::cmd::open_vertical_shell_pane() {
 	ftl_pane_shell_id=$ftl_pane_preview_id
 	ftl_pane_preview_id=$saved_pane
 	sleep 0.2
-	ftl::pane::send_to_shell "$1" "$(printf "%s " "${ftl_selection_current[@]@Q}")" C-b
+	ftl::pane::send_to_shell "${1:-}" "$(printf "%s " "${ftl_selection_current[@]@Q}")" C-b
 	ftl::list::change_dir
 }
 

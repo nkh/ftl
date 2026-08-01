@@ -8,7 +8,7 @@ ftl::plugin::via_bash::bash_select()
 	# the pane when running bash
 	ftl::pane::stop_file_watcher
 	tmp_ftl_files="$(mktemp ftl_to_select_XXXXXXX)"
-	: >"$tmp_ftl_file"
+	: >"$tmp_ftl_files"
 
 	ftl::cmd::run_interactive_bash
 

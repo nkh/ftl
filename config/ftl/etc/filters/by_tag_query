@@ -1,8 +1,8 @@
 declare -g -A keep=() PWDS=()
 
-[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+[[ "${1:-}" == reset ]] && { unset -v keep PWDS ; } ||
 {
-	[[ "$1" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag_query" ]] && source "$ftl_state_parent_dir/by_tag_query" ||
+	[[ "${1:-}" == load ]] && [[ -e "$ftl_state_parent_dir/by_tag_query" ]] && source "$ftl_state_parent_dir/by_tag_query" ||
 	{
 		ftl::prev::clear
 		query_file="$(mktemp -p $ftl_state_session_dir ftl_tmsu_tag_query_XXXXXXX)"

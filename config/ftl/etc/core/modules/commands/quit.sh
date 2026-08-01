@@ -51,7 +51,7 @@ _ftl::cmd::quit_cleanup() {
 
 ftl::cmd::quit_all() {
 	if (( ftl_pane_is_primary )) ; then
-		ftl::pane::send_to_all_children "${ftl_kbd_command_to_key[quit_ftl]}"
+		ftl::pane::send_to_all_children "${ftl_kbd_command_to_key[ftl::cmd::quit_ftl]:-}"
 		sleep 0.05
 		ftl_state_quit_cancelled=1
 		ftl::cmd::quit

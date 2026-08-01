@@ -149,7 +149,7 @@ _ftl::cmd::delete_current() {
 }
 
 _ftl::cmd::delete_tagged() {
-	declare -A ltags
+	declare -A ltags=() ; local class=
 	ftl::sel::get_by_class ltags class
 	(( ${#ltags[@]} )) || return 0
 	ftl::sel::unset_by_class "$class"
@@ -347,7 +347,7 @@ ftl::cmd::tag_move_dest() {
 }
 
 ftl::cmd::move_via_fzf() {
-	declare -A ltags
+	declare -A ltags=() ; local class=
 	ftl::sel::get_by_class ltags class
 	if (( ${#ltags[@]} )) ; then
 		fzf_mv "${!ltags[@]}" && ftl::sel::unset_by_class "$class"
@@ -363,7 +363,7 @@ ftl::cmd::tag_move_fzf() {
 }
 
 ftl::cmd::move_to_subdir_via_fzf() {
-	declare -A ltags
+	declare -A ltags=() ; local class=
 	ftl::sel::get_by_class ltags class
 	if (( ${#ltags[@]} )) ; then
 		fzf_mv_sd "${!ltags[@]}" && ftl::sel::unset_by_class "$class"
@@ -419,7 +419,7 @@ _ftl::cmd::find_other_tab_dir() {
 }
 
 _ftl::cmd::copy_or_move_with_tags() {
-	declare -A ltags
+	declare -A ltags=() ; local class=
 	ftl::sel::get_by_class ltags class
 	if (( ${#ltags[@]} )) ; then
 		ftl::sel::unset_by_class "$class"

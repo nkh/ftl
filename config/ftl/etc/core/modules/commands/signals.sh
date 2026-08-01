@@ -1,3 +1,4 @@
+declare -ag ftl_pane_child_ids=() 2>/dev/null || true
 # commands/signals.sh — Signal handlers
 #
 # Split from commands.sh. Each command is a function that takes no

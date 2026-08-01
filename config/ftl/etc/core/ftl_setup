@@ -87,6 +87,7 @@ ftl_pane_session_shell_active=0
 ftl_pane_inotify_pid=
 ftl_pane_inotify_all_pids=()
 ftl_pane_primary_id=
+ftl_pane_child_ids=()
 
 # Initialize logging (after session dir is set)
 ftl::log::init
@@ -102,6 +103,7 @@ declare -Ag ftl_selection_class_index=()
 
 # Preview state
 ftl_preview_is_vim=0
+ftl_view_media_pid=
 ftl_state_images_hidden=0
 ftl_state_show_stat=0
 
@@ -124,7 +126,7 @@ declare -Ag ftl_state_child_env
 declare -Ag ftl_list_dir_size_cache
 
 # Raw-entry arrays (populated during directory scan)
-declare -ag ftl_list_raw_entries
+declare -ag ftl_list_raw_entries=()
 declare -Ag ftl_list_raw_paths
 declare -Ag ftl_list_raw_names
 declare -Ag ftl_list_raw_colors

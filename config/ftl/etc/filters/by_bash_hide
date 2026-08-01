@@ -63,9 +63,9 @@ ftl::filter::apply_external() { ftl::plugin::by_bash_hide::filter ; }
 
 declare -g -A hide PWDS
 
-[[ "$1" == reset ]] && { unset keep PWDS ; } ||
+[[ "${1:-}" == reset ]] && { unset keep PWDS ; } ||
 	{
-		[[ "$1" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_hide" ]] && source "$ftl_state_parent_dir/by_bash_hide" ; true ; } ||
+		[[ "${1:-}" == load ]] && { [[ -e "$ftl_state_parent_dir/by_bash_hide" ]] && source "$ftl_state_parent_dir/by_bash_hide" ; true ; } ||
 		bash_filter_hide_imp
 	}
 

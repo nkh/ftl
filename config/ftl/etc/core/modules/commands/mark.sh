@@ -77,7 +77,7 @@ ftl::cmd::add_persistent_mark() {
 		else
 			echo "$ftl_state_current_path"
 		fi
-	} | awk '!seen[$0]++' | sponge "$FTL_STATE_DIR/shared/marks"
+	} | awk '!seen[$0]++' > /tmp/ftl_marks_tmp ; mv /tmp/ftl_marks_tmp "$FTL_STATE_DIR/shared/marks"
 }
 
 ftl::cmd::gmark() {
@@ -146,7 +146,7 @@ ftl::cmd::edit_global_history() {
 	rg -v -x -F -f \
 		"$(<"$FTL_STATE_DIR/shared/history" lscolors \
 			| fzf-tmux $ftl_cfg_fzf_popup_opts --tac -m --ansi)" \
-		"$FTL_STATE_DIR/shared/history" | sponge "$FTL_STATE_DIR/shared/history"
+		"$FTL_STATE_DIR/shared/history" > /tmp/ftl_hist_tmp ; mv /tmp/ftl_hist_tmp "$FTL_STATE_DIR/shared/history"
 }
 
 ftl::cmd::ghistory_edit() {
