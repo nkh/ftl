@@ -72,6 +72,9 @@ iglyph=('' ᴵ ᴺ)				# image mode: all, no-image, image
 lglyph=('' ᵈ ᶠ)				# preview: all, directory-only, file-only
 tglyph=('' ¹ ² ³ D)			# tag classes 
 
+dtag_move=1				# move down on destination tagging
+dtag_l=15				# tag list length
+
 # Media Filters
 ifilter='svg|webp|jpg|jpeg|JPG|png|gif|bmp'	# images
 mfilter='mp3|mp4|flv|mkv|webm'			# video
@@ -347,6 +350,14 @@ bind ftl selection	y4		selection_class_4	"class 4 selection"
 bind ftl selection	yc		selection_untag_all	"deselect all"
 bind ftl selection	yC		selection_untag_fzf	"deselect fzf"
 bind ftl selection	ytc		copy_clipboard		"copy selection to clipboard"
+
+bind ftl selection	t		selection_class_l	"destination directory selection"
+bind ftl selection	TCC		selection_class_lc	"clear destination directory selection"
+bind ftl selection	TCA		selection_class_lc_all	"clear all destination directory selection"
+bind ftl selection	TT		selection_class_l_bis	"set to the last destination directory"
+bind ftl selection	"COUNT TT"	selection_class_l_bis	"set to the last destination directory"
+bind ftl selection	Tc		selection_class_l_copy	"copy tagged to destination directory"
+bind ftl selection	Tm		selection_class_l_move	"move to destination directory"
 
 bind ftl selection	gy		selection_goto		"fzf goto selection"
 # bind ftl selection	""		selection_merge_all	"merge from panes"

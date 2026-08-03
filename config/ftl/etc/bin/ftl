@@ -87,6 +87,8 @@ for p_index in "${dir_entries_list[@]}" ; do
 	pnc_l=${#pnc}
 	ppath_l=${#ppath}
 	
+	pc_c=${pc:0:${#pc} - (pnc_l + 4)} ;
+	
 	[[ -f "$pnc" ]] && # extension filtering
 		{
 		if [[ "$pnc" =~ '.' ]] ; then
@@ -117,13 +119,14 @@ for p_index in "${dir_entries_list[@]}" ; do
 	[[ ${#pc} == $pnc_l ]] || pc="${pc:0:-4}" # remove color reset if entry is colored
 	
 	((rpath_l + pnc_l > COLS - 1)) && { 
+		
 		[[ "$pnc" =~ '.' ]] && e="${pnc##*.}" || e= 
 		ext_l="$((${#e}+1))"
 		
 		local prefix_length=$((- (((rpath_l + pnc_l) - (COLS - 1)) + ext_l) ))
 		((prefix_length < 0)) && prefix_length=$((COLS - (${#e} + 1))) 
 		
-		pc="${pc:0:$prefix_length}…${e}"
+		pc="${pc:0:$prefix_length+${#pc_c}}…${e}"
 		}
 	
 	files_color[$nfiles]="$pc" ; files[$nfiles]="$ppath$sep$pnc"
@@ -162,7 +165,10 @@ show_header
 	{
 	for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
 		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
-		echo -ne "\e[${tline};0H\e[m\e[K$cursor${files_color[i]/¿/$flip}\e[0m" ; ((i != bottom)) && echo ; ((l++))
+		
+		[[ -n ${dest_tags[${files[$i]}]} ]] && { dtag="${dest_tags[${files[$i]}]: -dtag_l}" ; printf -v dtag "%-${dtag_l}s" "$dtag" ; dtag=" [...${dtag}]" ; } || dtag=
+		
+		echo -ne "\e[${tline};0H\e[m\e[K$cursor\e[2;37m$dtag\e[0m ${files_color[i]/¿/$flip}\e[0m" ; ((i != bottom)) && echo ; ((l++))
 	done
 	
 	clear_list $tline 

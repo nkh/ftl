@@ -1,9 +1,64 @@
 # Current
 
-functionality: another etags column, possibility to control cursor look, control line number column rendering
+features: move files mode
+	leader + m: enter move files mode
+	escape: cancel mode
+	up/down: move through entries
+	leader + m moves entries
+	
+	letters tag current entry for movement or move it directly
+		tagged entries are moved to the destination directory when with shortcut
+			current destination or all
+		tagged entries have their name overlayed with the destination directory name
+		destination directory is selected
+			by typing a shortcut 
+			with fzf
+			by typing a path path
+				in the shorcut list
+				path with completion
 
-functionality: diffrent virtual directory in different tabs, show all selected, show results of a search, result of a diff or other command, sorting directory in sub virtual directories
+	the tagging should be ossible without entering a special mode, it should be how ftl works normally
+		we already have tagging but only 4 tag classes not clsses that correspond to directories
+		
+		tagging information should be saved in a file so it can be used later, and also to avoid losing it if ftl is closed
 
+features: more git suport
+	find files changed in last commit, or any commit, in git repo
+	find files changed in last commit, or any commit, and only display those files in ftl
+
+	integrate:
+		https://github.com/unhappychoice/gitlogue
+		https://github.com/modem-dev/hunk
+		cimomands that open vim with fugitive command run
+
+
+https://github.com/tjblackheart/andcli
+
+functionality: files that have changes in the last commit, or any commit, in git repo
+	eg: ftl -g HEAD~1
+	open it in vim + fugitive, gitlogue, ...
+
+functionality: shortcuts or fzf pick commands to be run in a shell pane
+		run automatically or not
+		pass selection or not
+
+		exmemple: want to know the weather but doesn't want to leave ftl, so run a command in a shell pane and show the result in a popup pane
+		leader + r + r/R pick and wait or run automatically
+		leader + r + ? use predefined command
+
+
+issue: dir_entries_relative_path_length[$pnc]=0 is not used
+
+functionality: -f user_oeverride && . user_override ; this is a way to override ftl's default settings and functions
+		better done in ftlrc but it may be sources too late for some settings and functions
+
+functionality: another etags column, possibility to control cursor look, control line number column rendering to change colors
+
+functionality: diffrent virtual directory in different tabs
+		show all selected
+		show results of a search
+		result of a diff or other command
+		sorting directory in sub virtual directories
 
 functionality: completion for ftl commands
 	eg: ftl -v file1 file2 file3
@@ -11,10 +66,12 @@ functionality: completion for ftl commands
 
 functionality: multiple files/dirs as arguments
 	-v put them  in the same virtual directory
+		without directory structure, just the files
 	-t in different tabs
 	-r recursively add files/dirs to virtual directory
 
-	some of the files/dirs may not exist, but they will be created when the virtual directory is created
+	some of the files/dirs may not exist
+		option to create them if they don't exist
 
 functionality: option to create a virtual directory with a list of files, and then use ftl to browse it
 	eg: ftl -v file1 file2 file3
