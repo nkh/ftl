@@ -177,16 +177,17 @@ _ftl::list::scan_directory() {
                 read -s -u 5 pc
                 read -s -u 6 size
 
-                [[ -z "$pnc" ]] && break
-                (( ${uniq_file[$pnc]:-0} )) && continue
-                uniq_file[$pnc]=1
+                [[ -z "$entry_name" ]] && break
+                (( ${uniq_file[$entry_name]:-0} )) && continue
+                uniq_file[$entry_name]=1
 
-                ftl_list_raw_entries+=("$pnc")
-                ftl_list_raw_paths[$pnc]="$PWD"
-                ftl_list_raw_relpath_len[$pnc]=0
-                ftl_list_raw_names[$pnc]="$pnc"
-                ftl_list_raw_colors[$pnc]="$pc"
-                ftl_list_raw_sizes[$pnc]=$size
+                ftl_list_raw_entries+=("$entry_name")
+                local _idx=$((${#ftl_list_raw_entries[@]} - 1))
+                ftl_list_raw_paths[$_idx]="$PWD"
+                ftl_list_raw_relpath_len[$_idx]=0
+                ftl_list_raw_names[$_idx]="$entry_name"
+                ftl_list_raw_colors[$_idx]="$entry_color"
+                ftl_list_raw_sizes[$_idx]=$entry_size
 
                 # Quick display progress indicator
                 if (( ftl_cfg_quick_display_threshold \
@@ -216,22 +217,22 @@ _ftl::list::apply_filters_and_format() {
         printf -v pad_str "%d" ${#ftl_list_raw_entries[@]}
         ftl_list_index_padding=${#pad_str}
 
-        local p_index pc pnc ppath rpath_l size pnc_l ppath_l
+        local p_index e ext_l
         local e ext_l
-        for p_index in "${ftl_list_raw_entries[@]}" ; do
-                pc="${ftl_list_raw_colors[$p_index]}"
-                pnc="${ftl_list_raw_names[$p_index]}"
-                ppath="${ftl_list_raw_paths[$p_index]}"
-                rpath_l=${ftl_list_raw_relpath_len[$p_index]}
+        for p_index in "${!ftl_list_raw_entries[@]}" ; do
+                local entry_color="${ftl_list_raw_colors[$p_index]}"
+                local entry_name="${ftl_list_raw_names[$p_index]}"
+                local entry_parent="${ftl_list_raw_paths[$p_index]}"
+                local entry_relpath_len=${ftl_list_raw_relpath_len[$p_index]}
 
-                size=${ftl_list_raw_sizes[$p_index]}
-                (( ftl_list_total_size += size ))
-                pnc_l=${#pnc}
+                local entry_size=${ftl_list_raw_sizes[$p_index]}
+                (( ftl_list_total_size += entry_size ))
+                local entry_name_len=${#entry_name}
 
                 # Extension filtering
-                if [[ -f "$pnc" ]] ; then
-                        if [[ "$pnc" =~ '.' ]] ; then
-                                e=${pnc##*.}
+                if [[ -f "$entry_name" ]] ; then
+                        if [[ "$entry_name" =~ '.' ]] ; then
+                                e=${entry_name##*.}
                                 (( ${ftl_filter_listing_hide_exts[${ftl_state_current_tab_index}_${e@Q}]:-0} \
                                           || ${ftl_filter_listing_hide_exts[${e@Q}]:-0} )) && continue
                                 ((${#ftl_filter_listing_keep_exts_per_tab[$ftl_state_current_tab_index]})) && { (( ${ftl_filter_listing_keep_exts_per_tab[${ftl_state_current_tab_index}_${e@Q}]:-0} )) || continue ; }
@@ -250,64 +251,64 @@ _ftl::list::apply_filters_and_format() {
                 fi
 
                 # Color inaccessible directories red
-                if [[ -d "$pnc" && ! -x "$pnc" ]] ; then
-                        pc="\e[31m$pnc"
+                if [[ -d "$entry_name" && ! -x "$entry_name" ]] ; then
+                        pc="\e[31m$entry_name"
                 fi
 
                 # Apply etag
                 if (( ftl_state_etag_enabled )) ; then
-                        ftl::etag::get_entry_tag "$pnc" ftl_etag_entry_tag ftl_etag_entry_tag_len
-                        pc="$ftl_etag_entry_tag$pc"
-                        (( pnc_l += ftl_etag_entry_tag_len ))
+                        ftl::etag::get_entry_tag "$entry_name" ftl_etag_entry_tag ftl_etag_entry_tag_len
+                        pc="$ftl_etag_entry_tag$entry_color"
+                        (( entry_name_len += ftl_etag_entry_tag_len ))
                 fi
 
                 # Size column
                 if (( ftl_state_show_size_mode )) ; then
-                        if [[ -d "$pnc" ]] ; then
+                        if [[ -d "$entry_name" ]] ; then
                                 if (( ftl_state_show_size_mode > 1 )) ; then
-                                        pc="$(_ftl::list::format_dir_size "$pnc") $pc"
+                                        pc="$(_ftl::list::format_dir_size "$entry_name") $entry_color"
                                 else
-                                        pc="      $pc"
+                                        pc="      $entry_color"
                                 fi
                         else
-                                pc="\e[94m$(ftl::util::format_size_human "$size")\e[m $pc"
+                                pc="\e[94m$(ftl::util::format_size_human "$entry_size")\e[m $entry_color"
                         fi
-                        (( pnc_l += 6 ))
+                        (( entry_name_len += 6 ))
                 fi
 
                 # Index column
                 if (( ftl_cfg_show_entry_index )) ; then
                         (( ftl_list_display_line_no++ ))
-                        printf -v pc "$ftl_cfg_line_color_default%${ftl_list_index_padding}d\e[m¿${pc//\%/%%}" \
+                        printf -v entry_color "$ftl_cfg_line_color_default%${ftl_list_index_padding}d\e[m¿${pc//\%/%%}" \
                                 "$ftl_list_display_line_no"
-                        (( pnc_l += ftl_list_index_padding + 1 ))
+                        (( entry_name_len += ftl_list_index_padding + 1 ))
                 fi
 
                 # Remove trailing color reset if entry is colored
-                if [[ ${#pc} != $pnc_l ]] ; then
-                        pc="${pc:0:-4}"
+                if [[ ${#entry_color} != $entry_name_len ]] ; then
+                        entry_color="${entry_color:0:-4}"
                 fi
 
                 # Truncation
-                if (( rpath_l + pnc_l > ftl_pane_width - 1 )) ; then
-                        if [[ "$pnc" =~ '.' ]] ; then
-                                e=${pnc##*.}
+                if (( entry_relpath_len + entry_name_len > ftl_pane_width - 1 )) ; then
+                        if [[ "$entry_name" =~ '.' ]] ; then
+                                e=${entry_name##*.}
                         else
                                 e=
                         fi
                         ext_l=$((${#e}+1))
-                        pc="${pc:0:((- (((rpath_l + pnc_l) - (ftl_pane_width - 1)) + ext_l) ))}…${e}"
+                        entry_color="${entry_color:0:((- (((entry_relpath_len + entry_name_len) - (ftl_pane_width - 1)) + ext_l) ))}…${e}"
                 fi
 
-                ftl_list_entry_colors[$ftl_list_entry_count]="$pc"
-                ftl_list_entries[$ftl_list_entry_count]="$ppath$ftl_list_path_separator$pnc"
+                ftl_list_entry_colors[$ftl_list_entry_count]="$entry_color"
+                ftl_list_entries[$ftl_list_entry_count]="$entry_parent$ftl_list_path_separator$entry_name"
 
                 # Track first file and search target
-                if [[ -z "$ftl_list_first_file_index" && -f "$pnc" ]] ; then
+                if [[ -z "$ftl_list_first_file_index" && -f "$entry_name" ]] ; then
                         ftl_list_first_file_index=$ftl_list_entry_count
                 fi
                 if [[ -n "$ftl_state_search_string" && -z "$ftl_list_search_found_index" ]] ; then
-                        if [[ "${pnc:0:${#ftl_state_search_string}}" == "$ftl_state_search_string" ]] ; then
+                        if [[ "${entry_name:0:${#ftl_state_search_string}}" == "$ftl_state_search_string" ]] ; then
                                 ftl_list_search_found_index=$ftl_list_entry_count
                         fi
                 fi
@@ -382,18 +383,18 @@ ftl::list::render() {
 
         # Render entries
         if (( ftl_list_entry_count )) ; then
-                local -i i tline=2
-                local cursor
+                local -i i terminal_line=2
+                local selection_glyph
                 for (( i = ftl_list_window_top ; i <= ftl_list_window_bottom ; i++, tline++ )) ; do
                         cursor=${ftl_selection_tags[${ftl_list_entries[$i]}]:- }
                         if (( i == ftl_state_cursor_index )) ; then
-                                cursor="${ftl_cfg_cursor_color_default}$cursor\e[m"
+                                cursor="${ftl_cfg_cursor_color_default}$selection_glyph\e[m"
                         fi
-                        echo -ne "\e[${tline};0H\e[m\e[K$cursor${ftl_list_entry_colors[i]/¿/$ftl_list_current_flip_char}\e[0m"
+                        echo -ne "\e[${tline};0H\e[m\e[K$selection_glyph${ftl_list_entry_colors[i]/¿/$ftl_list_current_flip_char}\e[0m"
                         (( i != ftl_list_window_bottom )) && echo
                 done
 
-                _ftl::list::clear_below "$tline"
+                _ftl::list::clear_below "$terminal_line"
 
                 if (( ! ftl_list_quick_display_active && ! ftl_pane_is_child )) ; then
                         ftl::prev::dispatch
@@ -407,10 +408,10 @@ ftl::list::render() {
 
 # Render the header line.
 _ftl::list::render_header() {
-        local head search_h tabsd stat date
+        local header_prefix header_search header_tabs header_stat header_date
 
         head="${ftl_cfg_glyph_listing_mode[${ftl_tab_listing_mode[$ftl_state_current_tab_index]}]}${ftl_cfg_glyph_image_mode[${ftl_tab_view_mode[$ftl_state_current_tab_index]}]}${ftl_tab_preview_dirs_only[$ftl_state_current_tab_index]}${ftl_state_montage_glyph}"
-        head=${head:+$head }
+        head=${head:+$header_prefix }
 
         if [[ -n "$ftl_state_search_string" ]] ; then
                 search_h="S:$ftl_state_search_string "
@@ -425,7 +426,7 @@ _ftl::list::render_header() {
         fi
 
         if (( ! ftl_list_entry_count )) ; then
-                _ftl::list::print_header '' "\e[33m∅  $head$ftl_filter_active_glyph$tabsd$search_h"
+                _ftl::list::print_header '' "\e[33m∅  $header_prefix$ftl_filter_active_glyph$header_tabs$header_search"
                 return
         fi
 
@@ -443,7 +444,7 @@ $(stat -c %s "${ftl_list_entries[$ftl_state_cursor_index]}" | numfmt --to=iec --
         fi
 
         _ftl::list::print_header '' \
-                "$head$ftl_filter_active_glyph$(printf "%${ftl_list_index_padding}d" $((ftl_state_cursor_index+1)))/${ftl_list_header_total_count:-$ftl_list_entry_count}$ftl_list_header_total_size$stat$date$tabsd$search_h"
+                "$header_prefix$ftl_filter_active_glyph$(printf "%${ftl_list_index_padding}d" $((ftl_state_cursor_index+1)))/${ftl_list_header_total_count:-$ftl_list_entry_count}$ftl_list_header_total_size$header_stat$header_date$header_tabs$header_search"
 }
 
 # Print the header with PWD (left) and info (right), truncated to fit.
@@ -451,11 +452,11 @@ $(stat -c %s "${ftl_list_entries[$ftl_state_cursor_index]}" | numfmt --to=iec --
 #   $1: PWD color code (defaults to 94)
 #   $2: info string
 _ftl::list::print_header() {
-        local tsc
+        local bg_window_count
         tsc=$(ftl::pane::count_bg_windows)
-        local h="${@:2} $(ftl::filt::get_sort_glyph)$ftl_list_resolved_sort_reversed$(ftl::sel::format_header_summary)"
-        _ftl::list::compute_header_truncation "$h$tsc"
-        echo -e "\e[H\e[K\e[${1:-94}m${PWD:0:ftl_list_header_path_length} \e[${1:-95}m${h:ftl_list_header_attr_length}\e[m \e[4;33m$tsc\e[0m"
+        local header_info="${@:2} $(ftl::filt::get_sort_glyph)$ftl_list_resolved_sort_reversed$(ftl::sel::format_header_summary)"
+        _ftl::list::compute_header_truncation "$header_info$bg_window_count"
+        echo -e "\e[H\e[K\e[${1:-94}m${PWD:0:ftl_list_header_path_length} \e[${1:-95}m${h:ftl_list_header_attr_length}\e[m \e[4;33m$bg_window_count\e[0m"
 }
 
 # Compute how much of PWD and info to display.
@@ -611,7 +612,7 @@ ftl::list::compute_dir_sizes() {
         declare -Ag ftl_list_dir_size_cache
         local color size file
         while IFS=$'\t' read -r color size file ; do
-                ftl_list_dir_size_cache[$PWD/$file]="$color$size$reset"
+                ftl_list_dir_size_cache[$PWD/$file]="$color$entry_size$reset"
         done < <(_ftl::list::run_du)
 }
 

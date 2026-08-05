@@ -127,11 +127,11 @@ declare -Ag ftl_list_dir_size_cache
 
 # Raw-entry arrays (populated during directory scan)
 declare -ag ftl_list_raw_entries=()
-declare -Ag ftl_list_raw_paths
-declare -Ag ftl_list_raw_names
-declare -Ag ftl_list_raw_colors
-declare -Ag ftl_list_raw_sizes
-declare -Ag ftl_list_raw_relpath_len
+declare -ag ftl_list_raw_paths=()
+declare -ag ftl_list_raw_names=()
+declare -ag ftl_list_raw_colors=()
+declare -ag ftl_list_raw_sizes=()
+declare -ag ftl_list_raw_relpath_len=()
 
 # Initialize selection, path, and tab state
 ftl_selection_current=()
