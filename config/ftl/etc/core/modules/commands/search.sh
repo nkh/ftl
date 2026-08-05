@@ -150,24 +150,24 @@ ftl::cmd::go_rgl() {
 }
 
 _ftl::cmd::build_vim_args_from_rg() {
-	local gls=""
+	local vim_args=""
 	local g l _
 	while IFS=: read -r g l _ ; do
 		[[ -z "$g" ]] && continue
-		if [[ -n "$gls" ]] ; then
+		if [[ -n "$vim_args" ]] ; then
 			gls+=" -c \"tabe +$l $g\""
 		else
 			gls+=" +$l $g"
 		fi
 	done <<<"$(fzfr)"
-	echo "$gls"
+	echo "$vim_args"
 }
 
 _ftl::cmd::process_search_results() {
 	local type="$1"
 	local results="$2"
-	local prev_pwd=
-	local in_tab=
+	local prev_directory=
+	local open_in_tab=
 	local dst
 
 	if [[ $type == "f" ]] ; then
@@ -181,15 +181,15 @@ _ftl::cmd::process_search_results() {
 	while read -r dst ; do
 		_ftl::cmd::check_open_in_tab "$dst"
 		if [[ $type == "fzf" ]] ; then
-			_ftl::cmd::goto_fzf_result "$in_tab" "$prev_pwd" "$dst"
+			_ftl::cmd::goto_fzf_result "$open_in_tab" "$prev_directory" "$dst"
 		elif [[ $type == "rg" ]] ; then
-			_ftl::cmd::goto_rg_result "$in_tab" "$prev_pwd" "$dst"
+			_ftl::cmd::goto_rg_result "$open_in_tab" "$prev_directory" "$dst"
 		fi
 	done <<<"$results"
 }
 
 _ftl::cmd::check_open_in_tab() {
-	if [[ -z "$in_tab" ]] ; then
+	if [[ -z "$open_in_tab" ]] ; then
 		if [[ "$1" == ctrl-t ]] ; then
 			in_tab=1
 		else
@@ -199,15 +199,15 @@ _ftl::cmd::check_open_in_tab() {
 }
 
 _ftl::cmd::goto_fzf_result() {
-	local in_tab="$1"
-	local prev_pwd="$2"
+	local open_in_tab="$1"
+	local prev_directory="$2"
 	local dst="$3"
 	local d
 	d="$(dirname "$dst")"
 	(( in_tab )) && ftl::tab::create
 	local nd
-	if [[ -n "$prev_pwd" ]] ; then
-		nd="$prev_pwd/$d"
+	if [[ -n "$prev_directory" ]] ; then
+		nd="$prev_directory/$d"
 	else
 		nd="$d"
 	fi
@@ -221,8 +221,8 @@ _ftl::cmd::goto_fzf_result() {
 }
 
 _ftl::cmd::goto_rg_result() {
-	local in_tab="$1"
-	local prev_pwd="$2"
+	local open_in_tab="$1"
+	local prev_directory="$2"
 	local dst="$3"
 	local g l
 	g=${dst%%:*}
@@ -232,7 +232,7 @@ _ftl::cmd::goto_rg_result() {
 	local d
 	d="$(dirname "$g")"
 	(( in_tab )) && ftl::tab::create
-	ftl::list::change_dir "$prev_pwd/$d" "$(basename "$g")"
+	ftl::list::change_dir "$prev_directory/$d" "$(basename "$g")"
 }
 
 ftl::cmd::goto_image_via_sxiv() {

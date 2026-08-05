@@ -1,5 +1,5 @@
-mkdir -p $(dirname "$fs/lock_preview/$n")
-{ echo -e ">>> LOCKED PREVIEW: stat_and_text\n" ; stat $n ; echo -e "\n<<< LOCKED PREVIEW" ; } > $fs/lock_preview/$n
+mkdir -p $(dirname "$ftl_state_session_dir/lock_preview/$ftl_state_current_path")
+{ echo -e ">>> LOCKED PREVIEW: stat_and_text\n" ; stat $ftl_state_current_path ; echo -e "\n<<< LOCKED PREVIEW" ; } > $ftl_state_session_dir/lock_preview/$ftl_state_current_path
 
 # vim: set filetype=sh :
 

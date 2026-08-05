@@ -124,6 +124,31 @@ declare -Ag ftl_selection_tags
 declare -Ag ftl_selection_class_index
 declare -Ag ftl_state_child_env
 declare -Ag ftl_list_dir_size_cache
+declare -Ag ftl_cfg_color_overrides
+declare -Ag ftl_cfg_command_aliases
+declare -Ag ftl_cfg_glyph_listing_mode
+declare -Ag ftl_cfg_glyph_image_mode
+declare -Ag ftl_cfg_glyph_sort
+declare -Ag ftl_cfg_sort_options
+declare -Ag ftl_cfg_row_separator_chars
+declare -Ag ftl_cfg_preview_zoom_levels
+declare -Ag ftl_cfg_preset_destinations
+declare -Ag ftl_tab_view_mode
+declare -Ag ftl_tab_listing_mode
+declare -Ag ftl_tab_show_hidden
+declare -Ag ftl_tab_sort_type
+declare -Ag ftl_tab_sort_reversed
+declare -Ag ftl_tab_filter_1
+declare -Ag ftl_tab_filter_2
+declare -Ag ftl_tab_filter_dirs
+declare -Ag ftl_tab_filter_reverse
+declare -Ag ftl_tab_filter_image_mode
+declare -Ag ftl_tab_filter_image_negate
+declare -Ag ftl_tab_preview_dirs_only
+declare -Ag ftl_tab_listing_depth
+declare -Ag ftl_tab_directories
+declare -Ag ftl_mark_session_marks
+declare -Ag ftl_kbd_redo_excluded
 
 # Raw-entry arrays (populated during directory scan)
 declare -ag ftl_list_raw_entries=()

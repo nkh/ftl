@@ -157,7 +157,7 @@ ftl::prev::sync_and_dispatch() {
 		ftl::prev::dispatch
 		source "$ftl_state_parent_dir/ftl"
 	else
-		ftl::list::change_dir "$sdir" '' "$sindex"
+		ftl::list::change_dir "$ftl_state_sync_dir" '' "$ftl_state_sync_index"
 	fi
 	ftl_state_other_session_dir=
 }

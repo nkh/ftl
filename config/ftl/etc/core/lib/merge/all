@@ -1,4 +1,4 @@
-list=($(find $pfs -type d | grep -v -P "$fs$" | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && print "$_\n"'))
+list=($(find $ftl_state_parent_dir -type d | grep -v -P "$ftl_state_session_dir$" | perl -ne 'chomp ; $_ .= "/tags" ; -e && -s > 1 && print "$_\n"'))
 
 for tag_file in "${list[@]}"
 #sed -e 's/\-A tags/-A new_tags/'

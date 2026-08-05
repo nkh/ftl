@@ -142,8 +142,8 @@ ftl::log::debug() {
         if [[ -f $ftl_state_parent_dir/pdh ]] ; then
                 local pane_id
                 read -r pane_id <"$ftl_state_parent_dir/pdh"
-                if [[ -n "$pane_id" ]] ; then
-                        ftl_log_debug_pane_id="$pane_id"
+                if [[ -n "$ftl_pane_preview_id" ]] ; then
+                        ftl_log_debug_pane_id="$ftl_pane_preview_id"
                         tmux send -t "$ftl_log_debug_pane_id" "$$ $ftl_pane_self_id: ${1//\\n/$'\n'}"
                 fi
         fi

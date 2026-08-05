@@ -440,17 +440,17 @@ _ftl::cmd::copy_or_move() {
 }
 
 _ftl::cmd::do_copy() {
-	local cmvs="$ftl_state_session_dir/cmv_$SECONDS"
-	printf '%s\n' "${@:3}" >"$cmvs"
+	local ftl_state_copy_move_list="$ftl_state_session_dir/cmv_$SECONDS"
+	printf '%s\n' "${@:3}" >"$ftl_state_copy_move_list"
 	ftl::pane::run_in_bg_window \
-		"xargs -a $cmvs -t -I{} -- cp -r \$'{}' ${2@Q}"
+		"xargs -a $ftl_state_copy_move_list -t -I{} -- cp -r \$'{}' ${2@Q}"
 }
 
 _ftl::cmd::do_move() {
-	local cmvs="$ftl_state_session_dir/cmv_$SECONDS"
-	printf '%s\0' "${@:3}" >"$cmvs"
+	local ftl_state_copy_move_list="$ftl_state_session_dir/cmv_$SECONDS"
+	printf '%s\0' "${@:3}" >"$ftl_state_copy_move_list"
 	ftl::pane::run_in_bg_window \
-		"xargs -0 -a $cmvs -t -- mv -t ${2@Q}"
+		"xargs -0 -a $ftl_state_copy_move_list -t -- mv -t ${2@Q}"
 }
 
 ftl::cmd::preview_with_command() {
