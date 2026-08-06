@@ -49,7 +49,7 @@ $ftl_state_parent_dir/prev/
   change. Children compare it to their own
   `ftl_selection_other_revision` to decide whether to re-source `tags`.
 - **`fs`** — the session dir of the pane that just wrote state. A
-  child reads this, then `source "$fs/ftl"` to re-hydrate its state.
+  child reads this, then `source "$ftl_state_session_dir/ftl"` to re-hydrate its state.
 - **`pane`** — the primary pane's tmux id. Children use it to send
   `Ä` back to the primary.
 - **`panes`** — list of live child pane ids. The primary uses it to

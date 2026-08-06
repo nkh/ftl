@@ -143,7 +143,7 @@ the function, its module, and a short purpose. See also
 | `ftl::filt::pipeline_clear` | clear the pipeline |
 | `ftl::filt::pipeline_remove` | remove a filter from the pipeline |
 | `ftl::filt::reset` | reset all filters to defaults |
-| `ftl::filt::sort_entries` / `sort_by` | default sort |
+| `ftl::filt::sort_entries` / `ftl::filt::sort_entries` | default sort |
 | `ftl::filt::get_sort_glyph` | return the sort glyph |
 | `ftl::filt::apply_user_colors` | apply user color overrides |
 | `ftl::filt::load_external` | load an external filter plugin |

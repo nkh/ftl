@@ -252,13 +252,13 @@ _ftl::list::apply_filters_and_format() {
 
                 # Color inaccessible directories red
                 if [[ -d "$entry_name" && ! -x "$entry_name" ]] ; then
-                        pc="\e[31m$entry_name"
+                                entry_color="\e[31m$entry_name"
                 fi
 
                 # Apply etag
                 if (( ftl_state_etag_enabled )) ; then
                         ftl::etag::get_entry_tag "$entry_name" ftl_etag_tag ftl_etag_tag_len
-                        pc="$ftl_etag_tag$entry_color"
+                        entry_color="$ftl_etag_tag$entry_color"
                         (( entry_name_len += ftl_etag_tag_len ))
                 fi
 
@@ -266,12 +266,12 @@ _ftl::list::apply_filters_and_format() {
                 if (( ftl_state_show_size_mode )) ; then
                         if [[ -d "$entry_name" ]] ; then
                                 if (( ftl_state_show_size_mode > 1 )) ; then
-                                        pc="$(_ftl::list::format_dir_size "$entry_name") $entry_color"
+                                        entry_color="$(_ftl::list::format_dir_size "$entry_name") $entry_color"
                                 else
-                                        pc="      $entry_color"
+                                        entry_color="      $entry_color"
                                 fi
                         else
-                                pc="\e[94m$(ftl::util::format_size_human "$entry_size")\e[m $entry_color"
+                                entry_color="\e[94m$(ftl::util::format_size_human "$entry_size")\e[m $entry_color"
                         fi
                         (( entry_name_len += 6 ))
                 fi
@@ -279,7 +279,7 @@ _ftl::list::apply_filters_and_format() {
                 # Index column
                 if (( ftl_cfg_show_entry_index )) ; then
                         (( ftl_list_display_line_no++ ))
-                        printf -v entry_color "$ftl_cfg_line_color_default%${ftl_list_index_padding}d\e[m¿${pc//\%/%%}" \
+                        printf -v entry_color "$ftl_cfg_line_color_default%${ftl_list_index_padding}d\e[m¿${entry_color//\%/%%}" \
                                 "$ftl_list_display_line_no"
                         (( entry_name_len += ftl_list_index_padding + 1 ))
                 fi

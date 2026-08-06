@@ -63,7 +63,7 @@ also [Function Index](function-index.md).
 |----------|--------|---------|
 | `ftl_state_session_dir` | state | this pane's private dir |
 | `ftl_state_parent_dir` | state | parent pane's session dir |
-| `ftl_state_shared_dir` | state | rendezvous dir (= `$pfs/prev`) |
+| `ftl_state_shared_dir` | state | rendezvous dir (= `$ftl_state_parent_dir/prev`) |
 | `ftl_state_other_session_dir` | state | the pane being synced from |
 | `ftl_state_previous_pwd` | state | previous PWD |
 | `ftl_state_child_env` | state | assoc of env vars for children |

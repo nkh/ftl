@@ -81,7 +81,7 @@ passed positionally. Commands have access to ftl's environment via
 
 | Command | Invocation | Description |
 |---------|------------|-------------|
-| `01_example` | `:01_example` | Reference implementation: a sourced script that writes ftl state to `$fs/01_example_info` |
+| `01_example` | `:01_example` | Reference implementation: a sourced script that writes ftl state to `$ftl_state_session_dir/01_example_info` |
 | `02_example` | `:02_example` | Reference implementation: an executable script that reads `$ftl_state_info_file_path` |
 | `etags` | `:etags <name>` | Activates the named etag plugin (or opens an fzf list if no name given) |
 | `fma` | `:fma <args>` | Adds paths to the fzf-mv queue |

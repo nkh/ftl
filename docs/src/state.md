@@ -10,7 +10,7 @@ plugins and reasoning about pane sync.
 |-------|----------|------------|----------|----------|
 | **Process-local** | this pane's process | this process only | in-memory globals | `ftl_kbd_trie`, `ftl_list_entries` |
 | **Per-session** | this pane's session | this pane (and any re-source) | `$ftl_state_session_dir/` | `tags`, `history`, `ftl` |
-| **Shared-parent** | the parent pane's session | parent + all its children | `$ftl_state_shared_dir/` (= `$pfs/prev`) | `stagsi`, `fs`, `pane`, `panes` |
+| **Shared-parent** | the parent pane's session | parent + all its children | `$ftl_state_shared_dir/` (= `$ftl_state_parent_dir/prev`) | `stagsi` (selection revision), `fs` (session dir), `pane` (pane id), `panes` (child panes) |
 | **Cross-session** | forever, across all ftl invocations | every ftl process | `$FTL_STATE_DIR/shared/` | `history` (global), persistent marks |
 
 ### Process-local
