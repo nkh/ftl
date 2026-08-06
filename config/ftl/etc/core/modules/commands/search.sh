@@ -71,6 +71,10 @@ ftl::cmd::find_dirs_via_fzf() {
         _ftl::cmd::process_search_results fzf \
                 "$(fd -td -I -L | sed 's/^.\///' | fzf_vvip -m $ftl_cfg_fzf_pane_opts)"
         exec 2>"$ftl_state_session_dir/log"
+        # Final re-render without rescanning, mirroring upstream b1234f0 which
+        # appends view_list to find_fzf_dirs so the listing is in a clean state
+        # after the last selected directory has been entered.
+        _ftl::list::render_window
 }
 
 ftl::cmd::find_fzf_dirs() {

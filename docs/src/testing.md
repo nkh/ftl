@@ -80,7 +80,8 @@ it at the top of each test, or reset the relevant globals manually.
 | `test_filter.sh` | `filter.sh` | pipeline `add`/`remove`/`clear`, sort glyph |
 | `test_tab.sh` | `tab.sh` | `create`, `advance_index`, `retreat_index` |
 | `test_mark.sh` | `mark.sh` | `save_to_history` (session + global, child-pane skip) |
-| `test_list_format.sh` | `list.sh` | `_ftl::list::apply_filters_and_format` truncation, filters |
+| `test_list_format.sh` | `list.sh` | `_ftl::list::apply_filters_and_format` truncation (incl. b1234f0 clamp), filters |
+| `test_filename_split_fix.sh` | `commands/search.sh` + `viewers/core` | b1234f0: `find_dirs_via_fzf` final render, `pcbr` debug-log removal |
 | `test_project_marks.sh` | `bindings/project_marks` | `get_project_marks`, `pmark`, `pmarks_fzf`/`_subdir_fzf`, `pmarks_edit`, registered bindings |
 
 ## What's not tested

@@ -215,7 +215,6 @@ ftl::plugin::core::pcbr()
 {
         local t
         t="$("$ftl_gen_dir/cbr" "$ftl_state_current_path" "$ftl_cache_thumb_dir/cbr" '' ONE)"
-        ftl::log::debug "ftl::prev::dispatch file: $t"
         [[ -e "$t" ]] && { ftl::prev::show_image "$t" ; true ; } || ftl::plugin::core::ptype
 }
 

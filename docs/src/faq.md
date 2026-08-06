@@ -48,7 +48,7 @@ my_function() {
     ftl::list::render
 }
 
-ftl::kbd::bind	ftl	entry	"LEADER m x"	my_function	"my custom binding"
+ftl::kbd::bind  ftl     entry   "LEADER m x"    my_function     "my custom binding"
 ```
 
 Restart ftl (or run `:source ~/.config/ftl/etc/bindings/my_binding`
@@ -141,6 +141,23 @@ previous. Press `Escape` to exit search mode.
 ### How do to search file contents?
 
 Press `\g` to search with ripgrep. Results appear in the preview pane.
+
+## Display
+
+### Why are long file names truncated and the dot before the extension missing?
+
+When an entry's combined path + name length exceeds the pane width,
+ftl truncates it to fit on one line. The truncation keeps the
+extension visible (so you can still tell a `.txt` from a `.png`) but
+drops the dot between the ellipsis and the extension — the visible
+form is `prefix…ext` rather than `prefix…ext`. This matches upstream
+behaviour and is intentional.
+
+If you see garbled truncation (e.g. random characters from the middle
+of the name appearing where the prefix should be), make sure you have
+the b1234f0 fix applied — older versions used a negative slice index
+that bash silently reinterpreted as "from end of string", producing
+mangled output for entries that barely overflowed.
 
 ## Shell Integration
 

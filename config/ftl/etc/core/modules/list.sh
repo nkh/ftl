@@ -290,14 +290,24 @@ _ftl::list::apply_filters_and_format() {
                 fi
 
                 # Truncation
+                # When the entry overflows the pane width, keep the extension visible
+                # and truncate the prefix. The prefix_length is the number of characters
+                # to keep from the start of entry_color; we then append an ellipsis and
+                # the extension. The clamp below guards against negative slice indices
+                # (which bash treats as "from end" semantics, mangling the output).
                 if (( entry_relpath_len + entry_name_len > ftl_pane_width - 1 )) ; then
+                        local prefix_length
                         if [[ "$entry_name" =~ '.' ]] ; then
-                                e=${entry_name##*.}
+                                e="${entry_name##*.}"
                         else
                                 e=
                         fi
-                        ext_l=$((${#e}+1))
-                        entry_color="${entry_color:0:((- (((entry_relpath_len + entry_name_len) - (ftl_pane_width - 1)) + ext_l) ))}…${e}"
+                        ext_l="$((${#e}+1))"
+
+                        prefix_length=$((- (((entry_relpath_len + entry_name_len) - (ftl_pane_width - 1)) + ext_l) ))
+                        (( prefix_length < 0 )) && prefix_length=$((ftl_pane_width - (${#e} + 1)))
+
+                        entry_color="${entry_color:0:$prefix_length}…${e}"
                 fi
 
                 ftl_list_entry_colors[$ftl_list_entry_count]="$entry_color"

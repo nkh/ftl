@@ -123,6 +123,14 @@ Routes everything through `ftl::log::write`, which appends to
 - **Variables**: `ftl_list_entries`, `ftl_list_entry_count`,
   `ftl_list_resolved_sort_type`, `ftl_list_resolved_sort_reversed`,
   `ftl_state_cursor_index`, `ftl_state_cursor_memory`.
+- **Truncation**: `_ftl::list::apply_filters_and_format` shortens
+  overflowing entries to fit `ftl_pane_width` by keeping the extension
+  visible and replacing the middle with an ellipsis. The slice length
+  (`prefix_length`) is clamped to a minimum of `ftl_pane_width - (ext_l + 1)`
+  so the arithmetic never goes negative — bash treats negative slice
+  lengths as "from end" semantics, which would mangle the output. This
+  fix was backported from upstream commit b1234f0 "FIXED: bad splitting
+  of file name".
 
 ## preview.sh — preview pane management
 

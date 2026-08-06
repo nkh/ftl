@@ -205,4 +205,101 @@ test_format_color_contains_name() {
                 "color string should contain the filename"
 }
 
+# ---------------------------------------------------------------------------
+# Truncation tests — backport coverage for upstream b1234f0
+# "FIXED: bad splitting of file name"
+# ---------------------------------------------------------------------------
+
+# Test: a long file name with extension is truncated and keeps the extension
+test_truncation_long_name_keeps_extension() {
+        # Pane width 20; name "very_long_filename.txt" (22 chars) + ext_l=4
+        # overflows 19-char display. Truncated form ends with "…txt" (the dot
+        # is consumed by the ellipsis — upstream format is "<prefix>…<ext>").
+        ftl_pane_width=20
+        setup_raw_entries "very_long_filename.txt"
+        _ftl::list::apply_filters_and_format
+
+        ftl::test::assert_contains "${ftl_list_entry_colors[0]}" "…" \
+                "overflowing entry should contain ellipsis"
+        ftl::test::assert_contains "${ftl_list_entry_colors[0]}" "txt" \
+                "truncated entry should keep extension visible"
+}
+
+# Test: a long file name without extension is truncated with ellipsis only
+test_truncation_long_name_no_extension() {
+        ftl_pane_width=15
+        setup_raw_entries "very_long_no_ext"
+        _ftl::list::apply_filters_and_format
+
+        ftl::test::assert_contains "${ftl_list_entry_colors[0]}" "…" \
+                "overflowing extensionless entry should contain ellipsis"
+}
+
+# Test: a short file name is NOT truncated (no ellipsis added)
+test_truncation_short_name_not_truncated() {
+        ftl_pane_width=80
+        setup_raw_entries "short.txt"
+        _ftl::list::apply_filters_and_format
+
+        ftl::test::assert_not_contains "${ftl_list_entry_colors[0]}" "…" \
+                "short entry should not be truncated"
+}
+
+# Test: the fix's clamp branch — when the natural prefix_length would be
+# negative (overflow barely larger than ext_l), the result must still be a
+# valid string ending with the extension. Before b1234f0 this produced a
+# garbled output because bash treats negative slice length as "from end".
+test_truncation_clamp_avoids_negative_slice() {
+        # Pane width = 12; name = "abcdefgh.txt" (12 chars, ext_l=4)
+        # entry_relpath_len = 0; entry_name_len = 12
+        # overflow = (0 + 12) - (12 - 1) = 1; prefix_length = -(1 + 4) = -5
+        # The clamp kicks in: prefix_length = 12 - (3 + 1) = 8
+        ftl_pane_width=12
+        setup_raw_entries "abcdefgh.txt"
+        _ftl::list::apply_filters_and_format
+
+        local color="${ftl_list_entry_colors[0]}"
+        # Must end with the extension (post-fix behaviour); upstream format
+        # is "<prefix>…<ext>" (no dot between ellipsis and extension).
+        ftl::test::assert_contains "$color" "txt" \
+                "clamped truncation must preserve the 'txt' extension"
+        # Must contain exactly one ellipsis (the truncation marker)
+        local ellipsis_count
+        ellipsis_count=$(awk 'BEGIN{c=0} {i=index($0,"…"); while(i){c++; $0=substr($0,i+1); i=index($0,"…")}} END{print c}' <<<"$color")
+        ftl::test::assert_eq 1 "$ellipsis_count" \
+                "clamped truncation should contain exactly one ellipsis"
+}
+
+# Test: extension is computed via ${entry_name##*.} (post-fix quotes the RHS)
+test_truncation_extension_extraction_with_dots_in_name() {
+        # "archive.tar.gz" — extension should be "gz" (last segment after last dot)
+        ftl_pane_width=10
+        setup_raw_entries "archive.tar.gz"
+        _ftl::list::apply_filters_and_format
+
+        ftl::test::assert_contains "${ftl_list_entry_colors[0]}" "gz" \
+                "extension should be the last dot-segment (gz)"
+        ftl::test::assert_not_contains "${ftl_list_entry_colors[0]}" "tar.gz" \
+                "should not preserve the full multi-dot extension"
+}
+
+# Test: multiple long entries are all truncated independently
+test_truncation_multiple_long_entries() {
+        ftl_pane_width=20
+        setup_raw_entries \
+                "very_long_file_a.txt" \
+                "very_long_file_b.txt" \
+                "very_long_file_c.txt"
+        _ftl::list::apply_filters_and_format
+
+        ftl::test::assert_eq 3 "$ftl_list_entry_count" "all 3 entries should be present"
+        local i
+        for i in 0 1 2 ; do
+                ftl::test::assert_contains "${ftl_list_entry_colors[$i]}" "…" \
+                        "entry $i should be truncated"
+                ftl::test::assert_contains "${ftl_list_entry_colors[$i]}" "txt" \
+                        "entry $i should keep its extension"
+        done
+}
+
 # vim: set filetype=bash :
