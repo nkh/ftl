@@ -186,8 +186,8 @@ A command is either:
 
 {
     for f in "${ftl_selection_current[@]}" ; do
-        if file "$f" | grep -q text ; then
-            lines=$(wc -l < "$f")
+        if file "$ftl_state_current_path" | grep -q text| grep -q text ; then
+            lines=$(wc -l < "$ftl_state_current_path")
             printf '%6d  %s\n' "$lines" "${f##*/}"
         fi
     done
@@ -400,10 +400,10 @@ ftl::etag::scan_directory() {
     local f owner
 
     while IFS= read -r f ; do
-        owner=$(stat -c %U "$f" 2>/dev/null || echo "?")
+        owner=$(stat -c %U "$ftl_state_current_path" 2>/dev/null || echo "?")
         # Truncate to 8 chars for column alignment
         owner="${owner:0:8}"
-        owner_tags["$f"]="$owner"
+        owner_tags["$ftl_state_current_path"]="$owner"
     done < <(find "$PWD/" -maxdepth 1 2>/dev/null)
 }
 
@@ -702,3 +702,13 @@ category. Read them as templates:
 | Viewer | `viewers/core` | The full dispatcher (~25 viewer functions) |
 | Generator | `generators/pdf` | `pdftoppm`-based thumbnail |
 | Generator | `generators/mp4` | `ffmpeg`-based thumbnail |
+
+## See Also
+
+- [Writing Bindings](./writing-bindings.md) — detailed binding plugin guide
+- [Writing Commands](./writing-commands.md) — detailed command guide
+- [Writing Filters](./writing-filters.md) — detailed filter plugin guide
+- [Writing Etags](./writing-etags.md) — detailed etag plugin guide
+- [Writing Viewers](./writing-viewers.md) — detailed viewer plugin guide
+- [Plugin API](./plugins.md) — the 6 plugin categories
+- [Extra Features](./extra-features.md) — catalog of shipped plugins

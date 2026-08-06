@@ -104,7 +104,7 @@ done
 ```
 
 The `ftl_cfg_key_timeout` (default 1 second) is what makes time events
-work: if no key arrives within that window, `get_key` returns an
+work: if no key arrives within that window, `ftl::kbd::get_key` returns an
 `ERROR_*` sentinel and the loop body runs anyway, so `ftl::time::tick`
 and `ftl::pane::check_resize` get a turn.
 

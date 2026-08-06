@@ -71,3 +71,9 @@ arguments so it can re-hydrate state in a child pane and clean up. See
 
 When any filter is active, the header shows a `~` glyph
 (`ftl_filt_active_glyph`).
+
+## See Also
+
+- [Searching](./searching.md) — incremental search
+- [Writing Filters](../writing-filters.md) — how to write a custom filter plugin
+- [Navigation](./navigation.md) — moving through the listing

@@ -114,3 +114,52 @@ ftl_state_etag_enabled=0
 ```
 
 The `zt` binding toggles etags on/off; `zT` selects the etag source.
+
+## Inline Rename Mode
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ftl_cfg_inline_rename_no_confirm_delete` | `0` | skip delete confirmation in inline rename |
+| `ftl_cfg_inline_rename_sequence_format` | `%03d` | printf format for sequential rename |
+| `ftl_cfg_inline_rename_regexp_default` | `s/OLD/NEW/` | default sed expression for regexp rename |
+| `ftl_cfg_glyph_inline_rename` | `⟦R⟧` | header glyph in outer mode |
+| `ftl_cfg_glyph_inline_rename_edit` | `⟦R✎⟧` | header glyph in inner mode |
+
+## Media Players
+
+| Variable | Default | Description |
+|------|---------|-------------|
+| `ftl_cfg_background_player` | `mplayer` | background media player command |
+| `ftl_cfg_live_preview_player` | `mplayer` | live preview media player |
+| `ftl_cfg_queue_player` | `cmus` | queue-based media player |
+| `ftl_cfg_external_terminal_player` | `mplayer` | terminal media player for external viewer |
+| `ftl_cfg_gif_viewer` | `mpv --loop` | GIF viewer command |
+
+## Terminal and Display
+
+| Variable | Default | Description |
+|------|---------|-------------|
+| `ftl_cfg_char_width_px` | `8` | character width in pixels (for image sizing) |
+| `ftl_cfg_char_height_px` | `16` | character height in pixels |
+| `ftl_cfg_image_clean_borders` | `0` | clean image borders on display |
+| `ftl_cfg_image_zoomed` | `0` | image zoom state |
+| `ftl_cfg_tmux_border_colors_default` | (set in ftlrc) | default tmux border colors |
+| `ftl_cfg_ansi_pager` | `less -R` | ANSI-aware pager |
+| `ftl_cfg_markdown_renderer_default` | `glow` | default markdown renderer |
+| `ftl_cfg_markdown_dir_renderer` | `exa` | directory listing in markdown preview |
+| `ftl_cfg_default_new_tab_dir` | (empty) | default directory for new tabs |
+| `ftl_cfg_gpg_key_id` | (empty) | GPG key ID for encryption |
+
+## Row Separators
+
+| Variable | Default | Description |
+|------|---------|-------------|
+| `ftl_cfg_row_separator_chars` | `(' ' ' ')` | alternate row separator characters |
+
+## Image Extensions
+
+| Variable | Default | Description |
+|------|---------|-------------|
+| `ftl_cfg_image_extensions` | `(jpg jpeg png ...)` | extensions for image preview/mode |
+| `ftl_cfg_image_extensions_regex` | `svg\|webp\|jpg\|...` | regex for image extensions |
+| `ftl_cfg_media_extensions_regex` | `mp3\|mp4\|flv\|...` | regex for media extensions |

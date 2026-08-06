@@ -68,3 +68,8 @@ browsing match results without leaving the listing. The plugin is in
   these integrate with ftl's session state.
 - Combine filters with search: `ff \.py$` then `grr` to search only
   Python files in the current directory.
+
+## See Also
+
+- [Filtering](./filtering.md) — narrowing the listing
+- [Navigation](./navigation.md) — moving through the listing

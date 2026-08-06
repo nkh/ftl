@@ -81,3 +81,9 @@ ftl::sel::sync_from_other_pane() {
 
 The selection array is serialized with `declare -p ftl_selection_tags |
 sed 's/-A/-A -g/'` so it can be `source`d back into another shell.
+
+## See Also
+
+- [File Operations](./file-operations.md) — operations on the selection
+- [Inline Rename Mode](./inline-rename.md) — modal rename of selected entries
+- [Filtering](./filtering.md) — filtering the listing

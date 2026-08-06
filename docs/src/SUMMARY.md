@@ -1,6 +1,8 @@
 # Summary
 
 [Introduction](./introduction.md)
+[Quick Reference](./quick-reference.md)
+[FAQ](./faq.md)
 [Extra Features](./extra-features.md)
 [Extending ftl](./extending-ftl.md)
 

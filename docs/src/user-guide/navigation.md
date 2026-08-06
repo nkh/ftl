@@ -70,3 +70,10 @@ This page lists every movement binding. All of these are registered in the
 The cursor index itself lives in `ftl_state_cursor_index`, and per-directory
 cursor memory is stored in `ftl_state_cursor_memory` so revisiting a
 directory restores your position.
+
+## See Also
+
+- [Selection & Tags](./selection.md) — tagging entries for batch operations
+- [Filtering](./filtering.md) — narrowing the listing with filters
+- [Searching](./searching.md) — incremental search and ripgrep
+- [Marks & History](./marks-history.md) — bookmarks and directory history

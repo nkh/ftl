@@ -168,10 +168,10 @@ The listing pipeline applies filters in this order:
 
 1. `find` emits raw entries
 2. External filter (`ftl::filter::apply_external`) — the swap-in plugin slot
-3. Directory filter (`ftl::tab_filter_dirs[$tab]`)
-4. File filter 1 (`ftl::tab_filter_1[$tab]`)
-5. File filter 2 (`ftl::tab_filter_2[$tab]`)
-6. Reverse filter (`ftl::tab_filter_reverse[$tab]`)
+3. Directory filter (`ftl::tab_filter_dirs[$ftl_state_current_tab_index]`)
+4. File filter 1 (`ftl::tab_filter_1[$ftl_state_current_tab_index]`)
+5. File filter 2 (`ftl::tab_filter_2[$ftl_state_current_tab_index]`)
+6. Reverse filter (`ftl::tab_filter_reverse[$ftl_state_current_tab_index]`)
 7. Sort (`ftl::filt::sort_entries`)
 
 Refer to [Extending ftl — Filters](./extending-ftl.md#filters) for the

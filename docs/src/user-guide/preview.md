@@ -74,3 +74,8 @@ For media, `ee`/`er`/`ew` launch the file in an external viewer in three
 modes (mode 1 inline, mode 2 detached, mode 3 detached + fullscreen). See
 [External Commands](../external-commands.md) for the underlying config
 variables.
+
+## See Also
+
+- [Navigation](./navigation.md) — moving the cursor
+- [Configuration](../configuration.md) — preview-related config variables

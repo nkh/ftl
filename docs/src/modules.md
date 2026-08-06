@@ -52,7 +52,7 @@ Routes everything through `ftl::log::write`, which appends to
   `ftl::kbd::drain_input`, `ftl::kbd::show_bindings`,
   `ftl::kbd::reset_redo_exclusions`, `ftl::kbd::exclude_from_redo`.
 - **Variables**: `ftl_kbd_trie`, `ftl_kbd_command_to_key`,
-  `ftl_kbd_bindings_display`, `ftl_kbd_submode_handler`,
+  `ftl_kbd_bindings_display`, `ftl_kbd_sub-mode_handler`,
   `ftl_kbd_current_key`, `ftl_kbd_count`, `ftl_kbd_has_count`,
   `ftl_kbd_last_command`, `ftl_kbd_redo_excluded`,
   `ftl_kbd_altgr_map`/`_inverse`, `ftl_kbd_shift_altgr_map`/`_inverse`.
