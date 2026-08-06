@@ -137,6 +137,19 @@ are space-separated.
 | `gM` | `goto_persistent_via_fzf` | fzf persistent marks |
 | `Mc` | `clear_persistent_marks` | clear persistent |
 
+## Project marks
+
+Per-directory bookmarks stored in `.ftl_project_marks` files. See
+[user guide: marks & history](user-guide/marks-history.md#project-marks)
+for the full mechanism.
+
+| Key | Command | Description |
+|-----|---------|-------------|
+| `Mpp` | `ftl::plugin::project_marks::pmark` | add current entry to local `.ftl_project_marks` |
+| `Mpe` | `ftl::plugin::project_marks::pmarks_edit` | edit the local mark file |
+| `gpp` | `ftl::plugin::project_marks::pmarks_fzf` | fzf over marks (parents + children) |
+| `gps` | `ftl::plugin::project_marks::pmarks_subdir_fzf` | fzf over marks (children only) |
+
 ## History
 
 | Key | Command | Description |

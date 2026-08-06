@@ -158,6 +158,10 @@
 | `HH` | Global history |
 | `MM` | Add persistent mark |
 | `Mc` | Clear persistent marks |
+| `Mpp` | Add current entry to local `.ftl_project_marks` |
+| `Mpe` | Edit local `.ftl_project_marks` |
+| `gpp` | Goto project mark (parents + children) |
+| `gps` | Goto project mark (children only) |
 
 ## View Modes
 

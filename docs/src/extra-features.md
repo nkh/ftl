@@ -63,7 +63,7 @@ them with the keyboard trie.
 | `file_diff` | Diff exactly 2 selected files (or directories) | `\d` |
 | `fzf_pane_preview` | Experimental fzf search with ftl preview in a pane | (experimental) |
 | `missing_functionalities` | 42 extended features: duplicate, hardlink, touch, checksums, rename_pattern, chmod_numeric, chown, selection_invert, select_by_pattern, select_by_size, size_analysis, nav_back/forward, move_left_select, marks_manage, selection_save/load/union/intersect/subtract, visual_mode, rg_replace, find_with_history, preview_pin/unpin/compare/zoom/rotate/tail_live, command_palette, workspace_save/load, git_blame/log/diff_stat, compress_zip/7z, archive_list, scp_upload, download_url | `xd`, `xH`, `xt`, `xs`, `xv`, `xR`, `xn`, `xo`, `zA`, `ALT-z`, `ALT-y`, `H`, `mM`, `yi`, `yp`, `yz`, `yS`, `yL`, `yu`, `yd`, `v`, `rR`, `rh`, `zp`, `zP`, `zpc`, `zi`, `zo`, `zr`, `zL`, `CP`, `LEADER ws`, `LEADER wl`, `gbl`, `gll`, `gds`, `LEADER fz`, `LEADER f7`, `LEADER fl`, `LEADER su`, `LEADER dl` |
-| `project_marks` | Per-project bookmark management with hierarchical search (`.ftl_project_marks` files searched upward and downward) | (bound in plugin) |
+| `project_marks` | Per-project bookmark management with hierarchical search (`.ftl_project_marks` files searched upward and downward) | `Mpp`, `Mpe`, `gpp`, `gps` |
 | `tmsu` | TMSU tagging integration: preview shows tags, manage tags via fzf | (bound in plugin) |
 | `type_handlers` | Type-aware navigation: enter archives as virtual directories, exit on `h` | `l` (on archives), `h` (to exit) |
 | `via_bash` | Run a Bash command on the selection, capturing output | (bound in plugin) |

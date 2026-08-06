@@ -46,11 +46,11 @@ ftl_cfg_help_command="man ftl.1"
 # Session marks (single-char bookmarks). Keys are characters, values are
 # paths ending in $ for directories or no suffix for files.
 declare -Ag ftl_mark_session_marks=(
-	[0]=/
-	[1]="$HOME/"
-	[2]=/CHANGE_ME/dir/filename
-	[3]=/CHANGE_ME/dir/filename
-	["'"]="$(tail -n1 "$ftl_state_global_history_file")"
+        [0]=/
+        [1]="$HOME/"
+        [2]=/CHANGE_ME/dir/filename
+        [3]=/CHANGE_ME/dir/filename
+        ["'"]="$(tail -n1 "$ftl_state_global_history_file")"
 )
 
 # Preset destinations for copy/move (PP / PM bindings)
@@ -275,8 +275,8 @@ ftl_cfg_bindings_display_width=150
 
 # Command aliases for the command prompt
 declare -Ag ftl_cfg_command_aliases=(
-	[csx]="split finfo | xargs -0"
-	[cfx]="full finfo | xargs -0"
+        [csx]="split finfo | xargs -0"
+        [cfx]="full finfo | xargs -0"
 )
 
 #----------------------------------------------------------------------------
@@ -444,7 +444,10 @@ ftl::kbd::bind  ftl     pane    "CTL-W j"       ftl::cmd::pane_down     "extra p
 ftl::kbd::bind  ftl     pane    "CTL-W H"       ftl::cmd::pane_left_keep_focus  "extra pane: left"
 ftl::kbd::bind  ftl     pane    "CTL-W L"       ftl::cmd::pane_right_keep_focus "extra pane: right"
 ftl::kbd::bind  ftl     pane    "CTL-W n"       ftl::cmd::goto_next_pane        "next pane or viewer"
-ftl::kbd::bind  ftl     pane    gp      ftl::cmd::goto_next_pane        "next pane or viewer"
+# 'gp' is intentionally left unbound so it can be used as a chord prefix
+# by the project_marks plugin ('gpp' = go to project mark, 'gps' = subdir
+# only). Use 'gP' for the direct "next pane" shortcut.
+ftl::kbd::bind  ftl     pane    gP      ftl::cmd::goto_next_pane        "next pane or viewer"
 
 # --- shell ---
 
@@ -577,25 +580,25 @@ ftl::kbd::bind  ftl     SIG     'Ä'     ftl::ipc::handle_preview_request       
 #----------------------------------------------------------------------------
 
 ftl::cmd::toggle_debug() {
-	if (( ftl_log_level == 0 )) ; then
-		ftl::log::set_level 1
-		ftl::log::info "debug logging enabled"
-		tmux popup -w 40% -h 5 "echo -ne '\e[33mDebug logging ON\e[m'"
-	else
-		ftl::log::set_level 0
-		tmux popup -w 40% -h 5 "echo -ne '\e[33mDebug logging OFF\e[m'"
-	fi
+        if (( ftl_log_level == 0 )) ; then
+                ftl::log::set_level 1
+                ftl::log::info "debug logging enabled"
+                tmux popup -w 40% -h 5 "echo -ne '\e[33mDebug logging ON\e[m'"
+        else
+                ftl::log::set_level 0
+                tmux popup -w 40% -h 5 "echo -ne '\e[33mDebug logging OFF\e[m'"
+        fi
 }
 
 ftl::cmd::toggle_trace() {
-	if (( ftl_log_level < 2 )) ; then
-		ftl::log::set_level 2
-		ftl::log::info "trace logging enabled"
-		tmux popup -w 40% -h 5 "echo -ne '\e[33mTrace logging ON\e[m'"
-	else
-		ftl::log::set_level 0
-		tmux popup -w 40% -h 5 "echo -ne '\e[33mTrace logging OFF\e[m'"
-	fi
+        if (( ftl_log_level < 2 )) ; then
+                ftl::log::set_level 2
+                ftl::log::info "trace logging enabled"
+                tmux popup -w 40% -h 5 "echo -ne '\e[33mTrace logging ON\e[m'"
+        else
+                ftl::log::set_level 0
+                tmux popup -w 40% -h 5 "echo -ne '\e[33mTrace logging OFF\e[m'"
+        fi
 }
 
 ftl::kbd::bind  ftl     ftl     "LEADER d d"    ftl::cmd::toggle_debug  "toggle debug logging"
@@ -608,9 +611,9 @@ ftl::kbd::bind  ftl     ftl     "LEADER d t"    ftl::cmd::toggle_trace  "toggle 
 # Source all binding plugins from etc/bindings/ and bindings/.
 # Uses fd if available, falls back to find (which is always installed).
 if command -v fd >/dev/null 2>&1 ; then
-	_ftl_list_bindings() { fd . "$1" --type f | sort -u ; }
+        _ftl_list_bindings() { fd . "$1" --type f | sort -u ; }
 else
-	_ftl_list_bindings() { find "$1" -type f | sort -u ; }
+        _ftl_list_bindings() { find "$1" -type f | sort -u ; }
 fi
 
 for b in $(_ftl_list_bindings "$FTL_CFG/etc/bindings") ; do source "$b" ; done

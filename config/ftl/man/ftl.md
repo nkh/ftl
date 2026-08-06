@@ -28,22 +28,22 @@ filters, etags, generators, viewers, commands, and bindings.
 # OPTIONS
 
 **-f** _filter_
-:	Load an external filter plugin at startup.
+:       Load an external filter plugin at startup.
 
 **-s** _file_
-:	File containing paths to pre-select. One path per line.
+:       File containing paths to pre-select. One path per line.
 
-		ftl -s <(find -name '*.py')
+                ftl -s <(find -name '*.py')
 
 **-t** _file_
-:	File containing paths to open in separate tabs. Must come after **-s**
-	if both are used. One path per line.
+:       File containing paths to open in separate tabs. Must come after **-s**
+        if both are used. One path per line.
 
-		ftl -t <(find -name '*.py')
+                ftl -t <(find -name '*.py')
 
 _directory_/_file_
-:	Initial directory to open. If a file is specified, ftl opens its parent
-	directory and selects the file.
+:       Initial directory to open. If a file is specified, ftl opens its parent
+        directory and selects the file.
 
 # CONCEPTS
 
@@ -487,6 +487,20 @@ examples, and test coverage.
 | **He** | Edit global history |
 | **Hc** | Clear global history |
 
+### Project marks
+
+Per-directory bookmarks stored in `.ftl_project_marks` files. The plugin
+walks parent and child directories to collect marks, then offers them
+through fzf. See *docs/src/user-guide/marks-history.md* for the full
+mechanism.
+
+| Key | Action |
+|-----|--------|
+| **Mpp** | Add current entry to local `.ftl_project_marks` |
+| **Mpe** | Edit local `.ftl_project_marks` |
+| **gpp** | fzf over project marks (parents + children) |
+| **gps** | fzf over project marks (children only) |
+
 ## Media
 
 | Key | Action |
@@ -644,16 +658,16 @@ Configuration is read from `~/.config/ftl/etc/ftlrc`. All variables use the
 # ENVIRONMENT
 
 **FTL_CFG**
-:	Configuration directory (default: `$HOME/.config/ftl`).
+:       Configuration directory (default: `$HOME/.config/ftl`).
 
 **FTL_STATE_DIR**
-:	Runtime state directory (default: `$FTL_CFG/var`).
+:       Runtime state directory (default: `$FTL_CFG/var`).
 
 **FTL_CACHE_DIR**
-:	Thumbnail cache directory (default: `$FTL_STATE_DIR/thumbs`).
+:       Thumbnail cache directory (default: `$FTL_STATE_DIR/thumbs`).
 
 **FTL_DEBUG**
-:	Set to `1` to enable debug logging.
+:       Set to `1` to enable debug logging.
 
 # FILES
 
@@ -710,25 +724,25 @@ Configuration is read from `~/.config/ftl/etc/ftlrc`. All variables use the
 ## State Files
 
 $FTL_STATE_DIR/$$/
-:	Per-session state directory (one per ftl process).
+:       Per-session state directory (one per ftl process).
 
 $FTL_STATE_DIR/$$/log
-:	Session log file.
+:       Session log file.
 
 $FTL_STATE_DIR/$$/tags
-:	Serialized selection (Bash `declare -p` output).
+:       Serialized selection (Bash `declare -p` output).
 
 $FTL_STATE_DIR/$$/ftl
-:	Serialized state for preview pane synchronization.
+:       Serialized state for preview pane synchronization.
 
 $FTL_STATE_DIR/$$/history
-:	Session directory-visit history.
+:       Session directory-visit history.
 
 $FTL_STATE_DIR/shared/history
-:	Global directory-visit history (all sessions).
+:       Global directory-visit history (all sessions).
 
 $FTL_STATE_DIR/shared/marks
-:	Persistent bookmarks.
+:       Persistent bookmarks.
 
 # PLUGIN SYSTEM
 
@@ -787,7 +801,7 @@ also define helper functions (namespaced as `ftl::plugin::<name>::*`).
 
 Add to `~/.bashrc`:
 
-	source $FTL_CFG/etc/bin/cdf
+        source $FTL_CFG/etc/bin/cdf
 
 Then use `cdf` to navigate. Press `q` to quit and cd to the current
 directory.
@@ -796,7 +810,7 @@ directory.
 
 Add to `~/.bashrc`:
 
-	source $FTL_CFG/etc/bin/ftll
+        source $FTL_CFG/etc/bin/ftll
 
 Then use `ftll` to select files. Press `q` to return the selection.
 
@@ -804,28 +818,28 @@ Then use `ftll` to select files. Press `q` to return the selection.
 
 Add to `~/.vimrc`:
 
-	function! Ftl(preview)
-		let temp = tempname()
-		let id = localtime()
-		exec "silent !tmux new-window ftlvim " . shellescape(temp) . " ftl_" . id . " " . a:preview . " ; tmux wait ftl_" . id
-		if !filereadable(temp)
-			redraw!
-			return
-		endif
-		for name in readfile(temp)
-			exec 'tabedit ' . fnameescape(name)
-		endfor
-		redraw!
-	endfunction
-	map <silent> <leader>f :call Ftl(1)<cr>
+        function! Ftl(preview)
+                let temp = tempname()
+                let id = localtime()
+                exec "silent !tmux new-window ftlvim " . shellescape(temp) . " ftl_" . id . " " . a:preview . " ; tmux wait ftl_" . id
+                if !filereadable(temp)
+                        redraw!
+                        return
+                endif
+                for name in readfile(temp)
+                        exec 'tabedit ' . fnameescape(name)
+                endfor
+                redraw!
+        endfunction
+        map <silent> <leader>f :call Ftl(1)<cr>
 
 # TESTING
 
-	ftl includes a test framework:
+        ftl includes a test framework:
 
-	./test/harness.sh                     # run all unit tests
-	./test/harness.sh test/unit/test_keyboard.sh  # run one test file
-	./test/harness.sh -v                  # verbose mode
+        ./test/harness.sh                     # run all unit tests
+        ./test/harness.sh test/unit/test_keyboard.sh  # run one test file
+        ./test/harness.sh -v                  # verbose mode
 
 # SEE ALSO
 

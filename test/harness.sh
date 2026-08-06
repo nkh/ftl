@@ -80,6 +80,16 @@ ftl::test::assert_contains() {
     fi
 }
 
+# Assert a string does NOT contain a substring.
+ftl::test::assert_not_contains() {
+    local haystack="$1" needle="$2" msg="${3:-}"
+    if [[ "$haystack" != *"$needle"* ]] ; then
+        ftl::test::_pass "${msg:+$msg: }'$haystack' does not contain '$needle'"
+    else
+        ftl::test::_fail "${msg:+$msg: }'$haystack' should not contain '$needle'"
+    fi
+}
+
 # Assert a string matches a regex.
 ftl::test::assert_match() {
     local regex="$1" string="$2" msg="${3:-}"

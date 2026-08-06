@@ -68,6 +68,64 @@ echo "$ftl_state_current_path" \
 | `He` | `ftl::cmd::edit_global_history` | edit the global history file |
 | `Hc` | `ftl::cmd::clear_global_history` | clear the global history |
 
+## Project marks
+
+Project marks are a third, directory-scoped bookmark system provided by
+the `bindings/project_marks` plugin (auto-sourced from `etc/ftlrc`).
+Unlike session marks (single-character, in-memory) and persistent marks
+(global, in `$FTL_STATE_DIR/shared/`), project marks live in plain
+`.ftl_project_marks` files inside your directory tree, so they travel
+with the project, can be checked into version control, and can be
+edited by hand or by any other tool.
+
+Each `.ftl_project_marks` file contains one absolute path per line.
+When you ask ftl to jump to a project mark, the plugin walks the
+filesystem to collect every relevant mark file:
+
+1. **Upward walk** (parents): from `$PWD` up to `/`, concatenating any
+   `.ftl_project_marks` it finds. This lets a parent directory (e.g. a
+   repo root) advertise shared shortcuts that apply to every subdirectory.
+2. **Downward walk** (children): a `find -type f -name .ftl_project_marks`
+   under `$PWD`. This lets nested subdirectories advertise their own
+   shortcuts without polluting the parent.
+
+The combined list is deduplicated, the `$PWD/` prefix is stripped for
+display, and the result is piped through `fzf-tmux` for selection.
+Selecting multiple marks (with `Tab`) opens each one in turn; `Ctrl-T`
+opens the selection in a new tab.
+
+The `gps` variant (subdir-only) skips the upward walk — useful in deep
+project trees where you only want to see marks defined *inside* the
+current directory, not the inherited parent shortcuts.
+
+### Project mark bindings
+
+| Key | Command | Description |
+|-----|---------|-------------|
+| `Mpp` | `ftl::plugin::project_marks::pmark` | add the current entry to the local `.ftl_project_marks` |
+| `Mpe` | `ftl::plugin::project_marks::pmarks_edit` | open `.ftl_project_marks` in `$EDITOR` |
+| `gpp` | `ftl::plugin::project_marks::pmarks_fzf` | fzf over marks from parents + children |
+| `gps` | `ftl::plugin::project_marks::pmarks_subdir_fzf` | fzf over marks from children only |
+
+### Mark file format
+
+The file is plain text, one path per line, newest first (the plugin
+reverses the list on insert so the most recently added mark is at the
+top). Duplicate paths are removed automatically.
+
+```
+/home/user/project/src
+/home/user/project/tests
+/home/user/project/docs
+```
+
+### Why `gp` is unbound
+
+The `gpp` and `gps` chords share the `gp` prefix. To make this work,
+`etc/ftlrc` intentionally leaves `gp` unbound and binds the related
+"next pane" shortcut to `gP` instead. If you rebind `gp` to a leaf
+command, the `gpp`/`gps` chords will stop working.
+
 ## Tips
 
 - Marks and history are complementary: use marks for "I'll come back here
@@ -76,3 +134,6 @@ echo "$ftl_state_current_path" \
   one path per line.
 - The global history is shared across all ftl processes and panes, which
   is why `Hs` is handy for filtering to the current subtree.
+- Project marks are the only system that's **portable**: commit
+  `.ftl_project_marks` to your repo and anyone who clones it gets the
+  same set of shortcuts.
