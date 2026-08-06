@@ -85,6 +85,19 @@ it at the top of each test, or reset the relevant globals manually.
 | `test_project_marks.sh` | `bindings/project_marks` | `get_project_marks`, `pmark`, `pmarks_fzf`/`_subdir_fzf`, `pmarks_edit`, registered bindings |
 | `test_dest_tags.sh` | `commands/dest_tags.sh` | 38a073a: 7 dest_tag commands, format_annotation, ftlrc/ftl_setup declarations |
 | `test_dest_tags_render.sh` | `commands/dest_tags.sh` + `list.sh` | 38a073a: render emits ` [...dest]` annotation, trim long paths |
+| `test_util_deep.sh` | `util.sh` | parse_path root/relative bugs, format_size_human PiB fallthrough, resolve_full_path, dedup_file, is_binary_file |
+| `test_keyboard_deep.sh` | `keyboard.sh` | normalize_key (DOWN app-mode bug, F-keys, CTL chars), bind/unbind, redo exclusions |
+| `test_tab_deep.sh` | `tab.sh` | retreat_index rev bug (11+ tabs), advance_index gaps, create "." trailing slash, load_from_file empty lines |
+| `test_selection_deep.sh` | `selection.sh` | adjust_total_size crash on missing file, load_from_file flip-vs-set, build_class_index side effect |
+| `test_dest_tags_deep.sh` | `commands/dest_tags.sh` | dtag_move=0 same-entry bug, copy/move clears tags on failure, format_annotation edge cases |
+| `test_state_deep.sh` | `state.sh` | save round-trip var-name mismatch, sed `-A` corruption, cleanup guard, emit_selection_fd3 |
+| `test_inline_rename_deep.sh` | `inline_rename.sh` | dotfile extension bug, commit mv-failure, abort doesn't clear active flag (bug) |
+| `test_filter_deep.sh` | `filter.sh` | pipeline_remove empty array, get_sort_glyph quoting, init defaults, load_external |
+| `test_pane_deep.sh` | `pane.sh` | count_bg_windows set -e, send_to_all_children empty, read_child_list missing file, select empty |
+| `test_preview_deep.sh` | `preview.sh` | show_in_vim incomplete escaping, show_image unquoted vars, clear no-arg, thumb_path md5 newline |
+| `test_dispatcher_deep.sh` | `commands/dispatcher.sh` | dispatch_command numeric sets path not index (bug), empty string crash, out-of-range crash |
+| `test_commands_mark_deep.sh` | `commands/mark.sh` | set_mark/goto_mark use ftl_kbd_current_key not REPLY (bug), clear_persistent_marks same bug |
+| `test_file_ops_deep.sh` | `commands/file_ops.sh` | create_file/copy_to_prompted/delete_selection use trigger key not REPLY (bug), do_copy/do_move |
 
 ## What's not tested
 
