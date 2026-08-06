@@ -77,59 +77,62 @@ files=() ; nfiles=0 ; files_color=() ; line=0 ; sum=0 ; first_file= ; found=
 
 printf -v pad "%d" ${#dir_entries_list[@]} ; pad=${#pad}
 
-for p_index in "${dir_entries_list[@]}" ; do
-	pc="${dir_entries_color[$p_index]}"
-	pnc="${dir_entries_file[$p_index]}"
-	ppath="${dir_entries_path[$p_index]}"
-	rpath_l=${dir_entries_relative_path_length[$p_index]}
+for entry in "${dir_entries_list[@]}" ; do
+	local display_entry= display_entry_length=0
 	
-	size=${dir_entries_size[$p_index]} ; ((sum += size))
+	pnc="${dir_entries_file[$entry]}"
+	e= ; [[ "$pnc" =~ '.' ]] && e=${pnc##*.}
 	pnc_l=${#pnc}
-	ppath_l=${#ppath}
-	
-	pc_c=${pc:0:${#pc} - (pnc_l + 4)} ;
 	
 	[[ -f "$pnc" ]] && # extension filtering
 		{
-		if [[ "$pnc" =~ '.' ]] ; then
-			e=${pnc##*.}
-			((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue
-			((${#lkeep_tab[$tab]})) && { ((lkeep_tab[${tab}_${e@Q}])) || continue ; }
-			((${#lkeep[@]})) && { ((lkeep[${e@Q}])) || continue ; }
+		if [[ "$e" ]] ; then
+			((lignore[${tab}_${e@Q}] || lignore[${e@Q}])) && continue                                       # ignored, per tab
+			((${#lkeep_tab[$tab]}))                       && { ((lkeep_tab[${tab}_${e@Q}])) || continue ; } # show this extension only, per tab
+			((${#lkeep[@]}))                              && { ((lkeep[${e@Q}])) || continue ; }            # show this extension only, global
 		else
-			((${#lkeep[@]} || ${#lkeep_tab[$tab]})) && continue
+			((${#lkeep[@]} || ${#lkeep_tab[$tab]}))       && continue                                       # no extension, but only showing extensions, per tab or global
 		fi
 		}
 	
 	((quick_display && nfiles > 0 && 0 == nfiles % quick_display)) && { echo -e "\e[H\e[31m$nfiles\e[0m" ; qd=1 ; }
+	size=${dir_entries_size[$entry]} ; ((sum += size))
 	
 	# color directory that are not accessible
-	[[ -d "$pnc" && ! -x "$pnc" ]] && pc="\e[31m$pnc"
+	[[ -d "$pnc" && ! -x "$pnc" ]] && { pc="\e[31m$pnc" ; }
 	
-	((etag)) && { etag_tag "$pnc" external_tag external_tag_length ; pc="$external_tag$pc" ; ((pnc_l+=external_tag_length)) ; }
-	
+	((etag)) && 
+		{
+		etag_tag "$pnc" external_tag external_tag_length
+		display_entry+="$external_tag" ; ((display_entry_length += external_tag_length))
+		}
+		
 	((show_size)) && 
 		{
-		[[ -d "$pnc" ]] && { ((show_size > 1)) && pc="$(dir_size "$pnc") $pc" || pc="      $pc" ; true ; } || pc="\e[94m$(file_size $size)\e[m $pc"
-		((pnc_l += 6))
+		[[ -d "$pnc" ]] && { ((show_size > 1)) && display_entry="$(dir_size "$pnc") $display_entry" || display_entry="      $display_entry" ; true ; }
+		[[ -f "$pnc" ]] && { display_entry="\e[94m$(file_size $size)\e[m $display_entry" ; }
+		((display_entry_length += 6))
 		}
 	
-	((show_line)) && { ((line++)) ; printf -v pc "$line_color%${pad}d\e[m¿${pc/\%/%%}" $line ; ((pnc_l += pad + 1)) ; }
-	
-	[[ ${#pc} == $pnc_l ]] || pc="${pc:0:-4}" # remove color reset if entry is colored
-	
-	((rpath_l + pnc_l > COLS - 1)) && { 
-		
-		[[ "$pnc" =~ '.' ]] && e="${pnc##*.}" || e= 
-		ext_l="$((${#e}+1))"
-		
-		local prefix_length=$((- (((rpath_l + pnc_l) - (COLS - 1)) + ext_l) ))
-		((prefix_length < 0)) && prefix_length=$((COLS - (${#e} + 1))) 
-		
-		pc="${pc:0:$prefix_length+${#pc_c}}…${e}"
+	((show_line)) && \
+		{
+		printf -v line_display "%${pad}d" $(($nfiles + 1)) ;
+		display_entry="$line_color$line_display\e[m¿$display_entry" ; ((display_entry_length += pad + 1)) 
 		}
 	
-	files_color[$nfiles]="$pc" ; files[$nfiles]="$ppath$sep$pnc"
+	pc="${dir_entries_color[$entry]}"
+	pc_c=${pc:0:${#pc} - (pnc_l + 4)} ;
+	
+	rpath_l=${dir_entries_relative_path_length[$entry]}
+	((display_entry_length + rpath_l + pnc_l > COLS - 1)) && \
+		{ 
+		e_l="$((${#e}+1))"
+		local visible_part=$(( (COLS - 1)  - ( display_entry_length + 1 + e_l ) ))
+		
+		display_entry+="${pc:0:(${#pc_c} + $visible_part)}….${e}"
+		} || display_entry+="${pc}"
+	
+	files_color[$nfiles]="$display_entry" ; files[$nfiles]="${dir_entries_path[$entry]}$sep$pnc"
 	
 	[[ -z $first_file ]] && [[ -f "$pnc" ]] && first_file=$nfiles
 	[[ -n "$search" && -z "$found" ]] && [[ "${pnc:0:${#search}}" == "$search" ]] && found=$nfiles
@@ -166,9 +169,9 @@ show_header
 	for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
 		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
 		
-		[[ -n ${dest_tags[${files[$i]}]} ]] && { dtag="${dest_tags[${files[$i]}]: -dtag_l}" ; printf -v dtag "%-${dtag_l}s" "$dtag" ; dtag=" [...${dtag}]" ; } || dtag=
+		# [[ -n ${dest_tags[${files[$i]}]} ]] && { dtag="${dest_tags[${files[$i]}]: -dtag_l}" ; printf -v dtag "%-${dtag_l}s" "$dtag" ; dtag=" [...${dtag}]" ; } || dtag=
 		
-		echo -ne "\e[${tline};0H\e[m\e[K$cursor\e[2;37m$dtag\e[0m ${files_color[i]/¿/$flip}\e[0m" ; ((i != bottom)) && echo ; ((l++))
+		echo -ne "\e[${tline};0H\e[m\e[K$cursor\e[2;37m$dtag\e[0m${files_color[i]/¿/$flip}\e[0m" ; ((i != bottom)) && echo ; ((l++))
 	done
 	
 	clear_list $tline 
