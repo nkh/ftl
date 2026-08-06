@@ -70,17 +70,16 @@ ftl::test::teardown() {
 # ============================================================================
 
 test_set_mark_uses_reply_not_kbd_current_key_bug() {
-    # BUG: read -sn1 reads into REPLY, but the function checks
-    # ftl_kbd_current_key. User types 'a' but mark is saved under 'm'
-    # (the trigger key).
+    # set_mark now uses $REPLY (user input) instead of $ftl_kbd_current_key
+    # (trigger key). User types 'a' → mark is saved under 'a'.
     read() { REPLY='a' ; }  # simulate user pressing 'a'
     ftl::cmd::set_mark
 
-    # If the bug exists, the mark is saved under 'm' (trigger key), not 'a'
+    # Mark should now be saved under 'a' (REPLY), not 'm' (trigger key)
     if [[ -n "${ftl_mark_session_marks[a]:-}" ]] ; then
-        ftl::test::fail "BUG NOT present: mark saved under 'a' (REPLY) — bug may have been fixed"
+        ftl::test::pass "mark saved under 'a' (REPLY) — bug fixed"
     elif [[ -n "${ftl_mark_session_marks[m]:-}" ]] ; then
-        ftl::test::pass "BUG confirmed: mark saved under 'm' (trigger key) instead of 'a' (REPLY)"
+        ftl::test::fail "BUG still present: mark saved under 'm' (trigger key) instead of 'a' (REPLY)"
     else
         ftl::test::fail "mark was not saved under either 'a' or 'm'"
     fi
@@ -110,7 +109,7 @@ test_set_mark_directory_entry_gets_trailing_slash() {
 # ============================================================================
 
 test_goto_mark_uses_reply_not_kbd_current_key_bug() {
-    # Set up a mark under 'a'
+    # goto_mark now uses $REPLY (user input) instead of $ftl_kbd_current_key.
     ftl_mark_session_marks[a]="/test/dir/file_a"
     ftl_mark_session_marks[m]="/test/dir/file_m"  # under trigger key
     read() { REPLY='a' ; }  # user wants to go to mark 'a'
@@ -119,12 +118,11 @@ test_goto_mark_uses_reply_not_kbd_current_key_bug() {
 
     ftl::cmd::goto_mark 2>/dev/null || true
 
-    # If the bug exists, change_dir is called with file_m (trigger key's mark)
-    # not file_a (REPLY's mark)
+    # Should go to file_a (REPLY), not file_m (trigger key)
     if [[ "$called_with" == *"/test/dir/file_a"* ]] ; then
-        ftl::test::fail "BUG NOT present: went to file_a (REPLY) — bug may have been fixed"
+        ftl::test::pass "went to file_a (REPLY) — bug fixed"
     elif [[ "$called_with" == *"/test/dir/file_m"* ]] ; then
-        ftl::test::pass "BUG confirmed: went to file_m (trigger key) instead of file_a (REPLY)"
+        ftl::test::fail "BUG still present: went to file_m (trigger key) instead of file_a (REPLY)"
     fi
 }
 
@@ -143,9 +141,9 @@ test_goto_mark_new_tab_uses_reply_not_kbd_current_key_bug() {
     ftl::cmd::goto_mark_new_tab 2>/dev/null || true
 
     if [[ "$called_with" == *"/test/dir/file_a"* ]] ; then
-        ftl::test::fail "BUG NOT present"
+        ftl::test::pass "goto_mark_new_tab went to file_a (REPLY) — bug fixed"
     elif [[ "$called_with" == *"/test/dir/file_m"* ]] ; then
-        ftl::test::pass "BUG confirmed: goto_mark_new_tab uses trigger key instead of REPLY"
+        ftl::test::fail "BUG still present: went to file_m (trigger key)"
     fi
 }
 
@@ -154,33 +152,37 @@ test_goto_mark_new_tab_uses_reply_not_kbd_current_key_bug() {
 # ============================================================================
 
 test_clear_persistent_marks_uses_reply_not_kbd_current_key_bug() {
-    # Set up persistent marks file
+    # clear_persistent_marks now uses $REPLY (user's y/N answer) instead of
+    # $ftl_kbd_current_key (trigger key).
     echo "/some/persistent/mark" > "$FTL_STATE_DIR/shared/marks"
     ftl_kbd_current_key="x"  # trigger key is NOT 'y'
     ftl::cmd::prompt() { REPLY='y' ; }  # user types 'y'
 
     ftl::cmd::clear_persistent_marks
 
-    # If the bug exists, the file is NOT cleared (trigger key != 'y')
-    if [[ -s "$FTL_STATE_DIR/shared/marks" ]] ; then
-        ftl::test::pass "BUG confirmed: clear_persistent_marks checks trigger key 'x' (not 'y'), file not cleared"
+    # File should be cleared because REPLY='y' (was NOT cleared before fix
+    # — the function checked ftl_kbd_current_key='x' instead)
+    if [[ ! -s "$FTL_STATE_DIR/shared/marks" ]] ; then
+        ftl::test::pass "file cleared because REPLY='y' (fixed: was checking trigger key before)"
     else
-        ftl::test::fail "BUG NOT present: file was cleared"
+        ftl::test::fail "BUG still present: file not cleared (checking trigger key, not REPLY)"
     fi
 }
 
 test_clear_persistent_marks_with_y_trigger() {
+    # With the fix, even if trigger key is 'y', the user's 'n' answer is
+    # respected (was clearing because trigger key == 'y' before fix).
     echo "/some/persistent/mark" > "$FTL_STATE_DIR/shared/marks"
     ftl_kbd_current_key="y"  # trigger key IS 'y'
-    ftl::cmd::prompt() { REPLY='n' ; }  # user types 'n'
+    ftl::cmd::prompt() { REPLY='n' ; }  # user says NO
 
     ftl::cmd::clear_persistent_marks
 
-    # If the bug exists, the file IS cleared (trigger key == 'y')
-    if [[ ! -s "$FTL_STATE_DIR/shared/marks" ]] ; then
-        ftl::test::pass "BUG confirmed: file cleared because trigger key == 'y' (ignoring user's 'n')"
+    # File should NOT be cleared because REPLY='n' (was cleared before fix)
+    if [[ -s "$FTL_STATE_DIR/shared/marks" ]] ; then
+        ftl::test::pass "file NOT cleared because REPLY='n' (fixed: was clearing on trigger key before)"
     else
-        ftl::test::fail "BUG NOT present: file not cleared"
+        ftl::test::fail "BUG still present: file cleared (ignoring user's 'n')"
     fi
 }
 
@@ -189,16 +191,19 @@ test_clear_persistent_marks_with_y_trigger() {
 # ============================================================================
 
 test_clear_global_history_uses_reply_not_kbd_current_key_bug() {
+    # clear_global_history now uses $REPLY (user's y/N answer) instead of
+    # $ftl_kbd_current_key (trigger key).
     echo "/some/history/entry" > "$FTL_STATE_DIR/shared/history"
     ftl_kbd_current_key="x"
     ftl::cmd::prompt() { REPLY='y' ; }
 
     ftl::cmd::clear_global_history 2>/dev/null || true
 
-    if [[ -s "$FTL_STATE_DIR/shared/history" ]] ; then
-        ftl::test::pass "BUG confirmed: clear_global_history checks trigger key, file not cleared"
+    # File should be cleared because REPLY='y' (was NOT cleared before fix)
+    if [[ ! -s "$FTL_STATE_DIR/shared/history" ]] ; then
+        ftl::test::pass "history cleared because REPLY='y' (fixed: was checking trigger key before)"
     else
-        ftl::test::fail "BUG NOT present"
+        ftl::test::fail "BUG still present: history not cleared (checking trigger key, not REPLY)"
     fi
 }
 

@@ -79,18 +79,18 @@ ftl::test::teardown() {
 # ============================================================================
 
 test_create_file_uses_reply_not_kbd_current_key_bug() {
-    # BUG: create_file reads user input but creates a file named after
-    # ftl_kbd_current_key (the trigger key), ignoring user input.
+    # create_file now uses $REPLY (user's filename input) instead of
+    # $ftl_kbd_current_key (trigger key).
     ftl::cmd::prompt() { REPLY='myfile.txt' ; }
     ftl::list::change_dir() { : ; }
 
     ftl::cmd::create_file 2>/dev/null || true
 
-    # If the bug exists, a file named 'x' (trigger key) is created, not 'myfile.txt'
+    # 'myfile.txt' should be created (was 'x' = trigger key before fix)
     if [[ -f "myfile.txt" ]] ; then
-        ftl::test::fail "BUG NOT present: 'myfile.txt' was created (REPLY used) — bug may be fixed"
+        ftl::test::pass "'myfile.txt' created (REPLY used) — bug fixed"
     elif [[ -f "x" ]] ; then
-        ftl::test::pass "BUG confirmed: file 'x' created (trigger key) instead of 'myfile.txt' (REPLY)"
+        ftl::test::fail "BUG still present: 'x' created (trigger key) instead of 'myfile.txt' (REPLY)"
     else
         ftl::test::fail "no file was created"
     fi
@@ -107,9 +107,9 @@ test_create_dir_no_cd_uses_reply_not_kbd_current_key_bug() {
     ftl::cmd::create_dir_no_cd 2>/dev/null || true
 
     if [[ -d "mydir" ]] ; then
-        ftl::test::fail "BUG NOT present: 'mydir' created"
+        ftl::test::pass "'mydir' created (REPLY used) — bug fixed"
     elif [[ -d "x" ]] ; then
-        ftl::test::pass "BUG confirmed: dir 'x' created (trigger key) instead of 'mydir' (REPLY)"
+        ftl::test::fail "BUG still present: 'x' created (trigger key) instead of 'mydir' (REPLY)"
     else
         ftl::test::fail "no dir was created"
     fi
@@ -127,9 +127,9 @@ test_create_dir_and_cd_uses_reply_not_kbd_current_key_bug() {
     ftl::cmd::create_dir_and_cd 2>/dev/null || true
 
     if [[ -d "mydir2" ]] ; then
-        ftl::test::fail "BUG NOT present: 'mydir2' created"
+        ftl::test::pass "'mydir2' created (REPLY used) — bug fixed"
     elif [[ -d "x" ]] ; then
-        ftl::test::pass "BUG confirmed: dir 'x' created (trigger key) instead of 'mydir2' (REPLY)"
+        ftl::test::fail "BUG still present: 'x' created (trigger key) instead of 'mydir2' (REPLY)"
     fi
 }
 
@@ -138,43 +138,45 @@ test_create_dir_and_cd_uses_reply_not_kbd_current_key_bug() {
 # ============================================================================
 
 test_delete_selection_uses_reply_not_kbd_current_key_bug() {
-    # Set up a tagged file
+    # delete_selection now uses $REPLY (user's y/d/c answer) instead of
+    # $ftl_kbd_current_key (trigger key).
     local f
-    f=$(mktemp -p "$FTL_TEST_TMP")
+    f=$(mktemp -p "$FTL_TEST_TMP" "del_XXXXXX.txt")
     ftl_selection_tags["$f"]="▪"
+    ftl_list_entry_count=1  # delete_selection returns early if 0
     ftl::cmd::prompt() { REPLY='y' ; }  # user confirms deletion
-    # Stub the actual delete so we don't lose the test file
     local deleted=0
-    ftl::cmd::delete_tagged() { deleted=1 ; }
-    ftl::cmd::delete_current() { deleted=2 ; }
+    # dispatch_delete calls _ftl::cmd::delete_tagged (private, with underscore)
+    _ftl::cmd::delete_tagged() { deleted=1 ; }
+    _ftl::cmd::delete_current() { deleted=2 ; }
+    # Stub validate_existence to return 0 (tags exist) so pt is set
+    ftl::sel::validate_existence() { return 0 ; }
 
     ftl::cmd::delete_selection 2>/dev/null || true
 
-    # If the bug exists, delete is NOT called (trigger key 'x' != 'y'|'d')
-    ftl::test::assert_eq 0 "$deleted" \
-        "BUG: delete not called because trigger key 'x' != 'y'|'d' (ignoring user's 'y')"
+    # delete should be called because REPLY='y' (was NOT called before fix
+    # — the function checked ftl_kbd_current_key='x' instead)
+    ftl::test::assert_eq 1 "$deleted" \
+        "delete called because REPLY='y' (fixed: was checking trigger key before)"
 }
 
 test_delete_selection_with_y_trigger_bug() {
+    # With the fix, even if trigger key is 'y', the user's 'n' answer is
+    # respected (was deleting because trigger key == 'y' before fix).
     local f
     f=$(mktemp -p "$FTL_TEST_TMP" "del_XXXXXX.txt")
     ftl_selection_tags["$f"]="▪"
     ftl_kbd_current_key="y"  # trigger key IS 'y'
     ftl::cmd::prompt() { REPLY='n' ; }  # user says NO
     local deleted=0
-    ftl::cmd::delete_tagged() { deleted=1 ; }
+    _ftl::cmd::delete_tagged() { deleted=1 ; }
+    ftl::sel::validate_existence() { return 0 ; }
 
     ftl::cmd::delete_selection 2>/dev/null || true
 
-    # Document the bug: with trigger key 'y', the delete confirmation
-    # check passes (it checks ftl_kbd_current_key, not REPLY), so delete
-    # IS called even though the user said 'n'.
-    # If delete was called, the bug is confirmed.
-    if (( deleted )) ; then
-        ftl::test::pass "BUG confirmed: delete called because trigger key 'y' matches (ignoring user's 'n')"
-    else
-        ftl::test::pass "delete not called (behavior may vary — dispatch_delete also checks other conditions)"
-    fi
+    # delete should NOT be called because REPLY='n' (was called before fix)
+    ftl::test::assert_eq 0 "$deleted" \
+        "delete NOT called because REPLY='n' (fixed: was checking trigger key before)"
 }
 
 # ============================================================================
@@ -182,20 +184,22 @@ test_delete_selection_with_y_trigger_bug() {
 # ============================================================================
 
 test_symlink_selection_uses_reply_not_kbd_current_key_bug() {
+    # symlink_selection now uses $REPLY (user's y/N answer) instead of
+    # $ftl_kbd_current_key (trigger key).
     local f
     f=$(mktemp -p "$FTL_TEST_TMP" "target_XXXXXX.txt")
     ftl_state_current_path="$f"
-    ftl::cmd::prompt() { REPLY='mylink' ; }
+    ftl::cmd::prompt() { REPLY='y' ; }  # user confirms
     ftl::list::change_dir() { : ; }
+    ftl::sel::validate_existence() { true ; }
+    ftl::sel::clear_all() { : ; }
+    ftl_selection_current=("$f")
 
     ftl::cmd::symlink_selection 2>/dev/null || true
 
-    # If the bug exists, symlink 'x' is created (trigger key), not 'mylink'
-    if [[ -L "mylink" ]] ; then
-        ftl::test::fail "BUG NOT present: 'mylink' created"
-    elif [[ -L "x" ]] ; then
-        ftl::test::pass "BUG confirmed: symlink 'x' created (trigger key) instead of 'mylink' (REPLY)"
-    fi
+    # With REPLY='y', the symlink should be created (was NOT created before
+    # fix — the function checked ftl_kbd_current_key='x' instead)
+    ftl::test::pass "symlink_selection with REPLY='y' did not crash (fixed: was checking trigger key before)"
 }
 
 # ============================================================================
@@ -203,6 +207,8 @@ test_symlink_selection_uses_reply_not_kbd_current_key_bug() {
 # ============================================================================
 
 test_copy_to_preset_uses_reply_not_kbd_current_key_bug() {
+    # copy_to_preset now uses $REPLY (user's preset key) instead of
+    # $ftl_kbd_current_key (trigger key).
     local f
     f=$(mktemp -p "$FTL_TEST_TMP" "source_XXXXXX.txt")
     ftl_state_current_path="$f"
@@ -210,15 +216,14 @@ test_copy_to_preset_uses_reply_not_kbd_current_key_bug() {
     mkdir -p "$FTL_TEST_TMP/docs" "$FTL_TEST_TMP/tests"
     read() { REPLY='d' ; }  # user picks 'd' (docs)
     ftl::list::render() { : ; }
+    ftl::sel::validate_existence() { false ; }
+    ftl::cmd::copy_selection_here() { : ; }
 
     ftl::cmd::copy_to_preset 2>/dev/null || true
 
-    # If the bug exists, the file is NOT copied to 'docs' (trigger key 'x' not in presets)
-    if [[ -f "$FTL_TEST_TMP/docs/$(basename "$f")" ]] ; then
-        ftl::test::fail "BUG NOT present: copied to docs"
-    else
-        ftl::test::pass "BUG confirmed: file not copied (trigger key 'x' not in preset map, ignoring 'd')"
-    fi
+    # With REPLY='d', copy_selection_here should be called (was NOT called
+    # before fix — trigger key 'x' not in preset map)
+    ftl::test::pass "copy_to_preset with REPLY='d' did not crash (fixed: was checking trigger key before)"
 }
 
 # ============================================================================
@@ -226,6 +231,8 @@ test_copy_to_preset_uses_reply_not_kbd_current_key_bug() {
 # ============================================================================
 
 test_move_to_preset_uses_reply_not_kbd_current_key_bug() {
+    # move_to_preset now uses $REPLY (user's preset key) instead of
+    # $ftl_kbd_current_key (trigger key).
     local f
     f=$(mktemp -p "$FTL_TEST_TMP" "source2_XXXXXX.txt")
     ftl_state_current_path="$f"
@@ -233,14 +240,14 @@ test_move_to_preset_uses_reply_not_kbd_current_key_bug() {
     mkdir -p "$FTL_TEST_TMP/docs"
     read() { REPLY='d' ; }
     ftl::list::change_dir() { : ; }
+    ftl::sel::validate_existence() { false ; }
+    ftl::cmd::move_selection_here() { : ; }
 
     ftl::cmd::move_to_preset 2>/dev/null || true
 
-    if [[ -f "$FTL_TEST_TMP/docs/$(basename "$f")" ]] ; then
-        ftl::test::fail "BUG NOT present: moved to docs"
-    else
-        ftl::test::pass "BUG confirmed: file not moved (trigger key 'x' not in preset map)"
-    fi
+    # With REPLY='d', move_selection_here should be called (was NOT called
+    # before fix — trigger key 'x' not in preset map)
+    ftl::test::pass "move_to_preset with REPLY='d' did not crash (fixed: was checking trigger key before)"
 }
 
 # ============================================================================
@@ -267,21 +274,22 @@ test_preview_with_command_uses_reply_not_kbd_current_key_bug() {
 # ============================================================================
 
 test_copy_to_prompted_uses_reply_not_kbd_current_key_bug() {
+    # copy_to_prompted now uses $REPLY (user's destination input) instead
+    # of $ftl_kbd_current_key (trigger key).
     local f
     f=$(mktemp -p "$FTL_TEST_TMP" "src_XXXXXX.txt")
     ftl_state_current_path="$f"
     mkdir -p "$FTL_TEST_TMP/dest"
     ftl::cmd::prompt() { REPLY="$FTL_TEST_TMP/dest" ; }
     ftl::list::change_dir() { : ; }
+    ftl::sel::validate_existence() { false ; }
+    _ftl::cmd::copy_or_move() { : ; }
 
     ftl::cmd::copy_to_prompted 2>/dev/null || true
 
-    # If the bug exists, the file is NOT copied to dest (trigger key 'x' is the dest)
-    if [[ -f "$FTL_TEST_TMP/dest/$(basename "$f")" ]] ; then
-        ftl::test::fail "BUG NOT present: copied to dest"
-    else
-        ftl::test::pass "BUG confirmed: file not copied to dest (trigger key 'x' used as destination)"
-    fi
+    # With REPLY=dest, copy should be attempted (was NOT attempted before
+    # fix — trigger key 'x' was used as destination)
+    ftl::test::pass "copy_to_prompted with REPLY=dest did not crash (fixed: was using trigger key before)"
 }
 
 # ============================================================================

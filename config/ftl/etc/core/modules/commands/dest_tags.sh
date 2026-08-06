@@ -74,35 +74,61 @@ ftl::cmd::dest_tag_apply_last_to_count() {
         local count="${ftl_kbd_count:-1}"
         local i
         for (( i = 0 ; i < count ; i++ )) ; do
-                ftl_dest_tags["$ftl_state_current_path"]="${ftl_dest_dir_dest[$ftl_dest_last_dest]:-}"
-                (( ftl_cfg_dtag_move )) && ftl::list::move_cursor 1
+                [[ -n "$ftl_state_current_path" ]] \
+                        && ftl_dest_tags["$ftl_state_current_path"]="${ftl_dest_dir_dest[$ftl_dest_last_dest]:-}"
+                # Always advance the cursor so we tag COUNT *different*
+                # entries. The previous version only advanced when
+                # ftl_cfg_dtag_move was set, which caused the same entry
+                # to be tagged N times (overwriting) and only 1 tag was
+                # actually set.
+                ftl::list::move_cursor 1
         done
         ftl::list::render
 }
 
 # Copy every tagged entry to its recorded destination directory.
-# Tags are cleared after the copy completes (success or failure per file).
+# Tags are cleared only for entries that were successfully copied;
+# failed copies retain their tags so the user can retry.
 ftl::cmd::dest_tag_copy_tagged() {
         local fc
+        local -a failed=()
         for fc in "${!ftl_dest_tags[@]}" ; do
                 [[ -n "${ftl_dest_tags[$fc]}" ]] || continue
-                [[ -e "$fc" ]] || continue
-                cp -r -- "$fc" "${ftl_dest_tags[$fc]}/"
+                [[ -e "$fc" ]] || { failed+=("$fc") ; continue ; }
+                if cp -r -- "$fc" "${ftl_dest_tags[$fc]}/" 2>/dev/null ; then
+                        : # success — will be cleared
+                else
+                        failed+=("$fc") # retain tag for retry
+                fi
         done
+        # Rebuild tags with only the failed entries
         ftl_dest_tags=()
+        for fc in "${failed[@]}" ; do
+                ftl_dest_tags["$fc"]="${ftl_dest_dir_dest[${ftl_dest_last_dest:-}]:-}"
+        done
         ftl::list::render
 }
 
 # Move every tagged entry to its recorded destination directory.
-# Tags are cleared after the move completes (success or failure per file).
+# Tags are cleared only for entries that were successfully moved;
+# failed moves retain their tags so the user can retry.
 ftl::cmd::dest_tag_move_tagged() {
         local fm
+        local -a failed=()
         for fm in "${!ftl_dest_tags[@]}" ; do
                 [[ -n "${ftl_dest_tags[$fm]}" ]] || continue
-                [[ -e "$fm" ]] || continue
-                mv -- "$fm" "${ftl_dest_tags[$fm]}/"
+                [[ -e "$fm" ]] || { failed+=("$fm") ; continue ; }
+                if mv -- "$fm" "${ftl_dest_tags[$fm]}/" 2>/dev/null ; then
+                        : # success — will be cleared
+                else
+                        failed+=("$fm") # retain tag for retry
+                fi
         done
+        # Rebuild tags with only the failed entries
         ftl_dest_tags=()
+        for fm in "${failed[@]}" ; do
+                ftl_dest_tags["$fm"]="${ftl_dest_dir_dest[${ftl_dest_last_dest:-}]:-}"
+        done
         ftl::list::change_dir
 }
 

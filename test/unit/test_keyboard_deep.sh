@@ -68,12 +68,13 @@ test_normalize_key_down_normal_mode() {
 }
 
 test_normalize_key_down_app_mode_bug() {
-    # BUG: keyboard.sh:212 has $'\e[0B' (digit 0) instead of $'\e[OB' (letter O).
-    # App-mode DOWN arrow is silently dropped (returns empty string).
+    # App-mode DOWN arrow (\e[OB) is now correctly normalized to "DOWN"
+    # (was empty before fix — keyboard.sh:212 had $'\e[0B' typo, digit 0
+    # instead of letter O).
     local result
     result=$(ftl::kbd::normalize_key $'\e[OB')
-    ftl::test::assert_eq "" "$result" \
-        "app-mode DOWN (\\e[OB) currently returns empty (BUG: $'\\e[0B' typo at keyboard.sh:212 — should be $'\\e[OB')"
+    ftl::test::assert_eq "DOWN" "$result" \
+        "app-mode DOWN (\\e[OB) should normalize to 'DOWN' (fixed: was empty before)"
 }
 
 test_normalize_key_right_app_mode() {

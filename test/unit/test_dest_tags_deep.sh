@@ -74,21 +74,28 @@ ftl::test::teardown() {
 # ============================================================================
 
 test_apply_last_to_count_dtag_move_zero_tags_same_entry_bug() {
-    # BUG: with ftl_cfg_dtag_move=0, the loop tags ftl_state_current_path
-    # N times (overwriting), and move_cursor is never called, so only 1
-    # entry is tagged regardless of count.
+    # dest_tag_apply_last_to_count now always advances the cursor (was
+    # tagging the same entry N times when dtag_move=0 before fix).
     ftl_cfg_dtag_move=0
     ftl_dest_last_dest="d"
     declare -Ag ftl_dest_dir_dest=([d]="/tmp/docs")
-    ftl_state_current_path="/work/file1.txt"
     ftl_kbd_count=3
-    ftl::list::move_cursor() { : ; }
+    ftl_list_entry_count=5
+    ftl_list_entries=("/work/f1" "/work/f2" "/work/f3" "/work/f4" "/work/f5")
+    ftl_state_cursor_index=0
+    ftl_state_current_path="/work/f1"
+    ftl::list::move_cursor() {
+        (( ftl_state_cursor_index++ ))
+        (( ftl_state_cursor_index >= ftl_list_entry_count )) \
+            && ftl_state_cursor_index=$((ftl_list_entry_count - 1))
+        ftl_state_current_path="${ftl_list_entries[$ftl_state_cursor_index]}"
+    }
     ftl::list::render() { : ; }
 
     ftl::cmd::dest_tag_apply_last_to_count
 
-    ftl::test::assert_eq 1 "${#ftl_dest_tags[@]}" \
-        "BUG: with dtag_move=0 and count=3, only 1 entry is tagged (same entry tagged N times)"
+    ftl::test::assert_eq 3 "${#ftl_dest_tags[@]}" \
+        "with dtag_move=0 and count=3, 3 different entries should be tagged (fixed: was 1 before)"
 }
 
 test_apply_last_to_count_dtag_move_one_tags_multiple() {
@@ -134,8 +141,8 @@ test_apply_last_to_count_zero_count() {
 # ============================================================================
 
 test_copy_tagged_clears_tags_even_when_cp_fails_bug() {
-    # BUG: ftl_dest_tags=() runs after the loop regardless of cp success.
-    # If cp fails (e.g., destination dir doesn't exist), the tags are lost.
+    # dest_tag_copy_tagged now retains tags for failed copies (was clearing
+    # all tags regardless of cp success before fix — lost work).
     mkdir -p "$FTL_TEST_TMP/src"
     echo "content" > "$FTL_TEST_TMP/src/file1.txt"
     # Destination dir doesn't exist
@@ -146,8 +153,8 @@ test_copy_tagged_clears_tags_even_when_cp_fails_bug() {
 
     ftl::cmd::dest_tag_copy_tagged 2>/dev/null || true
 
-    ftl::test::assert_eq 0 "${#ftl_dest_tags[@]}" \
-        "BUG: tags are cleared even when cp fails (lost work)"
+    ftl::test::assert_eq 1 "${#ftl_dest_tags[@]}" \
+        "tags should be RETAINED when cp fails (fixed: was cleared before — lost work)"
 }
 
 test_copy_tagged_with_existing_destination() {
@@ -170,6 +177,8 @@ test_copy_tagged_with_existing_destination() {
 # ============================================================================
 
 test_move_tagged_clears_tags_even_when_mv_fails_bug() {
+    # dest_tag_move_tagged now retains tags for failed moves (was clearing
+    # all tags regardless of mv success before fix — lost work).
     mkdir -p "$FTL_TEST_TMP/src"
     echo "content" > "$FTL_TEST_TMP/src/file1.txt"
     ftl_dest_tags=(
@@ -179,8 +188,8 @@ test_move_tagged_clears_tags_even_when_mv_fails_bug() {
 
     ftl::cmd::dest_tag_move_tagged 2>/dev/null || true
 
-    ftl::test::assert_eq 0 "${#ftl_dest_tags[@]}" \
-        "BUG: tags are cleared even when mv fails (lost work)"
+    ftl::test::assert_eq 1 "${#ftl_dest_tags[@]}" \
+        "tags should be RETAINED when mv fails (fixed: was cleared before — lost work)"
     # Original file should still exist (mv failed)
     ftl::test::assert_eq "content" "$(cat "$FTL_TEST_TMP/src/file1.txt")" \
         "original file should still exist after failed mv"

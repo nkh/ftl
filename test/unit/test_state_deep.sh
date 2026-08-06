@@ -104,16 +104,15 @@ test_save_creates_tags_file() {
 }
 
 test_save_round_trip_restores_preview_callback_bug() {
-    # BUG: save writes OLD variable names (prev_cb, etag, dirmode, etc.),
-    # but the child pane reads NEW names (ftl_state_preview_callback, etc.).
-    # So the round-trip fails for these variables.
+    # save now writes namespaced variable names (was writing legacy 'prev_cb'
+    # before fix — child pane never read it, breaking state sync).
     ftl_state_preview_callback="my_preview_func"
     ftl::state::save
     # Clear and reload
     ftl_state_preview_callback=
     source "$ftl_state_session_dir/ftl"
-    ftl::test::assert_eq "" "$ftl_state_preview_callback" \
-        "BUG: ftl_state_preview_callback is NOT restored (save writes old name 'prev_cb')"
+    ftl::test::assert_eq "my_preview_func" "$ftl_state_preview_callback" \
+        "ftl_state_preview_callback should be restored (fixed: was empty before)"
 }
 
 test_save_round_trip_restores_etag_enabled_bug() {
@@ -121,8 +120,8 @@ test_save_round_trip_restores_etag_enabled_bug() {
     ftl::state::save
     ftl_state_etag_enabled=0
     source "$ftl_state_session_dir/ftl"
-    ftl::test::assert_eq 0 "$ftl_state_etag_enabled" \
-        "BUG: ftl_state_etag_enabled is NOT restored (save writes 'etag' not 'ftl_state_etag_enabled')"
+    ftl::test::assert_eq 1 "$ftl_state_etag_enabled" \
+        "ftl_state_etag_enabled should be restored (fixed: was 0 before)"
 }
 
 test_save_round_trip_restores_dir_preview_mode_bug() {
@@ -130,8 +129,8 @@ test_save_round_trip_restores_dir_preview_mode_bug() {
     ftl::state::save
     ftl_state_dir_preview_mode=0
     source "$ftl_state_session_dir/ftl"
-    ftl::test::assert_eq 0 "$ftl_state_dir_preview_mode" \
-        "BUG: ftl_state_dir_preview_mode is NOT restored (save writes 'dirmode')"
+    ftl::test::assert_eq 2 "$ftl_state_dir_preview_mode" \
+        "ftl_state_dir_preview_mode should be restored (fixed: was 0 before)"
 }
 
 test_save_round_trip_restores_current_path() {
@@ -149,18 +148,16 @@ test_save_round_trip_restores_current_path() {
 # ============================================================================
 
 test_save_tag_with_hyphen_A_in_path_bug() {
-    # BUG: `declare -p ftl_selection_tags | sed 's/\-A/-A -g/'` matches
-    # "-A" ANYWHERE in the output, including inside filename values.
-    # If a tagged file is named "file-Apples.txt", the sed turns it into
-    # "file-A -gpples.txt", corrupting the path.
+    # save now uses anchored sed `s/^declare -A /declare -Ag /` (was
+    # `s/-A/-A -g/` before fix — broad match corrupted paths containing "-A").
     ftl_selection_tags["/test/file-Apples.txt"]="▪"
     ftl::state::save
     # Reload
     ftl_selection_tags=()
     source "$ftl_state_session_dir/tags"
-    # Check the tag survived the round-trip
-    ftl::test::assert_eq "" "${ftl_selection_tags[/test/file-Apples.txt]:-}" \
-        "BUG: tag with '-A' in path is corrupted by sed (lost on reload)"
+    # Check the tag survived the round-trip (was corrupted before fix)
+    ftl::test::assert_eq "▪" "${ftl_selection_tags[/test/file-Apples.txt]:-}" \
+        "tag with '-A' in path should survive round-trip (fixed: was corrupted before)"
 }
 
 test_save_tag_normal_path_round_trips() {

@@ -75,27 +75,26 @@ test_dispatch_command_zero_returns_one() {
 }
 
 test_dispatch_command_one_sets_cursor_index_bug() {
-    # BUG: dispatch_command "1" sets ftl_state_cursor_index to the ENTRY PATH
-    # (a string), not the numeric index.
+    # dispatch_command "1" now correctly sets ftl_state_cursor_index to the
+    # NUMERIC index (was setting it to the entry PATH string before fix).
     ftl::cmd::dispatch_command "1" 2>/dev/null || true
-    ftl::test::assert_eq "/tmp/file_a" "$ftl_state_cursor_index" \
-        "BUG confirmed: dispatch_command '1' sets cursor_index to the entry PATH (string), not the numeric index 0"
+    ftl::test::assert_eq 0 "$ftl_state_cursor_index" \
+        "dispatch_command '1' should set cursor_index to numeric 0 (fixed: was path string before)"
 }
 
 test_dispatch_command_two_sets_cursor_index_one() {
     ftl::cmd::dispatch_command "2" 2>/dev/null || true
-    # Same BUG: cursor_index is set to the entry path, not the index
-    ftl::test::assert_eq "/tmp/file_b" "$ftl_state_cursor_index" \
-        "BUG confirmed: dispatch_command '2' sets cursor_index to entry path (string)"
+    ftl::test::assert_eq 1 "$ftl_state_cursor_index" \
+        "dispatch_command '2' should set cursor_index to numeric 1 (fixed: was path string before)"
 }
 
 test_dispatch_command_out_of_range_bug() {
-    # BUG: dispatch_command "99" with only 3 entries accesses
-    # ftl_list_entries[98] which is unset under set -u → crashes.
+    # dispatch_command now bounds-checks before accessing the array (was
+    # crashing with "unbound variable" under set -u before fix).
     local output
     output=$(ftl::cmd::dispatch_command "99" 2>&1) || true
-    ftl::test::assert_contains "$output" "unbound variable" \
-        "BUG: dispatch_command with out-of-range index crashes (no bounds check)"
+    ftl::test::assert_not_contains "$output" "unbound variable" \
+        "dispatch_command with out-of-range index should NOT crash (fixed: was crashing before)"
 }
 
 test_dispatch_command_with_leading_zero_bug() {
@@ -212,14 +211,12 @@ test_dispatch_command_path_traversal_does_not_source_arbitrary_file_bug() {
 # ============================================================================
 
 test_dispatch_command_empty_string_bug() {
-    # BUG: dispatch_command "" crashes under set -u because cmd_parts[0]
-    # is unbound (parse_parts returns nothing for empty input).
-    # The crash kills the subshell, so we can't even assert here.
-    # We document the bug by verifying the crash happens.
+    # dispatch_command "" now returns early (was crashing with "unbound
+    # variable" under set -u before fix — cmd_parts[0] was not guarded).
     local output
     output=$(ftl::cmd::dispatch_command "" 2>&1) || true
-    ftl::test::assert_contains "$output" "unbound variable" \
-        "BUG: dispatch_command '' crashes with 'unbound variable' (cmd_parts[0] not guarded)"
+    ftl::test::assert_not_contains "$output" "unbound variable" \
+        "dispatch_command '' should NOT crash (fixed: was crashing before)"
 }
 
 test_dispatch_command_only_spaces_does_not_crash() {
@@ -244,16 +241,16 @@ test_dispatch_command_q_calls_quit() {
 # ============================================================================
 
 test_dispatch_command_numeric_sets_path_not_index_bug() {
-    # Verify the bug: after dispatch_command "1", cursor_index is set to
-    # the entry PATH (string), not the numeric index 0.
+    # dispatch_command now sets cursor_index to the numeric index (was
+    # setting it to the entry PATH string before fix).
     ftl_list_entries=("/unique/path/file.txt")
     ftl_list_entry_count=1
     ftl_state_cursor_index=99  # sentinel
 
     ftl::cmd::dispatch_command "1" 2>/dev/null || true
 
-    ftl::test::assert_eq "/unique/path/file.txt" "$ftl_state_cursor_index" \
-        "BUG confirmed: cursor_index is set to the entry PATH (string), not the numeric index"
+    ftl::test::assert_eq 0 "$ftl_state_cursor_index" \
+        "cursor_index should be numeric 0 (fixed: was path string before)"
 }
 
 # vim: set filetype=bash :

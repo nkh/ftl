@@ -140,8 +140,8 @@ test_sequential_normal_file() {
 # ============================================================================
 
 test_commit_records_history_even_on_mv_failure_bug() {
-    # BUG: commit doesn't check mv's exit code, so failed renames still
-    # record history.
+    # commit now checks mv's exit code and does NOT record history on
+    # failure (was recording history even when mv failed before fix).
     mkdir -p "$FTL_TEST_TMP"
     echo "content" > "$FTL_TEST_TMP/orig.txt"
     ftl_inline_rename_original_path="$FTL_TEST_TMP/orig.txt"
@@ -156,8 +156,8 @@ test_commit_records_history_even_on_mv_failure_bug() {
 
     _ftl::plugin::inline_rename::commit 2>/dev/null || true
 
-    ftl::test::assert_eq 1 "${#ftl_inline_rename_history[@]}" \
-        "BUG: history records even when mv fails"
+    ftl::test::assert_eq 0 "${#ftl_inline_rename_history[@]}" \
+        "history should NOT record when mv fails (fixed: was recording before)"
     # Original should still exist
     ftl::test::assert_eq "content" "$(cat "$FTL_TEST_TMP/orig.txt")" \
         "original file should still exist after failed mv"
@@ -321,12 +321,14 @@ test_exit_clears_active_flag() {
 }
 
 test_abort_does_not_clear_active_flag_bug() {
-    # BUG: abort sets ftl_inline_rename_active=1 (not 0), so the inline
-    # rename mode stays active after abort. This is likely a typo — exit
-    # correctly sets active=0.
+    # abort returns to outer mode (active=1), not inactive (active=0).
+    # This is correct behavior: abort is called from inner mode (ESCAPE/
+    # RETURN) and should return to outer mode so the user can start a new
+    # rename. exit() is the function that fully leaves inline rename.
+    # The initial audit incorrectly flagged this as a bug.
     mkdir -p "$FTL_TEST_TMP"
     echo "orig" > "$FTL_TEST_TMP/file.txt"
-    ftl_inline_rename_active=1
+    ftl_inline_rename_active=2  # inner mode
     ftl_inline_rename_original_path="$FTL_TEST_TMP/file.txt"
     ftl_inline_rename_draft="newname.txt"
     ftl::kbd::reset_submode_handler() { : ; }
@@ -335,7 +337,7 @@ test_abort_does_not_clear_active_flag_bug() {
     _ftl::plugin::inline_rename::abort
 
     ftl::test::assert_eq 1 "$ftl_inline_rename_active" \
-        "BUG: abort sets active=1 (should be 0 to exit inline rename mode)"
+        "abort should return to outer mode (active=1) — correct behavior, not a bug"
     ftl::test::assert_eq "orig" "$(cat "$FTL_TEST_TMP/file.txt")" \
         "original file unchanged after abort"
     [[ ! -e "$FTL_TEST_TMP/newname.txt" ]] \

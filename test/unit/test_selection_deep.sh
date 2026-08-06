@@ -71,14 +71,15 @@ ftl::test::teardown() {
 # ============================================================================
 
 test_adjust_total_size_add_nonexistent_no_crash() {
-    # BUG: stat returns empty for nonexistent file, causing
-    # `(( x +=  ))` syntax error. The function should handle this gracefully.
+    # adjust_total_size now gracefully handles non-existent files (was
+    # crashing with "operand expected" syntax error before fix — stat
+    # returned empty and `(( x +=  ))` failed).
     ftl_selection_total_bytes=0
-    # Capture stderr to verify the syntax error
+    # Should NOT produce a syntax error
     local err
     err=$(ftl::sel::adjust_total_size + "/nonexistent/file" 2>&1)
-    ftl::test::assert_contains "$err" "operand expected" \
-        "BUG: adjust_total_size on non-existent file produces syntax error (stat returns empty)"
+    ftl::test::assert_not_contains "$err" "operand expected" \
+        "adjust_total_size on non-existent file should not produce syntax error (fixed)"
     ftl::test::assert_eq 0 "$ftl_selection_total_bytes" \
         "total should remain 0 after failed add"
 }
@@ -106,14 +107,14 @@ test_adjust_total_size_subtract_real_file() {
 }
 
 test_adjust_total_size_subtract_can_go_negative_bug() {
-    # BUG: subtract more than was added → total goes negative
+    # adjust_total_size now clamps to 0 (was going negative before fix).
     local f
     f=$(mktemp)
     echo "hello" > "$f"  # 6 bytes
     ftl_selection_total_bytes=0  # never added
     ftl::sel::adjust_total_size - "$f"
-    ftl::test::assert_eq -6 "$ftl_selection_total_bytes" \
-        "BUG: subtracting without prior add makes total negative (no lower bound)"
+    ftl::test::assert_eq 0 "$ftl_selection_total_bytes" \
+        "subtracting without prior add should clamp to 0 (fixed: was negative before)"
     rm -f "$f"
 }
 
@@ -133,8 +134,8 @@ test_load_from_file_sets_tags() {
 }
 
 test_load_from_file_uses_flip_not_set_bug() {
-    # BUG: load_from_file uses flip (toggle), so loading the same file twice
-    # untags everything.
+    # load_from_file now uses `set` (idempotent) instead of `flip` (toggle).
+    # Loading the same file twice now correctly keeps tags set.
     local f
     f=$(mktemp)
     printf '%s\n' "/tmp/file1" > "$f"
@@ -143,8 +144,8 @@ test_load_from_file_uses_flip_not_set_bug() {
     local count_after_first=${#ftl_selection_tags[@]}
     ftl::sel::load_from_file "$f"
     local count_after_second=${#ftl_selection_tags[@]}
-    ftl::test::assert_eq 0 "$count_after_second" \
-        "BUG: loading same file twice untags everything (flip instead of set)"
+    ftl::test::assert_eq "$count_after_first" "$count_after_second" \
+        "loading same file twice should be idempotent (fixed: was toggling off before)"
     rm -f "$f"
 }
 
@@ -245,14 +246,14 @@ test_validate_existence_empty_selection() {
 # ============================================================================
 
 test_build_class_index_increments_revision_bug() {
-    # BUG: build_class_index is a "read" operation but increments
-    # ftl_selection_revision as a side effect.
+    # build_class_index no longer increments ftl_selection_revision (was
+    # a side effect before fix — a read-only operation was modifying state).
     ftl_selection_tags["/file1"]="¹"
     ftl_selection_tags["/file2"]="²"
     ftl_selection_revision=5
     ftl::sel::build_class_index
-    ftl::test::assert_eq 6 "$ftl_selection_revision" \
-        "BUG: build_class_index increments revision (read-only op should not modify state)"
+    ftl::test::assert_eq 5 "$ftl_selection_revision" \
+        "build_class_index should NOT increment revision (fixed: was 6 before)"
 }
 
 test_build_class_index_populates_index() {

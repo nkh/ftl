@@ -64,25 +64,46 @@ ftl::tab::create() {
         ftl::tab::init_defaults
 }
 
-# Move to the next tab (skipping closed gaps).
+# Move to the next tab (skipping closed gaps, wrapping around).
 ftl::tab::advance_index() {
-        (( ftl_state_current_tab_index++ ))
         local -a indices=( ${!ftl_tab_directories[@]} )
+        local n=${#indices[@]}
+        if (( n == 0 )) ; then return ; fi
         local i
-        for i in "${indices[@]:$ftl_state_current_tab_index}" "${indices[@]}" ; do
-                if [[ -n "${ftl_tab_directories[$i]:-}" ]] ; then
-                        ftl_state_current_tab_index=$i
+        # Walk forward from current+1, wrapping around, until we find an
+        # open tab or come back to the start.
+        for (( i = 1 ; i <= n ; i++ )) ; do
+                local candidate=$(( (ftl_state_current_tab_index + i) % n ))
+                local tab_idx="${indices[$candidate]}"
+                if [[ -n "${ftl_tab_directories[$tab_idx]:-}" ]] ; then
+                        ftl_state_current_tab_index=$tab_idx
                         break
                 fi
         done
 }
 
 # Move to the previous tab (skipping closed gaps).
+# Builds a wrapped, reversed list of indices and picks the first open one.
+# The previous implementation used `rev` (character reversal) which
+# corrupted multi-digit indices (e.g. "10" became "01"). This version
+# reverses the array element-wise.
 ftl::tab::retreat_index() {
         local -a indices=( ${!ftl_tab_directories[@]} )
-        local -a reversed_indices
-        reversed_indices=($(echo "${indices[@]}" "${indices[@]:0:ftl_state_current_tab_index}" | rev | tr ' ' '\n'))
+        local -a reversed_indices=()
         local i
+
+        # Build the wrapped list: indices[current+1 .. end] ++ indices[0 .. current]
+        # then reverse it element-wise so the current index's predecessor
+        # (with wrap-around) is first.
+        local n=${#indices[@]}
+        if (( n == 0 )) ; then return ; fi
+
+        # Wrapped list: start after current, wrap to start, end at current
+        for (( i = 0 ; i < n ; i++ )) ; do
+                local src=$(( (ftl_state_current_tab_index + 1 + i) % n ))
+                reversed_indices=( "${indices[$src]}" "${reversed_indices[@]}" )
+        done
+
         for i in "${reversed_indices[@]}" ; do
                 if [[ -n "${ftl_tab_directories[$i]:-}" ]] ; then
                         ftl_state_current_tab_index=$i

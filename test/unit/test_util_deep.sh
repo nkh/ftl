@@ -35,22 +35,20 @@ ftl::test::teardown() {
 # ============================================================================
 
 test_parse_path_single_component_absolute_bug() {
-    # BUG: parse_path "/foo" sets dir to "$PWD/" instead of "/"
-    # because ${path%/*} on "/foo" strips "/foo" entirely → empty string
-    # → PWD prepended.
+    # parse_path "/foo" now correctly sets dir to "/" (was "$PWD/" before fix).
     ftl::util::parse_path "/foo"
     ftl::test::assert_eq "foo" "$ftl_state_current_basename" \
         "basename of /foo should be 'foo'"
-    ftl::test::assert_eq "$PWD/" "$ftl_state_current_dir" \
-        "BUG: dir of /foo is '\$PWD/' instead of '/' (parse_path root decomposition bug)"
+    ftl::test::assert_eq "/" "$ftl_state_current_dir" \
+        "dir of /foo should be '/' (fixed: was \$PWD/ before)"
 }
 
 test_parse_path_root_bug() {
     ftl::util::parse_path "/"
     ftl::test::assert_eq "" "$ftl_state_current_basename" \
         "basename of '/' should be empty"
-    ftl::test::assert_eq "$PWD/" "$ftl_state_current_dir" \
-        "BUG: dir of '/' is '\$PWD/' instead of '/' (same root decomposition bug)"
+    ftl::test::assert_eq "/" "$ftl_state_current_dir" \
+        "dir of '/' should be '/' (fixed: was \$PWD/ before)"
 }
 
 test_parse_path_relative_no_slash_bug() {
@@ -58,8 +56,8 @@ test_parse_path_relative_no_slash_bug() {
     ftl::util::parse_path "file.txt"
     ftl::test::assert_eq "file.txt" "$ftl_state_current_basename" \
         "basename of relative 'file.txt' should be 'file.txt'"
-    ftl::test::assert_eq "$PWD/" "$ftl_state_current_dir" \
-        "BUG: dir of relative 'file.txt' has trailing slash (should be \$PWD without /)"
+    ftl::test::assert_eq "$PWD" "$ftl_state_current_dir" \
+        "dir of relative 'file.txt' should be \$PWD without trailing slash (fixed)"
 }
 
 test_parse_path_with_extension() {
@@ -142,20 +140,18 @@ test_format_size_human_tib() {
 }
 
 test_format_size_human_pib_bug() {
-    # BUG: the loop only iterates K, M, G, T — for >= 1 PiB it falls through
-    # and returns an empty string. This test documents the bug.
+    # format_size_human now handles PiB (was empty before fix — loop only had K M G T).
     local result
     result=$(ftl::util::format_size_human $((1024 ** 5)))
-    # When the bug is fixed, this assertion should pass:
-    ftl::test::assert_eq "" "$result" \
-        "1 PiB currently returns empty (loop fallthrough bug — needs P, E, Z, Y in loop)"
+    ftl::test::assert_contains "$result" "P" \
+        "1 PiB should be formatted with P unit (fixed: was empty before)"
 }
 
 test_format_size_human_eib_bug() {
     local result
     result=$(ftl::util::format_size_human $((1024 ** 6)))
-    ftl::test::assert_eq "" "$result" \
-        "1 EiB currently returns empty (same loop fallthrough bug)"
+    ftl::test::assert_contains "$result" "E" \
+        "1 EiB should be formatted with E unit (fixed: was empty before)"
 }
 
 test_format_size_human_just_under_kib() {
@@ -184,21 +180,23 @@ test_resolve_full_path_dot_slash() {
 }
 
 test_resolve_full_path_relative_no_dot_slash_bug() {
-    # BUG: "foo" (no ./ prefix) returns "foo" unchanged, not "$PWD/foo"
+    # resolve_full_path "foo" now correctly returns "$PWD/foo" (was "foo" before fix).
     cd "$FTL_TEST_TMP"
     local result
     result=$(ftl::util::resolve_full_path "foo")
-    ftl::test::assert_eq "foo" "$result" \
-        "relative 'foo' (no ./) currently returns 'foo' unchanged (BUG: should be \$PWD/foo)"
+    ftl::test::assert_eq "$PWD/foo" "$result" \
+        "relative 'foo' should resolve to \$PWD/foo (fixed: was 'foo' before)"
 }
 
 test_resolve_full_path_middle_dot_slash_bug() {
-    # BUG: ${1/\.\//$PWD\/} replaces the FIRST "./" anywhere, not just at start
+    # Middle ./ is no longer mangled (was "foo/$PWD/bar" before fix).
+    # The function now only prepends $PWD for relative paths, leaving
+    # embedded ./ intact (the caller can normalize if needed).
     cd "$FTL_TEST_TMP"
     local result
     result=$(ftl::util::resolve_full_path "foo/./bar")
-    ftl::test::assert_eq "foo/$PWD/bar" "$result" \
-        "middle ./ is mangled (BUG: should keep 'foo/bar' or fully resolve)"
+    ftl::test::assert_eq "$PWD/foo/./bar" "$result" \
+        "middle ./ is preserved with \$PWD prefix (fixed: was mangled before)"
 }
 
 # ============================================================================

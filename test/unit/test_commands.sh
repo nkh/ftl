@@ -63,11 +63,14 @@ test_dispatch_numeric_file_calls_render() {
     local tmpfile
     tmpfile=$(mktemp)
     ftl_list_entries=( "$tmpfile" )
+    ftl_list_entry_count=1
     ftl::cmd::dispatch_command 1
     ftl::test::assert_eq "1" "$RENDER_CALLED" "render should be called for file"
     ftl::test::assert_eq "" "$CHANGE_DIR_CALLED" "change_dir should not be called for file"
-    ftl::test::assert_eq "$tmpfile" "$ftl_state_cursor_index" \
-        "cursor_index should be set to the file path"
+    # dispatch_command sets cursor_index to the NUMERIC index (0), not the
+    # entry path. The previous version set it to the path string (a bug).
+    ftl::test::assert_eq "0" "$ftl_state_cursor_index" \
+        "cursor_index should be set to the numeric index 0 (not the path)"
     rm -f "$tmpfile"
 }
 
@@ -76,11 +79,13 @@ test_dispatch_numeric_dir_calls_change_dir() {
     local tmpdir
     tmpdir=$(mktemp -d)
     ftl_list_entries=( "$tmpdir" )
+    ftl_list_entry_count=1
     ftl::cmd::dispatch_command 1
     ftl::test::assert_eq "1" "$CHANGE_DIR_CALLED" "change_dir should be called for dir"
     ftl::test::assert_eq "" "$RENDER_CALLED" "render should not be called for dir"
-    ftl::test::assert_eq "$tmpdir" "$ftl_state_cursor_index" \
-        "cursor_index should be set to the dir path"
+    # cursor_index is the numeric index (0), not the path
+    ftl::test::assert_eq "0" "$ftl_state_cursor_index" \
+        "cursor_index should be set to the numeric index 0 (not the dir path)"
     rmdir "$tmpdir" 2>/dev/null || rm -rf "$tmpdir"
 }
 
@@ -89,6 +94,7 @@ test_dispatch_numeric_returns_1() {
     local tmpfile
     tmpfile=$(mktemp)
     ftl_list_entries=( "$tmpfile" )
+    ftl_list_entry_count=1
     if ftl::cmd::dispatch_command 1 ; then
         ftl::test::fail "numeric command should return 1"
     else
