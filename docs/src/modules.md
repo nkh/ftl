@@ -169,7 +169,20 @@ Routes everything through `ftl::log::write`, which appends to
 ## commands.sh — user-facing command functions
 
 The largest module. Defines every `ftl::cmd::*` function that bindings
-dispatch to, organized into 14 sections (movement, selection, file ops,
+dispatch to, organized into 15 sections (movement, selection, file ops,
 filters, search, tabs, panes, preview, shell, view mode, marks/history,
-quit, signal handlers, command prompt). Entry point:
-`ftl::cmd::dispatch_command`.
+**destination tags**, quit, signal handlers, command prompt). Entry
+point: `ftl::cmd::dispatch_command`.
+
+## commands/dest_tags.sh — destination tag commands (38a073a backport)
+
+- **Functions**: `ftl::cmd::dest_tag_current`,
+  `dest_tag_clear_current`, `dest_tag_clear_all`,
+  `dest_tag_apply_last_to_count`, `dest_tag_copy_tagged`,
+  `dest_tag_move_tagged`, plus the private `_ftl::dest::format_annotation`
+  used by `ftl::list::render` to emit the ` [...dest]` block.
+- **Variables**: `ftl_dest_tags` (assoc: path → dest dir),
+  `ftl_dest_dir_dest` (assoc, user-configurable: shortcut → dir),
+  `ftl_dest_last_dest` (last shortcut key used).
+- **Config**: `ftl_cfg_dtag_move` (auto-advance after tagging),
+  `ftl_cfg_dtag_l` (display column width for the annotation).

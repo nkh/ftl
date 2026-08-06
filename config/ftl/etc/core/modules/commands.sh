@@ -17,6 +17,7 @@
 #   commands/shell.sh       — shell pane integration
 #   commands/view.sh        — view mode, sorting, size display
 #   commands/mark.sh        — marks and history
+#   commands/dest_tags.sh   — destination tag commands (38a073a backport)
 #   commands/quit.sh        — quit and cancel
 #   commands/signals.sh     — signal handlers
 #   commands/prompt.sh      — command prompt (: prompt)
@@ -33,6 +34,7 @@ source "$FTL_CFG/etc/core/modules/commands/preview.sh"
 source "$FTL_CFG/etc/core/modules/commands/shell.sh"
 source "$FTL_CFG/etc/core/modules/commands/view.sh"
 source "$FTL_CFG/etc/core/modules/commands/mark.sh"
+source "$FTL_CFG/etc/core/modules/commands/dest_tags.sh"
 source "$FTL_CFG/etc/core/modules/commands/quit.sh"
 source "$FTL_CFG/etc/core/modules/commands/signals.sh"
 source "$FTL_CFG/etc/core/modules/commands/prompt.sh"

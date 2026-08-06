@@ -168,6 +168,31 @@ ftl_cfg_glyph_listing_mode=('' ᵈ ᶠ)         # 0=all, 1=dir-only, 2=file-only
 ftl_cfg_glyph_tag_classes=('' ¹ ² ³ D)      # 0=unused, 1-4=classes
 
 #----------------------------------------------------------------------------
+# Destination tags (38a073a backport)
+#----------------------------------------------------------------------------
+
+# If non-zero, the cursor advances to the next entry after tagging an
+# entry with a destination, so you can rapidly tag a sequence of files.
+ftl_cfg_dtag_move=1
+
+# Display width (in columns) of the destination annotation shown next
+# to each tagged entry. Long destination paths are trimmed to the last
+# N characters so the annotation fits in a fixed-width column.
+ftl_cfg_dtag_l=15
+
+# User-configurable shortcut-key → destination-directory map.
+# Populate this in your own ftlrc to define your destination shortcuts.
+# Example:
+#   declare -Ag ftl_dest_dir_dest=(
+#       [d]="$HOME/Documents"
+#       [t]="$HOME/Downloads"
+#       [s]="$HOME/src"
+#   )
+# Then pressing 't' (the destination-tag binding) followed by 'd' marks
+# the current entry to be moved/copied to ~/Documents.
+declare -Ag ftl_dest_dir_dest=()
+
+#----------------------------------------------------------------------------
 # Media filter regexes
 #----------------------------------------------------------------------------
 
@@ -513,6 +538,17 @@ ftl::kbd::bind  ftl     selection       y4      ftl::cmd::select_class_4        
 ftl::kbd::bind  ftl     selection       yc      ftl::cmd::untag_all     "deselect all"
 ftl::kbd::bind  ftl     selection       yC      ftl::cmd::untag_via_fzf "deselect fzf"
 ftl::kbd::bind  ftl     selection       ytc     ftl::cmd::copy_paths_to_clipboard       "copy selection to clipboard"
+
+# Destination tags (38a073a backport) — tag entries with a destination
+# directory, then copy/move them all in one shot. The destination is
+# picked from ftl_dest_dir_dest[<key>] where <key> is the next keystroke.
+ftl::kbd::bind  ftl     selection       t       ftl::cmd::dest_tag_current              "destination directory selection"
+ftl::kbd::bind  ftl     selection       TCC     ftl::cmd::dest_tag_clear_current       "clear destination directory selection"
+ftl::kbd::bind  ftl     selection       TCA     ftl::cmd::dest_tag_clear_all           "clear all destination directory selection"
+ftl::kbd::bind  ftl     selection       TT      ftl::cmd::dest_tag_apply_last_to_count "set to the last destination directory"
+ftl::kbd::bind  ftl     selection       "COUNT TT"      ftl::cmd::dest_tag_apply_last_to_count "set to the last destination directory"
+ftl::kbd::bind  ftl     selection       Tc      ftl::cmd::dest_tag_copy_tagged         "copy tagged to destination directory"
+ftl::kbd::bind  ftl     selection       Tm      ftl::cmd::dest_tag_move_tagged         "move to destination directory"
 
 ftl::kbd::bind  ftl     selection       gy      ftl::cmd::goto_selection_via_fzf        "fzf goto selection"
 

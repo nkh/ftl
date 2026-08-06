@@ -160,6 +160,14 @@ declare -Ag ftl_tab_directories
 declare -Ag ftl_mark_session_marks
 declare -Ag ftl_kbd_redo_excluded
 
+# Destination tags state (38a073a backport)
+#   ftl_dest_tags      — assoc: full_path → destination_directory
+#   ftl_dest_dir_dest  — assoc (user-configurable): shortcut_key → directory
+#   ftl_dest_last_dest — last shortcut key used (for "apply last to COUNT")
+declare -Ag ftl_dest_tags
+declare -Ag ftl_dest_dir_dest
+ftl_dest_last_dest=
+
 # Raw-entry arrays (populated during directory scan)
 declare -ag ftl_list_raw_entries=()
 declare -ag ftl_list_raw_paths=()

@@ -215,6 +215,13 @@ the function, its module, and a short purpose. See also
 | `ftl::time::tick` | check if it's time to fire handlers |
 | `ftl::cmd::dispatch_command` | dispatch a command entered at the prompt |
 | `ftl::cmd::*` (hundreds) | every binding's command function — see [Key Bindings](key-bindings.md) |
+| `ftl::cmd::dest_tag_current` | tag current entry with a destination directory (38a073a) |
+| `ftl::cmd::dest_tag_clear_current` | clear current entry's dest tag |
+| `ftl::cmd::dest_tag_clear_all` | clear all dest tags |
+| `ftl::cmd::dest_tag_apply_last_to_count` | re-apply last dest shortcut to COUNT entries |
+| `ftl::cmd::dest_tag_copy_tagged` | copy all tagged entries to their dests |
+| `ftl::cmd::dest_tag_move_tagged` | move all tagged entries to their dests |
+| `_ftl::dest::format_annotation` | format the ` [...dest]` annotation for display |
 | `ftl::ipc::handle_pane_focus` | handle `å` pane-focus signal |
 | `ftl::ipc::handle_preview_request` | handle `Ä` preview-sync signal |
 | `ftl::ipc::handle_refresh` | handle `r` refresh signal |

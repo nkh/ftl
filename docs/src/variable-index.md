@@ -188,3 +188,8 @@ also [Function Index](function-index.md).
 | `ftl_preview_is_dir_ftl` / `_is_vim` / `_is_image_daemon` | preview state flags |
 | `ftl_view_media_pid` / `_w3mimg_pid` | background preview PIDs |
 | `ftl_log_alt_screen` / `_debug_pane_id` | logging state |
+| `ftl_dest_tags` | assoc: full_path → destination_directory (38a073a) |
+| `ftl_dest_dir_dest` | assoc (user config): shortcut_key → directory |
+| `ftl_dest_last_dest` | last shortcut key used (for `TT` re-apply) |
+| `ftl_cfg_dtag_move` | if non-zero, auto-advance cursor after tagging |
+| `ftl_cfg_dtag_l` | display column width for ` [...dest]` annotation |

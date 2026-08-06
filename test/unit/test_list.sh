@@ -7,6 +7,7 @@
 # and ftl::list::get_mime_type (caching behavior).
 
 # Source dependencies
+source "$FTL_CFG/etc/core/modules/util.sh"
 source "$FTL_CFG/etc/core/modules/log.sh"
 source "$FTL_CFG/etc/core/modules/pane.sh"
 source "$FTL_CFG/etc/core/modules/list.sh"
@@ -50,32 +51,39 @@ test_move_cursor_basic() {
         "cursor_memory should be 3 after +1 from 2"
 }
 
-# Test: move_cursor clamps to 0 when delta goes negative
+# Test: move_cursor at lower boundary still updates memory (post-38a073a)
+# Upstream 38a073a removed the `((nf != file)) &&` guard so move_cursor
+# always updates memory and re-parses the path. This is required so that
+# destination-tag commands can read ftl_state_current_path after a move
+# and see the new entry's path, not the pre-move entry's path.
 test_move_cursor_clamp_low() {
     ftl_list_entry_count=5
     ftl_state_cursor_index=0
     ftl::list::move_cursor -3
-    ftl::test::assert_eq "" "${ftl_state_cursor_memory[0_$PWD]:-}" \
-        "cursor_memory should NOT update when already at 0"
+    ftl::test::assert_eq "0" "${ftl_state_cursor_memory[0_$PWD]:-}" \
+        "cursor_memory should be 0 (clamped, always updated post-38a073a)"
 }
 
-# Test: move_cursor clamps to entry_count - 1 when delta goes too high
+# Test: move_cursor at upper boundary still updates memory (post-38a073a)
 test_move_cursor_clamp_high() {
     ftl_list_entry_count=5
     ftl_state_cursor_index=4
     ftl::list::move_cursor 10
-    ftl::test::assert_eq "" "${ftl_state_cursor_memory[0_$PWD]:-}" \
-        "cursor_memory should NOT update when already at last entry"
+    ftl::test::assert_eq "4" "${ftl_state_cursor_memory[0_$PWD]:-}" \
+        "cursor_memory should be 4 (clamped, always updated post-38a073a)"
 }
 
-# Test: move_cursor returns non-zero when no movement (boundary)
-test_move_cursor_returns_nonzero_at_boundary() {
+# Test: move_cursor always returns zero (post-38a073a)
+# The old behavior returned non-zero when no movement occurred. The new
+# behavior always returns the result of parse_path/clear_path_vars (0),
+# matching upstream move().
+test_move_cursor_returns_zero_at_boundary() {
     ftl_list_entry_count=3
     ftl_state_cursor_index=0
     if ftl::list::move_cursor -1 ; then
-        ftl::test::fail "move at lower boundary should return non-zero"
+        ftl::test::pass "move at lower boundary returns zero (post-38a073a)"
     else
-        ftl::test::pass "move at lower boundary returns non-zero"
+        ftl::test::fail "move at lower boundary should return zero (post-38a073a)"
     fi
 }
 
@@ -88,6 +96,30 @@ test_move_cursor_returns_zero_on_move() {
     else
         ftl::test::fail "move in middle should return zero"
     fi
+}
+
+# Test: move_cursor updates ftl_state_current_path to the new entry's path
+# This is the core rationale for the 38a073a change — destination-tag
+# commands read ftl_state_current_path immediately after move_cursor.
+test_move_cursor_updates_current_path() {
+    ftl_list_entry_count=3
+    ftl_list_entries=( "/tmp/file_a.txt" "/tmp/file_b.txt" "/tmp/file_c.txt" )
+    ftl_state_cursor_index=0
+    ftl_state_current_path=
+    ftl::list::move_cursor 1
+    ftl::test::assert_eq "/tmp/file_b.txt" "$ftl_state_current_path" \
+        "move_cursor should update ftl_state_current_path to the new entry"
+}
+
+# Test: move_cursor clears path vars when the listing is empty
+test_move_cursor_clears_path_when_empty() {
+    ftl_list_entry_count=0
+    ftl_list_entries=()
+    ftl_state_cursor_index=0
+    ftl_state_current_path="/some/stale/path"
+    ftl::list::move_cursor 1
+    ftl::test::assert_eq "" "$ftl_state_current_path" \
+        "move_cursor should clear ftl_state_current_path when listing is empty"
 }
 
 # Test: quote_all_entries quotes entries one per line

@@ -260,6 +260,28 @@ this man page.
 | **ytc** | Copy selection paths to clipboard |
 | **gy** | fzf goto selected entry |
 
+### Destination tags
+
+Tag entries with a destination directory, then copy/move them all in
+one shot. The destination is picked from `ftl_dest_dir_dest[<key>]`
+where `<key>` is the next keystroke. Configure the map in your `ftlrc`:
+
+```
+declare -Ag ftl_dest_dir_dest=(
+    [d]="$HOME/Documents"
+    [t]="$HOME/Downloads"
+)
+```
+
+| Key | Action |
+|-----|--------|
+| **t** + key | Tag current entry with the dest mapped to key |
+| **TCC** | Clear current entry's dest tag |
+| **TCA** | Clear all dest tags |
+| **TT** | Re-apply last dest shortcut (use **COUNT TT** for N entries) |
+| **Tc** | Copy tagged entries to their dests |
+| **Tm** | Move tagged entries to their dests |
+
 ## File Operations
 
 | Key | Action |

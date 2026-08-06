@@ -36,7 +36,6 @@
 
 | Key | Action |
 |-----|--------|
-| `SPACE` / `t` | Toggle tag on current entry |
 | `a` | Toggle tag and move down |
 | `s` | Toggle tag and move up |
 | `ya` | Select all |
@@ -46,6 +45,20 @@
 | `ye` | Select same extension |
 | `yn` / `yN` | Next / previous tagged |
 | `yi` | Intersect with file (missing functionality) |
+
+## Destination tags
+
+Tag entries with a destination directory, then copy/move them all in
+one shot. The destination is picked from `ftl_dest_dir_dest[<key>]`.
+
+| Key | Action |
+|-----|--------|
+| `t` + key | Tag current entry with the dest mapped to `key` |
+| `TCC` | Clear current entry's dest tag |
+| `TCA` | Clear all dest tags |
+| `TT` | Re-apply last dest shortcut (use `COUNT TT` for N entries) |
+| `Tc` | Copy tagged entries to their dests |
+| `Tm` | Move tagged entries to their dests |
 
 ## File Operations
 

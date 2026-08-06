@@ -44,6 +44,24 @@ are space-separated.
 | `ytc` | `copy_paths_to_clipboard` | copy to clipboard |
 | `gy` | `goto_selection_via_fzf` | fzf over selection |
 
+## Destination tags
+
+Tag entries with a destination directory, then copy/move them all in
+one shot. The destination is picked from `ftl_dest_dir_dest[<key>]`
+where `<key>` is the next keystroke. See
+[user guide: selection](user-guide/selection.md#destination-tags) for
+the full mechanism.
+
+| Key | Command | Description |
+|-----|---------|-------------|
+| `t` + key | `ftl::cmd::dest_tag_current` | mark current entry for the dest mapped to `key` |
+| `TCC` | `ftl::cmd::dest_tag_clear_current` | clear current entry's dest tag |
+| `TCA` | `ftl::cmd::dest_tag_clear_all` | clear all dest tags |
+| `TT` | `ftl::cmd::dest_tag_apply_last_to_count` | re-apply last dest shortcut |
+| `COUNT TT` | `ftl::cmd::dest_tag_apply_last_to_count` | re-apply to COUNT entries |
+| `Tc` | `ftl::cmd::dest_tag_copy_tagged` | copy tagged to their dests |
+| `Tm` | `ftl::cmd::dest_tag_move_tagged` | move tagged to their dests |
+
 ## Filter
 
 | Key | Command | Description |

@@ -82,6 +82,73 @@ ftl::sel::sync_from_other_pane() {
 The selection array is serialized with `declare -p ftl_selection_tags |
 sed 's/-A/-A -g/'` so it can be `source`d back into another shell.
 
+## Destination tags
+
+Destination tags are a separate annotation system from selection tags.
+Instead of grouping entries by class glyph, each destination tag records
+a *target directory* that the entry should be copied or moved to. The
+user picks the target by pressing a single shortcut key whose mapping
+to a directory path is configurable.
+
+This is useful when you have a batch of files scattered across one
+directory that need to be sorted into several target directories — tag
+each one with its destination, then issue a single "move tagged" command
+to dispatch them all in one shot.
+
+### Configuring destination shortcuts
+
+Define the shortcut-key → directory map in your `ftlrc`:
+
+```bash
+declare -Ag ftl_dest_dir_dest=(
+    [d]="$HOME/Documents"
+    [t]="$HOME/Downloads"
+    [s]="$HOME/src"
+    [p]="$HOME/projects"
+)
+```
+
+Now pressing `t` (the destination-tag binding) followed by `d` marks
+the current entry for dispatch to `~/Documents`.
+
+### Destination-tag bindings
+
+| Key | Command | Description |
+|-----|---------|-------------|
+| `t` + key | `ftl::cmd::dest_tag_current` | mark current entry for the dest mapped to `key` |
+| `TCC` | `ftl::cmd::dest_tag_clear_current` | clear current entry's dest tag |
+| `TCA` | `ftl::cmd::dest_tag_clear_all` | clear all dest tags |
+| `TT` | `ftl::cmd::dest_tag_apply_last_to_count` | re-apply the last dest shortcut |
+| `COUNT TT` | `ftl::cmd::dest_tag_apply_last_to_count` | re-apply to COUNT entries |
+| `Tc` | `ftl::cmd::dest_tag_copy_tagged` | copy all tagged entries to their dests |
+| `Tm` | `ftl::cmd::dest_tag_move_tagged` | move all tagged entries to their dests |
+
+### Config variables
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ftl_cfg_dtag_move` | `1` | If non-zero, the cursor advances to the next entry after tagging, so you can rapidly tag a sequence of files. |
+| `ftl_cfg_dtag_l` | `15` | Display column width for the `[...dest]` annotation shown next to each tagged entry. Long destination paths are trimmed to the last N characters so the entry column aligns. |
+
+### Display
+
+Tagged entries are annotated in the listing with a ` [...dest]` block
+between the cursor glyph and the entry name. The destination path is
+trimmed to the last `ftl_cfg_dtag_l` characters and left-padded so the
+entry column stays aligned regardless of path length. Untagged entries
+show no annotation.
+
+### State
+
+Destination tags live in three globals:
+
+- `ftl_dest_tags` — assoc array: `full_path → destination_directory`
+- `ftl_dest_dir_dest` — assoc array (user config): `shortcut_key → directory`
+- `ftl_dest_last_dest` — the last shortcut key used (so `TT` can re-apply it)
+
+Tags are session-scoped (not persisted to disk). If you quit ftl, the
+tags are lost — issue `Tc` or `Tm` before quitting to dispatch them.
+
 ## See Also
 
 - [File Operations](./file-operations.md) — operations on the selection

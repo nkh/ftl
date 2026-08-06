@@ -289,12 +289,24 @@ _ftl::list::apply_filters_and_format() {
                         entry_color="${entry_color:0:-4}"
                 fi
 
+                # Color prefix length — the part of entry_color that comes before
+                # the visible name (color codes, size column, index column).
+                # Used to adjust the truncation slice so it cuts at the right
+                # VISIBLE position rather than the right STRING position
+                # (color codes count toward the string length but take no
+                # visible columns). Backported from upstream 38a073a.
+                local entry_color_c=
+                if (( ${#entry_color} > entry_name_len )) ; then
+                        entry_color_c="${entry_color:0:$((${#entry_color} - entry_name_len))}"
+                fi
+
                 # Truncation
                 # When the entry overflows the pane width, keep the extension visible
-                # and truncate the prefix. The prefix_length is the number of characters
-                # to keep from the start of entry_color; we then append an ellipsis and
-                # the extension. The clamp below guards against negative slice indices
-                # (which bash treats as "from end" semantics, mangling the output).
+                # and truncate the prefix. The prefix_length is the number of VISIBLE
+                # characters to keep from the start of the entry name; we add
+                # ${#entry_color_c} to skip past the color prefix in the string.
+                # The clamp below guards against negative slice indices (which bash
+                # treats as "from end" semantics, mangling the output).
                 if (( entry_relpath_len + entry_name_len > ftl_pane_width - 1 )) ; then
                         local prefix_length
                         if [[ "$entry_name" =~ '.' ]] ; then
@@ -307,7 +319,7 @@ _ftl::list::apply_filters_and_format() {
                         prefix_length=$((- (((entry_relpath_len + entry_name_len) - (ftl_pane_width - 1)) + ext_l) ))
                         (( prefix_length < 0 )) && prefix_length=$((ftl_pane_width - (${#e} + 1)))
 
-                        entry_color="${entry_color:0:$prefix_length}…${e}"
+                        entry_color="${entry_color:0:$prefix_length+${#entry_color_c}}…${e}"
                 fi
 
                 ftl_list_entry_colors[$ftl_list_entry_count]="$entry_color"
@@ -354,7 +366,7 @@ _ftl::list::render_window() {
 # Args:
 #   $1: optional index to select
 ftl::list::render() {
-        [[ -n "$1" ]] && ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD]="$1"
+        [[ -n "${1:-}" ]] && ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD]="$1"
         ftl_state_cursor_index=${ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD]:-0}
 
         # Clamp cursor to valid range
@@ -393,18 +405,24 @@ ftl::list::render() {
 
         # Render entries
         if (( ftl_list_entry_count )) ; then
-                local -i i terminal_line=2
-                local selection_glyph
+                local -i i tline=2
+                local cursor
+                local dtag
                 for (( i = ftl_list_window_top ; i <= ftl_list_window_bottom ; i++, tline++ )) ; do
                         cursor=${ftl_selection_tags[${ftl_list_entries[$i]}]:- }
                         if (( i == ftl_state_cursor_index )) ; then
-                                cursor="${ftl_cfg_cursor_color_default}$selection_glyph\e[m"
+                                cursor="${ftl_cfg_cursor_color_default}$cursor\e[m"
                         fi
-                        echo -ne "\e[${tline};0H\e[m\e[K$selection_glyph${ftl_list_entry_colors[i]/¿/$ftl_list_current_flip_char}\e[0m"
+                        # Destination tag annotation (38a073a backport).
+                        # Empty when the entry has no destination tag; otherwise
+                        # " [...<dest>]" (with a leading space, padded to
+                        # ftl_cfg_dtag_l columns so the entry column aligns).
+                        dtag="$(_ftl::dest::format_annotation "${ftl_list_entries[$i]}")"
+                        echo -ne "\e[${tline};0H\e[m\e[K$cursor$dtag${ftl_list_entry_colors[i]/¿/$ftl_list_current_flip_char}\e[0m"
                         (( i != ftl_list_window_bottom )) && echo
                 done
 
-                _ftl::list::clear_below "$terminal_line"
+                _ftl::list::clear_below "$tline"
 
                 if (( ! ftl_list_quick_display_active && ! ftl_pane_is_child )) ; then
                         ftl::prev::dispatch
@@ -497,14 +515,34 @@ _ftl::list::clear_below() {
 }
 
 # Move the cursor by N entries.
+#
+# Always updates the cursor memory, sets ftl_state_cursor_index, and
+# re-parses the new entry's path so the per-entry state vars
+# (ftl_state_current_path, _dir, _basename, _stem, _extension) reflect
+# the new cursor position. This matches upstream 38a073a's change to
+# move(): the original only updated dir_file on actual movement, which
+# left the path vars stale when destination-tag commands ran move(1)
+# followed by reading the path vars.
+#
 # Args:
 #   $1: delta (positive or negative)
 ftl::list::move_cursor() {
         local nf
         (( nf = ftl_state_cursor_index + $1, \
            nf = nf < 0 ? 0 : nf >= ftl_list_entry_count ? ftl_list_entry_count - 1 : nf ))
-        (( nf != ftl_state_cursor_index )) && \
-                ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD]=$nf
+        ftl_state_cursor_memory[${ftl_state_current_tab_index}_$PWD]=$nf
+        ftl_state_cursor_index=$nf
+        # Re-parse the new entry's path so the per-entry state vars
+        # (ftl_state_current_path, _dir, _basename, _stem, _extension)
+        # reflect the new cursor position. Mirrors upstream 38a073a's
+        # change to move(). Use ${arr[idx]:-} for set -u safety: when
+        # the listing is empty (no entries), the index is unset.
+        if (( ftl_list_entry_count )) \
+                && [[ -n "${ftl_list_entries[$ftl_state_cursor_index]:-}" ]] ; then
+                ftl::util::parse_path "${ftl_list_entries[$ftl_state_cursor_index]}"
+        else
+                ftl::util::clear_path_vars
+        fi
 }
 
 # Scan for the directory view (used by tab indexing).
