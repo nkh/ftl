@@ -164,7 +164,7 @@ ftl::util::enter_alt_screen() {
 # Args:
 #   $1: "f" for file-only mode (strip PWD prefix), else keep PWD
 #   $2: newline-separated list of results
-go_loop() {
+ftl::util::go_loop() {
 	local P=
 	[[ "$1" == "f" ]] && { P= ; shift ; } || P="$PWD"
 	local in_tab= dst

@@ -132,7 +132,7 @@ ftl::plugin::core::ext_mp3()
         else
                 ($ftl_cfg_gui_media_player "${ftl_selection_current[@]}" &>/dev/null &)
         fi
-        ftl_view_media_pid=$!
+        ftl_preview_media_pid=$!
 }
 
 ftl::plugin::core::ext_media()
@@ -143,7 +143,7 @@ ftl::plugin::core::ext_media()
         else
                 ($ftl_cfg_gui_media_player "${ftl_selection_current[@]}" &>/dev/null &)
         fi
-        ftl_view_media_pid=$!
+        ftl_preview_media_pid=$!
 }
 
 ftl::plugin::core::ext_pdf()

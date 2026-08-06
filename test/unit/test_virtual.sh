@@ -13,7 +13,7 @@ ftl::test::setup() {
     ftl_plugin_vfiles=()
     ftl_plugin_vdirs=()
     ftl_plugin_virtual_enabled=0
-    ftl_etag_callback=
+    ftl_plugin_virtual_callback=
 }
 
 # Test: set_callbacks redefines get_dirs_callback
@@ -44,13 +44,13 @@ test_set_callbacks_files() {
     ftl::test::assert_contains "$out" "file_b" "files callback should echo file_b"
 }
 
-# Test: set_callbacks populates ftl_etag_callback string
+# Test: set_callbacks populates ftl_plugin_virtual_callback string
 test_set_callbacks_populates_etag_callback() {
     ftl::plugin::virtual::set_callbacks "D" "F" "C" "P" "H"
-    ftl::test::assert_contains "$ftl_etag_callback" "get_dirs_callback" \
-        "ftl_etag_callback should contain get_dirs_callback"
-    ftl::test::assert_contains "$ftl_etag_callback" "get_files_callback" \
-        "ftl_etag_callback should contain get_files_callback"
+    ftl::test::assert_contains "$ftl_plugin_virtual_callback" "get_dirs_callback" \
+        "ftl_plugin_virtual_callback should contain get_dirs_callback"
+    ftl::test::assert_contains "$ftl_plugin_virtual_callback" "get_files_callback" \
+        "ftl_plugin_virtual_callback should contain get_files_callback"
 }
 
 # Test: enable turns on the virtual entries flag
@@ -75,8 +75,8 @@ test_reset_disables() {
     ftl::plugin::virtual::reset
     ftl::test::assert_eq "0" "$ftl_plugin_virtual_enabled" \
         "reset should disable virtual entries"
-    ftl::test::assert_eq "" "$ftl_etag_callback" \
-        "reset should clear ftl_etag_callback"
+    ftl::test::assert_eq "" "$ftl_plugin_virtual_callback" \
+        "reset should clear ftl_plugin_virtual_callback"
 }
 
 # Test: reset restores default no-op callbacks

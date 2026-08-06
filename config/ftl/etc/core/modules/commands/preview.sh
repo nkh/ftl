@@ -361,9 +361,9 @@ ftl::cmd::preview_queue() {
 }
 
 ftl::cmd::kill_media_player() {
-	if (( ftl_view_media_pid )) ; then
-		kill "$ftl_view_media_pid" &>/dev/null
-		ftl_view_media_pid=
+	if (( ftl_preview_media_pid )) ; then
+		kill "$ftl_preview_media_pid" &>/dev/null
+		ftl_preview_media_pid=
 	fi
 }
 

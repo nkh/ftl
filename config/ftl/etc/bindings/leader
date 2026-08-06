@@ -1,5 +1,5 @@
 
-leader_help_index=${FTL_LTC_INDEX:-1}
+ftl_plugin_leader_help_index=${FTL_LTC_INDEX:-1}
 
 ftl::plugin::leader::leader_help()
 {
@@ -12,7 +12,7 @@ ftl::plugin::leader::leader_help()
         fi
 
         tmux popup ${FTL_LTC_OPT:- -h 40% -w 80%} -d "$PWD" \
-                "leader_help_index='${1:-$leader_help_index}' ; \
+                "ftl_plugin_leader_help_index='${1:-$ftl_plugin_leader_help_index}' ; \
                  ftl_proc=$$ \
                  ftl_state_current_dir='$ftl_state_current_dir' \
                  ftl_state_current_path='$ftl_state_current_path' \
@@ -21,19 +21,19 @@ ftl::plugin::leader::leader_help()
 
 ftl::plugin::leader::leader_help_reset()
 {
-        leader_help_index=${1:-${FTL_LTC_INDEX:-1}}
+        ftl_plugin_leader_help_index=${1:-${FTL_LTC_INDEX:-1}}
 }
 
 ftl::plugin::leader::leader_help_next()
 {
-        ((leader_help_index++))
-        ftl::plugin::leader::leader_help "$leader_help_index"
+        ((ftl_plugin_leader_help_index++))
+        ftl::plugin::leader::leader_help "$ftl_plugin_leader_help_index"
 }
 
 ftl::plugin::leader::leader_help_previous()
 {
-        ((leader_help_index > 1 && leader_help_index--))
-        ftl::plugin::leader::leader_help "$leader_help_index"
+        ((ftl_plugin_leader_help_index > 1 && ftl_plugin_leader_help_index--))
+        ftl::plugin::leader::leader_help "$ftl_plugin_leader_help_index"
 }
 
 ftl::kbd::bind  leader  help    "LEADER h h"    ftl::plugin::leader::leader_help        "leader help"

@@ -134,7 +134,7 @@ ftl::plugin::tmsu::tmsu_table2()
 
 ftl::plugin::tmsu::tmsu_goto()
 {
-	go_loop f fzf "$(ftl::plugin::tmsu::tmsu_table2 | lscolors | fzf-tmux $ftl_cfg_fzf_popup_opts -m --ansi --expect=ctrl-t --preview 'lscolors {}' --preview-window noborder:wrap:down:4 | sed 's/:.*//')"
+	ftl::util::go_loop f fzf "$(ftl::plugin::tmsu::tmsu_table2 | lscolors | fzf-tmux $ftl_cfg_fzf_popup_opts -m --ansi --expect=ctrl-t --preview 'lscolors {}' --preview-window noborder:wrap:down:4 | sed 's/:.*//')"
 }
 
 # tmsu_get_queries() { echo "find queries/ -type d" ; }

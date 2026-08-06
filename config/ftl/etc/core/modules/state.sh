@@ -58,7 +58,7 @@ ftl::state::save() {
 		echo "prev_cb=\"$ftl_state_preview_callback\""
 		echo "etag=$ftl_state_etag_enabled"
 		echo "etag_s=\"$ftl_etag_source_name\""
-		echo "etag_cb=\"$ftl_etag_callback\""
+		echo "etag_cb=\"$ftl_plugin_virtual_callback\""
 		echo "dirmode=\"$ftl_state_dir_preview_mode\""
 		echo "filter_ext=\"$ftl_filter_external_name\""
 		echo "vmode[tab]=\"${ftl_tab_view_mode[$ftl_state_current_tab_index]}\""

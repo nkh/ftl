@@ -36,19 +36,19 @@ ftl::plugin::virtual::handle_key()          { false ; }
 #   $4: preview_callback function name
 #   $5: handle_key function name
 ftl::plugin::virtual::set_callbacks() {
-	ftl_etag_callback="ftl::plugin::virtual::get_dirs_callback(){ $1 ; } ; \
+	ftl_plugin_virtual_callback="ftl::plugin::virtual::get_dirs_callback(){ $1 ; } ; \
 ftl::plugin::virtual::get_files_callback(){ $2 ; } ; \
 ftl::plugin::virtual::clear_filter(){ $3 ; } ; \
 ftl::plugin::virtual::preview_callback(){ $4 ; } ; \
 ftl::plugin::virtual::handle_key(){ $5 \"\$@\"; }"
-	eval "$ftl_etag_callback"
+	eval "$ftl_plugin_virtual_callback"
 }
 
 # Enable virtual entries.
 # Args:
 #   $1: enable flag (1=on)
 ftl::plugin::virtual::enable() {
-	ftl_etag_callback+="; ftl::plugin::virtual::enable $1"
+	ftl_plugin_virtual_callback+="; ftl::plugin::virtual::enable $1"
 	ftl_plugin_virtual_enabled=$1
 	declare -Ag ftl_plugin_vfiles=() ftl_plugin_vdirs=()
 }
@@ -60,7 +60,7 @@ ftl::plugin::virtual::get_files_callback(){ : ; } ; \
 ftl::plugin::virtual::clear_filter(){ cat ; } ; \
 ftl::plugin::virtual::preview_callback(){ : ; } ; \
 ftl::plugin::virtual::handle_key(){ : ; }'
-	ftl_etag_callback=
+	ftl_plugin_virtual_callback=
 	ftl_plugin_virtual_enabled=0
 }
 

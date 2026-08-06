@@ -202,7 +202,7 @@ ftl::test::setup() {
         ftl_cfg_fzf_listen_command="fd"
         ftl_mark_session_marks=()
         ftl_etag_source_name=""
-        ftl_etag_callback=""
+        ftl_plugin_virtual_callback=""
         ftl_etag_entry_tag=""
         ftl_etag_entry_tag_len=0
         ftl_view_vim_tail_commands=()

@@ -257,9 +257,9 @@ _ftl::list::apply_filters_and_format() {
 
                 # Apply etag
                 if (( ftl_state_etag_enabled )) ; then
-                        ftl::etag::get_entry_tag "$entry_name" ftl_etag_entry_tag ftl_etag_entry_tag_len
-                        pc="$ftl_etag_entry_tag$entry_color"
-                        (( entry_name_len += ftl_etag_entry_tag_len ))
+                        ftl::etag::get_entry_tag "$entry_name" ftl_etag_tag ftl_etag_tag_len
+                        pc="$ftl_etag_tag$entry_color"
+                        (( entry_name_len += ftl_etag_tag_len ))
                 fi
 
                 # Size column

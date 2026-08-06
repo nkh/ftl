@@ -7,7 +7,7 @@ ftl::test::setup() {
 	ftl_plugin_vfiles=()
 	ftl_plugin_vdirs=()
 	ftl_plugin_virtual_enabled=0
-	ftl_etag_callback=
+	ftl_plugin_virtual_callback=
 }
 
 test_enable_sets_flag() {
@@ -30,7 +30,7 @@ test_reset_clears_flag() {
 test_reset_clears_callback() {
 	ftl::plugin::virtual::set_callbacks D F C P H
 	ftl::plugin::virtual::reset
-	ftl::test::assert_eq "" "$ftl_etag_callback"
+	ftl::test::assert_eq "" "$ftl_plugin_virtual_callback"
 }
 
 test_inject_populates_vdirs() {
@@ -78,33 +78,33 @@ test_get_virtual_dirs_multiple() {
 
 test_set_callbacks_has_dirs() {
 	ftl::plugin::virtual::set_callbacks DIRS FILES CLR PREV KEY
-	ftl::test::assert_contains "$ftl_etag_callback" "DIRS"
+	ftl::test::assert_contains "$ftl_plugin_virtual_callback" "DIRS"
 }
 
 test_set_callbacks_has_files() {
 	ftl::plugin::virtual::set_callbacks DIRS FILES CLR PREV KEY
-	ftl::test::assert_contains "$ftl_etag_callback" "FILES"
+	ftl::test::assert_contains "$ftl_plugin_virtual_callback" "FILES"
 }
 
 test_set_callbacks_has_clear() {
 	ftl::plugin::virtual::set_callbacks DIRS FILES CLR PREV KEY
-	ftl::test::assert_contains "$ftl_etag_callback" "CLR"
+	ftl::test::assert_contains "$ftl_plugin_virtual_callback" "CLR"
 }
 
 test_set_callbacks_has_preview() {
 	ftl::plugin::virtual::set_callbacks DIRS FILES CLR PREV KEY
-	ftl::test::assert_contains "$ftl_etag_callback" "PREV"
+	ftl::test::assert_contains "$ftl_plugin_virtual_callback" "PREV"
 }
 
 test_set_callbacks_has_key() {
 	ftl::plugin::virtual::set_callbacks DIRS FILES CLR PREV KEY
-	ftl::test::assert_contains "$ftl_etag_callback" "KEY"
+	ftl::test::assert_contains "$ftl_plugin_virtual_callback" "KEY"
 }
 
 test_enable_appends_to_callback() {
-	ftl_etag_callback="existing"
+	ftl_plugin_virtual_callback="existing"
 	ftl::plugin::virtual::enable 1
-	ftl::test::assert_contains "$ftl_etag_callback" "existing"
+	ftl::test::assert_contains "$ftl_plugin_virtual_callback" "existing"
 }
 
 test_inject_clears_first() {

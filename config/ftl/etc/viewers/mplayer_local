@@ -1,6 +1,6 @@
 [[ $ftl_state_current_extension =~ $ftl_cfg_media_extensions_regex ]] && {
 	ftl::cmd::kill_media_player
-	ftl_view_media_pid -vo null "$ftl_state_current_path" </dev/null &>/dev/null &
-} && ftl_view_media_pid=$!
+	ftl_preview_media_pid -vo null "$ftl_state_current_path" </dev/null &>/dev/null &
+} && ftl_preview_media_pid=$!
 
 # vim: set filetype=sh :

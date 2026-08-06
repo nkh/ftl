@@ -103,7 +103,17 @@ declare -Ag ftl_selection_class_index=()
 
 # Preview state
 ftl_preview_is_vim=0
-ftl_view_media_pid=
+ftl_preview_media_pid=
+ftl_state_copy_move_list=
+ftl_state_fixed_preview_filename=
+ftl_state_info_file_path=
+ftl_state_inline_rename_error=
+ftl_state_main_info_file_path=
+ftl_state_pdf_preview_as_image=0
+ftl_state_preview_zoom_index=1
+ftl_state_quit_attempt_count=0
+ftl_state_sync_dir=
+ftl_state_sync_index=
 ftl_state_images_hidden=0
 ftl_state_show_stat=0
 

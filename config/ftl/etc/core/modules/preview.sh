@@ -21,7 +21,7 @@
 #   ftl_state_preview_pane_visible — whether preview pane is on (was: prev_all)
 #   ftl_state_preview_callback    — callback for virtual entries (was: prev_cb)
 #   ftl_state_fixed_preview_filename — filename for fixed preview (was: preview_pane2)
-#   ftl_view_media_pid            — background media player PID (was: mplayer)
+#   ftl_preview_media_pid            — background media player PID (was: mplayer)
 #   ftl_view_w3mimg_pid           — w3mimgdisplay PID (was: w3iproc)
 
 # Dispatch the preview for the current entry.
@@ -139,8 +139,8 @@ ftl::prev::sync_and_dispatch() {
 	if (( ftl_pane_is_child )) ; then
 		if [[ -n "$ftl_etag_source_name" ]] ; then
 			source "$FTL_CFG/etc/etags/$ftl_etag_source_name"
-			if [[ -n "$ftl_etag_callback" ]] ; then
-				eval "$ftl_etag_callback"
+			if [[ -n "$ftl_plugin_virtual_callback" ]] ; then
+				eval "$ftl_plugin_virtual_callback"
 			fi
 			true
 		else

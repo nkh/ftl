@@ -50,7 +50,7 @@ ftl::plugin::fzf_pane_preview::fzf_pane_preview_all()
 	ftl::prev::clear
 
 	if [[ "$fzf_choice" ]] ; then
-		go_loop fzf "$fzf_choice"
+		ftl::util::go_loop fzf "$fzf_choice"
 		ftl::list::render
 		true
 	else

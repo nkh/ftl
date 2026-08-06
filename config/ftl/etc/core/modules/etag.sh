@@ -12,9 +12,9 @@
 # Globals:
 #   ftl_state_etag_enabled         — master toggle (was: etag)
 #   ftl_etag_source_name           — name of the active etag source (was: etag_s)
-#   ftl_etag_callback              — callback string for virtual entries (was: etag_cb)
-#   ftl_etag_entry_tag             — out: the tag string (was: external_tag)
-#   ftl_etag_entry_tag_len         — out: the tag display length (was: external_tag_length)
+#   ftl_plugin_virtual_callback              — callback string for virtual entries (was: etag_cb)
+#   ftl_etag_tag             — out: the tag string (was: external_tag)
+#   ftl_etag_tag_len         — out: the tag display length (was: external_tag_length)
 
 # Default no-op etag functions (overridden by sourcing an etag plugin).
 ftl::etag::scan_directory() { : ; }
