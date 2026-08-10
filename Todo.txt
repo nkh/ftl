@@ -1,27 +1,5 @@
 # Current
 
-features: move files mode
-	leader + m: enter move files mode
-	escape: cancel mode
-	up/down: move through entries
-	leader + m moves entries
-	
-	letters tag current entry for movement or move it directly
-		tagged entries are moved to the destination directory when with shortcut
-			current destination or all
-		tagged entries have their name overlayed with the destination directory name
-		destination directory is selected
-			by typing a shortcut 
-			with fzf
-			by typing a path path
-				in the shorcut list
-				path with completion
-
-	the tagging should be ossible without entering a special mode, it should be how ftl works normally
-		we already have tagging but only 4 tag classes not clsses that correspond to directories
-		
-		tagging information should be saved in a file so it can be used later, and also to avoid losing it if ftl is closed
-
 features: more git suport
 	find files changed in last commit, or any commit, in git repo
 	find files changed in last commit, or any commit, and only display those files in ftl
@@ -29,14 +7,17 @@ features: more git suport
 	integrate:
 		https://github.com/unhappychoice/gitlogue
 		https://github.com/modem-dev/hunk
-		cimomands that open vim with fugitive command run
+		https://github.com/areese801/git-visual-timeline
+		commands that open vim with fugitive command run
 
-
-https://github.com/tjblackheart/andcli
+	open in tig, gitlogue, git history, fgl, ...
+	go to next  git file, ...
 
 functionality: files that have changes in the last commit, or any commit, in git repo
 	eg: ftl -g HEAD~1
 	open it in vim + fugitive, gitlogue, ...
+
+https://github.com/tjblackheart/andcli
 
 functionality: shortcuts or fzf pick commands to be run in a shell pane
 		run automatically or not
@@ -49,12 +30,12 @@ functionality: shortcuts or fzf pick commands to be run in a shell pane
 
 issue: dir_entries_relative_path_length[$pnc]=0 is not used
 
-functionality: -f user_oeverride && . user_override ; this is a way to override ftl's default settings and functions
+functionality: -f user_override && . user_override ; this is a way to override ftl's default settings and functions
 		better done in ftlrc but it may be sources too late for some settings and functions
 
 functionality: another etags column, possibility to control cursor look, control line number column rendering to change colors
 
-functionality: diffrent virtual directory in different tabs
+functionality: different virtual directory in different tabs
 		show all selected
 		show results of a search
 		result of a diff or other command

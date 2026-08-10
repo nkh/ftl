@@ -43,8 +43,8 @@ selection_class_l()	{ read -sn1 ; last_dest=$REPLY ; dest_tags[$p/$f]="${dir_des
 selection_class_lc()	{ dest_tags[$p/$f]= ; [[ $dtag_move ]] && move_down ; list ; }
 selection_class_lc_all(){ dest_tags=() ; list ; }
 selection_class_l_bis()	{ for ((i=0 ; i < ${COUNT:-1} ; i++)) ; do dest_tags[$p/$f]="${dir_dest[$last_dest]}" ; [[ $dtag_move ]] && move 1 ; done ; list ; }
-selection_class_l_copy(){ for fc in "${!dest_tags[@]}" ; do cp "$fc" "${dest_tags[$fc]}" ; done ; dest_tags=() ; list ; }
-selection_class_l_move(){ for fm in "${!dest_tags[@]}" ; do mv "$fm" "${dest_tags[$fm]}" ; done ; dest_tags=() ; list ; }
+selection_class_l_copy(){ for fc in "${!dest_tags[@]}" ; do cp "$fc" "${dest_tags[$fc]}" ; done ; dest_tags=() ; cdir ; }
+selection_class_l_move(){ for fm in "${!dest_tags[@]}" ; do mv "$fm" "${dest_tags[$fm]}" ; done ; dest_tags=() ; cdir ; }
 selection_class_1()	{ selection_class_c 1 ; }
 selection_class_2()	{ selection_class_c 2 ; }
 selection_class_3()	{ selection_class_c 3 ; }

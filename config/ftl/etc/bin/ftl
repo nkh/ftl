@@ -169,7 +169,7 @@ show_header
 	for((i=$top, tline=2 ; i <= bottom ; i++, tline++)) ; do
 		cursor=${tags[${files[$i]}]:- } ; [[ $i == $file ]] && cursor="${cursor_color}$cursor\e[m"
 		
-		# [[ -n ${dest_tags[${files[$i]}]} ]] && { dtag="${dest_tags[${files[$i]}]: -dtag_l}" ; printf -v dtag "%-${dtag_l}s" "$dtag" ; dtag=" [...${dtag}]" ; } || dtag=
+		[[ -n ${dest_tags[${files[$i]}]} ]] && { dtag="${dest_tags[${files[$i]}]: -dtag_l}" ; printf -v dtag "%-${dtag_l}s" "$dtag" ; dtag=" [...${dtag}]" ; } || dtag=
 		
 		echo -ne "\e[${tline};0H\e[m\e[K$cursor\e[2;37m$dtag\e[0m${files_color[i]/¿/$flip}\e[0m" ; ((i != bottom)) && echo ; ((l++))
 	done

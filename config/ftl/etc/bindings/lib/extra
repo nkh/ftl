@@ -34,5 +34,7 @@ pass_encrypt()
 cdir '' "$REPLY"
 }
 
+free_space() { tmux popup -h 25% -w 50% -E -d "$PWD" "df ; read -sn1" ; }
+
 # vim: set ft=bash:
 
