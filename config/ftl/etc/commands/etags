@@ -1,8 +1,8 @@
 p="$FTL_CFG/etags" ; file="${1#etags }"
 
 [[ -f "$p/$file" ]] &&
-	{ . "$p/$file" $fs ; etag=1 ; cdir ; } || 
-	{ file="$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline)" ; [[ "$file" ]] && { . "$p/$file" $fs ; etag=1 ; cdir ; } ; }
+	{ . "$p/$file" $fs ; etag1=1 ; etag1_name=$(etag_name) ; cdir ; } || 
+	{ file="$(cd $p ; fd | fzf-tmux -p 50% --reverse --info=inline)" ; [[ "$file" ]] && { . "$p/$file" $fs ; etag1=1 ; etag1_name=$(etag_name) ; cdir ; } ; }
 
 # vim: set filetype=bash :
 

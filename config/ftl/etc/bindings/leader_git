@@ -1,9 +1,9 @@
 
-git_etags() { etag_s=git ; source "$FTL_CFG/etc/etags/$etag_s" ; ((etag^=1)) ; cdir ; }
+git_etags() { etag1_s="$FTL_CFG/etc/etags/git" ; source "$etag1_s" ; ((etag1^=1)) ; etag1_name="$(etag_name)" ; cdir ; }
 
-git_ignore() { printf "%s\n" "${selection[@]}" | sed "s~$PWD/~~" >>.gitignore ; etag_dir ; cdir ; }
+git_ignore() { printf "%s\n" "${selection[@]}" | sed "s~$PWD/~~" >>.gitignore ; git_etag_dir ; cdir ; }
 
-git_add() { git add "${selection[@]}" ; etag_dir ; cdir ; }
+git_add() { git add "${selection[@]}" ; git_etag_dir ; cdir ; }
 
 git_find() 
 {

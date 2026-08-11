@@ -774,9 +774,10 @@ to be optional you must specify two bindings; one with "COUNT" and one without.
         not_assigned       Fzf merge selection from panes 
 
 ## Etags
-        <zt>               Show/hide etags
+        <zTTT>               Show/hide etag1
 
-        <zT>               Select etag type from list
+        <zT1>               Select etag1 type from list
+        <zT2>               Select etag2 type from list
 
 ## Tags
 
@@ -1014,8 +1015,6 @@ From the command prompt
                 - <empty answer>         Cancel
 
                 - ^[1-9][0-9]*$          Goto entry
-
-                - ^etags                 Chose tagging method
 
                 - "load_sel"       Load selection from a file
 

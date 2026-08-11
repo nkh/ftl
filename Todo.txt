@@ -13,27 +13,13 @@ features: more git suport
 	open in tig, gitlogue, git history, fgl, ...
 	go to next  git file, ...
 
-functionality: files that have changes in the last commit, or any commit, in git repo
+	show files that have changes in the last commit, or any commit, in git repo
 	eg: ftl -g HEAD~1
 	open it in vim + fugitive, gitlogue, ...
 
-https://github.com/tjblackheart/andcli
-
-functionality: shortcuts or fzf pick commands to be run in a shell pane
-		run automatically or not
-		pass selection or not
-
-		exmemple: want to know the weather but doesn't want to leave ftl, so run a command in a shell pane and show the result in a popup pane
-		leader + r + r/R pick and wait or run automatically
-		leader + r + ? use predefined command
-
+feature: https://github.com/tjblackheart/andcli
 
 issue: dir_entries_relative_path_length[$pnc]=0 is not used
-
-functionality: -f user_override && . user_override ; this is a way to override ftl's default settings and functions
-		better done in ftlrc but it may be sources too late for some settings and functions
-
-functionality: another etags column, possibility to control cursor look, control line number column rendering to change colors
 
 functionality: different virtual directory in different tabs
 		show all selected
@@ -62,8 +48,6 @@ functionality: option to create a virtual directory with a list of files, and th
 		this can be used to browse files from different categories in git commits
 
 
-functionality: open todo shortcut
-
 functionality: wizards to add new functionality
 	eg: add a new command, add a new key binding, add a new mode, ...
 		eg: add a new command to ftl, add a new key binding to ftl, add a new mode to ftl, ...
@@ -71,10 +55,6 @@ functionality: wizards to add new functionality
 functionality: replace åäö with other special characters, update documentation
 
 functionality: use mcat as file and image viewer
-
-functionality: show files changed in last commit (or any commit) in git repo
-		eg: ftl -g HEAD~1
-		open it in vim + fugitive, gitlogue, ...
 
 functionality: inline rename mode
 	leader r i: enter mode with keyboard sub mode handler
@@ -94,15 +74,6 @@ functionality: inline rename mode
 		exit tagging
 		sequential rename
 		regexp rename
-
-
-functionality: copy/move files and apply rename rules to them
-
-
-functionality: fzf comlpetion for ftl commands
-	in a popup pane
-	single letter to start th compeletion, then fzf style completion
-	¿ too much like k_binding
 
 issue: yif not working!
 issue: zT not working!

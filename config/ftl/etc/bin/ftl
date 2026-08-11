@@ -51,7 +51,8 @@ get_dir_entries()
 dir_entries_list=() ; dir_entries_path=() ; dir_entries_relative_path_length=() ; dir_entries_file=() ; dir_entries_color=() ; dir_entries_size=()
 declare -A uniq_file
 
-((etag)) && etag_dir 
+((etag1))  && ${etag1_name}_etag_dir 
+((etag2)) && ${etag2_name}_etag_dir 
 
 ((gpreview)) || nice -10 $pgen/generator $thumbs &
 
@@ -101,9 +102,15 @@ for entry in "${dir_entries_list[@]}" ; do
 	# color directory that are not accessible
 	[[ -d "$pnc" && ! -x "$pnc" ]] && { pc="\e[31m$pnc" ; }
 	
-	((etag)) && 
+	((etag1)) && 
 		{
-		etag_tag "$pnc" external_tag external_tag_length
+		${etag1_name}_etag_tag "$pnc" external_tag external_tag_length
+		display_entry+="$external_tag" ; ((display_entry_length += external_tag_length))
+		}
+		
+	((etag2)) && 
+		{
+		${etag2_name}_etag_tag "$pnc" external_tag external_tag_length
 		display_entry+="$external_tag" ; ((display_entry_length += external_tag_length))
 		}
 		

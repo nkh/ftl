@@ -1,11 +1,13 @@
 yellow=$'\e[93m'
 reset=$'\e[0m'
 
-etag_dir()
+etag_name() { echo git ; }
+
+git_etag_dir()
 {
 declare -g -A git_tags=() ; is_git=0
 
-((etag)) && git rev-parse HEAD &>/dev/null && 
+git rev-parse HEAD &>/dev/null && 
 	{
 	readarray -t lines < <(unbuffer git status -s * 2>/dev/null)
 	is_git=1
@@ -43,6 +45,6 @@ declare -g -A git_tags=() ; is_git=0
 	}
 }
 
-etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; (( is_git && etag )) && { r2="${git_tags[$1]:-   }" ; r3=3 ; } ; }
+git_etag_tag() { local -n r2=$2 r3=$3 ; r2= ; r3=0 ; (( is_git )) && { r2="${git_tags[$1]:-   }" ; r3=3 ; } ; }
 
 # vim: set filetype=sh :

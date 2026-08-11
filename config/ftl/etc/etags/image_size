@@ -1,4 +1,6 @@
-etag_dir()
+etag_name() { echo "image_size" ; }
+
+image_size_etag_dir()
 {
 declare -g -A ext_sizes=()
 while read ext_file ; do ext_sizes[$ext_file]="          " ; done < <(find "$PWD/" -maxdepth 1 2>&-)
@@ -11,7 +13,7 @@ done < <(\
 	)
 }
 
-etag_tag() { local -n r2=$2 r3=$3 ; r2="${ext_sizes[$PWD/$1]}" ; r3=10 ; }
+image_size_etag_tag() { local -n r2=$2 r3=$3 ; r2="${ext_sizes[$PWD/$1]}" ; r3=10 ; }
 
 # vim: set filetype=bash :
 

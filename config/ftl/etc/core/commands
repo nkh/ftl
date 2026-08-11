@@ -231,8 +231,11 @@ selection_merge()	{ p="$FTL_CFG/etc/core/lib/merge" ; file=$(cd $p 2>&- && fd | 
 selection_merge_all()	{ source "$FTL_CFG/etc/core/lib/merge/all" ; list ; }
 selection_untag_all()	{ tags_clear ; list ; }
 selection_untag_fzf()	{ tag_check && { fzf_tag U "$(printf "%s\n" "${!tags[@]}" | lscolors | fzf-tmux $fzf_opt -m --ansi --marker '⊟')" ; list ; } ; }
-etag_show()		{ ((etag^=1)) ; cdir ; }
-etag_select()		{ p="$FTL_CFG/etags" ; { etag_s=$(cd $p ; fd | fzf-tmux -p 50% --cycle --reverse --info=inline) ; [[ $etag_s ]] && { . $p/$etag_s $fs ; etag=1 ; cdir ; } ; } ; }
+etag1_show()		{ ((etag1^=1)) ; cdir ; }
+etag2_show()		{ ((etag2^=1)) ; cdir ; }
+_etag_select()		{ p="$FTL_CFG/etags" ; local etag_f=$(cd $p ; fd | fzf-tmux -p 50% --cycle --reverse --info=inline) ; echo "$FTL_CFG/etags/$etag_f" ; }
+etag1_select()		{ etag1_s="$(_etag_select)" ; [[ $etag1_s ]] && { . $etag1_s $fs ; etag1=1 ; etag1_name=$(etag_name) ; cdir ; } ; } 
+etag2_select()		{ etag2_s="$(_etag_select)" ; [[ $etag2_s ]] && { . $etag2_s $fs ; etag2=1 ; etag2_name=$(etag_name) ; cdir ; } ; }
 SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
 SIG_REFRESH()		{ ((gpreview)) && kbdf && prev_synch ; }
 SIG_REMOTE()		{ ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }

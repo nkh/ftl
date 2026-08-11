@@ -83,7 +83,7 @@ prev_cb="ventries_on"
 cdir
 }
 
-ventries_etag(){ etag_s="virtual" ; source "$FTL_CFG/etags/$etag_s" ; etag=1 ; cdir '' "$f" ; } # etag_s synchs source with preview
+ventries_etag(){ etag1_s="$FTL_CFG/etags/virtual" ; source "$etag1_s" ; etag1=1 ; etag1_name=virtual ; cdir '' "$f" ; } # etag_s synchs source with preview
 
 bind leader_ftl extra	"LEADER v v"	ventries_on	"insert virtual entries"
 bind leader_ftl extra	"LEADER v V"	ventries_off	"removes virtual entries"

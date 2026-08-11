@@ -58,7 +58,7 @@ exclude_command_from_redo "move_right_arrow"
 
 key_command()
 {
-(( keys_in > 3 ))               && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
+(( keys_in > 4 ))               && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
 [[ "$REPLY" == ERROR_142     ]] && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
 [[ "$REPLY" == "?"           ]] && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 
