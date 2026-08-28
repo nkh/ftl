@@ -16,17 +16,24 @@ git rev-parse HEAD &>/dev/null &&
 		do 
 			git_status=
 			
-			if [[ $line == " "* ]]; then
-				# Plain space cell
+			if [[ ${line:0:2} == "  " ]]; then
+				# two leading spaces → one plain space cell
 				git_status+=" "
 				line=${line:1}
-			elif [[ $line == $'\e['* ]]; then
-				# ANSI-colored character cell
+			else
+				# optional leading space before ANSI
+				if [[ ${line:0:1} == " " ]]; then
+					git_status+=" "
+					line=${line:1}
+					fi
+				
+				# ANSI-colored character cell (line now starts with CSI)
 				tmp=${line#*$'m'}      # remove opening CSI sequence
-				ch=${tmp:0:1}          # the visible character
+				ch=${tmp:0:1}          # visible character
 				tmp=${tmp:1}
-				end=${tmp%%m*}         # until the terminating 'm'
+				end=${tmp%%m*}         # until terminating 'm'
 				len=$(( ${#line} - ${#tmp} + ${#end} + 1 ))
+				
 				git_status+=${line:0:len}
 				line=${line:len}
 			fi
@@ -40,6 +47,7 @@ git rev-parse HEAD &>/dev/null &&
 				*/*) file="${file%%/*}" ; git_status="$yellow**$reset" ;;
 			esac
 			
+			pdhn "<${line}> -> <${file}> <${git_status}>"
 			git_tags[$file]="${git_status} "
 		done
 	}

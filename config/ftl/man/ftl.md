@@ -1179,7 +1179,7 @@ See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details.
         # start ftl on a specific directory in a new window
         tmux bind C-D new-window -n download "ftl $HOME/downloads"
 
-## Example User RCfile
+## User RCfile example 1
 
         # source default config
         source $FTL_CFG/etc/ftlrc
@@ -1218,6 +1218,103 @@ See _"$FTL_CFG/etc/ftlrc"_, ftl's default config file, for details.
 
         # load git etag support 
         . ~/.config/ftl/etags/git
+
+
+## User RCfile example 2
+
+	# this is my personal ftlrc ...
+
+	source $FTL_CFG/etc/ftlrc
+
+	# file not loaded when running via tmux
+	eval $(dircolors -b "$META_HOME/config/dir_colors")
+
+	FTLI_H=19	# hint FTLI about Character height
+	FTLI_W=10	# hint FTLI about Character width
+
+	leader_key=SPACE
+
+	rfilter0='\.sw.$'
+	fzf_opt="-p 90% --cycle --reverse --info=inline --color=hl+:214,hl:214"
+	FZF_LISTEN_COMMAND='fd -I -H -E ".git/"'
+
+	mount_archive=1
+	CMD_COLS=150 # columns when displaying command mapping in popup
+
+	tag_new_tab="$HOME/nadim/downloads"
+
+	HEXEDIT='hx -g 4 -o 36'
+	HEXVIEW="HUXD_COLORS='0x00-0xff=136;printable=251;whitespace=115;nul=160;0x0a=49;0x20=73;offset=240;ascii_borders=240' huxd -l 28"
+	GPGID=nadim.khemir
+	SXIV=nsxiv
+	GIF_VIEWER=pixelhopper
+
+	PAGER_ANSI='moar --no-statusbar -no-linenumbers'
+	MD_PAGER='moar --no-statusbar -no-linenumbers'
+
+	MD_RENDER1='glow -s dark'
+	MD_RENDER2='piper_md'
+	MD_DIR_RENDER='glow --pager -s dark'
+
+	NCDU=gdu
+
+	# command to write the current bindins in a file
+	# bind ftl selection	PT		kgen	"" ; kgen()    { printf '%s\n' "${bindings[@]}" | sort -h > ./key_bindings ; }
+
+	declare -A marks=(
+		[0]=/
+		[1]=$HOME/$
+		[2]=$HOME/nadim/$
+		[3]=$HOME/downloads/$
+		[4]=$HOME/downloads/images/$
+		[B]=$HOME/nadim/bin/bash$
+		[C]=$HOME/nadim/config/$
+		[F]=$HOME/nadim/devel/repositories/ftl/$
+		[M]=/media/nadim/$
+		[R]=$HOME/nadim/devel/repositories/$
+		[T]=/tmp/$USER/$
+		["'"]="$(tail -n1 $ghist)"
+		)
+
+	declare -A dir_dest=(
+		[b]=$HOME/downloads/bikes
+		[B]=$HOME/downloads/boat
+		[i]=$HOME/downloads/images
+		[M]=$HOME/downloads/music
+		[m]=$HOME/downloads/memes
+		[p]=$HOME/downloads/palestine
+		)
+
+	# use colored dfc2 to show disk free space in a popup 
+	free_space() { tmux popup -h 25% -w 35% -E -d "$PWD" "dfc2 ; read -sn1" ; }
+
+	# open file in less mode
+	vim_less_mode() { [[ -f "${files[file]}" ]] && { tcpreview ; alt_screen ; inotify_k ; ${EDITOR} "${1:-${files[file]}}" -c 'silent! call LessMode()' ; alt_screen ; emode=0 ; cdir ; } ; } 
+	bind ftl entry		L		vim_less_mode		"vim in less mode"
+
+	# how to delete and create an undelete binding 
+	RM="rip --graveyard $HOME/graveyard" ; mkdir -p $HOME/graveyard
+
+	bind ftl file	U	unbury	"undo last deletion in current directory"
+	unbury() { last_bury="$(rip --graveyard $HOME/graveyard -s | tail -n1)" ; [[ -n "$last_bury" ]] && { rip --graveyard $HOME/graveyard -u ; cdir "$PWD" "$(basename "$last_bury")" ; } ; } 
+
+	# add marks from fzf-marks to global marks
+	gmark_fzf_user() { perl -ape '$_ = "$F[2]/\n"' ~/.fzf-marks ; }
+
+	# override preview
+	user_pviewers() { [[ $e == pbs_log || $e == pbs_log_fail ]] && ((extmode==1)) && { ptext ; return 0 ; } ; }
+
+	# override colors
+	declare -A user_colors=(
+		[.ftl_project_marks]="30;48;5;237"
+		[.ftlrc_dir]="30;48;5;237"
+		[.directory]="30;48;5;237"
+		)
+
+	# load git etags but keep them invisible
+	etag1_s="$HOME/.config/ftl/etc/etags/git" ; . "$etag1_s" ; etag1_name=git
+
+	# vim: set filetype=bash:
 
 ## User Command With Binding
 

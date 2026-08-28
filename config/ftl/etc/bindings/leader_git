@@ -11,11 +11,36 @@ git_root="$(git rev-parse --show-toplevel)"
 go_loop f fzf "$(cd "$git_root" ; git-color-status -u | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi | sed 's#...#'$git_root'/#')"
 }
 
+
+git_goto_changes_between_head_2and_head1
+
+git_goto_changes_between_head1_and_head() { git_goto_changes_between 'HEAD~..HEAD' ; }
+git_goto_changes_between_head2_and_head1() { git_goto_changes_between 'HEAD~2..HEAD~1' ; }
+
+git_goto_changes_between() 
+{
+git_etags # tag  what has changed in the git repo since the last commit
+
+# find what has changed in the git repo between the last two commits and allow the user to select files from that list
+git_root="$(git rev-parse --show-toplevel)"
+go_loop f fzf "$(cd "$git_root" ; git diff $1 --name-only | lscolors | fzf-tmux $fzf_opt --header "revisions: $1" --header-first -m --expect=ctrl-t --ansi | sed 's#^#'$git_root'/#')"
+}
+
 git_diff() { tcpreview ; exec 2>&9 ; picked=$(fgd) ; [[ "$picked" ]] && { pdir=$(dirname $picked) ; pfile=$(basename $picked) ; } ; exec 2>"$fs/log" ; alt_screen ; cdir $pdir $pfile ; }
 git_diff2() { tcpreview ; git diff --color=always "$n" | diff-so-fancy | moar --no-statusbar --no-linenumbers ; cdir ; }
 
 git_fga() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "bash -ic fga" ; cdir ; }
 git_tree() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "git-tree-status -u | less -r" ; cdir ; }
+
+git_tig() { tcpreview ; tig -- "$f" ; cdir ; }
+git_gvt() { tcpreview ; exec 2>&9 ; gvt "$f" ; exec 2>"$fs/log" ; cdir ; }
+
+selection_from_git_status()
+{
+git_root="$(git rev-parse --show-toplevel)"
+fzf_tag T "$(git-color-status -u | fzf-tmux $fzf_opt --multi --reverse --info=inline --color=hl+:214,hl:214 --ansi --marker '▪'| sed 's#...#'$git_root'/#')" ; list ; 
+}
+
 
 bind git	extra	"LEADER g g"	git_etags	"git display status"
 bind git	extra	"LEADER g t"	git_tree	"git tree status"
@@ -25,6 +50,13 @@ bind git	extra	"LEADER g f"	git_find	"git go to git file"
 
 bind git	extra	"LEADER g i"	git_ignore	"git add selection to directory .gitignore"
 bind git	extra	"LEADER g a"	git_add		"git add selection"
+bind git	extra	"LEADER g s"	selection_from_git_status	"select files from git status"
+
+bind git	extra	"LEADER g F F"	git_goto_changes_between_head1_and_head		"git go to git file changes between HEAD~ and HEAD"
+bind git	extra	"LEADER g F 2"	git_goto_changes_between_head2_and_head1	"git go to git file changes between HEAD~2 and HEAD~1"
+
 bind git	extra	"LEADER g A"	git_fga		"git add selection in forgit"
+bind git	extra	"LEADER g v"	git_tig		"open in tig"
+bind git	extra	"LEADER g V"	git_gvt		"open in gvt"
 
 # vim: set filetype=bash:

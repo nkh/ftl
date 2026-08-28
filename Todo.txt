@@ -1,56 +1,157 @@
-# Current
+issue ?: alt_screen not aware of which screen it is in, so it doesn't know which screen to restore to when exiting alt_screen
+	add a mechanism to keep track of the current screen and restore it when exiting alt_screen in bash:
+		eg: use a variable to keep track of the current screen and restore it when exiting alt_screen
+		using this code:
+		```bash
+		# Save the current screen
+		current_screen=$(tput smcup)
+		# Restore the previous screen
+		tput rmcup
+		```
 
-features: more git suport
-	find files changed in last commit, or any commit, in git repo
-	find files changed in last commit, or any commit, and only display those files in ftl
+feature: pick file in fzf and open it directly
+		ctrl+0
+		other key binding to start the search and open the selected file directly 
+		find, latest used, most used, ...
 
-	integrate:
-		https://github.com/unhappychoice/gitlogue
-		https://github.com/modem-dev/hunk
-		https://github.com/areese801/git-visual-timeline
-		commands that open vim with fugitive command run
+feature: show when a git file was last changed and by whom
 
-	open in tig, gitlogue, git history, fgl, ...
-	go to next  git file, ...
+	When browsing a Git repository, it would be useful to see when a file was last changed and by whom.
 
-	show files that have changes in the last commit, or any commit, in git repo
-	eg: ftl -g HEAD~1
-	open it in vim + fugitive, gitlogue, ...
+feature: show how many times a file was changed in the last 10 commits
+
+feature: virtual directorie for git based on how many times a file was changed
+
+
+feature: virtual directories support arbitrary file collections
+
+	Expand virtual directories into a general mechanism for browsing a collection of files
+
+	A virtual directory should be constructible from:
+
+	* individual files
+	* directories
+	* recursively collected files
+	* search results
+	* selected files
+	* diff results
+	* results from other FTL commands
+	* files changed by a Git commit
+	* files from different categories or sources
+	* file/directory that does not necessarily correspond to a physical file
+		this is how virtual files work but the content needs to be defined in an ftl script, change
+		it so any process can generate a virtual file, not just ftl scripts
+
+	For example:
+
+	```text
+	ftl -v file1 file2 file3
+	ftl -v file1 file2 file3 -o output_dir
+	```
+
+	Support options for controlling how the files are organized:
+
+	* `-v` — add files/directories to a virtual directory
+	* `-r` — recursively add files from directories
+	* `-t` — put groups of files in separate tabs
+	* option to preserve the original directory structure
+	* option to flatten the structure and show only the files
+
+	Allow multiple virtual directories to exist simultaneously, including different virtual directories in different tabs.
+
+	This would allow, for example, one tab to contain search results, another to contain files from a diff, and another to contain a manually selected group of files.
+
+	Virtual directories should also support grouping files into subdirectories, allowing files to be sorted into categories within the virtual directory.
+
+	### Missing files
+
+	Some files or directories supplied as arguments may not exist.
+
+	Provide an option to create missing files/directories when constructing the virtual directory.
+
+	### creation time
+
+	can be at start up with arguments or at run time with a command, eg: selected files
+
+	### display
+
+	A virtual directory should be displayed in the same way as a physical directory, with the same options for sorting, filtering, and previewing files.
+
+	files in a virtual directory should be displayed with their original names and paths, even if they are located in different directories or do not exist on disk.
+
+	files in a virtual directory can be displayed with another name or path
+
+	A virtual directory contains files that may not exist on disk or files located in different directories, what they are and where they come from should be displayed
+		option or etag
+
+	Sorting and filtering should be available for virtual directories, just like for physical directories.
+		sorting is a bit more complicated since the files may come from different directories and have different attributes
+			eg: should files be sorted by their original directory
+			eg: should files be sorted by their original name or by their virtual name
+
+
+feature: Add a general filtering mechanism that can be used to restrict what FTL displays.
+
+	Filtering should be usable with:
+
+	* Git commit results
+	* search results
+	* diff results
+	* command output
+	* selected files
+	* virtual directories
+
+	Ideally, filtering should feed directly into the virtual-directory mechanism so that any file list can become a browsable file collection.
+
+	we have a user filter mechanism, but it is not very flexible as there is just one of them
+
+feature: more Git integration and Git-based virtual directories
+
+	Expand Git support by making Git operations able to produce file collections that can then be browsed through FTL's virtual-directory mechanism.
+
+	### Files changed by a commit
+
+	Add an option to select the files changed by a specific commit and open them in FTL:
+
+	```text
+	ftl -g HEAD~1
+	ftl -g <commit>
+	```
+
+	The resulting files should be displayed as a virtual directory containing only the files changed by that commit.
+
+	This should work for any commit, not only `HEAD`.
+
+	The same mechanism could be used to build virtual directories containing files from different commits or categories, making it possible to compare or browse groups of changed files.
+
+	### Open Git tools from FTL
+
+	Provide commands for opening the current file, selection, or virtual-directory contents in external Git tools, such as:
+
+	* Vim with an appropriate Fugitive command
+	* tig
+	* git history
+	* fgl
+
+	Investigate integration or useful ideas from:
+
+	* [https://github.com/unhappychoice/gitlogue](https://github.com/unhappychoice/gitlogue)
+	* [https://github.com/modem-dev/hunk](https://github.com/modem-dev/hunk)
+	* [https://github.com/areese801/git-visual-timeline](https://github.com/areese801/git-visual-timeline)
+
+	issue: gvt not displaying properly, maybe because of the way it is called from ftl
 
 feature: https://github.com/tjblackheart/andcli
 
 issue: dir_entries_relative_path_length[$pnc]=0 is not used
 
-functionality: different virtual directory in different tabs
-		show all selected
-		show results of a search
-		result of a diff or other command
-		sorting directory in sub virtual directories
+functionality: wizards to add new functionality
+	eg: add a new command, add a new key binding, add a new mode, ...
+		eg: add a new command to ftl, add a new key binding to ftl, add a new mode to ftl, ...
 
 functionality: completion for ftl commands
 	eg: ftl -v file1 file2 file3
 	eg: ftl -v file1 file2 file3 -o output_dir
-
-functionality: multiple files/dirs as arguments
-	-v put them  in the same virtual directory
-		without directory structure, just the files
-	-t in different tabs
-	-r recursively add files/dirs to virtual directory
-
-	some of the files/dirs may not exist
-		option to create them if they don't exist
-
-functionality: option to create a virtual directory with a list of files, and then use ftl to browse it
-	eg: ftl -v file1 file2 file3
-	eg: ftl -v file1 file2 file3 -o output_dir
-
-	possibility to put different files in different virtual directories, and then use ftl to browse them
-		this can be used to browse files from different categories in git commits
-
-
-functionality: wizards to add new functionality
-	eg: add a new command, add a new key binding, add a new mode, ...
-		eg: add a new command to ftl, add a new key binding to ftl, add a new mode to ftl, ...
 
 functionality: replace åäö with other special characters, update documentation
 
