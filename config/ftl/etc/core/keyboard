@@ -170,6 +170,8 @@ case "$REPLY$E1$E2$E3$E4" in
 	$'\031'                         ) REPLY=CTL-Y ;;
 	#$'\0??'                        ) REPLY=CTL-Z ;;
 	
+	$'\eb'                          ) REPLY="ALT-B" ;;
+	$'\ef'                          ) REPLY="ALT-F" ;;
 	$'\ej'                          ) REPLY="ALT-J" ;;
 	$'\ek'                          ) REPLY="ALT-K" ;;
 esac

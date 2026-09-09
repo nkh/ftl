@@ -30,7 +30,11 @@ git_diff() { tcpreview ; exec 2>&9 ; picked=$(fgd) ; [[ "$picked" ]] && { pdir=$
 git_diff2() { tcpreview ; git diff --color=always "$n" | diff-so-fancy | moar --no-statusbar --no-linenumbers ; cdir ; }
 
 git_fga() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "bash -ic fga" ; cdir ; }
-git_tree() { tmux popup -w 90% -h 90% -E -d "#{pane_current_path}" "git-tree-status -u | less -r" ; cdir ; }
+
+git_history() { tmux popup -w 60% -h 60% -E -d "#{pane_current_path}" "git log --follow -M -C --color --oneline -- '$f' | less -R" ; cdir ; }
+git_patch() { tmux popup -w 60% -h 80% -E -d "#{pane_current_path}" "git log --onelinee --color -- '$f' | fzf --ansi " ; cdir ; }
+# git_patch() { tmux popup -w 60% -h 80% -E -d "#{pane_current_path}" "git log -p --color -- '$f' | less -R" ; cdir ; }
+git_tree() { tmux popup -w 60% -h 90% -E -d "#{pane_current_path}" "git-tree-status -u | less -R" ; cdir ; }
 
 git_tig() { tcpreview ; tig -- "$f" ; cdir ; }
 git_gvt() { tcpreview ; exec 2>&9 ; gvt "$f" ; exec 2>"$fs/log" ; cdir ; }
@@ -48,6 +52,8 @@ bind git	extra	"LEADER g d"	git_diff2	"git diff2"
 bind git	extra	"LEADER g D"	git_diff	"git diff"
 bind git	extra	"LEADER g f"	git_find	"git go to git file"
 
+bind git	extra	"LEADER g h"	git_history	"selected file log"
+bind git	extra	"LEADER g H"	git_patch	"selected file log with patch"
 bind git	extra	"LEADER g i"	git_ignore	"git add selection to directory .gitignore"
 bind git	extra	"LEADER g a"	git_add		"git add selection"
 bind git	extra	"LEADER g s"	selection_from_git_status	"select files from git status"

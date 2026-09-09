@@ -259,6 +259,8 @@ bind ftl move		RIGHT		move_right_arrow	"right; cd into directory"
 bind ftl move		LEFT		move_left_arrow		"cd to parent directory"
 bind ftl move		ALT-J		preview_down		"scroll preview down"
 bind ftl move		ALT-K		preview_up		"scroll preview up"
+bind ftl move		ALT-F		preview_page_down	"scroll preview page down"
+bind ftl move		ALT-B		preview_page_up		"scroll preview page up"
 
 bind ftl move		J		preview_down2		"scroll fixed preview down"
 bind ftl move		K		preview_up2		"scroll fixed preview up"

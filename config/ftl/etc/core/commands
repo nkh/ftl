@@ -35,6 +35,8 @@ goto_alt1()		{ to_search=".$e" ; R="${C[find_next]}" ; }
 goto_alt2()		{ for ((i=file + 1 ; i != $nfiles ; i++)) ; do [[ ! "${files[i]##*/}" =~ ".$e" ]] && { list $i ; return ; } ; done ; list ; }
 preview_down()		{ ((in_viprev)) && tmux send -t $pane_id C-D || [[ $pane_id ]] && tmux send -t $pane_id j ; }
 preview_up()		{ ((in_viprev)) && tmux send -t $pane_id C-U || [[ $pane_id ]] && tmux send -t $pane_id k ; }
+preview_page_down()	{ ((in_viprev)) && tmux send -t $pane_id C-] || [[ $pane_id ]] && tmux send -t $pane_id Pagedown ; }
+preview_page_up()	{ ((in_viprev)) && tmux send -t $pane_id C-\ || [[ $pane_id ]] && tmux send -t $pane_id Pageup ; }
 preview_down2()		{ [[ $pane2_id ]] && tmux send -t $pane2_id C-D ; }
 preview_up2()		{ [[ $pane2_id ]] && tmux send -t $pane2_id C-U ; }
 preview_left()		{ [[ $pane_id ]] && tmux send -t $pane_id Left ; }
@@ -199,7 +201,7 @@ hide_size()		{ show_size=0 ; cdir ; }
 show_size()		{ ((show_size++, show_size = show_size > 3 ? 0 : show_size)) ; ((show_size == 3)) && { header '' "$msg_du" ; dir_dusize ; header '' "$head" ; } ; cdir ; }
 show_stat()		{ ((show_stat ^= 1)) ; refresh ; list ; }
 sort_entries()		{ ((sort_type[tab] = sort_type[tab] + 1 >= ${#sort_filters[@]} ? 0 : sort_type[tab] + 1)) ; cdir '' "$f" ; }
-sort_entries_reversed()	{ [[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; cdir '' "$f"; }
+sort_entries_reversed()	{ [[ ${reversed[tab]} == '-r' ]] && reversed[tab]=0 || reversed[tab]=-r ; s_reversed="${reversed[tab]}" ; cdir '' "$f"; }
 tab_new()		{ [[ -d "$f" ]] && _tab_new "$n" || _tab_new "${1:-$PWD}" ; cdir "${tabs[tab]}" ; }
 tab_next()		{ ctab=$tab ; _tab_next ; ((tab != ctab)) && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
 tab_prev()		{ ctab=$tab ; _tab_prev ; ((tab != ctab)) && cdir "${tabs[tab]}" '' "${dir_file[${tab}_${tabs[tab]}]}" ; }
