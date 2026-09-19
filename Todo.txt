@@ -9,6 +9,12 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
+feature: add shortcut to tag files in class using fzf
+	- can we multi select with different tags directly in fzf?
+
+feature: interactive class tag
+	- start mode, letters are either class, escape or movement, return is accept, backspace is remove the tag
+
 feature: pick file in fzf and open it directly
 		ctrl+0
 		other key binding to start the search and open the selected file directly 

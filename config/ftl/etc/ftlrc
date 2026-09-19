@@ -362,6 +362,7 @@ bind ftl selection	TT		selection_class_l_bis	"set to the last destination direct
 bind ftl selection	"COUNT TT"	selection_class_l_bis	"set to the last destination directory"
 bind ftl selection	Tc		selection_class_l_copy	"copy tagged to destination directory"
 bind ftl selection	Tm		selection_class_l_move	"move to destination directory"
+bind ftl selection	Tf		selection_class_l_fzf	"select destination directory via fzf"
 
 bind ftl selection	gy		selection_goto		"fzf goto selection"
 # bind ftl selection	""		selection_merge_all	"merge from panes"
