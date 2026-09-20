@@ -18,7 +18,7 @@ fsp=$pfs/prev ; PPWD="$dir"
 
 ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_main_info_file" 
 
-while : ; do tag_synch ; winch ; time_event ; { [[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || get_key $KEY_TIMEOUT ; } && try key_command ; kbdf ; winch=1 ; REPLY= ; done
+while : ; do tag_synch ; winch ; time_event ;  get_key $KEY_TIMEOUT && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
 
 cdir() { [[ -n $custom_list ]] && view_list || cview get_dir_entries "$@" ; }
@@ -159,6 +159,8 @@ true
 
 list() # select_index
 {
+[[ $no_list_update ]] && return
+
 [[ "$1" ]] && dir_file[${tab}_$PWD]="$1" ; file=${dir_file[${tab}_$PWD]:-0}
 
 ((file = file > nfiles - 1 ? nfiles - 1 : file)) ; ((nfiles)) && path "${files[file]}" || path_none

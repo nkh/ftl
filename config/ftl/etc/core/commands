@@ -41,17 +41,24 @@ preview_down2()		{ [[ $pane2_id ]] && tmux send -t $pane2_id C-D ; }
 preview_up2()		{ [[ $pane2_id ]] && tmux send -t $pane2_id C-U ; }
 preview_left()		{ [[ $pane_id ]] && tmux send -t $pane_id Left ; }
 preview_right()		{ [[ $pane_id ]] && tmux send -t $pane_id Right ; }
-selection_class_l()	{ read -sn1 ; last_dest=$REPLY ; dest_tags[$p/$f]="${dir_dest[$REPLY]}" ; [[ $dtag_move ]] && move_down ; list ; }
-selection_class_lc()	{ dest_tags[$p/$f]= ; [[ $dtag_move ]] && move_down ; list ; }
+selection_class_l()	{ 
+			[[ $REPLY == '.' ]] && { [[ $last_dest ]] && selection_class_l_bis ; return ; }
+			
+			[[ $1 ]] && REPLY="$1" || get_key
+			[[ -v dir_dest[$REPLY] ]] && { last_dest="${dir_dest[$REPLY]}" ; dest_tags[$p/$f]="$last_dest" ; scl_md ; }
+			}
+selection_class_lc()	{ dest_tags[$p/$f]= ; last_dest= ; list ; }
 selection_class_lc_all(){ dest_tags=() ; list ; }
-selection_class_l_bis()	{ for ((i=0 ; i < ${COUNT:-1} ; i++)) ; do dest_tags[$p/$f]="${dir_dest[$last_dest]}" ; [[ $dtag_move ]] && move 1 ; done ; list ; }
+selection_class_l_bis()	{ for ((bis=0 ; bis < ${COUNT:-1} ; bis++)) ; do dest_tags[$p/$f]="$last_dest" ; no_list_update=1 ; move_down ; done ; no_list_update= ; list ; }
 selection_class_l_copy(){ for fc in "${!dest_tags[@]}" ; do cp "$fc" "${dest_tags[$fc]}" ; done ; dest_tags=() ; cdir ; }
 selection_class_l_move(){ for fm in "${!dest_tags[@]}" ; do mv "$fm" "${dest_tags[$fm]}" ; done ; dest_tags=() ; cdir ; }
 selection_class_l_fzf() {
 			REPLY="$(for k in "${!dir_dest[@]}" ; do echo "$k -> ${dir_dest[$k]}" ; done | sort | fzf)"
-			[[ $REPLY ]] && { last_dest=${REPLY%% -> *} ; dest_tags[$p/$f]="${dir_dest[$last_dest]}" ; [[ $dtag_move ]] && move_down ; }
+			REPLY="${REPLY%% -> *}"
+			[[ -v dir_dest[$REPLY] ]] && { last_dest="${dir_dest[$REPLY]}" ; dest_tags[$p/$f]="$last_dest" ; scl_md ; }
 			list
 			}
+scl_md()		{ [[ $dtag_move ]] && move_down ; } 
 selection_class_1()	{ selection_class_c 1 ; }
 selection_class_2()	{ selection_class_c 2 ; }
 selection_class_3()	{ selection_class_c 3 ; }
@@ -70,7 +77,6 @@ copy()			{ prompt 'write to: ' && [[ $REPLY ]] && { tag_check && cp_mv_tags copy
 copy_clipboard()	{ q_sel | xsel -b -i ; }
 add_selection_to_file()	{ prompt 'add selection to: ' && [[ $REPLY ]] && { q_sel >> "$REPLY" ; }  ; cdir ; }
 create_bulk()		{ B=$fs/BULK ; >$B ; $EDITOR $B && [[ -s $B ]] && { grep '/$' "$B" | tr '\n' '\0' | xargs -r -0 mkdir -p ; create_bulk_files "$B"; } ; cdir ; }
-create_bulk_files()	{ grep -v '/$' "$1" | tr '\n' '\0' | xargs -r -0 dirname -z | xargs -0 mkdir -p ; grep -v '/$' "$1" | grep -v '^$' | tr '\n' '\0' | xargs -r -0 touch ; }
 create_dir_no_cd()	{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" ; cdir ; }
 create_dir()		{ prompt 'mkdir: ' && [[ "$REPLY" ]] && mkdir -p "$PWD/$REPLY" && cdir "$PWD/$REPLY" || list ; }
 create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdir "$PWD" "$REPLY" ; }

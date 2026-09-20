@@ -9,12 +9,6 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
-feature: add shortcut to tag files in class using fzf
-	- can we multi select with different tags directly in fzf?
-
-feature: interactive class tag
-	- start mode, letters are either class, escape or movement, return is accept, backspace is remove the tag
-
 feature: pick file in fzf and open it directly
 		ctrl+0
 		other key binding to start the search and open the selected file directly 
@@ -27,7 +21,6 @@ feature: show when a git file was last changed and by whom
 feature: show how many times a file was changed in the last 10 commits
 
 feature: virtual directorie for git based on how many times a file was changed
-
 
 feature: virtual directories support arbitrary file collections
 
@@ -163,24 +156,10 @@ functionality: replace åäö with other special characters, update documentatio
 
 functionality: use mcat as file and image viewer
 
-functionality: inline rename mode
-	leader r i: enter mode with keyboard sub mode handler
-	escape: cancel mode
-	up/down: move through entries
-	letters enter rename mode for current entry
-		special shortcut to add label to image
-		letter add letter
-		backspace remove letter
-		escape cancel rename mode
-		return accept rename
-	return: enter rename mode for current entry
-	special shortcuts for
-		delete entry
-		select entry
-		batch rename with regexp 
-		exit tagging
-		sequential rename
-		regexp rename
+functionality: inline rename mode or use an external renamer
+	binding to rename all te files, do the work in vim instead
+	binding for multi directory renames
+	can select the files via fzf and then rename them in vim
 
 issue: yif not working!
 issue: zT not working!

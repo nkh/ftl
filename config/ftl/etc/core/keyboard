@@ -60,6 +60,8 @@ key_command()
 {
 (( keys_in > 4 ))               && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # OVERFLOW
 [[ "$REPLY" == ERROR_142     ]] && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # TIMEOUT
+
+# todo: move to get_key
 [[ "$REPLY" == "?"           ]] && REPLY=QUESTION_MARK
 [[ "$REPLY" == "$leader_key" ]] && REPLY=LEADER 
 
@@ -79,6 +81,7 @@ keys_command="$keys_command$REPLY" ; (( keys_in++)) #; ((main)) && pdh "(main) "
 	setup_finfo "$ftl_main_info_file"
 	
 	keys_function=${kbd_trie[$HAS_COUNT$keys_command]}
+	pdhn "[$COUNT] <$keys_command> ($keys_function)"
 	$keys_function
 	
 	[[ "${exclude_from_redo[$keys_function]}" ]] || keys_latest_command="$keys_function"
@@ -97,7 +100,7 @@ get_key()
 {
 OIFS="$IFS" ; IFS=
 
-[[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; } ; OREPLY="$REPLY"
+[[ "$R" ]] && { REPLY="${R:0:1}" ; R="${R:1}" ; } || { [[ "$1" ]] && {  read -rsn 1 -t "$1" || REPLY=ERROR_$? ; } || { read -rsn 1 || REPLY=ERROR_$? ; } ; OREPLY="$REPLY" ; }
 
 read -rsn 4 -t 0.001 E1 E2 E3 E4
 
