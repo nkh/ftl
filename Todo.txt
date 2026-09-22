@@ -9,20 +9,15 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
+feature: integrate latest_changed
+
 feature: pick file in fzf and open it directly
 		ctrl+0
 		other key binding to start the search and open the selected file directly 
 		find, latest used, most used, ...
 
-feature: show when a git file was last changed and by whom
-
-	When browsing a Git repository, it would be useful to see when a file was last changed and by whom.
-
-feature: show how many times a file was changed in the last 10 commits
-
-feature: virtual directorie for git based on how many times a file was changed
-
 feature: virtual directories support arbitrary file collections
+	? difference between a virtual directory and a file list? a virtual directory and a directory with virtual files? a virtual directory and a directory with symlinks?
 
 	Expand virtual directories into a general mechanism for browsing a collection of files
 
@@ -40,6 +35,7 @@ feature: virtual directories support arbitrary file collections
 	* file/directory that does not necessarily correspond to a physical file
 		this is how virtual files work but the content needs to be defined in an ftl script, change
 		it so any process can generate a virtual file, not just ftl scripts
+	* created at start time and created dynamically at run time
 
 	For example:
 
@@ -57,7 +53,8 @@ feature: virtual directories support arbitrary file collections
 	* option to flatten the structure and show only the files
 
 	Allow multiple virtual directories to exist simultaneously, including different virtual directories in different tabs.
-
+		virtual directories in virtual directories?
+		
 	This would allow, for example, one tab to contain search results, another to contain files from a diff, and another to contain a manually selected group of files.
 
 	Virtual directories should also support grouping files into subdirectories, allowing files to be sorted into categories within the virtual directory.
@@ -77,6 +74,7 @@ feature: virtual directories support arbitrary file collections
 	A virtual directory should be displayed in the same way as a physical directory, with the same options for sorting, filtering, and previewing files.
 
 	files in a virtual directory should be displayed with their original names and paths, even if they are located in different directories or do not exist on disk.
+		optionally not as default!
 
 	files in a virtual directory can be displayed with another name or path
 
@@ -140,6 +138,14 @@ feature: more Git integration and Git-based virtual directories
 
 	issue: gvt not displaying properly, maybe because of the way it is called from ftl
 
+feature: show when a git file was last changed and by whom
+
+	When browsing a Git repository, it would be useful to see when a file was last changed and by whom.
+
+feature: show how many times a file was changed in the last 10 commits
+
+feature: virtual directorie for git based on how many times a file was changed
+
 feature: https://github.com/tjblackheart/andcli
 
 issue: dir_entries_relative_path_length[$pnc]=0 is not used
@@ -155,11 +161,6 @@ functionality: completion for ftl commands
 functionality: replace åäö with other special characters, update documentation
 
 functionality: use mcat as file and image viewer
-
-functionality: inline rename mode or use an external renamer
-	binding to rename all te files, do the work in vim instead
-	binding for multi directory renames
-	can select the files via fzf and then rename them in vim
 
 issue: yif not working!
 issue: zT not working!
