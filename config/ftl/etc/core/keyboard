@@ -81,7 +81,7 @@ keys_command="$keys_command$REPLY" ; (( keys_in++)) #; ((main)) && pdh "(main) "
 	setup_finfo "$ftl_main_info_file"
 	
 	keys_function=${kbd_trie[$HAS_COUNT$keys_command]}
-	pdhn "[$COUNT] <$keys_command> ($keys_function)"
+	# pdhn "[$COUNT] <$keys_command> ($keys_function)"
 	$keys_function
 	
 	[[ "${exclude_from_redo[$keys_function]}" ]] || keys_latest_command="$keys_function"

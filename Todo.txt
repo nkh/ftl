@@ -1,7 +1,3 @@
-issue: errors not reported visibly in ftl 
-	error when running lc 2d, where is it coming from?
-	tsc: "config/ftl/etc/core/ftl" 201L
-
 issue ?: alt_screen not aware of which screen it is in, so it doesn't know which screen to restore to when exiting alt_screen
 	add a mechanism to keep track of the current screen and restore it when exiting alt_screen in bash:
 		eg: use a variable to keep track of the current screen and restore it when exiting alt_screen
@@ -12,13 +8,6 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		# Restore the previous screen
 		tput rmcup
 		```
-
-feature: integrate latest_changed
-
-feature: pick file in fzf and open it directly
-		ctrl+0
-		other key binding to start the search and open the selected file directly 
-		find, latest used, most used, ...
 
 feature: virtual directories support arbitrary file collections
 	? difference between a virtual directory and a file list? a virtual directory and a directory with virtual files? a virtual directory and a directory with symlinks?
@@ -147,8 +136,6 @@ feature: show when a git file was last changed and by whom
 	When browsing a Git repository, it would be useful to see when a file was last changed and by whom.
 
 feature: show how many times a file was changed in the last 10 commits
-
-feature: virtual directorie for git based on how many times a file was changed
 
 feature: https://github.com/tjblackheart/andcli
 

@@ -7,7 +7,7 @@ alt_screen(){ [[ $alt_screen == 0 ]] && { echo -en '\e[?1049h' ; stty -echo ; tp
 
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && try_error "$@" || try_errorp "$@" ; } ; }
 try_error() { echo -en "\e[2J\e[H\e[31m;" ; [[ -s $fs/log ]] && { { cat $fs/log ; } | tee -a $fs/errors_log && rm $fs/log ; } ; }
-try_errorp(){ pdhn  "$(cat $fs/log)" ; read -sn1 ; tmux popup -w 80% "$(try_error "$@")" ; }
+try_errorp(){ pdhn  "$(cat $fs/log)" ; tmux popup -w 80% "[[ -s $fs/log ]] && { { cat $fs/log ; } | tee -a $fs/errors_log && rm $fs/log ; } ;" ; }
 warn()      { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[33m$*'" ; }
 error()     { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[31m$*'" ; }
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
@@ -16,7 +16,7 @@ select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id= ; in_pdir= ; in_viprev= ; in_ftli= ; sleep 0.01 ; } ; tcpreview2 ; [[ $1 ]] && prev_all=$1 ; }
 tcpreview2(){ [[ "$pane2_id" ]] && { tmux killp -t $pane2_id &>/dev/null ; pane2_id= ; sleep 0.01 ; } ; }
 vipreview() { ((in_viprev)) && tmux send -t $pane_id ":e ${tail[$1]}$(sed -E -e 's/\$/\\$/g' -e 's/#/\\\\#/' <<<"$1")" C-m  || ctsplit "$EDITOR -R ${tail[$1]}${1@Q}" ; in_viprev=1 ; }
-cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ; stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
+cmd_prompt(){ trap 'echo -ne "\e[A\e[K" ;stty -echo ; tput civis' SIGINT ; echo $(rlwrap -p'0;33' -S"${1:-ftl> }" -f$fs/command_names -H $ftl_root/cmd_history -o cat) ; trap - SIGINT ; }
 clear_list(){ for(( i=$1 ; i <= LINES  ; i++)) ; do echo -ne "\e[${i};0H\e[K$flip" ; ((i <= LINES - 1)) && echo ; done ; }
 psplit()    { ((fzf_viewer)) && [[ $pane_id ]] && tmux respawn-pane -k -t $pane_id "$@" || ctsplit "$@" ; true ; }
 ctsplit()   { in_pdir= in_viprev= in_ftli= ; [[ $pane_id ]] && tmux respawnp -k -t $pane_id "$1" &>/dev/null || tsplit "$1" ; sleep 0.2 ; }
@@ -177,7 +177,7 @@ tbcolor()   { tmux set pane-border-style "fg=color$1" ; tmux set pane-active-bor
 tscommand() { tsnew ; tmux neww -t ftl$$ -d ${@:2} "echo -e \"\e[33m$(date)\nftl> $1\e[m\" ; { $1 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
 tsucommand(){ tsnew "$1" ; tmux neww -t ftl$1 -d "echo -e \"\e[33m$(date)\nftl> $2\e[m\" ; { $2 ; } || { echo -e \"\e[7;31mftl: failed\e[m\\n\" ; exec bash ; }" ; }
 tsnew()     { tmux has-session -t ftl${1:-$$} &>/dev/null || { tmux new -A -d -s ftl${1:-$$} ; sleep 0.2 ; } ; }
-tsc()       { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; } #((w-=1)) ; (( w > 0 )) && { [[ "${1:-0}" != "$w" ]] && error Error in background command ; echo $w ; } ; }
+tsc()       { w=$(tmux lsw -t ftl$$ 2>&- | wc -l) ; ((w-=1)) ; (( w > 0 )) && { echo $w ; } ; }
 tsplit()    { tmux sp $(ftl_env) $5 -t $my_pane ${3:--h} -l ${2:-${zooms[zoom]}%} -c "$PWD" "$1" ; sleep 0.04 ; pane_id=$(tmux display -p '#{pane_id}') ; tsplitf ; tselectp $4 ; }
 tsplitf()   { [[ $pane_id && $preview_pane2 ]] && { tmux sp -b -l 9 -t $pane_id "$EDITOR '$preview_pane2' ; read -sn 1" ; sleep 0.04 ; pane2_id=$(tmux display -p '#{pane_id}') ; } ; }
 

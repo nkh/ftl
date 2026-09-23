@@ -57,9 +57,10 @@ echo "export ftl_info_file=$ftl_info_file"
 echo "cd '$PWD'"
 echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
 echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$fs/cmd_log"
-echo "${cmd_parts[@]}"
+echo "${cmd_parts[@]} > >(sed 's/^/STDOUT: /' | tee -a $fs/cmd_log) 2> >(sed 's/^/STDERR: /' | tee -a $fs/cmd_log >&2)"
 echo "exit_code=\$?"
 echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$fs/cmd_log"
+echo "echo -e \"\n\e[2;33mlog: $fs/cmd_log\e[m\""
 echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
 } >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
 
