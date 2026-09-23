@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# latest_changes()
+# {
+# fd . --type ${1:-f} --changed-within ${2:-1month} | \
+# rg -v 'repositories|.git|perl_modules|web-scrapping|.precom' | \
+# perl -pe 's/\n/\0/' | xargs -0 ls -${1:-f} -h -l --color=always | \
+# tr -s ' ' | perl -F'\s+' -ane "print join(q[ ], @F[4..8]) .join(q[🚲], @F[9..\$#F]) . qq[\n]" | column -t | sed 's/🚲/ /g' | \
+# shorten $COLUMNS -e $(echo -e "...$RESET") | \
+# sort -k 3 -k 4 -h | less -XR
+# }
+
+latest_changes() {
+    local fd_type="${1:-f}"
+    local since="${2:-1month}"
+
+    fd . --type "$fd_type" --changed-within "$since" -0 |
+    rg --null-data -v 'repositories|\.git|perl_modules|web-scrapping|.precom' |
+    while IFS= read -r -d '' file; do
+        file=${file#./}
+        stat --printf '%s\t%Y\t%U\t%G\t%A\t%n\n' "$file"
+    done |
+    sort -k2,2n |
+    while IFS=$'\t' read -r size mtime owner group perm name; do
+        printf "${DARK_GREY}%4s${RESET} %4s " $(numfmt --to=iec "$size") $(age_from_epoch "$mtime")
+        lscolors "$name"
+    done
+    # |
+    # column -t |
+    # shorten "$COLUMNS" -e "...$RESET" |
+    # less -XR
+}
+
+age_from_epoch() {
+    local age diff=$(( $(date +%s) - $1 ))
+
+   { ((diff<60))    && age="${diff}s"; } \
+|| { ((diff<3600))  && age="$((diff/60))m"; } \
+|| { ((diff<86400)) && age="$((diff/3600))h"; } \
+||                     age="$((diff/86400))d"
+
+printf "%4s" "$age"
+}
+
+[[ "${BASH_SOURCE[0]}" = "${0}" ]] && latest_changes $@

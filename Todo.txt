@@ -1,3 +1,7 @@
+issue: errors not reported visibly in ftl 
+	error when running lc 2d, where is it coming from?
+	tsc: "config/ftl/etc/core/ftl" 201L
+
 issue ?: alt_screen not aware of which screen it is in, so it doesn't know which screen to restore to when exiting alt_screen
 	add a mechanism to keep track of the current screen and restore it when exiting alt_screen in bash:
 		eg: use a variable to keep track of the current screen and restore it when exiting alt_screen

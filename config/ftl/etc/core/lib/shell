@@ -48,6 +48,10 @@ user_cmd="$FTL_CFG/commands/$cmd"
 [[ "$cmd" == split ]] && { tcpreview ; tmux split-window -e ftl_info_file="$ftl_info_file" -l 50% "$(printf "%s " "${cmd_parts[@]:1}")" ; cdir ; tmux selectp -D ; return ; }
 [[ "$cmd" == fsh   ]] && { fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; return ; }
 
+
+[[ "${cmd_parts[0]}" == "lc" ]] && { show_latest_changes "${cmd_parts[1]}" ; return ; }
+
+
 {
 echo "export ftl_info_file=$ftl_info_file"
 echo "cd '$PWD'"

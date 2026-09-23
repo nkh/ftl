@@ -1,0 +1,24 @@
+
+dest_tag_mode() { key_map=dest_tag_key_map ; }
+
+dest_tag_key_map()
+{
+case "$REPLY" in 
+	ERROR_142     ) : ;;
+	
+	RIGHT         ) move_right_arrow ;;
+	LEFT          ) move_left_arrow ;;
+	
+	QUESTION_MARK ) selection_class_l_fzf ;;
+	'.'           ) selection_class_l_bis ;;
+	PGDN          ) move_page_down ;;
+	PGUP          ) move_page_up ;;
+	DOWN          ) move_down ;;
+	UP            ) move_up ;;
+	DEL|ESCAPE    ) key_map= ;;
+	BACKSPACE     ) selection_class_lc ;;
+	*             ) [[ ${dir_dest[$REPLY]} ]] && selection_class_l "$REPLY" ;;
+esac
+}
+
+# vim: set ft=bash:
