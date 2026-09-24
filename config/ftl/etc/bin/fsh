@@ -1,22 +1,31 @@
 #!/bin/bash
 
 source $ftl_info_file # to get FTL_PID
-cmd="$(printf "%s " "$@")"
 
-tmux neww -P -a -t ftl${FTL_PID} "export ftl_info_file='$ftl_info_file' ;\
+tmux has-session -t ftl${FTL_PID} 2>/dev/null
+[[ "$?" -eq 1 ]] && tmux new -A -d -s ftl${FTL_PID} 2>/dev/null
+
+cmd="$*"
+
+tmux neww -P -a -t ftl${FTL_PID} \
+"export ftl_info_file='$ftl_info_file' ;\
+relay() { tag=\"$1\" log=\"$2\" ; while IFS= read -r line; do printf '%s: %s\n' \"$tag\" \"$line\" >>\"$log\" ; done ; } ;\
+export FTL_FS='$FTL_FS' ;\
+echo \"cd '$PWD'\" ;\
 echo -e \"\e[2;33m[\$(date -R)] \$PWD\n\e[0;33mfsh> $cmd\e[m\" ;\
 echo -e \"\t\e[93m\$\$ - [\$(date -R)] \$PWD\n\t\e[93m\$\$ - fsh> $cmd\e[m\" >>$FTL_FS/cmd_log ;\
 { \
 $cmd \
-  > >(sed 's/^/STDOUT: /' | tee -a $FTL_FS/cmd_log) \
-  2> >(sed 's/^/STDERR: /' | tee -a $FTL_FS/cmd_log >&2)
+   > >(sed -u 's/^/STDOUT: /' | stdbuf -oL tee -a $FTL_FS/cmd_log) \
+  2> >(sed -u 's/^/STDERR: /' | stdbuf -oL tee -a $FTL_FS/cmd_log >&2)\
 ; } ;\
 exit_code=\$? ; \
 { \
 echo -e \"\t\e[93m\$\$ - exit code: \$exit_code\e[m\n\" >>$FTL_FS/cmd_log ; \
 echo -e \"\n\e[2;33mlog : $FTL_FS/cmd_log\e[m\" ; \
 echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\" ; \
-bash ; \
-}"
+[[ \$exit_code != 0 ]] && { pdh failed: $cmd ; sleep 0.1 ; tmux popup -h 80% -w 100% 'less +G -R $FTL_FS/cmd_log' ; true ; } || pdh success: $cmd ; \
+[[ \$exit_code != 0 ]] && bash ; \
+}" 1>/dev/null
 
 # vim: set filetype=bash :

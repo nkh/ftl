@@ -13,6 +13,7 @@ return
 
 shell_command()
 {
+# move to line number if argument is a number
 [[ "$1" == 0 ]] && { return 1 ; }
 [[ "$1" =~ ^[1-9][0-9]*$ ]] && { file="${files[(($1 - 1))]}"  ; [[ -d "$file" ]] && cdir "$file" || list $(($1 - 1)) ; return 1 ; }
 
@@ -38,30 +39,28 @@ user_cmd="$FTL_CFG/commands/$cmd"
 	return
 	}
 
-# Shell command
-((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
-
 # check command aliases
 [[ -n "${cmd_aliases[$cmd]}" ]] && cmd_parts=(${cmd_aliases[$cmd]} $(printf "%s " "${cmd_parts[@]:1}")) ; cmd="$cmd_parts"
 
-[[ "$cmd" == full  ]] && { tcpreview ; clear ; eval "${cmd_parts[@]:1}" ; cdir ; return ; }
-[[ "$cmd" == split ]] && { tcpreview ; tmux split-window -e ftl_info_file="$ftl_info_file" -l 50% "$(printf "%s " "${cmd_parts[@]:1}")" ; cdir ; tmux selectp -D ; return ; }
-[[ "$cmd" == fsh   ]] && { fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; return ; }
-
-
+[[ "$cmd" == full  ]]           && { tcpreview ; clear ; eval "${cmd_parts[@]:1}" ; cdir ; return ; }
+[[ "$cmd" == split ]]           && { tcpreview ; tmux split-window -e ftl_info_file="$ftl_info_file" -l 50% "$(printf "%s " "${cmd_parts[@]:1}")" ; cdir ; tmux selectp -D ; return ; }
+[[ "$cmd" == fsh   ]]           && { fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; return ; }
 [[ "${cmd_parts[0]}" == "lc" ]] && { show_latest_changes "${cmd_parts[1]}" ; return ; }
 
+# Shell command session
+((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }
 
 {
 echo "export ftl_info_file=$ftl_info_file"
 echo "cd '$PWD'"
 echo "echo -e '\e[2;33m[$(date -R)] $PWD\n\e[0;33mftl> $@ \e[m'"
 echo "echo -e \"\e[33m[$(date -R)] $PWD\n\e[33mftl> $@ \e[m\" >>$fs/cmd_log"
-echo "${cmd_parts[@]} > >(sed 's/^/STDOUT: /' | tee -a $fs/cmd_log) 2> >(sed 's/^/STDERR: /' | tee -a $fs/cmd_log >&2)"
+echo "${cmd_parts[@]} > >(sed -u 's/^/STDOUT: /' | tee -a $fs/cmd_log) 2> >(sed -u 's/^/STDERR: /' | tee -a $fs/cmd_log >&2)"
 echo "exit_code=\$?"
 echo "echo -e \"\e[33mexit code: \$exit_code\e[m\n\" >>$fs/cmd_log"
 echo "echo -e \"\n\e[2;33mlog: $fs/cmd_log\e[m\""
 echo "echo -e \"\n\e[2;33mexit code: \$exit_code\e[m\""
+echo "[[ \$exit_code != 0 ]] && { sleep 0.1 ; tmux popup -h 80% -w 100% 'less -R $fs/cmd_log' ; }"
 } >$fs/bash_command && tmux send -t ftl$$:ftl$$_bash ". $fs/bash_command" Enter
 
 }

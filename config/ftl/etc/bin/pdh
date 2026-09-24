@@ -1,0 +1,7 @@
+#!/bin/bash
+
+[[ $FTL_FS ]] || { echo "FTL_FS not set" ; exit 1 ; }
+
+pfs=${FTL_FS}
+
+[[ -f $pfs/pdh ]] && { read pdh <$pfs/pdh ; [[ $pdh ]] && tmux send -t $pdh -- "$*" ENTER ; } ;
