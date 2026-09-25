@@ -49,15 +49,35 @@ my_pane=$(pid_2_pane $$)
 stty -echo
 tput civis
 
-CLEAN_IMAGE=${4:-1}
-FONT_W=${5:-10}
-FONT_H=${6:-19}
+PFS=${1:-$HOME/.config/ftl}
+FTL_INFO_FILE=${2:-$PFS/ftl_info}
+IMAGE=${3:-$PFS/image.png}
+ZOOM=${4:-1}
+CLEAN_IMAGE=${5:-1}
+FONT_W=${6:-10}
+FONT_H=${7:-19}
 
 image_bg="$HOME/.config/ftl/image_bg.png"
 
-[[ -e $1/W3M_PIPE ]] || mkfifo $1/W3M_PIPE ; eval "exec 7<>$1/W3M_PIPE"
-{ <&7 /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$!
+[[ -e $PFS/W3M_PIPE ]] || mkfifo $PFS/W3M_PIPE ; eval "exec 7<>$PFS/W3M_PIPE"
 
-[[ -e "$2" ]] && pw3image "$2" "$3"
+# source $FTL_INFO_FILE # toget FTL_FS needed by pdh
+# export FTL_FS="$FTL_FS"
+# pdh testing if w3mimgdisplay is already running
+
+[[ -e $PFS/W3M_PROC ]] && 
+	{
+	read -r PID < $PFS/W3M_PROC
+	
+	if ps -p "$PID" > /dev/null 2>&1 ; then
+		PID_RUNNING=1
+		#pdh reusing pid $PID
+		w3iproc=$PID
+	fi
+	}
+
+[[ $PID_RUNNING ]] || { { <&7 setsid /usr/lib/w3m/w3mimgdisplay &> /dev/null & } ; w3iproc=$! ; echo $w3iproc > $PFS/W3M_PROC ; }
+
+[[ -e "$IMAGE" ]] && pw3image "$IMAGE" "$ZOOM"
 while read -r n ; do read -r z ; pw3image "$n" "$z" ; done
 

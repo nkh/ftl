@@ -7,8 +7,11 @@ extmode=${3:-0}
 f="$(md5sum <<<"$1" | cut -d' ' -f1)_$(basename "$1")"
 t="$2/$f.$extmode.txt"
 
-[[ FORCE == "$4" || "$t" -ot "$1" ]] &&
+# source $ftl_info_file # to get FTL_FS needed by pdh
+# # export FTL_FS="$FTL_FS"
 
+
+[[ FORCE == "$4" || "$t" -ot "$1" ]] &&
 	{
 	mutool draw -o "$t" "$1" $( (($extmode)) || echo 1-3 ) 2>/dev/null
 	}

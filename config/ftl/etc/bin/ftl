@@ -197,6 +197,7 @@ show_header()
 {
 head="${lglyph[lmode[tab]]}${iglyph[vmode[tab]]}${pdir_only[tab]}${montage}" ; head=${head:+$head }
 
+
 [[ "$to_search" ]] && search_h="S:$to_search " || search_h=
 
 ((ntabs>1)) && tabsd=' ᵗ'$((tab+1)) || tabsd= ; 
@@ -209,8 +210,14 @@ header '' "$head$ftag$(printf "%${pad}d" $((file+1)))/${nfiles_h:-$nfiles}$hsum$
 
 preview()
 {
+# start=`date +%s.%N`
+
 ((main)) && { ((emode)) && { ext_viewers ; emode=0 ; } || { ((prev_all)) && pviewers ; extmode=0 ; } ; } \
 	 || { save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ;}
+
+# end=`date +%s.%N`
+# runtime=$( echo "$end - $start" | bc -l )
+# pdhn $f preview time: $runtime
 }
 
 setup_finfo()

@@ -1,3 +1,16 @@
+issue: yif not working!
+
+issue: zT not working!
+
+issue: inotify not working!
+
+issue: error message fromn inotify
+	? used in empty directory
+
+	?fix moved inotify_s down in code
+
+issue: dir_entries_relative_path_length[$pnc]=0 is not used
+
 issue ?: alt_screen not aware of which screen it is in, so it doesn't know which screen to restore to when exiting alt_screen
 	add a mechanism to keep track of the current screen and restore it when exiting alt_screen in bash:
 		eg: use a variable to keep track of the current screen and restore it when exiting alt_screen
@@ -8,6 +21,18 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		# Restore the previous screen
 		tput rmcup
 		```
+
+issue: slight delay when scrolling fast in directory and preview type changes
+	already modified psplit, what was fzf_viewer for?!
+	pdf list fast, image list fast, both ... go slow
+	rewrite pw3image()  so it doesn't split if there is a preview pane, pdf preview doesn't start with current test code
+
+functionality: simplest way to add shortcuts for the user, documnent that best is to have commands in a file for reuse
+	add tags so they can be searched via fzf
+	url to their documentation and/or a short description of what they do
+	link to the source code if possible
+
+functionality: run on entry in tmux popup pane
 
 feature: virtual directories support arbitrary file collections
 	? difference between a virtual directory and a file list? a virtual directory and a directory with virtual files? a virtual directory and a directory with symlinks?
@@ -131,15 +156,7 @@ feature: more Git integration and Git-based virtual directories
 
 	issue: gvt not displaying properly, maybe because of the way it is called from ftl
 
-feature: show when a git file was last changed and by whom
-
-	When browsing a Git repository, it would be useful to see when a file was last changed and by whom.
-
-feature: show how many times a file was changed in the last 10 commits
-
 feature: https://github.com/tjblackheart/andcli
-
-issue: dir_entries_relative_path_length[$pnc]=0 is not used
 
 functionality: wizards to add new functionality
 	eg: add a new command, add a new key binding, add a new mode, ...
@@ -152,18 +169,6 @@ functionality: completion for ftl commands
 functionality: replace åäö with other special characters, update documentation
 
 functionality: use mcat as file and image viewer
-
-issue: yif not working!
-issue: zT not working!
-
-functionality: run on entry in tmux popup pane
-
-issue: inotify not working!
-
-issue: error message fromn inotify
-	? used in empty directory
-
-	?fix moved inotify_s down in code
 
 functionality: pane splitting
 		what do we want?

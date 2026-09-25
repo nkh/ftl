@@ -11,7 +11,8 @@ try_errorp(){ pdhn  "$(cat $fs/log)" ; tmux popup -w 80% "[[ -s $fs/log ]] && { 
 warn()      { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[33m$*'" ; }
 error()     { pdhn  "$*" ; tmux popup -w 60% -h 20% "echo -ne '\e[2J\e[H\e[31m$*'" ; }
 ewith()     { source "$FTL_CFG/commands/open_with" ; R="${C[refresh_pane]}$R" ; true ; }
-pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || { ctsplit "ftli $pfs \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; } ; }
+pw3image()  { ((in_ftli)) && tmux send -t $pane_id "$1" C-m "$FTLI_Z" C-m || pw3image_r "$1" ; } 
+pw3image_r(){ ctsplit "ftli $pfs $ftl_info_file \"$1\" '$FTLI_Z' '$FTLI_CLEAN' '$FTLI_W' '$FTLI_H'" ; in_ftli=1 ; select_myp ; }
 select_myp(){ sleep 0.05 ; tmux selectp -t $my_pane ; }
 tcpreview() { [[ "$pane_id" ]] && { tmux killp -t $pane_id &>/dev/null ; pane_id= ; in_pdir= ; in_viprev= ; in_ftli= ; sleep 0.01 ; } ; tcpreview2 ; [[ $1 ]] && prev_all=$1 ; }
 tcpreview2(){ [[ "$pane2_id" ]] && { tmux killp -t $pane2_id &>/dev/null ; pane2_id= ; sleep 0.01 ; } ; }
