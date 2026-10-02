@@ -1,16 +1,28 @@
 #!/bin/env bash
 
+parse_args() # parse command line arguments
+{
+parsed_args=()
+
+while (($#)); do
+	case $1 in
+		-f  ) pfs=$ftl_root/$$ ; mkdir -p "$pfs" ; try load_filter "$2" ; shift 2 ;;
+		-s  ) sel_read "$@" ; shift 2 ;;
+		-t  ) tab_read "$@" ; shift 2 ;;
+		-TML) dir_dest[l]="$PWD" ; shift ;;
+		-FML) fzf_mv_start_dir="-d $PWD" ; shift ;;
+		-R  ) set_R "$2" ; shift 2 ;;
+		--  ) shift ; parsed_args+=("$@") ; break ;;
+		-*  ) echo "ftl: error: unknown option '$1'" >&2 ; exit 1 ;;
+		*   ) parsed_args+=("$1") ; shift ;;
+	esac
+done
+}
+
 ftl() # dir[/file], pfs, preview_ftl. © Nadim Khemir 2020-2025, Artistic licence 2.0
 {
 source $FTL_CFG/etc/core/ftl_setup
-[[ "$1" == '-f' ]] && { pfs=$ftl_root/$$ ; mkdir -p $pfs ; try load_filter "$2" ; shift 2 ; }
-[[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
-[[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
-
-[[ "$1" == '-TML' ]] && { dir_dest[l]="$PWD" ; shift ; }
-[[ "$1" == '-FML' ]] && { fzf_mv_start_dir="-d ${PWD}" ; shift ; }
-
-while [[ "$1" == '-R' ]] ; do set_R "$2" && shift 2 ; done
+parse_args "$@" ; set -- "${parsed_args[@]}"
 
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 
