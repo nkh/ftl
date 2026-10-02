@@ -124,10 +124,10 @@ image_select_rec()	{ OIFS="$IFS" IFS=$'\n' ; for image in $($SXIV -b -q -o -f -t
 image_zoom()		{ ((FTLI_Z ^= 1)) ; list ; }
 link()			{ tag_check && prompt "Link (${#tags[@]})? [y|N]" -sn1 ; [[ $REPLY == y ]] && tags_clear && for f in "${selection[@]}" ; do ln -s -b "$f" . ; done ; cdir ; }
 follow_link()		{ [[ -L "$n" ]] && cdir "$(dirname $(realpath "$n"))"  "$(basename $(realpath "$n"))" ; }
-mark()			{ read -sn1 ; [[ -n $REPLY ]] && { [[ -d  "${files[file]}" ]] && marks[$REPLY]="${files[file]}/$" || marks[$REPLY]="${files[file]}" ; } ; }
+mark()			{ get_key ; [[ -n $REPLY ]] && { [[ -d  "${files[file]}" ]] && marks[$REPLY]="${files[file]}/$" || marks[$REPLY]="${files[file]}" ; } ; }
 mark_fzf()		{ go_loop f fzf "$({ gmark_fzf_user ; printf "%s\n" "${marks[@]}" ; } | sort -u | lscolors | fzf-tmux $fzf_opt -m --expect=ctrl-t --ansi)" ; }
-mark_go()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
-mark_go_tab()		{ read -n 1 ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
+mark_go()		{ get_key ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
+mark_go_tab()		{ get_key ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
 player_kill()		{ player_k ; }
 pane_down()		{ pane_extra "-v" "" ; }
 

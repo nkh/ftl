@@ -22,16 +22,6 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
-issue: slight delay when scrolling fast in directory and preview type changes
-	already modified psplit, what was fzf_viewer for?!
-	pdf list fast, image list fast, both ... go slow
-	rewrite pw3image()  so it doesn't split if there is a preview pane, pdf preview doesn't start with current test code
-
-functionality: simplest way to add shortcuts for the user, documnent that best is to have commands in a file for reuse
-	add tags so they can be searched via fzf
-	url to their documentation and/or a short description of what they do
-	link to the source code if possible
-
 functionality: run on entry in tmux popup pane
 
 feature: virtual directories support arbitrary file collections

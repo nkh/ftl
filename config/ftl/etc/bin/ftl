@@ -7,6 +7,10 @@ source $FTL_CFG/etc/core/ftl_setup
 [[ "$1" == '-s' ]] && { sel_read "$@" && shift 2 ; }
 [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
+[[ "$1" == '-TML' ]] && { dir_dest[l]="$PWD" ; shift ; }
+
+while [[ "$1" == '-R' ]] ; do set_R "$2" && shift 2 ; done
+
 [[ "$1" ]] && { [[ -d "$1" ]] && { dir="$1" ; search='' ; } || { [[ -f "$1" ]] && { path "$1" ; dir="${p}" ; search="$f" ; } ; } || { echo ftl: \'$1\', no such path ; exit 1 ; } ; }
 
 alt_screen
@@ -20,6 +24,8 @@ ftl_main_info_file="$(mktemp -p $fs ftl_main_info_XXXXXXX)" ; setup_finfo "$ftl_
 
 while : ; do tag_synch ; winch ; time_event ;  get_key $KEY_TIMEOUT && try key_command ; kbdf ; winch=1 ; REPLY= ; done
 }
+
+set_R() { R="$R$1" ; }
 
 cdir() { [[ -n $custom_list ]] && view_list || cview get_dir_entries "$@" ; }
 
