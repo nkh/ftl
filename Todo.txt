@@ -22,6 +22,11 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
+functionality: open file in new tmux window or pane
+	eg: open file in new tmux window
+	eg: open file in new tmux pane
+	possibility to do it after opening the file from ftl, moving the editor to the new window/pane
+
 functionality: run on entry in tmux popup pane
 
 feature: virtual directories support arbitrary file collections

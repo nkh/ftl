@@ -8,6 +8,7 @@ source $FTL_CFG/etc/core/ftl_setup
 [[ "$1" == '-t' ]] && { tab_read "$@" && shift 2 ; }
 
 [[ "$1" == '-TML' ]] && { dir_dest[l]="$PWD" ; shift ; }
+[[ "$1" == '-FML' ]] && { fzf_mv_start_dir="-d ${PWD}" ; shift ; }
 
 while [[ "$1" == '-R' ]] ; do set_R "$2" && shift 2 ; done
 
