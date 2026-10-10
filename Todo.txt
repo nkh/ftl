@@ -22,12 +22,51 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
-functionality: open file in new tmux window or pane
-	eg: open file in new tmux window
-	eg: open file in new tmux pane
-	possibility to do it after opening the file from ftl, moving the editor to the new window/pane
+feature: simple way of adding a new command to ftl
+	examples in a ftlrc or file loaded from ftlrc
+		ext_bind normal_data, mode, command $f ...
+		selection?
+		2 files, $f1-$f2, command not valif if not defined
+		fzf pick and run
 
-functionality: run on entry in tmux popup pane
+	root letter for commands, LEADER r
+	leader u used to run user commands in files 
+	
+	sort out:
+		system to add shortcut in command line
+		add shortcut
+		command line bindings
+		command line external command
+		command line any external command
+		passing arguments to external command
+
+
+	external command:
+		* zonetimeline-tui, ztl
+		* lincast
+		https://github.com/vncsmnl/rwx?ref=terminaltrove
+		cmus
+https://github.com/jacek-kurlit/pik?ref=terminaltrove
+https://github.com/joknarf/pgtreeawk
+https://github.com/nasedkinpv/numr?ref=terminaltrove
+eva?
+https://github.com/jarun/ddgr?ref=terminaltrove#installation
+
+feature: external filters
+	stackable
+	listed in a config
+	added at run time
+	save to config
+	editable config with reload
+	per directory
+	inherit parent's or not
+	per tab
+	run in a pipeline
+	bash pipeline file, can contain multiple filters
+
+	use cases:
+		show only git file or non git files
+		hide some directories
 
 feature: virtual directories support arbitrary file collections
 	? difference between a virtual directory and a file list? a virtual directory and a directory with virtual files? a virtual directory and a directory with symlinks?

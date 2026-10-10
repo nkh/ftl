@@ -4,9 +4,11 @@ declare -A LA=( [ª]=a [”]=b [©]=c [ð]=d [€]=e [đ]=f [ŋ]=g [ħ]=h [→]=
 declare -A SA=( [a]=º [b]=’ [c]=© [d]=Ð [e]=¢ [f]=ª [g]=Ŋ [h]=Ħ [i]=ı [k]='&' [l]=Ł [m]=º [o]=Œ [p]=Þ [q]=Ω [r]=® [s]=§ [t]=Þ [u]=↑ [v]=‘ [x]='>' [y]=¥ [z]='<' ["'"]=× [.]=˙ [0]=° [/]=÷)
 declare -A LSA=([º]=a [’]=b [©]=c [Ð]=d [¢]=e [ª]=f [Ŋ]=g [Ħ]=h [ı]=i ['&']=k [Ł]=l [º]=m [Œ]=o [Þ]=p [Ω]=q [®]=r [§]=s [Þ]=t [↑]=u [‘]=v ['>']=x [¥]=y ['<']=z [×]="'" [˙]=. [°]=0 [÷]=/)
 
+declare -A C_ARGS=()
+
 bind()
 {
-local map="$1" section="$2" keys="$3" command="$4" help="$5" shortcut= dscut=
+local map="$1" section="$2" keys="$3" command="$4" help="$5" arguments="${@:6}" shortcut= dscut=
 local keysa=( $keys )
 
 for key in "${keysa[@]}"
@@ -21,7 +23,11 @@ for key in "${keysa[@]}"
 	done
 
 ((ftl_bind_check && ${kbd_trie[$shortcut]} > 1)) && echo "ftl: bind: map: $map, section: $section, keys:'$keys', command: '$command' is overriding command path" 
-C[$command]="$shortcut" ; kbd_trie[$shortcut]="$command" ; bindings[$dscut]="$map	$section	$dscut	$command	$help"
+C[$command]="$shortcut" ; [[ "$arguments" ]] && C_ARGS[$command]="$arguments" ; kbd_trie[$shortcut]="$command"
+
+
+local arguments_display ; [[ "$arguments" ]] && arguments_display=" <$arguments>" || arguments_display=
+bindings[$dscut]="$map	$section	$dscut	$command	$help$arguments_display"
 }
 
 unbind()
@@ -69,7 +75,7 @@ key_command()
 [[ "$REPLY" == ESCAPE ]]        && { keys_in= keys_command= HAS_COUNT= COUNT= ; return ; } # INTERRUPTED
 
 [[ -z "$keys_command" || "$keys_command" =~ ^[0-9]$ ]] && [[ "$REPLY" =~ ^[0-9]$ ]] && { [[ "$COUNT$REPLY" != 0 ]] && { HAS_COUNT=COUNT ; COUNT="$COUNT$REPLY" ; } ; return ; }
-
+# pdhn "testing command <$keys_command + $REPLY>"
 keys_command="$keys_command$REPLY" ; (( keys_in++)) #; ((main)) && pdh "(main) " ; pdhn "[$COUNT] <$keys_command> ($keys_in) -> ${kbd_trie[$HAS_COUNT$keys_command]}"
 
 # echo "$HAS_COUNT$keys_command -> ${kbd_trie[$HAS_COUNT$keys_command]}" >&3
@@ -81,10 +87,13 @@ keys_command="$keys_command$REPLY" ; (( keys_in++)) #; ((main)) && pdh "(main) "
 	setup_finfo "$ftl_main_info_file"
 	
 	keys_function=${kbd_trie[$HAS_COUNT$keys_command]}
-	# pdhn "[$COUNT] <$keys_command> ($keys_function)"
-	$keys_function
+	local args="${C_ARGS[$keys_function]}"
 	
-	[[ "${exclude_from_redo[$keys_function]}" ]] || keys_latest_command="$keys_function"
+	# pdhn "[$COUNT] <$keys_command> ($keys_function) <$args>"
+	
+	$keys_function $args
+	
+	[[ "${exclude_from_redo[$keys_function]}" ]] || keys_latest_command="$keys_function $args"
 	
 	keys_in= keys_command= HAS_COUNT= COUNT= REPLY=
 	}

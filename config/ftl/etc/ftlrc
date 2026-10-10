@@ -115,6 +115,7 @@ MD_PAGER='/usr/bin/less -R'		# markdown preview pager, alt: MD_PAGER='moar --no-
 MD_RENDER0='ptext'			# default markdown renderer 
 MD_RENDER1='vmd'			# markdown renderer #1, alt: MD_RENDER1='lowdown -Tterm'
 MD_RENDER2='vmd'			# markdown renderer #2
+MD_RENDER3='vmd'			# markdown renderer #3
 MD_DIR_RENDER="vmd"			# markdown renderer for mode "show README in directory"
 
 HEXVIEW=hexdump				# hex viewer

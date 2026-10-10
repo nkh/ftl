@@ -22,7 +22,8 @@ shell_command()
 [[ "$1" == "load_sel" ]] && { load_sel ; return ; }
 
 # command or shortcut bound to command
-[[ "${kbd_trie[$1]}" ]] && R=${kbd_trie[$1]} && return ;
+[[ "${kbd_trie[$1]}" ]] && ${kbd_trie[$1]} && return ;
+
 [[  ${C[$1]} ]] && R=${C[$1]} && return
 
 # split command
@@ -45,7 +46,14 @@ user_cmd="$FTL_CFG/commands/$cmd"
 [[ "$cmd" == full  ]]           && { tcpreview ; clear ; eval "${cmd_parts[@]:1}" ; cdir ; return ; }
 [[ "$cmd" == split ]]           && { tcpreview ; tmux split-window -e ftl_info_file="$ftl_info_file" -l 50% "$(printf "%s " "${cmd_parts[@]:1}")" ; cdir ; tmux selectp -D ; return ; }
 [[ "$cmd" == fsh   ]]           && { fsh "$(printf "%s " "${cmd_parts[@]:1}")" ; return ; }
-[[ "${cmd_parts[0]}" == "lc" ]] && { show_latest_changes "${cmd_parts[1]}" ; return ; }
+
+[[ $(type -t "$cmd") == function ]] &&
+	{
+	local args="${C_ARGS[$cmd]}"
+	${cmd} "${cmd_parts[@]:1}" $args
+	
+	return
+	} 
 
 # Shell command session
 ((session_shell)) || { tmux new -A -d -s ftl$$ ; tmux neww -t ftl$$ -n ftl$$_bash ; sleep 0.2 ; session_shell=1 ; }

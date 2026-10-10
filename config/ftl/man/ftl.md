@@ -2,6 +2,33 @@
 # NAME
 ftl - terminal file manager, with live previews, hyperorthodox
 
+# not upto-date
+
+options:
+-FML
+-TML
+-R
+
+external pdh command
+lc command
+RA && RR
+tt interactive selection class, tm?, ...
+TF
+preview pageup/down
+etag2
+space+f+s disk free
+project marks
+tree view
+git directory tag
+fixed preview view on top of the preview
+mo markdown preview
+open file in new tmux window, xV
+dir_dest and copy with single key
+stl preview
+custom external viewer
+a/s selection
+custom commands examples, popup, ..
+
 # SYNOPSIS
 
 ftl
@@ -256,9 +283,9 @@ Reserved for *ftl*: [ÅåÄ]
 <c> will open a window listing all the current binding, in _fzf_,
 wich allows you to search per key or name.
 
-        map    section  keys     command                
-        -------------------------------------------------------------------
-        ftl    file     w        copy          copy file to, prompts inline
+        map    section  keys     command   description                      args
+        -------------------------------------------------------------------------
+        ftl    file     w        copy      'copy file to, prompts inline'   [123]
         ...
 
 ## Leader Key
