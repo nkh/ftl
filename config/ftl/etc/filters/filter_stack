@@ -1,0 +1,35 @@
+# [[ $1 == sort_stack ]] &&
+# 	{
+# 	# first time loading the filter
+# 	source $FTL_CFG/filters/sort_by_extension "sort_by_extension"
+# 	eval "$(declare -f ftl_filter | sed '1s/^ftl_filter/filter_sort_by_extension/')"
+	
+# 	pdhn f1
+# 	source $FTL_CFG/filters/by_git "by_git"
+# 	eval "$(declare -f ftl_filter | sed '1s/^ftl_filter/filter_by_git/')"
+# 	pdhn f2
+# 	} || 
+# 	{
+# 	pdhn extra
+# 	source $FTL_CFG/filters/sort_by_extension "$@"
+# 	source $FTL_CFG/filters/by_git "$@"
+# 	}
+
+# ftl_stacked_filters() 
+# {
+# cmds=('filter_sort_by_extension' 'filter_by_git')
+# export -f filter_sort_by_extension
+# export -f filter_by_git
+
+# IFS='|'
+# bash -c "${cmds[*]}"
+# }
+#
+# ftl_filter() { ftl_stacked_filters ; }
+
+ftag=☰
+
+ftl_filter() { export FTL_TAGS="$(declare -p tags)" ; $FTL_CFG/filters/by_only_tagged "$@" | $FTL_CFG/filters/by_git "$@" ; }
+
+# vim: set filetype=sh :
+

@@ -1,4 +1,5 @@
 sort_glyph() { echo e ; }
+
 ftl_sort()
 {
 entry=0

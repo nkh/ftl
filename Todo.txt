@@ -54,17 +54,15 @@ https://github.com/jarun/ddgr?ref=terminaltrove#installation
 
 feature: external filters
 
+	the external filters are source and then we fiddle with the ftl_filter function
+		they should be run in a subshell and the output should be captured
+		this eliminates all the sharing details and makes it easier to run the filters in parallel
+
+
 	cmds=('grep ba' 'sort' '{ cat ; echo baboo ;}' 'uniq -c' 'wc -l') ; filters() { IFS='|' ;  bash -c "${cmds[*]}"; } ; printf '%s\n' 1foo 1bar 1baz | filters
 
-	add to the stack at run time
-		command that makes a copy of the filter and opens an editor to edit it, then reloads it
-
-	per directory - any other per directory settings?
-		yes, sorting order in download
-		loaded from a file in the directory
-
-	per tab - are the other filters per tab? they should be or at least could be
-		yes, ...
+	per directory / per tab
+		directly in the cache created by filters
 
 
 

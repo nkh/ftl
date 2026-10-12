@@ -1,4 +1,7 @@
+#! /bin/bash
+
 ftag="~"
+
 ftl_filter()
 {
 while IFS=$'\t' read -a file_data
@@ -6,5 +9,9 @@ while IFS=$'\t' read -a file_data
 		{ [[ -d ${file_data[2]} ]] || [[ "${tags[$PWD/${file_data[2]}]}" ]] ; } && printf "%s\t%s\t%s\n" "${file_data[@]}"
 	done
 }
+
+# use in a stacked filter, and called as an external script not sourced, the tags are passed via the FTL_TAGS environment variable
+[[ "${BASH_SOURCE[0]}" = "${0}" ]] && { eval "$FTL_TAGS" ; ftl_filter "$@" ; }  
+true
 
 # vim: set filetype=sh :

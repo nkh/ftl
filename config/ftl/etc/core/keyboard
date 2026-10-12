@@ -27,7 +27,7 @@ C[$command]="$shortcut" ; [[ "$arguments" ]] && C_ARGS[$command]="$arguments" ; 
 
 
 local arguments_display ; [[ "$arguments" ]] && arguments_display=" <$arguments>" || arguments_display=
-bindings[$dscut]="$map	$section	$dscut	$command	$help$arguments_display"
+bindings[$dscut]="$dscut $arguments_display	$help	$command	$map	$section"
 }
 
 unbind()

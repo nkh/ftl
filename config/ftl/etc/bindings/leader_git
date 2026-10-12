@@ -45,7 +45,9 @@ git_root="$(git rev-parse --show-toplevel)"
 fzf_tag T "$(git-color-status -u | fzf-tmux $fzf_opt --multi --reverse --info=inline --color=hl+:214,hl:214 --ansi --marker '▪'| sed 's#...#'$git_root'/#')" ; list ; 
 }
 
+filter_by_git() { load_filter "by_git" ; cdir '' "$f" ; }
 
+bind git	extra	"LEADER g z"	filter_by_git	"display only git files"
 bind git	extra	"LEADER g g"	git_etags	"git display status"
 bind git	extra	"LEADER g t"	git_tree	"git tree status"
 bind git	extra	"LEADER g d"	git_diff2	"git diff2"

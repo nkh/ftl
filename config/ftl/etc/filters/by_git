@@ -1,3 +1,5 @@
+#!/bin/bash
+
 declare -g -A keep PWDS
 
 [[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
@@ -28,5 +30,9 @@ ftl_filter()
 		done
 	} || cat 
 }
+
+# called directly in a stacked filter, not sourced
+[[ "${BASH_SOURCE[0]}" = "${0}" ]] && ftl_filter "$@"   
+true
 
 # vim: set filetype=sh :
