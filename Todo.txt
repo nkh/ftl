@@ -53,20 +53,20 @@ eva?
 https://github.com/jarun/ddgr?ref=terminaltrove#installation
 
 feature: external filters
-	stackable
-	listed in a config
-	added at run time
-	save to config
-	editable config with reload
-	per directory
-	inherit parent's or not
-	per tab
-	run in a pipeline
-	bash pipeline file, can contain multiple filters
 
-	use cases:
-		show only git file or non git files
-		hide some directories
+	cmds=('grep ba' 'sort' '{ cat ; echo baboo ;}' 'uniq -c' 'wc -l') ; filters() { IFS='|' ;  bash -c "${cmds[*]}"; } ; printf '%s\n' 1foo 1bar 1baz | filters
+
+	add to the stack at run time
+		command that makes a copy of the filter and opens an editor to edit it, then reloads it
+
+	per directory - any other per directory settings?
+		yes, sorting order in download
+		loaded from a file in the directory
+
+	per tab - are the other filters per tab? they should be or at least could be
+		yes, ...
+
+
 
 feature: virtual directories support arbitrary file collections
 	? difference between a virtual directory and a file list? a virtual directory and a directory with virtual files? a virtual directory and a directory with symlinks?
@@ -83,7 +83,6 @@ feature: virtual directories support arbitrary file collections
 	* diff results
 	* results from other FTL commands
 	* files changed by a Git commit
-	* files from different categories or sources
 	* file/directory that does not necessarily correspond to a physical file
 		this is how virtual files work but the content needs to be defined in an ftl script, change
 		it so any process can generate a virtual file, not just ftl scripts
