@@ -1,5 +1,6 @@
 ftl_filter() { /bin/cat ; } 
 filter_ext=
+ftag=
 
 # vim: set filetype=sh :
 

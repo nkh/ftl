@@ -1,0 +1,35 @@
+declare -g -A keep PWDS
+
+[[ "$1" == reset ]] && { unset -v keep PWDS ; } ||
+{
+	{
+	OIFS=$IFS ; IFS=$'\n'
+	
+	for file in $(git ls-files -- . ':!*/**')
+		do 
+			keep["$tab-$PWD/$file"]=1
+			PWDS[$tab-$PWD]=1
+			ftag="!ᵍⁱᵗ"
+		done
+	IFS=$OIFS
+	}
+}
+
+ftl_filter()
+{
+[[ ${PWDS["$tab-$PWD"]} == 1 ]] && 
+	{
+	while read -r file_data
+		do
+			IFS=$'\t' read -r _ _ fn <<< "$file_data"
+			
+			[[ -d "$fn" ]] && echo "$file_data" && continue
+
+			# not keeping the file if it is in the keep array (a git file)
+			[[ ${keep["$tab-$PWD/$fn"]} == 1 ]] || echo "$file_data"
+		done
+	} || cat 
+}
+
+# vim: set filetype=sh :
+
