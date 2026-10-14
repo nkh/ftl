@@ -47,7 +47,7 @@ git rev-parse HEAD &>/dev/null &&
 				*/*) file="${file%%/*}" ; git_status="$yellow**$reset" ;;
 			esac
 			
-			pdhn "<${line}> -> <${file}> <${git_status}>"
+			# pdhn "<${line}> -> <${file}> <${git_status}>"
 			git_tags[$file]="${git_status} "
 		done
 	}

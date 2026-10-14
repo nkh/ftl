@@ -45,19 +45,29 @@ selection_class_l()	{
 			[[ $REPLY == '.' ]] && { [[ $last_dest ]] && selection_class_l_bis ; return ; }
 			
 			[[ $1 ]] && REPLY="$1" || get_key
-			[[ -v dir_dest[$REPLY] ]] && { last_dest="${dir_dest[$REPLY]}" ; dest_tags[$p/$f]="$last_dest" ; scl_md ; }
+			selection_class_l_set
+			}
+selection_class_l_fzf() {
+			REPLY="$(for k in "${!dir_dest[@]}" ; do echo "$k -> ${dir_dest[$k]}" ; done | sort | fzf)"
+			REPLY="${REPLY%% -> *}"
+			
+			selection_class_l_set
+			}
+selection_class_l_set() {
+			[[ -v dir_dest[$REPLY] ]] && 
+				{
+				last_dest="${dir_dest[$REPLY]}"
+				
+				[[ ${#selection[@]} -gt 1 ]] && 
+					{ for pf in "${selection[@]}" ; do dest_tags[$pf]="$last_dest" ; done ; list ; } ||
+					{ dest_tags[$p/$f]="$last_dest" ; scl_md ; }
+				}
 			}
 selection_class_lc()	{ dest_tags[$p/$f]= ; last_dest= ; list ; }
 selection_class_lc_all(){ dest_tags=() ; list ; }
 selection_class_l_bis()	{ for ((bis=0 ; bis < ${COUNT:-1} ; bis++)) ; do dest_tags[$p/$f]="$last_dest" ; no_list_update=1 ; move_down ; done ; no_list_update= ; list ; }
 selection_class_l_copy(){ for fc in "${!dest_tags[@]}" ; do mkdir -p "${dest_tags[$fc]}" && cp "$fc" "${dest_tags[$fc]}" ; done ; dest_tags=() ; cdir ; }
 selection_class_l_move(){ for fm in "${!dest_tags[@]}" ; do mkdir -p "${dest_tags[$fm]}" && mv "$fm" "${dest_tags[$fm]}" ; done ; dest_tags=() ; cdir ; }
-selection_class_l_fzf() {
-			REPLY="$(for k in "${!dir_dest[@]}" ; do echo "$k -> ${dir_dest[$k]}" ; done | sort | fzf)"
-			REPLY="${REPLY%% -> *}"
-			[[ -v dir_dest[$REPLY] ]] && { last_dest="${dir_dest[$REPLY]}" ; dest_tags[$p/$f]="$last_dest" ; scl_md ; }
-			list
-			}
 scl_md()		{ [[ $dtag_move ]] && move_down ; } 
 selection_class_1()	{ selection_class_c 1 ; }
 selection_class_2()	{ selection_class_c 2 ; }

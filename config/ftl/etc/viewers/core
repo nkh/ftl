@@ -125,7 +125,7 @@ pgif()      { pw3image "$($pgen/gif "$n" "$thumbs/gif")" ; }
 
 pmp3()      { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "$PAGER_ANSI ${t@Q} ; read -sn1" ; } ; }
 pmedia()    { pmlive || { t="$($pgen/$e "$n" "$thumbs/$e" '' ONE)" ; [[ -e "$t" ]] && { pw3image "$t" ; true ; } || ptype ; } ; }
-pmlive()    { ((extmode)) && { player_k ; t="$($pgen/$e "$n" "$thumbs/$e")" ; psplit "cat ${t@Q} ; $T_PLAYER_STATUS ${n@Q}" ; true ; } ; }
+pmlive()    { ((extmode)) && { player_k ; psplit "exiftool ${n@Q} | piper '^.*?:' blue ; $T_PLAYER_STATUS ${n@Q} ; read -sn1" ; true ; } ; }
 
 pmd()       { pmd_1 || pmd_2 || pmd_3 || pmd_4 || pmd_def ; extmode=0 ; }
 pmd_1()     { ((extmode==1)) && { psplit "$MD_RENDER1 \"$f\" | $MD_PAGER" ; true ; } ; }

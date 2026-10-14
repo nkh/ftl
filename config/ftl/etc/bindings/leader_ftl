@@ -2,6 +2,8 @@
 . $FTL_CFG/etc/bindings/lib/optimize
 . $FTL_CFG/etc/bindings/lib/extra
 
+bind leader_ftl extra	"LEADER s"	shell_popup		"terminal popup"
+
 bind leader_ftl extra	"LEADER f c"	compress		"compress in tar.bz2"
 bind leader_ftl extra	"LEADER f d"	decompress		"decompress"
 bind leader_ftl extra	"LEADER f D"	decompress_in_dir	"decompress directory"
@@ -15,7 +17,8 @@ bind leader_ftl extra	"LEADER f m"	run_mutt		"send selection in mail"
 bind leader_ftl extra	"LEADER f P"	pdf2txt			"convert current pdf to text file"
 bind leader_ftl extra	"LEADER f p"	pdf_optimize		"reduce pdf size"
 bind leader_ftl extra	"LEADER f s"	free_space		"display free space in popup"
-bind leader_ftl extra	"LEADER s"	shell_popup		"terminal popup"
 bind leader_ftl extra	"LEADER f v"	video_optimize		"reduce video size"
+bind leader_ftl extra	"LEADER f 3"	ffmpeg_to_mp3		"transform to mp3"
 
 # vim: set filetype=bash :
+

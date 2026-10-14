@@ -1,4 +1,6 @@
 
+ffmpeg_to_mp3() { tmux popup -h 90% -w 90% -E -d "$PWD" "/usr/bin/ffmpeg -i '$f' -q:a 2 '$f.mp3'" ; cdir '' "$f3" ; }
+
 pdf2txt()     { [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ; }
 lint()        { rmlint "$PWD" ; cdir '' 'rmlint' ; }
 run_mutt()    { mutt $([[ ${#selection[@]} ]] && printf "\055a %s\n" "${selection[@]}" || [[ $f ]] && echo "-a $f") -s 'ftl files' -- ; refresh ; list ; }
