@@ -232,7 +232,7 @@ preview()
 # start=`date +%s.%N`
 
 ((main)) && { ((emode)) && { ext_viewers ; emode=0 ; } || { ((prev_all)) && pviewers ; extmode=0 ; } ; } \
-	 || { save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; tmux send -t $main_pane 'Ä' &>/dev/null ;}
+	|| { save_state ; echo "$fs" >$fsp/fs ; echo $my_pane >$fsp/pane ; pane_read ; tmux send -t $main_pane "X" &>/dev/null ;}
 
 # end=`date +%s.%N`
 # runtime=$( echo "$end - $start" | bc -l )

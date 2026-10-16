@@ -22,7 +22,21 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 		tput rmcup
 		```
 
-feature: to mp3 for selection
+issue: pane splitting
+	replace åäö with other special characters, update documentation
+	
+	what do we want?
+			split the current pane
+			keep focus or pass to new split
+			split on the other side of the preview
+	
+	new split that splits the file list
+		done, needed to save 4pane_id!
+
+	directory preview not working for sub pane
+		it works, just need to move to anoter entry so the preview signal is sent from the sub pane to the main pane
+		changing pane focus to the sub pane doesn't send the preview signal to the main pane because panes don't understand focus
+			the pane receinving the change pane command can send a signal to the sub pane so it can send a signal to the main pane to update the preview
 
 feature: VFS see documentation/vfs_analysis.md
 
@@ -36,28 +50,14 @@ functionality: completion for ftl commands
 	eg: ftl -v file1 file2 file3
 	eg: ftl -v file1 file2 file3 -o output_dir
 
-functionality: replace åäö with other special characters, update documentation
 
 functionality: use mcat as file and image viewer
 
-functionality: pane splitting
-		what do we want?
-			split the current pane
-			keep focus or pass to new split
-			split on the other side of the preview
+
 
 # Later
 
 functionality: make command out of fzf-ftl previewer
-
-functionality: grep in binary files https://github.com/phiresky/ripgrep-all
-		asciio files are compressed can we grep in them?
-		
-		only interesting if we're going to select and filter them
-		it's probably better to let user generate a selection/filter list
-		and instead for adding it to ftl, let the user handle it
-
-functionality: drag drop via dragon, what's the use case?
 
 arch: multi column attributes
 	have a column for entry number, size, etags, access attribute, time, file name, ...
@@ -69,6 +69,18 @@ arch: multi column attributes
 	columns can be added by background process
 		eg: many files need processing and take a long time
 			list every time a batch is processed
+	
+	we already have columns! size date name, those are passed around to be filtered and sorted
+	a process inserted the file listing function can add more columns
+		we need to reserv the first columns part of ftl
+		the user chosese which columns to display and where
+			today the layout is fixed: line space name
+						+ optional etag 1 and etag 2 columns
+						+ optional dir_dest for file
+			
+			a simple config is to say what column appears where, and theye max length
+			etags, a column, returns its width, maybe all should do that
+			
 
 arch: asynch list display for very large directories
 	process1: generate list in background process (filter, color, ...)
@@ -83,7 +95,8 @@ arch: asynch list display for very large directories
 
 arch: put all options in one array
 	to simplify handling it
-
+	declare -p for one shot dump of all options
+	
 arch: let hidden pane do preview so main pane data isn't overridden by extra pane's
 	this may also make it possible to use fz, rg, etc... as filters and ftl as preview
-
+	keep vim instance always ready to be switched to the preview location

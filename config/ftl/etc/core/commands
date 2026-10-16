@@ -140,7 +140,8 @@ mark_fzf()		{ go_loop f fzf "$({ gmark_fzf_user ; printf "%s\n" "${marks[@]}" ; 
 mark_go()		{ get_key ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
 mark_go_tab()		{ get_key ; [[ $REPLY && -n ${marks[$REPLY]} ]] && { d="$(dirname "${marks[$REPLY]}")" ; _tab_new ; cdir "$d" "$(basename "${marks[$REPLY]}")" ; } || list ; }
 player_kill()		{ player_k ; }
-pane_down()		{ pane_extra "-v" "" ; }
+# pane_down()		{ pane_extra "-v" "" ; }
+pane_down()		{ pane_extra "-v" "" 0 ; }
 
 pane_L()		{ pane_extra "-h -b" "-R" ; }
 pane_left()		{ pane_extra "-h -b" '' ; }
@@ -262,9 +263,9 @@ etag2_show()		{ ((etag2^=1)) ; cdir ; }
 _etag_select()		{ p="$FTL_CFG/etags" ; local etag_f=$(cd $p ; fd | fzf-tmux -p 50% --cycle --reverse --info=inline) ; echo "$FTL_CFG/etags/$etag_f" ; }
 etag1_select()		{ etag1_s="$(_etag_select)" ; [[ $etag1_s ]] && { . $etag1_s $fs ; etag1=1 ; etag1_name=$(etag_name) ; cdir ; } ; } 
 etag2_select()		{ etag2_s="$(_etag_select)" ; [[ $etag2_s ]] && { . $etag2_s $fs ; etag2=1 ; etag2_name=$(etag_name) ; cdir ; } ; }
-SIG_PANE()		{ pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
-SIG_REFRESH()		{ ((gpreview)) && kbdf && prev_synch ; }
-SIG_REMOTE()		{ ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }
+SIG_PANE()		{ : pdhn SIG_PANE ; pane_read ; ((${#panes[@]})) && tmux selectp -t ${panes[0]} || tmux selectp -t $my_pane ; ofs= ; R=${C[refresh_pane]} ; }
+SIG_REFRESH()		{ : pdhn SIG_REFRESH ; ((gpreview)) && kbdf && prev_synch ; }
+SIG_REMOTE()		{ : pdhn SIG_REMOTE ; ((prev_all)) && { read op <$fsp/pane ; prev_synch prev ; tmux selectp -t $op ; kbdf ; } ; }
 SIG_SYNCH_SHELL()	{ IFS=$'\n' read -r shell_dir <$pfs/synch_with_shell ; cdir "$shell_dir" ; }
 
 

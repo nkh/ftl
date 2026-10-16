@@ -62,8 +62,11 @@ mime_cache(){ while IFS=$':' read fm mm ; do mm=${mm## } ; mime[$PWD/$fm]="$mm" 
 mkapipe()   { for arg in "$@" ; do PIPE=$(mktemp -u) && mkfifo $PIPE && eval "exec $arg<>$PIPE" && rm $PIPE ; done ; }
 move()      { ((nf = file + $1, nf = nf < 0 ? 0 : nf >= nfiles ? nfiles - 1 : nf)) ; dir_file[${tab}_$PWD]=$nf ; file=$nf ; path "${files[$file]}" ; }
 player_k()  { ((mplayer)) && { kill $mplayer &>/dev/null ; mplayer= ; } ; }
-pane_extra(){ echo "${ofs:-$fs}" >$fsp/fs ; pane_ftl "'$n' $pfs" "$1" "$2" ; sleep 0.05 ; tmux selectp -t $new_pane ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
-pane_ftl()  { pane_read ; tcpreview ; tsplit "prev_all=0 ftl $1" 30% "$2" $3 ; panes+=($pane_id) ; new_pane=$pane_id ; pane_id= ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
+
+pane_extra(){ echo "${ofs:-$fs}" >$fsp/fs ; pane_ftl "'$n' $pfs" "$1" "$2" "$3" ; sleep 0.05 ; tmux selectp -t $new_pane ; echo -e "\e[H\e[K" ; header '2;97' "$head" ; }
+
+pane_ftl()  { pane_read ; [[ $4 == 0 ]] && pppp="$pane_id" || tcpreview ; tsplit "prev_all=0 ftl $1" 30% "$2" $3 ; panes+=($pane_id) ; new_pane=$pane_id ; pane_id= ; printf "%s\n" "${panes[@]}" >$pfs/panes ; [[ $pppp ]] && pane_id="$pppp" ; }
+
 pane_close(){ pane_read ; ((main && ${#panes[@]})) && { tail -n +2 $pfs/panes | sponge $pfs/panes ; tmux send -t ${panes[0]} ${C[quit_ftl]} 2>&- ; sleep 0.03 ; } ; }
 pane_next() { pane_read ; pf=0 ; tp=("${panes[@]}" $main_pane "${panes[@]}") ; for p in  "${tp[@]}" ; do [[ $p == $my_pane ]] && pf=1 || { ((pf)) && echo $p && break ; } ; done ; }
 pane_read() { <$pfs/pane read main_pane ; [[ -s $pfs/panes ]] && mapfile -t panes < <(grep -w -f <(tmux lsp -F "#{pane_id}") $pfs/panes) ; printf "%s\n" "${panes[@]}" >$pfs/panes ; }
@@ -76,7 +79,7 @@ pdhn()      { pdh "$*\n" ; }
 pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm $pfs/pdh ; } || { tcpreview; tsplit "$FTL_CFG/etc/bin/fpdh $pfs" 30% -v $my_pane ; pane_id= ; } ; cdir ; }
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
-quit()      { qshell && return ; tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane å ; } ; rm -rf $fs ; exit ; }
+quit()      { qshell && return ; tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane "$((0x19))" ; } ; rm -rf $fs ; exit ; }
 quit2()     { hist_save ; inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
 {
 qshell_c=0
@@ -123,7 +126,6 @@ declare -p tags | sed 's/\-A/-A -g/' >$fs/tags ; echo "$stagsi" >$fsp/stagsi ; e
 		}
 }
 
-# ;/home/nadim/.config/ftl/etc/core/ftl: line 131: /home/nadim/.config/ftl/etags//home/nadim/.config/ftl/etags/lines: No such file or directory
 prev_synch()
 {
 tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
