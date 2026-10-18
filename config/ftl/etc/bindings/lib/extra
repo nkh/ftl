@@ -1,5 +1,16 @@
 
-ffmpeg_to_mp3() { tmux popup -h 90% -w 90% -E -d "$PWD" "/usr/bin/ffmpeg -i '$f' -q:a 2 '$f.mp3'" ; cdir '' "$f3" ; }
+# ffmpeg_to_mp3() { tmux popup -h 90% -w 90% -E -d "$PWD" "/usr/bin/ffmpeg -i '$f' -q:a 2 '$f.mp3'" ; cdir '' "$f3" ; }
+ffmpeg_to_mp3()
+{
+tmux popup -h 90% -w 90% -E -d "$PWD" \
+	"for f in $(printf '%q ' "${selection[@]}"); do
+		/usr/bin/ffmpeg -i \"\$f\" -q:a 2 \"\$f.mp3\"
+		done
+
+	echo conversion done, press any key ; read -sn1"
+
+cdir '' "$f3"
+}
 
 pdf2txt()     { [[ $e == pdf ]] && [[ ! -e "$f.txt" ]] && { mutool draw -o "$f.txt" "$f" 2>/dev/null ; cdir '' "$f.txt" ; } ; }
 lint()        { rmlint "$PWD" ; cdir '' 'rmlint' ; }
@@ -32,7 +43,6 @@ pass_encrypt()
 [[ $e =~ gpg ]] && \
 	prompt 'file: ' -e && [[ -n "$REPLY" ]] && gpg -d --no-symkey-cache "$n" > "$REPLY" || \
 	{ gpg --no-symkey-cache --symmetric "$f" || read -sn1 ; }
-
 cdir '' "$REPLY"
 }
 
