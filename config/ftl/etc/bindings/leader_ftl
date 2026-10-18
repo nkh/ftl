@@ -4,6 +4,8 @@
 
 bind leader_ftl extra	"LEADER s"	shell_popup		"terminal popup"
 
+bind leader_ftl extra	"LEADER f b b"	restic_backup		"backup selection with restic"
+bind leader_ftl extra	"LEADER f b s"	restic_snapshots	"restic snapshots"
 bind leader_ftl extra	"LEADER f c"	compress		"compress in tar.bz2"
 bind leader_ftl extra	"LEADER f d"	decompress		"decompress"
 bind leader_ftl extra	"LEADER f D"	decompress_in_dir	"decompress directory"

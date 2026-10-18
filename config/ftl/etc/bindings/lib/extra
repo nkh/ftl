@@ -1,4 +1,23 @@
 
+
+restic_snapshots()
+{
+[[ $RESTIC_REPOSITORY ]] || { tmux popup -h 10% -w 50% -E -d "$PWD" "echo 'restic repository not set, aborting' ; read -sn1" ; return ; }
+tmux popup -h 90% -w 90% -E -d "$PWD" "restic -r $RESTIC_REPOSITORY snapshots ; read -sn1"
+}
+
+restic_backup()
+{
+[[ $RESTIC_REPOSITORY ]] || { tmux popup -h 10% -w 50% -E -d "$PWD" "echo 'restic repository not set, aborting' ; read -sn1" ; return ; }
+
+# Prompt 'restic backup: ' -e && [[ -n "$REPLY" ]] && RESTIC_REPOSITORY="$REPLY" || \
+# 	{ echo "restic repository not set, aborting" ; read -sn1 ; return 1 ; }
+
+cmd="restic -r $RESTIC_REPOSITORY backup --verbose $(printf '%q ' "${selection[@]}") ; echo 'backup done, press any key'; read -sn1"
+
+tmux popup -h 90% -w 90% -E -d "$PWD" "$cmd"
+}
+
 # ffmpeg_to_mp3() { tmux popup -h 90% -w 90% -E -d "$PWD" "/usr/bin/ffmpeg -i '$f' -q:a 2 '$f.mp3'" ; cdir '' "$f3" ; }
 ffmpeg_to_mp3()
 {
