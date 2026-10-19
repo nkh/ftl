@@ -1,16 +1,3 @@
-issue: yif not working!
-
-issue: zT not working!
-
-issue: inotify not working!
-
-issue: error message fromn inotify
-	? used in empty directory
-
-	?fix moved inotify_s down in code
-
-issue: dir_entries_relative_path_length[$pnc]=0 is not used
-
 issue ?: alt_screen not aware of which screen it is in, so it doesn't know which screen to restore to when exiting alt_screen
 	add a mechanism to keep track of the current screen and restore it when exiting alt_screen in bash:
 		eg: use a variable to keep track of the current screen and restore it when exiting alt_screen
@@ -24,14 +11,7 @@ issue ?: alt_screen not aware of which screen it is in, so it doesn't know which
 
 issue: pane splitting
 	replace åäö with other special characters, update documentation
-	
-	what do we want?
-			split the current pane
-			keep focus or pass to new split
-			split on the other side of the preview
-	
-	new split that splits the file list
-		done, needed to save 4pane_id!
+	can we remove SIG_REFRESH binding? it's also used for inotify
 
 	directory preview not working for sub pane
 		it works, just need to move to anoter entry so the preview signal is sent from the sub pane to the main pane
@@ -43,8 +23,21 @@ feature: VFS see documentation/vfs_analysis.md
 feature: https://github.com/tjblackheart/andcli
 
 functionality: wizards to add new functionality
-	eg: add a new command, add a new key binding, add a new mode, ...
-		eg: add a new command to ftl, add a new key binding to ftl, add a new mode to ftl, ...
+	where? default places for the wizard to add new functionality
+
+	- add a new command to ftl
+	- add a new key binding to ftl
+	- add a new mode to ftl
+	- add a new external filter
+	- add a new external previewer
+	- add a new popup
+	- add a new menu fot commands
+	- add a new alias for a command
+	- add command that take arguments and options 
+	- add a command that acts on the current selection
+	
+	- find what keyb binding is available for a new command
+
 
 functionality: completion for ftl commands
 	eg: ftl -v file1 file2 file3

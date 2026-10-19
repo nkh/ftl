@@ -431,7 +431,8 @@ bind ftl view		zM		preview_refresh		"refresh file preview/montage"
 
 # don't change, reserved for *ftl*: [ÅåÄä]
 bind ftl SIG		"$((0x19))"	SIG_PANE		"handle pane event"
-bind ftl SIG		"X"	SIG_REMOTE		"handle pane preview"
+bind ftl SIG		"X"	SIG_REMOTE			"handle pane preview"
+bind ftl SIG		"r"	SIG_REFRESH			"refresh"
 # bind ftl SIG		not assigned	SIG_SYNCH_SHELL		"cd to shell pane"
 
 # Extra Bindings
