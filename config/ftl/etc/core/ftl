@@ -3,7 +3,9 @@ source "$FTL_CFG/etc/core/commands"
 source "$FTL_CFG/etc/core/dir_file_filter"
 
 alt_screen=0
-alt_screen(){ [[ $alt_screen == 0 ]] && { echo -en '\e[?1049h' ; stty -echo ; tput civis ; alt_screen=1 ; } ; }
+alt_screen(){ [[ $alt_screen == 0 ]] && { echo -en '\e[?1049h' ; stty -echo ; tput civis ; ((alt_screen++)) ; } ; }
+refresh()   { echo -ne "\e[?25l$1" ; } 
+res_screen(){ refresh "\e[?25h\e[?1049l" ; ((alt_screen--)) ; }
 
 try()       { exec 9>&2 2>"$fs/log" ; "$@" ; exec 2>&9 ; [[ -s $fs/log ]] && { ((gpreview)) && try_error "$@" || try_errorp "$@" ; } ; }
 try_error() { echo -en "\e[2J\e[H\e[31m;" ; [[ -s $fs/log ]] && { { cat $fs/log ; } | tee -a $fs/errors_log && rm $fs/log ; } ; }
@@ -80,7 +82,7 @@ pdh_show()  { [[ -f $pfs/pdh ]] && { tmux killp -t $(<$pfs/pdh) &>/dev/null ; rm
 pid_2_pane(){ while read -s pi pp ; do [[ $1 == $pp ]] || [[ $(ps -o pid --no-headers --ppid $pp | rg $$) ]] && echo $pi && break ; done < <(tmux lsp -F '#{pane_id} #{pane_pid}') ; }
 prompt()    { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; read -e -rp "$@" ; echo -ne '\e[m' ; stty -echo ; tput civis ; exec 2>"$fs/log" ; }
 quit()      { qshell && return ; tcpreview ; quit2 ; quit_shell ; tmux kill-session -t ftl$$ &>/dev/null ; ((!main)) && { pane_read ; tmux send -t $main_pane "$((0x19))" ; } ; rm -rf $fs ; exit ; }
-quit2()     { hist_save ; inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; refresh "\e[?25h\e[?1049l" ; cdfl ; }
+quit2()     { hist_save ; inotify_k ; stty echo ; [[ $pfs == $fs ]] && tbcolor $TBCOLORS ; player_k ; ftl_event_quit ; res_screen ; cdfl ; }
 {
 qshell_c=0
 qshell()    { ((qshell_c++, qshell_c > 1)) && return 1 ; (( $(tmux lsw -t ftl$$ 2>&- | wc -l) > 1 )) && { tmux popup -h 5 "echo Shells open! «session: ctl-w !». " ; true ; } || false ; }
@@ -92,7 +94,6 @@ qshell()    { ((qshell_c++, qshell_c > 1)) && return 1 ; (( $(tmux lsw -t ftl$$ 
 }
 cdfl()      { true 2>&- >&3 && { ((! in_Q)) && printf "%s\n" "${selection[@]}" >&3 || echo >&3 ; } ; }
 quit_shell(){ ((! keep_shell)) && [[ $shell_id ]] && tmux killp -t $shell_id &> /dev/null ; }
-refresh()   { echo -ne "\e[?25l$1" ; } 
 run_bash()  { exec 2>&9 ; stty echo ; echo -ne '\e[H\e[K\e[33m\e[?25h' ; clear ; bash -i ; alt_screen ; exec 2>"$fs/log" ; }
 run_maxed() { aw=$(xdotool getwindowfocus -f) ; xdotool windowminimize $aw ; "$@" 2>/dev/null ;  wmctrl -ia $aw ; true ; }
 selection() { selection=() ; ((${#tags[@]})) && selection+=("${!tags[@]}") || { ((nfiles)) && selection=("${files[file]}") ; } ; }

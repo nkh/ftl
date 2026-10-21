@@ -21,6 +21,48 @@ issue: pane splitting
 feature: VFS see documentation/vfs_analysis.md
 
 feature: https://github.com/tjblackheart/andcli
+	crashes in ancli
+
+functionality: duplicates in two directories
+	rmlint fdupes jdupes rdfind
+
+
+	with hash
+		dskDitto or other
+
+
+	without hash
+		find dir1 dir2 -type f -printf '%f\n' | sort | uniq -d
+
+declare -A files
+
+find dir1 -type f -printf '%f\t%p\n' |
+while IFS=$'\t' read -r name path; do
+    files["$name"]="$path"
+done
+
+find dir2 -type f -printf '%f\t%p\n' |
+while IFS=$'\t' read -r name path; do
+    [[ ${files[$name]+x} ]] && printf '%s\n' "$path"
+done
+
+
+	as a tool for just that
+		eg: ftl -d dir1 dir2
+
+	what's the UX?
+		- show duplicates in a list, with the option to delete them
+		- show duplicates in a list, with the option to move them to a new directory
+		- show duplicates in a list, with the option to copy them to a new directory
+		- show duplicates in a list, with the option to link them to a new directory
+		- show duplicates in a list, with the option to rename them
+		- show duplicates in a list, with the option to open them in an editor
+		- show duplicates in a list, with the option to open them in a viewer
+		- show duplicates in a list, with the option to open them in a terminal
+		- show duplicates in a list, with the option to open them in a file manager
+		- show duplicates in a list, with the option to open them in a web browser
+
+		possibility to select duplicates by size, date, name, etc... fzf
 
 functionality: wizards to add new functionality
 	where? default places for the wizard to add new functionality
@@ -45,8 +87,7 @@ functionality: completion for ftl commands
 
 
 functionality: use mcat as file and image viewer
-
-
+< 	mcat doest compile
 
 # Later
 

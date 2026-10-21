@@ -107,7 +107,7 @@ pdir()      { pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; ((
 
 pdir_def()  { echo "${ofs:-$fs}" >$fsp/fs ; [[ "${pdirv[$dirmode]}" ]] && ${pdirv[$dirmode]} || pdir_ftl ; }
 
-pdir_ftl()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id 'r' ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
+pdir_ftl()  { ((in_pdir)) && [[ $pane_id ]] && { tmux send -t $pane_id ${C[SIG_REFRESH]} ; } || { tmux selectp -t $my_pane ; psplit "ftl ${n@Q} $pfs 1" ; in_pdir=1 ; } ; true ; }
 
 pdir_du()   { psplit "$NCDU \"$n\" ; read -sn 1000" ; true ; }
 pdir_ls()   { psplit "ls -lh --group-directories-first --color=always \"$n\" ; read -sn 10" ; true ; }
