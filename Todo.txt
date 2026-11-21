@@ -1,3 +1,6 @@
+issue: external viewer not working?
+	markdown previewer not working, maybe other formats too
+
 issue ?: alt_screen not aware of which screen it is in, so it doesn't know which screen to restore to when exiting alt_screen
 	add a mechanism to keep track of the current screen and restore it when exiting alt_screen in bash:
 		eg: use a variable to keep track of the current screen and restore it when exiting alt_screen
@@ -18,51 +21,20 @@ issue: pane splitting
 		changing pane focus to the sub pane doesn't send the preview signal to the main pane because panes don't understand focus
 			the pane receinving the change pane command can send a signal to the sub pane so it can send a signal to the main pane to update the preview
 
+issue: z1 on directory set gdu preview, which seems to set dirmode=1, and then things go south, no updates, no normal directory preview after
+	pdir()      { pdirv=(pdir_ftl pdir_du pdir_ls pdir_rmd pdir_exa pdir_image) ; (( extmode != 0 )) && { [[ "${pdirv[$extmode]}" ]] && ${pdirv[$extmode]} ; in_pdir=0 ; } || pdir_def ; }
+
+feature: https://github.com/ouch-org/ouch
+
+issue: closing a tmux popup send SIG_REFRESH to the main pane, which gets into the wrong directory
+
 feature: VFS see documentation/vfs_analysis.md
 
 feature: https://github.com/tjblackheart/andcli
-	crashes in ancli
+	crashes in ancli, reported to author, waiting for fix
 
-functionality: duplicates in two directories
-	rmlint fdupes jdupes rdfind
-
-
-	with hash
-		dskDitto or other
-
-
-	without hash
-		find dir1 dir2 -type f -printf '%f\n' | sort | uniq -d
-
-declare -A files
-
-find dir1 -type f -printf '%f\t%p\n' |
-while IFS=$'\t' read -r name path; do
-    files["$name"]="$path"
-done
-
-find dir2 -type f -printf '%f\t%p\n' |
-while IFS=$'\t' read -r name path; do
-    [[ ${files[$name]+x} ]] && printf '%s\n' "$path"
-done
-
-
-	as a tool for just that
-		eg: ftl -d dir1 dir2
-
-	what's the UX?
-		- show duplicates in a list, with the option to delete them
-		- show duplicates in a list, with the option to move them to a new directory
-		- show duplicates in a list, with the option to copy them to a new directory
-		- show duplicates in a list, with the option to link them to a new directory
-		- show duplicates in a list, with the option to rename them
-		- show duplicates in a list, with the option to open them in an editor
-		- show duplicates in a list, with the option to open them in a viewer
-		- show duplicates in a list, with the option to open them in a terminal
-		- show duplicates in a list, with the option to open them in a file manager
-		- show duplicates in a list, with the option to open them in a web browser
-
-		possibility to select duplicates by size, date, name, etc... fzf
+functionality: multiple selection classes
+	already existing but we don't have an exemple showing how to put a list of files in a specific selection class, and then use that selection class in a command
 
 functionality: wizards to add new functionality
 	where? default places for the wizard to add new functionality
@@ -87,9 +59,7 @@ functionality: completion for ftl commands
 
 
 functionality: use mcat as file and image viewer
-< 	mcat doest compile
-
-# Later
+	mcat doest compile, report to author, waiting for fix
 
 functionality: make command out of fzf-ftl previewer
 

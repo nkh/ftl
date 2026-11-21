@@ -9,6 +9,10 @@ ext_viewers()
 {
 user_eviewers && return ;
 
+pdhn "ext_viewers: $e, emode=$emode, extmode=$extmode" 
+
+
+
 [[ -d "$n"                  ]] && { ext_dir   ; return ; }
 [[ $e =~ html               ]] && { ext_html  ; return ; }
 [[ $e =~ svg                ]] && { ext_svg   ; return ; }
@@ -17,7 +21,7 @@ user_eviewers && return ;
 [[ $e =~ $mfilter           ]] && { ext_media ; return ; }
 [[ $e == pdf || $e == PDF   ]] && { ext_pdf   ; return ; }
 [[ $e == sc                 ]] && { ext_scim  ; return ; }
-[[ $e =~ ^md|MD$            ]] && { pmd       ; return ; }
+[[ $e =~ ^md|MD$            ]] && { ext_md    ; return ; }
 [[ $e == epub               ]] && { ext_epub  ; return ; }
 [[ $e =~ ^json|yml$         ]] && [[ -s "$n" ]] && { ext_json ; return ; }
 
@@ -95,6 +99,10 @@ ext_pdf_vi(){ edit "$($pgen/pdf "$n" $thumbs/pdf 1)" ; }
 ext_text()  { tcpreview ; tsplit "$EDITOR ${selection[@]@Q}" "33%" '-h -b' -R ; pane_id= ; }
 ext_json()  { tcpreview ; $JSON_VIEWER "$n" ; }
 ext_scim()  { tcpreview ; exec 2>&9 ; scim ${n@Q} ; exec 2>"$fs/log" ; alt_screen ; }
+ext_md()    { ext_md1 || ext_md2 || ext_md3 ; }
+ext_md1()   { ((emode == 1)) && { tcpreview ; alt_screen ; inotify_k ; $MD_RENDER1 "$n" | $MD_PAGER ; alt_screen ; emode=0 ; cdir ; } ; }
+ext_md2()   { ((emode == 2)) && { tcpreview ; alt_screen ; inotify_k ; $MD_RENDER2 "$n" | $MD_PAGER ; alt_screen ; emode=0 ; cdir ; } ; }
+ext_md3()   { ((emode == 3)) && { tcpreview ; alt_screen ; inotify_k ; $MD_RENDER3 "$n" ; alt_screen ; emode=0 ; cdir ; } ; }
 
 pignore()   { in_pdir= ; in_viprev= ; ptype ; }
 plock()     { vipreview "$fs/lock_preview/$n" ; }

@@ -1,4 +1,10 @@
 
+find_duplicates()
+{
+cmd="dskDitto --no-banner $(printf '%q ' "${selection[@]}")"
+
+tmux popup -h 90% -w 90% -E -d "$PWD" "$cmd"
+}
 
 restic_snapshots()
 {

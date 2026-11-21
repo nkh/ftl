@@ -131,15 +131,20 @@ prev_synch()
 {
 tag_synch ; read ofs <$fsp/fs ; source "$ofs/ftl"
 
-((gpreview)) && { [[ "$filter_ext" ]] && source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
-((gpreview)) && { [[ "$prev_cb" ]] && eval "$prev_cb" ; }
-((gpreview)) && { { [[ "$etag_cb" ]] && eval "$etag_cb" ; true ; } || source "$FTL_CFG/etags/none" ;  }
-((gpreview)) && { [[ "$etag1_s" ]] && source "$etag1_s" ; }
-((gpreview)) && { [[ "$etag2_s" ]] && source "$etag2_s" ; }
+((gpreview)) && 
+	{
+	[[ "$filter_ext" ]] && { source "$FTL_CFG/filters/$filter_ext" load $ofs || filter_rst ; }
+	[[ "$prev_cb" ]]    && eval "$prev_cb"
+	[[ "$etag_cb" ]]    && eval "$etag_cb" || source "$FTL_CFG/etags/none"
+	[[ "$etag1_s" ]]    && source "$etag1_s"
+	[[ "$etag2_s" ]]    && source "$etag2_s"
+	
+	view_mode "${vmode[tab]}"
+	}
 
-((gpreview)) && { view_mode "${vmode[tab]}" 1 ; }
 [[ $1 == prev ]] && { path "$n" ; preview ; source $pfs/ftl ; } || { cdir "$sdir" '' "$sindex" ; } ; ofs=
 }
+
 thumb()     { echo "$thumbs/$1/$(md5sum <<<"$n" | cut -d' ' -f1)_$f.$2" ; }
 q_files()   { printf "%q\n" "${files[@]}" | perl -lne '-d || print' ; }
 q_dirs()    { printf "%q\n" "${files[@]}" | perl -lne '-d && print' ; }

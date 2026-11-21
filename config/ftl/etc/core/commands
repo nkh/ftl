@@ -94,7 +94,7 @@ create_file()		{ prompt 'touch: ' && [[ "$REPLY" ]] && touch "$PWD/$REPLY" ; cdi
 delete_selection()	{ (($nfiles)) && { PC= PT= ; tag_check && { PC="|c" ; PT="*tags* " ; } ; prompt "delete $PT[y|d|N$PC] ? " -n1 && delete "$PT" ; REPLY= ; cdir ; } ; }
 depth()			{ prompt 'depth: ' && [ "$REPLY" -eq "$REPLY" ] 2>&- && { depth[tab]=$REPLY && cdir '' "$f" ; } || list ; }
 editor_detach()		{ ((in_viprev)) && in_viprev= && pane_id= && cdir ; }
-external_mode1()	{ emode=1 ; preview ; }
+external_mode1()	{ extmode=1 ; emode=1 ; preview ; }
 external_mode2()	{ emode=2 ; preview ; }
 external_mode3()	{ emode=3 ; preview ; }
 file_dir_mode()		{ ((lmode[tab]++)) ; ((lmode[tab] > 2)) && lmode[tab]=0 ; cdir '' "$f" ; }
